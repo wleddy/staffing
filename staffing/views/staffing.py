@@ -3,7 +3,6 @@ from flask import request, session, g, redirect, url_for, abort, \
 from shotglass2.users.admin import login_required, table_access_required
 from shotglass2.takeabeltof.utils import render_markdown_for, printException
 from shotglass2.takeabeltof.date_utils import datetime_as_string
-import os
 
 mod = Blueprint('staffing',__name__, template_folder='templates/staffing', url_prefix='')
 
