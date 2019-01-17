@@ -35,7 +35,8 @@ def initalize_all_tables(db=None):
     shotglass.initalize_user_tables(db)
     
     ### setup any other tables you need here....
-    
+    from staffing.models import init_event_db
+    init_event_db(db)
     
 def get_db(filespec=None):
     """Return a connection to the database.
