@@ -67,14 +67,14 @@ with 1 month of upcoming Spots.
 
  From publicly accessable web page, a visitor may:
 
-* Sign in if desired. Staff must sign in to see non-volunteer events and spots.  
-* Select future Event from a list 
-* Select a volunteer spot from list of spots for Event
-* Sign in with email address (if not signed in)  
-  Users with passwords set will be required to enter password.
-   *  If not known user collect info and create account
-* Acknowledge signup and send email with iCalendar event
-* Return visitor to spots list
+1. Sign in if desired. Staff must sign in to see non-volunteer events and spots.  
+1. Select future Event from a list 
+1. Select a volunteer spot from list of spots for Event
+1. Sign in with email address (if not signed in)  
+1. Users with passwords set will be required to enter password.
+  *  If not known user collect info and create account
+1. Acknowledge signup and send email with iCalendar event
+1. Return visitor to spots list
 
 ## Reminders
 
@@ -97,16 +97,16 @@ The volunteer response is primarily a Thank You and a chance for them to report 
 
 The managers will have access to Attendance records from the web site.
 
-* Sign in as manager.
-* Select "Manage Attendance"
-* Select Event and Spot
-* Select user record and update attendance info.
+1. Sign in as manager.
+1. Select "Manage Attendance"
+1. Select Event and Spot
+1. Select user record and update attendance info.
 
 > Repeat as needed.
 
 Managers may export an attendance report suitable to import into a spreadsheet
 
-* Sign in as manager
-* Select "Attendance Report"
-* Select Events to report
-* 'csv' report file is downloaded to user.
+1. Sign in as manager
+1. Select "Attendance Report"
+1. Select Events to report
+1. 'csv' report file is downloaded to user.
