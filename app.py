@@ -103,8 +103,8 @@ def server_error(error):
 #Register the static route
 app.add_url_rule('/static/<path:filename>','static',shotglass.static)
 
-from staffing.views import staffing
-app.register_blueprint(staffing.mod)
+from staffing.views import staff
+app.register_blueprint(staff.mod)
 
 ## Setup the routes for users
 shotglass.register_users(app)
