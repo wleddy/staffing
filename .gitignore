@@ -1,0 +1,19 @@
+*.py[co]
+env/
+.idea
+*.log
+logs/
+*.sqlite
+instance/
+__pycache__
+.pytest_cache
+.coverage
+
+## Passenger web app files
+tmp/
+passenger.*
+
+## The repo on which all depends
+shotglass2/
+#### in case it change the name
+shotglass/

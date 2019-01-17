@@ -1,0 +1,11 @@
+#!/usr/bin/bash
+
+git pull origin master
+
+cd shotglass2/
+git pull origin master
+
+cd ../
+echo 'All Done'
+
+
