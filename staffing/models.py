@@ -92,7 +92,7 @@ class Location(SqliteTable):
         """Define and create the table"""
         
         sql = """
-        locationName TEXT NOT NULL,
+        location_name TEXT NOT NULL,
         business_name TEXT,
         street_address TEXT,
         city  TEXT,

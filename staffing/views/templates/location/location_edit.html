@@ -1,0 +1,20 @@
+{% extends "form_layout.html" %}
+
+{% from "_form_helpers.html" import input_field, select_field, radio_field, checkbox_field, label_only %}
+
+{% block fieldset %}
+<fieldset>
+    <p>{{ input_field(rec.id,"id",type="hidden",default=0)}}</p>
+    <p>{{ input_field(rec.location_name,'location_name',req=True)}}</p>
+    <p>{{ input_field(rec.business_name,'business_name')}}</p>
+    <p>{{ input_field(rec.street_address,'street_address')}}</p>
+    <p class="w3-row w3-half" style="padding-right:3pt;">{{ input_field(rec.city,'city')}}</p>
+    <p class="w3-row w3-quarter" style="padding-right:3pt;padding-left:3pt;">{{ input_field(rec.state,'state')}}</p>
+    <p class="w3-row w3-quarter" style="padding-left:3pt;">{{ input_field(rec.zip,'zip')}}</p>
+    <p class="w3-row w3-half" style="padding-right:3pt;">{{ input_field(rec.lat,'lat',label="Latitude")}}</p>
+    <p class="w3-row w3-half" style="padding-left:3pt;">{{ input_field(rec.lng,'lng',label="Longitude")}}</p>
+    <p>{{ input_field(rec.w3w,'w3w',label="What3Words (map.what3words.com)")}}</p>  
+    <div id='map' class="w3-border w3-secondary-color" style="height:20em;width:100%;"></div>
+      
+</fieldset>
+{% endblock fieldset %}

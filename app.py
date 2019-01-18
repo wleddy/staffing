@@ -1,10 +1,10 @@
-from flask import Flask, g, session, request, redirect, flash, abort
+from flask import Flask, g, session, request, redirect, flash, abort, url_for
 from flask_mail import Mail
 from shotglass2 import shotglass
 from shotglass2.takeabeltof.database import Database
 from shotglass2.takeabeltof.jinja_filters import register_jinja_filters
 from shotglass2.users.admin import Admin
-
+from staffing.models import Event, Spot, Location
 # Create app
 # setting static_folder to None allows me to handle loading myself
 app = Flask(__name__, instance_relative_config=True,
@@ -72,10 +72,13 @@ def _before():
         
     #import pdb;pdb.set_trace()
     
+    get_db()
+        
     shotglass.get_app_config(app)
+    
+    
     shotglass.set_template_dirs(app)
     
-    get_db()
     
     # Is the user signed in?
     g.user = None
@@ -84,6 +87,11 @@ def _before():
         
         
     g.admin = Admin(g.db) # This is where user access rules are stored
+    # a header row must have the some permissions or higher than the items it heads
+    g.admin.register(Event,url_for('event.display'),display_name='Staffing Admin',header_row=True,minimum_rank_required=500)
+    g.admin.register(Event,url_for('event.display'),display_name='Events',minimum_rank_required=500,roles=['admin',])
+    g.admin.register(Location,url_for('location.display'),display_name='Locations',minimum_rank_required=500,roles=['admin',])
+
     shotglass.user_setup() # g.admin now holds access rules Users, Prefs and Roles
 
 @app.teardown_request
@@ -103,8 +111,11 @@ def server_error(error):
 #Register the static route
 app.add_url_rule('/static/<path:filename>','static',shotglass.static)
 
-from staffing.views import staff
-app.register_blueprint(staff.mod)
+#import pdb;pdb.set_trace()
+from staffing.views import event
+app.register_blueprint(event.mod)
+from staffing.views import location
+app.register_blueprint(location.mod)
 
 ## Setup the routes for users
 shotglass.register_users(app)
