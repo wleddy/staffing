@@ -5,7 +5,6 @@ from shotglass2.users.models import Role
 from shotglass2.takeabeltof.utils import render_markdown_for, printException, cleanRecordID
 from shotglass2.takeabeltof.date_utils import date_to_string, getDatetimeFromString
 from staffing.models import Event, Location, Spot, UserSpot
-from datetime import datetime
 
 mod = Blueprint('spot',__name__, template_folder='templates/spot', url_prefix='/spot')
 
@@ -21,7 +20,7 @@ def setExits():
 @table_access_required(Spot)
 def display():
     setExits()
-    g.title="Spot List"
+    g.title="Event Spot List"
     recs = Spot(g.db).select()
     
     return render_template('spot_list.html',recs=recs)
@@ -63,17 +62,18 @@ def edit(id=0,event_id=0):
     roles = Role(g.db).select()
     selected_roles = [] # this needs to be populated from SpotRoles
         
-    spot_date=None
-    start_time=None
-    start_time_AMPM=None
-    end_time=None
-    end_time_AMPM=None
-    
     
     if request.form:
         spot.update(rec,request.form)
         rec.event_id = cleanRecordID(request.form.get("event_id"))
         if valid_input(rec):
+            skills = []
+            if 'skills' in request.form:
+                #delete all the users current roles
+                for role_id in request.form.getlist('skills'):
+                    skills.append(str(role_id))
+                    
+            rec.role_list = ":" + ':'.join(skills) + ":" #every element is wrapped in colons
             spot.save(rec)
             g.db.commit()
             return redirect(g.listURL)
@@ -84,6 +84,12 @@ def edit(id=0,event_id=0):
             end_time=request.form.get('end_time',"")
             end_time_AMPM=request.form.get('end_time_AMPM',"AM")
         
+    spot_date=None
+    start_time=None
+    start_time_AMPM=None
+    end_time=None
+    end_time_AMPM=None
+    
     if rec.start_date and isinstance(rec.start_date,str):
         rec.start_date = getDatetimeFromString(rec.start_date)
     if rec.start_date:
@@ -171,6 +177,11 @@ def valid_input(rec):
     if rec.start_date and rec.end_date and rec.start_date > rec.end_date:
         valid_data = False
         flash("The End Time can't be before the Start Time")
+        
+        
+    if not request.form.get('skills'):
+        valid_data = False
+        flash("You must select at least one Skill for the spot.")
         
     return valid_data
     
