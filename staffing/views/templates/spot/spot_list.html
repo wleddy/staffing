@@ -1,0 +1,24 @@
+{% extends "layout.html" %}
+{% block title %}{{ g.title }}{% endblock %}
+{% block body %}
+
+      	<p id="addRecord"><a href="{{ g.editURL }}0/">Add a new record</a></p>
+	{%if recs %}
+		<table class="datatable w3-table w3-striped w3-hoverable">
+		<tr class="w3-primary-color">
+			<th class="w3-hide-small">Id</th>
+			<th>Title</th>
+			<th>Date</th>
+		</tr>
+		{% for rec in recs %}
+	    <tr>
+			<td class="w3-hide-small" onclick="window.location='{{ g.editURL }}{{rec.id}}/'">{{ rec.id }}</a></td>
+			<td onclick="window.location='{{ g.editURL }}{{rec.id}}/'">{{ rec.title }}</a></td>
+			<td onclick="window.location='{{ g.editURL }}{{rec.id}}/'">{{ rec.start_date | long_date_string }}</td>
+		</tr>
+		{% endfor %}
+	  </table>
+  	{% else %}
+    	<p><em>No records here so far</em></p>
+	{% endif %}
+{% endblock %}

@@ -1,26 +1,36 @@
-{% extends "form_layout.html" %}
+{% extends "form_layout_wide.html" %}
 
 {% from "_form_helpers.html" import input_field, select_field, radio_field, checkbox_field, label_only %}
 
 {% block fieldset %}
-<fieldset>
-    <p>{{ input_field(rec.id,"id",type="hidden",default=0)}}</p>
-    <p>{{ input_field(rec.title,'title',req=True)}}</p>
-    <p>{{ label_only(label="Description (may include markdown)")}}</p>
-    <p><textarea rows="5" name="description" style="width:100%;">{{rec.description |default('',True)}}</textarea></p>
-    <p>{{ select_field("location_id","Location", class="w3-border") }}
-            <option value="0">Select a location</option>
-            {% if locations %}
-            {% for loc in locations %}
-                <option value="{{loc.id}}" {% if loc.id == rec.location_id %}selected="selected" {% endif %}>{{loc.location_name}}</option>
-            {% endfor %}
-            {% endif %}
-        </select>
-    </p>
-    <p>{{ input_field(rec.manager_name,"manager_name")}}</p>
-    <p>{{ input_field(rec.manager_email,"manager_email")}}</p>
-    <p>{{ input_field(rec.manager_phone,"manager_phone")}}</p>
-    <p>{{ input_field(rec.image_url,"image_url",label="Image URL")}}</p>
+    <fieldset class="w3-col w3-half w3-left">        
+        <p>{{ input_field(rec.id,"id",type="hidden",default=0)}}</p>
+        <p>{{ input_field(rec.title,'title',req=True)}}</p>
+        <p>{{ label_only(label="Description (may include markdown)")}}</p>
+        <p><textarea rows="5" name="description" style="width:100%;">{{rec.description |default('',True)}}</textarea></p>
+        <p>{{ select_field("location_id","Location", class="w3-border") }}
+                <option value="0">Select a location</option>
+                {% if locations %}
+                {% for loc in locations %}
+                    <option value="{{loc.id}}" {% if loc.id == rec.location_id %}selected="selected" {% endif %}>{{loc.location_name}}</option>
+                {% endfor %}
+                {% endif %}
+            </select>
+        </p>
+        <p>{{ input_field(rec.manager_name,"manager_name")}}</p>
+        <p>{{ input_field(rec.manager_email,"manager_email")}}</p>
+        <p>{{ input_field(rec.manager_phone,"manager_phone")}}</p>
+        <p>{{ input_field(rec.image_url,"image_url",label="Image URL")}}</p>
     
-</fieldset>
+    </fieldset>
+    
+{% set spot_list = "hello"%}
+{% if spot_list %}
+<div class="w3-col l5 m5 s12" style="margin-left:20pt;">
+    <div id="trx_list" class="w3-card-4" >
+        {{ spot_list | safe }}
+    </div>
+</div>
+
+{% endif %}
 {% endblock fieldset %}

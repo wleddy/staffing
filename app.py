@@ -87,11 +87,15 @@ def _before():
         
         
     g.admin = Admin(g.db) # This is where user access rules are stored
+    #Events
     # a header row must have the some permissions or higher than the items it heads
     g.admin.register(Event,url_for('event.display'),display_name='Staffing Admin',header_row=True,minimum_rank_required=500)
     g.admin.register(Event,url_for('event.display'),display_name='Events',minimum_rank_required=500,roles=['admin',])
+    #location
     g.admin.register(Location,url_for('location.display'),display_name='Locations',minimum_rank_required=500,roles=['admin',])
-
+    #Spots
+    g.admin.register(Spot,url_for('spot.display'),display_name='Spots',minimum_rank_required=500,roles=['admin',])
+    
     shotglass.user_setup() # g.admin now holds access rules Users, Prefs and Roles
 
 @app.teardown_request
@@ -116,6 +120,8 @@ from staffing.views import event
 app.register_blueprint(event.mod)
 from staffing.views import location
 app.register_blueprint(location.mod)
+from staffing.views import spot
+app.register_blueprint(spot.mod)
 
 ## Setup the routes for users
 shotglass.register_users(app)

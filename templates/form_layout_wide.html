@@ -1,0 +1,19 @@
+{% extends "layout.html" %}
+{% block title %}{{ g.title }}{% endblock %}
+
+{% from "_form_helpers.html" import input_field, select_field, radio_field, checkbox_field, label_only %}
+
+{% block body %}
+{% if help %}
+<div class="w3-container">
+    <div class="w3-panel  w3-secondary-color">{{ help|safe }}</div>
+</div>
+{% endif %}
+
+<div class="w3-container">
+    <form action="{{ g.editURL }}" method=post class="entry ">
+		{% include "editFormButtons.html" %}
+        {% block fieldset %}{% endblock %}
+    </form>
+</div>
+{% endblock body %}

@@ -1,0 +1,50 @@
+{% extends "form_layout.html" %}
+
+{% from "_form_helpers.html" import input_field, select_field, radio_field, checkbox_field, label_only %}
+
+{% block fieldset %}
+<fieldset>
+    <p>{{ input_field(rec.id,"id",type="hidden",default=0)}}</p>
+    {% if events and not current_event %}
+    <p>
+        {{ select_field("event_id",label='Event for this Spot')}}
+        <option value="0"><em>Select one</em></option>
+        {% for event in events %}
+        <option value="{{event.id}}">{{ event.title}}</option>
+        {% endfor %}
+        </select>
+    </p>
+    {% else %}
+		<input type=hidden name="event_id" value="{{rec.event_id|default('0',True )}}">
+        <h3 class="w3-container w3-panel w3-primary-color">{{current_event.title}}</h3>
+    {% endif %}
+    
+    <p>{{ input_field(rec.title,'title',req=True)}}</p>
+    <p>{{ label_only(label="Description of duties (may include markdown)")}}</p>
+    <p><textarea rows="5" name="description" style="width:100%;">{{rec.description |default('',True)}}</textarea></p>
+    <p>{{ input_field(spot_date,'spot_date',label="Date",placeholder="MM/DD/YY")}}</p>
+    <p class="w3-row w3-quarter" style="padding-right:3pt;">{{ input_field(start_time,'start_time', label="Start Time", placeholder="8:00")}}</p>
+    <p class="w3-row w3-quarter" style="padding-left:3pt;">{{ select_field("start_time_AMPM",label='AM/PM')}}
+        <option value="AM" {% if start_time_AMPM == "AM"%}selected="selected"{%endif%} >AM</option>
+        <option value="PM" {% if start_time_AMPM == "PM"%}selected="selected"{%endif%} >PM</option>
+        </select>
+    </p>
+    <p class="w3-row w3-quarter" style="padding-left:3pt;">{{ input_field(end_time,'end_time',label="End Time", placeholder="10:00")}}</p>
+    <p class="w3-row w3-quarter" style="padding-left:3pt;">{{ select_field("end_time_AMPM",label='AM/PM')}}
+        <option value="AM" {% if end_time_AMPM == "AM"%}selected="selected"{%endif%} >AM</option>
+        <option value="PM" {% if end_time_AMPM == "PM"%}selected="selected"{%endif%} >PM</option>
+        </select>
+    </p>
+    {% if roles %}
+    <p class="w3-row w3-half" style="padding-right:6pt;">{{ select_field("roles","Skills Required", class="w3-border", extras=' multiple rows="5"') }}
+            {% for role in roles %}
+                <option value="{{role.id}}" {% if role.id in selected_roles %}selected="selected" {% endif %}>{{role.name}}</option>
+            {% endfor %}
+        </select>
+    </p>
+    {% endif %}
+    
+    <p class="w3-row w3-half">{{ input_field(rec.max_staff,'max_staff',label="# of People Requested", default=1, type="num")}}</p>  
+      
+</fieldset>
+{% endblock fieldset %}
