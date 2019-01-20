@@ -1,5 +1,7 @@
 # Staffing App Use Case
 
+_Modified Jan. 20, 2018_
+
 ## Overview
 
 A proposed web application to help manage employee and volunteer staffing for SABA events.
@@ -110,3 +112,31 @@ Managers may export an attendance report suitable to import into a spreadsheet
 1. Select "Attendance Report"
 1. Select Events to report
 1. 'csv' report file is downloaded to user.
+
+##Volunteer Signup
+
+Provide a url that members of the public can view to see volunteer opportunities.
+
+**About Volunteer Accounts:** Unlike "normal" users a person who only intends to volunteer will not be
+required to provide a user name or password. An email address and name are required as that is their only 
+sign in credential. A phone number will be requested but is optional.
+
+###Visitor Access
+
+1. Go to site. A list of upcoming events and spots with roles for volunteers is displayed.
+2. Visitor selects an event to see more info.
+    1. Selecting the Event link will reveal more info about event.
+3. Visitor selects link to sign up for a spot.
+4. If not logged in, Present Volunteer login page.
+    1. Prompt for email address only.
+    2. If email not on file request account creation:
+        1. Email Address
+        2. First Name and/or Last name (only one is required)
+        3. Phone (optional)
+        4. Allow or deny permission for text reminders
+5. After login or signup give user option to signup for more than one slot in spot (for a friend, etc.)
+6. Provide option to add a comment to event manager.
+7. Volunteer confirms sign up.
+    1. Record Sign up
+    2. email icalendar event to Volunteer
+8. Volunteer sign up for more.
