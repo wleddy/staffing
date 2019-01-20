@@ -39,7 +39,7 @@ def edit(id=0,event_id=0):
     if event_id > 0:
         current_event = Event(g.db).get(event_id)
         
-    events =  Event(g.db).select()
+    events =  Event(g.db).select() # This should only return current or future events
     
     if request.form:
         id = cleanRecordID(request.form.get("id"))
@@ -73,6 +73,8 @@ def edit(id=0,event_id=0):
                 for role_id in request.form.getlist('skills'):
                     skills.append(str(role_id))
                     
+            # role_list will be a string formatted like ":1:4:16:" so that a statement like
+            #    'if ":16:" in role_list' will return True.
             rec.role_list = ":" + ':'.join(skills) + ":" #every element is wrapped in colons
             spot.save(rec)
             g.db.commit()
@@ -124,8 +126,7 @@ def delete(id=0):
     if id <= 0:
         return abort(404)
         
-    if id > 0:
-        rec = spot.get(id)
+    rec = spot.get(id)
         
     if rec:
         spot.delete(rec.id)
@@ -201,7 +202,7 @@ def coerse_time(date_str,time_str,ampm):
                     
         time_parts.extend(["00","00"])
         if ampm == 'PM' and int(time_parts[0])<13:
-            time_parts[0] = str(int(time_parts[0]) + 12)
+            time_parts[0] = str(int(time_parts[0]) + 12)            
         time_str = ":".join(time_parts[:3])
         tempDatetime = getDatetimeFromString("{} {}".format(date_str,time_str))
         
