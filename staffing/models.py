@@ -66,11 +66,13 @@ class UserSpot(SqliteTable):
         """Define and create the table"""
         
         sql = """
-        'user_id' INTEGER NOT NULL,
-        'spot_id' INTEGER NOT NULL,
-        'attendance_start' DATETIME,
-        'attendance_end' DATETIME,
-        'attendance_note' TEXT,
+        user_id INTEGER NOT NULL,
+        spot_id INTEGER NOT NULL,
+        slot_count INTEGER,
+        user_comment TEXT,
+        attendance_start DATETIME,
+        attendance_end DATETIME,
+        attendance_note TEXT,
         FOREIGN KEY (user_id) REFERENCES user(id) ON DELETE CASCADE,
         FOREIGN KEY (spot_id) REFERENCES user(id) ON DELETE CASCADE """
                 
