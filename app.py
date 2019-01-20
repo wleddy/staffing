@@ -4,7 +4,7 @@ from shotglass2 import shotglass
 from shotglass2.takeabeltof.database import Database
 from shotglass2.takeabeltof.jinja_filters import register_jinja_filters
 from shotglass2.users.admin import Admin
-from staffing.models import Event, Spot, Location
+from staffing.models import Activity, Spot, Location
 # Create app
 # setting static_folder to None allows me to handle loading myself
 app = Flask(__name__, instance_relative_config=True,
@@ -35,8 +35,8 @@ def initalize_all_tables(db=None):
     shotglass.initalize_user_tables(db)
     
     ### setup any other tables you need here....
-    from staffing.models import init_event_db
-    init_event_db(db)
+    from staffing.models import init_activity_db
+    init_activity_db(db)
     
 def get_db(filespec=None):
     """Return a connection to the database.
@@ -87,10 +87,10 @@ def _before():
         
         
     g.admin = Admin(g.db) # This is where user access rules are stored
-    #Events
+    #Activities
     # a header row must have the some permissions or higher than the items it heads
-    g.admin.register(Event,url_for('event.display'),display_name='Staffing Admin',header_row=True,minimum_rank_required=500)
-    g.admin.register(Event,url_for('event.display'),display_name='Events',minimum_rank_required=500,roles=['admin',])
+    g.admin.register(Activity,url_for('activity.display'),display_name='Staffing Admin',header_row=True,minimum_rank_required=500)
+    g.admin.register(Activity,url_for('activity.display'),display_name='Activities',minimum_rank_required=500,roles=['admin',])
     #location
     g.admin.register(Location,url_for('location.display'),display_name='Locations',minimum_rank_required=500,roles=['admin',])
     #Spots
@@ -116,8 +116,8 @@ def server_error(error):
 app.add_url_rule('/static/<path:filename>','static',shotglass.static)
 
 #import pdb;pdb.set_trace()
-from staffing.views import event
-app.register_blueprint(event.mod)
+from staffing.views import activity
+app.register_blueprint(activity.mod)
 from staffing.views import location
 app.register_blueprint(location.mod)
 from staffing.views import spot

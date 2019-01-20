@@ -3,7 +3,7 @@ from flask import request, session, g, redirect, url_for, abort, \
 from shotglass2.users.admin import login_required, table_access_required
 from shotglass2.takeabeltof.utils import render_markdown_for, printException, cleanRecordID
 from shotglass2.takeabeltof.date_utils import datetime_as_string
-from staffing.models import Event, Location, Spot, UserSpot
+from staffing.models import Activity, Location, Spot, UserSpot
 
 mod = Blueprint('location',__name__, template_folder='templates/location', url_prefix='/location')
 

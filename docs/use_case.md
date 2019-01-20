@@ -4,20 +4,20 @@ _Modified Jan. 20, 2018_
 
 ## Overview
 
-A proposed web application to help manage employee and volunteer staffing for SABA events.
+A proposed web application to help manage employee and volunteer staffing for SABA activities.
 
-### Events
+### Activities
 
-The central element of the system are the Events. Strangely, perhaps, Events don't have a date as part of their
-data domain. In our experience events tend to repeat on a yearly or other basis. The dates and times of an Event 
+The central element of the system are the Activities. Strangely, perhaps, Activities don't have a date as part of their
+data domain. In our experience activities tend to repeat on a yearly or other basis. The dates and times of an Activity 
 are defined by Spots.
 
-An Event must occur in only one Location.
+An Activity must occur in only one Location.
 
 
 ### Spots
 
-A Spot is a record of what is required to fulfill a task that is part of an event. A Spot associated with an Event
+A Spot is a record of what is required to fulfill a task that is part of an activity. A Spot associated with an Activity
 has the following attributes:
 
 * A date for the spot
@@ -27,20 +27,20 @@ has the following attributes:
 
 ### Locations
 
-The physical location of the Event. Used to provide mapping features to staff and volunteers.
+The physical location of the Activity. Used to provide mapping features to staff and volunteers.
 
-## Events
+## Activities
 
-### Create / Edit Event
+### Create / Edit Activity
 1. login
-2. Select Event or make new
+2. Select Activity or make new
 3. Specify Location from Location list
 4. Upload Image if desired
-5. Update general event description
-6. Specify Event manager contact info
+5. Update general activity description
+6. Specify Activity manager contact info
 
 ### Create / Edit Spots
- 1. From Event record Select Spot or create new
+ 1. From Activity record Select Spot or create new
  2. Provide Title
  3. Provide Description of task
  4. Provide Date (one day only per spot)
@@ -49,13 +49,13 @@ The physical location of the Event. Used to provide mapping features to staff an
  Leave roles blank to allow volunteers to sign up for spots.
  7. Specify maximum number of people requested.
 
-> Repeat for all Spots for this event
+> Repeat for all Spots for this activity
 
 ### Announce Spots
 
 #### Staff Announcements
 
-From Event page, Click "Announce this event to Staff"  
+From Activity page, Click "Announce this activity to Staff"  
 Text and/or emails will be sent to all staff with required skills.  
 
 Weekly announcements will be automatically sent to all staff with 1 month of upcoming Spots.
@@ -69,13 +69,13 @@ with 1 month of upcoming Spots.
 
  From publicly accessable web page, a visitor may:
 
-1. Sign in if desired. Staff must sign in to see non-volunteer events and spots.  
-1. Select future Event from a list 
-1. Select a volunteer spot from list of spots for Event
+1. Sign in if desired. Staff must sign in to see non-volunteer activities and spots.  
+1. Select future Activity from a list 
+1. Select a volunteer spot from list of spots for Activity
 1. Sign in with email address (if not signed in)  
 1. Users with passwords set will be required to enter password.
   *  If not known user collect info and create account
-1. Acknowledge signup and send email with iCalendar event
+1. Acknowledge signup and send email with iCalendar activity
 1. Return visitor to spots list
 
 ## Reminders
@@ -84,7 +84,7 @@ Two days before spot, send email and/or text to volunteers (who opt in) and staf
 
 ## Attendance
 
-One day after event, send email and/or text to volunteers (who opt in) and staff.
+One day after activity, send email and/or text to volunteers (who opt in) and staff.
 
 ### Staff Response
 Staff will be asked to provide the hours they worked for each spot. They may also report any issues or
@@ -101,7 +101,7 @@ The managers will have access to Attendance records from the web site.
 
 1. Sign in as manager.
 1. Select "Manage Attendance"
-1. Select Event and Spot
+1. Select Activity and Spot
 1. Select user record and update attendance info.
 
 > Repeat as needed.
@@ -110,7 +110,7 @@ Managers may export an attendance report suitable to import into a spreadsheet
 
 1. Sign in as manager
 1. Select "Attendance Report"
-1. Select Events to report
+1. Select Activities to report
 1. 'csv' report file is downloaded to user.
 
 ##Volunteer Signup
@@ -123,9 +123,9 @@ sign in credential. A phone number will be requested but is optional.
 
 ###Visitor Access
 
-1. Go to site. A list of upcoming events and spots with roles for volunteers is displayed.
-2. Visitor selects an event to see more info.
-    1. Selecting the Event link will reveal more info about event.
+1. Go to site. A list of upcoming activities and spots with roles for volunteers is displayed.
+2. Visitor selects an activity to see more info.
+    1. Selecting the Activity link will reveal more info about activity.
 3. Visitor selects link to sign up for a spot.
 4. If not logged in, Present Volunteer login page.
     1. Prompt for email address only.
@@ -135,8 +135,8 @@ sign in credential. A phone number will be requested but is optional.
         3. Phone (optional)
         4. Allow or deny permission for text reminders
 5. After login or signup give user option to signup for more than one slot in spot (for a friend, etc.)
-6. Provide option to add a comment to event manager.
+6. Provide option to add a comment to activity manager.
 7. Volunteer confirms sign up.
     1. Record Sign up
-    2. email icalendar event to Volunteer
+    2. email icalendar activity to Volunteer
 8. Volunteer sign up for more.

@@ -5,18 +5,18 @@
 {% block fieldset %}
 <fieldset>
     <p>{{ input_field(rec.id,"id",type="hidden",default=0)}}</p>
-    {% if events and not current_event %}
+    {% if activities and not current_activity %}
     <p>
-        {{ select_field("event_id",label='Event for this Spot')}}
+        {{ select_field("activity_id",label='Activity for this Spot')}}
         <option value="0"><em>Select one</em></option>
-        {% for event in events %}
-        <option value="{{event.id}}" {% if event.id == rec.event_id %}selected="selected"{% endif %}>{{ event.title}}</option>
+        {% for activity in activities %}
+        <option value="{{activity.id}}" {% if activity.id == rec.activity_id %}selected="selected"{% endif %}>{{ activity.title}}</option>
         {% endfor %}
         </select>
     </p>
     {% else %}
-		<input type=hidden name="event_id" value="{{rec.event_id|default('0',True )}}">
-        <h3 class="w3-container w3-panel w3-primary-color">{{current_event.title}}</h3>
+		<input type=hidden name="activity_id" value="{{rec.activity_id|default('0',True )}}">
+        <h3 class="w3-container w3-panel w3-primary-color">{{current_activity.title}}</h3>
     {% endif %}
     
     <p>{{ input_field(rec.title,'title',req=True)}}</p>

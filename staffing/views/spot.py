@@ -4,7 +4,7 @@ from shotglass2.users.admin import login_required, table_access_required
 from shotglass2.users.models import Role
 from shotglass2.takeabeltof.utils import render_markdown_for, printException, cleanRecordID
 from shotglass2.takeabeltof.date_utils import date_to_string, getDatetimeFromString
-from staffing.models import Event, Location, Spot, UserSpot
+from staffing.models import Activity, Location, Spot, UserSpot
 
 mod = Blueprint('spot',__name__, template_folder='templates/spot', url_prefix='/spot')
 
@@ -20,7 +20,7 @@ def setExits():
 @table_access_required(Spot)
 def display():
     setExits()
-    g.title="Event Spot List"
+    g.title="Activity Spot List"
     recs = Spot(g.db).select()
     
     return render_template('spot_list.html',recs=recs)
@@ -28,18 +28,18 @@ def display():
     
 @mod.route('/edit/',methods=['GET','POST',])
 @mod.route('/edit/<int:id>/',methods=['GET','POST',])
-@mod.route('/edit/<int:id>/<int:event_id>/',methods=['GET','POST',])
+@mod.route('/edit/<int:id>/<int:activity_id>/',methods=['GET','POST',])
 @table_access_required(Spot)
-def edit(id=0,event_id=0):
+def edit(id=0,activity_id=0):
     setExits()
     g.title = 'Edit Spot Record'
     id = cleanRecordID(id)
-    event_id = cleanRecordID(event_id)
-    current_event = None
-    if event_id > 0:
-        current_event = Event(g.db).get(event_id)
+    activity_id = cleanRecordID(activity_id)
+    current_activity = None
+    if activity_id > 0:
+        current_activity = Activity(g.db).get(activity_id)
         
-    events =  Event(g.db).select() # This should only return current or future events
+    activities =  Activity(g.db).select() # This should only return current or future activities
     
     if request.form:
         id = cleanRecordID(request.form.get("id"))
@@ -57,7 +57,7 @@ def edit(id=0,event_id=0):
             return redirect(g.listURL)
     else:
         rec = spot.new()
-        rec.event_id = event_id
+        rec.activity_id = activity_id
 
     roles = Role(g.db).select()
     selected_roles = [] # this needs to be populated from SpotRoles
@@ -65,7 +65,7 @@ def edit(id=0,event_id=0):
     
     if request.form:
         spot.update(rec,request.form)
-        rec.event_id = cleanRecordID(request.form.get("event_id"))
+        rec.activity_id = cleanRecordID(request.form.get("activity_id"))
         if valid_input(rec):
             skills = []
             if 'skills' in request.form:
@@ -111,8 +111,8 @@ def edit(id=0,event_id=0):
             start_time_AMPM= start_time_AMPM,
             end_time=end_time,
             end_time_AMPM=end_time_AMPM,
-            events=events,
-            current_event=current_event,
+            activities=activities,
+            current_activity=current_activity,
             )
     
     
@@ -145,14 +145,14 @@ def valid_input(rec):
         valid_data = False
         flash("You must give the spot a title")
         
-    if not rec.event_id or rec.event_id < 1:
+    if not rec.activity_id or rec.activity_id < 1:
         valid_data = False
-        flash("You must select an event for this spot")
+        flash("You must select an activity for this spot")
     else:
-        event_rec = Event(g.db).get(rec.event_id)
-        if not event_rec:
+        activity_rec = Activity(g.db).get(rec.activity_id)
+        if not activity_rec:
             valid_data = False
-            flash("That does not seem to be a valid Event ID")
+            flash("That does not seem to be a valid Activity ID")
             
     spot_date = getDatetimeFromString(request.form.get("spot_date",""))
     if not spot_date:

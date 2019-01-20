@@ -1,11 +1,11 @@
 from shotglass2.takeabeltof.database import SqliteTable
 from shotglass2.takeabeltof.utils import cleanRecordID
         
-class Event(SqliteTable):
-    """Staffing Event Table"""
+class Activity(SqliteTable):
+    """Staffing Activity Table"""
     def __init__(self,db_connection):
         super().__init__(db_connection)
-        self.table_name = 'event'
+        self.table_name = 'activity'
         self.order_by_col = 'lower(title)'
         self.defaults = {}
         
@@ -46,7 +46,7 @@ class Spot(SqliteTable):
             start_date DATETIME,
             end_date DATETIME,
             max_staff INTEGER,
-            event_id INTEGER """
+            activity_id INTEGER """
                 
         super().create_table(sql)
         
@@ -111,9 +111,9 @@ class Location(SqliteTable):
         self.create_table()
 
 
-def init_event_db(db):
+def init_activity_db(db):
     """Create a intial user record."""
-    Event(db).init_table()
+    Activity(db).init_table()
     Spot(db).init_table()
     UserSpot(db).init_table()
     Location(db).init_table()
