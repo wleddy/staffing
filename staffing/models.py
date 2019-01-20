@@ -28,11 +28,11 @@ class Activity(SqliteTable):
         self.create_table()
         
         
-class Spot(SqliteTable):
-    """Staffing Spot Table"""
+class Task(SqliteTable):
+    """Staffing Task Table"""
     def __init__(self,db_connection):
         super().__init__(db_connection)
-        self.table_name = 'spot'
+        self.table_name = 'task'
         self.order_by_col = 'date(start_date) DESC, lower(title)'
         self.defaults = {'max_staff':1}
         
@@ -54,11 +54,11 @@ class Spot(SqliteTable):
         """Create the table and initialize data"""
         self.create_table()
         
-class UserSpot(SqliteTable):
-    """Staffing User_Spot Table"""
+class UserTask(SqliteTable):
+    """Staffing User_Task Table"""
     def __init__(self,db_connection):
         super().__init__(db_connection)
-        self.table_name = 'user_spot'
+        self.table_name = 'user_task'
         self.order_by_col = 'id'
         self.defaults = {}
         
@@ -67,14 +67,14 @@ class UserSpot(SqliteTable):
         
         sql = """
         user_id INTEGER NOT NULL,
-        spot_id INTEGER NOT NULL,
+        task_id INTEGER NOT NULL,
         slot_count INTEGER,
         user_comment TEXT,
         attendance_start DATETIME,
         attendance_end DATETIME,
         attendance_note TEXT,
         FOREIGN KEY (user_id) REFERENCES user(id) ON DELETE CASCADE,
-        FOREIGN KEY (spot_id) REFERENCES user(id) ON DELETE CASCADE """
+        FOREIGN KEY (task_id) REFERENCES user(id) ON DELETE CASCADE """
                 
         super().create_table(sql)
         
@@ -114,6 +114,6 @@ class Location(SqliteTable):
 def init_activity_db(db):
     """Create a intial user record."""
     Activity(db).init_table()
-    Spot(db).init_table()
-    UserSpot(db).init_table()
+    Task(db).init_table()
+    UserTask(db).init_table()
     Location(db).init_table()

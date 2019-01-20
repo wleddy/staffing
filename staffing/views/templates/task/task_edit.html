@@ -7,7 +7,7 @@
     <p>{{ input_field(rec.id,"id",type="hidden",default=0)}}</p>
     {% if activities and not current_activity %}
     <p>
-        {{ select_field("activity_id",label='Activity for this Spot')}}
+        {{ select_field("activity_id",label='Activity for this Task')}}
         <option value="0"><em>Select one</em></option>
         {% for activity in activities %}
         <option value="{{activity.id}}" {% if activity.id == rec.activity_id %}selected="selected"{% endif %}>{{ activity.title}}</option>
@@ -22,7 +22,7 @@
     <p>{{ input_field(rec.title,'title',req=True)}}</p>
     <p>{{ label_only(label="Description of duties (may include markdown)")}}</p>
     <p><textarea rows="5" name="description" style="width:100%;">{{rec.description |default('',True)}}</textarea></p>
-    <p>{{ input_field(spot_date,'spot_date',label="Date",placeholder="MM/DD/YY")}}</p>
+    <p>{{ input_field(task_date,'task_date',label="Date",placeholder="MM/DD/YY")}}</p>
     <p class="w3-row w3-quarter" style="padding-right:3pt;">{{ input_field(start_time,'start_time', label="Start Time", placeholder="8:00")}}</p>
     <p class="w3-row w3-quarter" style="padding-left:3pt;">{{ select_field("start_time_AMPM",label='AM/PM')}}
         <option value="AM" {% if start_time_AMPM == "AM"%}selected="selected"{%endif%} >AM</option>

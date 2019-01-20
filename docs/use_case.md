@@ -8,86 +8,66 @@ A proposed web application to help manage employee and volunteer staffing for SA
 
 ### Activities
 
-The central element of the system are the Activities. Strangely, perhaps, Activities don't have a date as part of their
+The central element of the system are the Activities. Activities don't have a date as part of their
 data domain. In our experience activities tend to repeat on a yearly or other basis. The dates and times of an Activity 
-are defined by Spots.
+are defined by [Tasks](/docs/tasks.md).
 
 An Activity must occur in only one Location.
 
+[More details.](/docs/activities.md)
 
-### Spots
+### Tasks
 
-A Spot is a record of what is required to fulfill a task that is part of an activity. A Spot associated with an Activity
+A Task is a record of what is required to fulfill a task that is part of an activity. A Task associated with an Activity
 has the following attributes:
 
-* A date for the spot
-* Start and end times for the spot
+* A date for the task
+* Start and end times for the task
 * The skills required of staff or volunteer
-* The number of people requested for the spot at this skill level
+* The number of people requested for the task at this skill level
 
 ### Locations
 
 The physical location of the Activity. Used to provide mapping features to staff and volunteers.
 
-## Activities
 
-### Create / Edit Activity
-1. login
-2. Select Activity or make new
-3. Specify Location from Location list
-4. Upload Image if desired
-5. Update general activity description
-6. Specify Activity manager contact info
-
-### Create / Edit Spots
- 1. From Activity record Select Spot or create new
- 2. Provide Title
- 3. Provide Description of task
- 4. Provide Date (one day only per spot)
- 5. Provide Start and End times
- 6. Specify skills (user roles) required. May be a comma separated list of user roles. 
- Leave roles blank to allow volunteers to sign up for spots.
- 7. Specify maximum number of people requested.
-
-> Repeat for all Spots for this activity
-
-### Announce Spots
+### Announce Tasks
 
 #### Staff Announcements
 
 From Activity page, Click "Announce this activity to Staff"  
 Text and/or emails will be sent to all staff with required skills.  
 
-Weekly announcements will be automatically sent to all staff with 1 month of upcoming Spots.
+Weekly announcements will be automatically sent to all staff with 1 month of upcoming Tasks.
 
 #### Volunteer Announcements
 
 Automated announcements will be sent to volunteers who have opted in for text and/or email announcements 
-with 1 month of upcoming Spots.
+with 1 month of upcoming Tasks.
 
 ## Signup
 
  From publicly accessable web page, a visitor may:
 
-1. Sign in if desired. Staff must sign in to see non-volunteer activities and spots.  
+1. Sign in if desired. Staff must sign in to see non-volunteer activities and tasks.  
 1. Select future Activity from a list 
-1. Select a volunteer spot from list of spots for Activity
+1. Select a volunteer task from list of tasks for Activity
 1. Sign in with email address (if not signed in)  
 1. Users with passwords set will be required to enter password.
   *  If not known user collect info and create account
 1. Acknowledge signup and send email with iCalendar activity
-1. Return visitor to spots list
+1. Return visitor to tasks list
 
 ## Reminders
 
-Two days before spot, send email and/or text to volunteers (who opt in) and staff.
+Two days before task, send email and/or text to volunteers (who opt in) and staff.
 
 ## Attendance
 
 One day after activity, send email and/or text to volunteers (who opt in) and staff.
 
 ### Staff Response
-Staff will be asked to provide the hours they worked for each spot. They may also report any issues or
+Staff will be asked to provide the hours they worked for each task. They may also report any issues or
 comments about the shift.
 
 ### Volunteer Response
@@ -101,7 +81,7 @@ The managers will have access to Attendance records from the web site.
 
 1. Sign in as manager.
 1. Select "Manage Attendance"
-1. Select Activity and Spot
+1. Select Activity and Task
 1. Select user record and update attendance info.
 
 > Repeat as needed.
@@ -113,30 +93,11 @@ Managers may export an attendance report suitable to import into a spreadsheet
 1. Select Activities to report
 1. 'csv' report file is downloaded to user.
 
-##Volunteer Signup
+##Volunteer Access
 
-Provide a url that members of the public can view to see volunteer opportunities.
+The system will provide an easy to use interface for the general public to discover and sign up for volunteer
+opportunities at SABA Activities. [More detail](/docs/volunteers.md)
 
-**About Volunteer Accounts:** Unlike "normal" users a person who only intends to volunteer will not be
-required to provide a user name or password. An email address and name are required as that is their only 
-sign in credential. A phone number will be requested but is optional.
+## Reports
 
-###Visitor Access
-
-1. Go to site. A list of upcoming activities and spots with roles for volunteers is displayed.
-2. Visitor selects an activity to see more info.
-    1. Selecting the Activity link will reveal more info about activity.
-3. Visitor selects link to sign up for a spot.
-4. If not logged in, Present Volunteer login page.
-    1. Prompt for email address only.
-    2. If email not on file request account creation:
-        1. Email Address
-        2. First Name and/or Last name (only one is required)
-        3. Phone (optional)
-        4. Allow or deny permission for text reminders
-5. After login or signup give user option to signup for more than one slot in spot (for a friend, etc.)
-6. Provide option to add a comment to activity manager.
-7. Volunteer confirms sign up.
-    1. Record Sign up
-    2. email icalendar activity to Volunteer
-8. Volunteer sign up for more.
+The system will provide viewable and downloadable reports. [More detail.](/docs/reports.md)

@@ -4,7 +4,7 @@ from shotglass2 import shotglass
 from shotglass2.takeabeltof.database import Database
 from shotglass2.takeabeltof.jinja_filters import register_jinja_filters
 from shotglass2.users.admin import Admin
-from staffing.models import Activity, Spot, Location
+from staffing.models import Activity, Task, Location
 # Create app
 # setting static_folder to None allows me to handle loading myself
 app = Flask(__name__, instance_relative_config=True,
@@ -93,8 +93,8 @@ def _before():
     g.admin.register(Activity,url_for('activity.display'),display_name='Activities',minimum_rank_required=500,roles=['admin',])
     #location
     g.admin.register(Location,url_for('location.display'),display_name='Locations',minimum_rank_required=500,roles=['admin',])
-    #Spots
-    g.admin.register(Spot,url_for('spot.display'),display_name='Spots',minimum_rank_required=500,roles=['admin',])
+    #Tasks
+    g.admin.register(Task,url_for('task.display'),display_name='Tasks',minimum_rank_required=500,roles=['admin',])
     
     shotglass.user_setup() # g.admin now holds access rules Users, Prefs and Roles
 
@@ -120,8 +120,8 @@ from staffing.views import activity
 app.register_blueprint(activity.mod)
 from staffing.views import location
 app.register_blueprint(location.mod)
-from staffing.views import spot
-app.register_blueprint(spot.mod)
+from staffing.views import task
+app.register_blueprint(task.mod)
 
 ## Setup the routes for users
 shotglass.register_users(app)

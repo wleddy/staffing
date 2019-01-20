@@ -4,35 +4,35 @@ from shotglass2.users.admin import login_required, table_access_required
 from shotglass2.users.models import Role
 from shotglass2.takeabeltof.utils import render_markdown_for, printException, cleanRecordID
 from shotglass2.takeabeltof.date_utils import date_to_string, getDatetimeFromString
-from staffing.models import Activity, Location, Spot, UserSpot
+from staffing.models import Activity, Location, Task, UserTask
 
-mod = Blueprint('spot',__name__, template_folder='templates/spot', url_prefix='/spot')
+mod = Blueprint('task',__name__, template_folder='templates/task', url_prefix='/task')
 
 
 def setExits():
     g.listURL = url_for('.display')
     g.editURL = url_for('.edit')
     g.deleteURL = url_for('.delete')
-    g.title = 'Spots'
+    g.title = 'Tasks'
 
 
 @mod.route('/')
-@table_access_required(Spot)
+@table_access_required(Task)
 def display():
     setExits()
-    g.title="Activity Spot List"
-    recs = Spot(g.db).select()
+    g.title="Activity Task List"
+    recs = Task(g.db).select()
     
-    return render_template('spot_list.html',recs=recs)
+    return render_template('task_list.html',recs=recs)
     
     
 @mod.route('/edit/',methods=['GET','POST',])
 @mod.route('/edit/<int:id>/',methods=['GET','POST',])
 @mod.route('/edit/<int:id>/<int:activity_id>/',methods=['GET','POST',])
-@table_access_required(Spot)
+@table_access_required(Task)
 def edit(id=0,activity_id=0):
     setExits()
-    g.title = 'Edit Spot Record'
+    g.title = 'Edit Task Record'
     id = cleanRecordID(id)
     activity_id = cleanRecordID(activity_id)
     current_activity = None
@@ -44,27 +44,27 @@ def edit(id=0,activity_id=0):
     if request.form:
         id = cleanRecordID(request.form.get("id"))
         
-    spot = Spot(g.db)
+    task = Task(g.db)
     #import pdb;pdb.set_trace()
     
     if id < 0:
         return abort(404)
         
     if id > 0:
-        rec = spot.get(id)
+        rec = task.get(id)
         if not rec:
-            flash("{} Record Not Found".format(spot.display_name))
+            flash("{} Record Not Found".format(task.display_name))
             return redirect(g.listURL)
     else:
-        rec = spot.new()
+        rec = task.new()
         rec.activity_id = activity_id
 
     roles = Role(g.db).select()
-    selected_roles = [] # this needs to be populated from SpotRoles
+    selected_roles = [] # this needs to be populated from TaskRoles
         
     
     if request.form:
-        spot.update(rec,request.form)
+        task.update(rec,request.form)
         rec.activity_id = cleanRecordID(request.form.get("activity_id"))
         if valid_input(rec):
             skills = []
@@ -76,17 +76,17 @@ def edit(id=0,activity_id=0):
             # role_list will be a string formatted like ":1:4:16:" so that a statement like
             #    'if ":16:" in role_list' will return True.
             rec.role_list = ":" + ':'.join(skills) + ":" #every element is wrapped in colons
-            spot.save(rec)
+            task.save(rec)
             g.db.commit()
             return redirect(g.listURL)
         else:
-            spot_date=request.form.get('spot_date',"")
+            task_date=request.form.get('task_date',"")
             start_time=request.form.get('start_time',"")
             start_time_AMPM=request.form.get('start_time_AMPM',"AM")
             end_time=request.form.get('end_time',"")
             end_time_AMPM=request.form.get('end_time_AMPM',"AM")
         
-    spot_date=None
+    task_date=None
     start_time=None
     start_time_AMPM=None
     end_time=None
@@ -95,7 +95,7 @@ def edit(id=0,activity_id=0):
     if rec.start_date and isinstance(rec.start_date,str):
         rec.start_date = getDatetimeFromString(rec.start_date)
     if rec.start_date:
-        spot_date=date_to_string(rec.start_date,'date')
+        task_date=date_to_string(rec.start_date,'date')
         start_time=date_to_string(rec.start_date,'time')
         start_time_AMPM=date_to_string(rec.start_date,'ampm').upper()
     if rec.end_date and isinstance(rec.end_date,str):
@@ -104,9 +104,9 @@ def edit(id=0,activity_id=0):
         end_time=date_to_string(rec.end_date,'time')
         end_time_AMPM=date_to_string(rec.end_date,'ampm').upper()
     
-    return render_template('spot_edit.html',rec=rec,
+    return render_template('task_edit.html',rec=rec,
             roles=roles,
-            spot_date=spot_date,
+            task_date=task_date,
             start_time=start_time,
             start_time_AMPM= start_time_AMPM,
             end_time=end_time,
@@ -118,20 +118,20 @@ def edit(id=0,activity_id=0):
     
 @mod.route('/delete/',methods=['GET','POST',])
 @mod.route('/delete/<int:id>/',methods=['GET','POST',])
-@table_access_required(Spot)
+@table_access_required(Task)
 def delete(id=0):
     setExits()
     id = cleanRecordID(id)
-    spot = Spot(g.db)
+    task = Task(g.db)
     if id <= 0:
         return abort(404)
         
-    rec = spot.get(id)
+    rec = task.get(id)
         
     if rec:
-        spot.delete(rec.id)
+        task.delete(rec.id)
         g.db.commit()
-        flash("{} Spot Deleted from {}".format(rec.name,spot.display_name))
+        flash("{} Task Deleted from {}".format(rec.name,task.display_name))
     
     return redirect(g.listURL)
     
@@ -140,34 +140,34 @@ def valid_input(rec):
     valid_data = True
     #import pdb;pdb.set_trace()
     
-    spot_name = request.form.get('title','').strip()
-    if not spot_name:
+    task_name = request.form.get('title','').strip()
+    if not task_name:
         valid_data = False
-        flash("You must give the spot a title")
+        flash("You must give the task a title")
         
     if not rec.activity_id or rec.activity_id < 1:
         valid_data = False
-        flash("You must select an activity for this spot")
+        flash("You must select an activity for this task")
     else:
         activity_rec = Activity(g.db).get(rec.activity_id)
         if not activity_rec:
             valid_data = False
             flash("That does not seem to be a valid Activity ID")
             
-    spot_date = getDatetimeFromString(request.form.get("spot_date",""))
-    if not spot_date:
+    task_date = getDatetimeFromString(request.form.get("task_date",""))
+    if not task_date:
         valid_data = False
         flash("That is not a valid date")
     #coerse the start and end datetimes
     #Get the start time into 24 hour format
-    tempDatetime =coerse_time(request.form.get("spot_date",""),request.form.get('start_time',''),request.form['start_time_AMPM'])
+    tempDatetime =coerse_time(request.form.get("task_date",""),request.form.get('start_time',''),request.form['start_time_AMPM'])
     if not tempDatetime:
         valid_data = False
         flash("That Date and Start Time are not valid")
     else:
         rec.start_date = tempDatetime
             
-    tempDatetime =coerse_time(request.form.get("spot_date",""),request.form.get('end_time',''),request.form['end_time_AMPM'])
+    tempDatetime =coerse_time(request.form.get("task_date",""),request.form.get('end_time',''),request.form['end_time_AMPM'])
     if not tempDatetime:
         valid_data = False
         flash("That Date and End Time are not valid")
@@ -182,7 +182,7 @@ def valid_input(rec):
         
     if not request.form.get('skills'):
         valid_data = False
-        flash("You must select at least one Skill for the spot.")
+        flash("You must select at least one Skill for the task.")
         
     return valid_data
     
