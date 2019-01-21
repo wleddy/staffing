@@ -150,16 +150,16 @@ def valid_input(rec):
     if not task_date:
         valid_data = False
         flash("That is not a valid date")
-    #coerse the start and end datetimes
+    #coerce the start and end datetimes
     #Get the start time into 24 hour format
-    tempDatetime =coerse_time(request.form.get("task_date",""),request.form.get('start_time',''),request.form['start_time_AMPM'])
+    tempDatetime =coerce_datetime(request.form.get("task_date",""),request.form.get('start_time',''),request.form['start_time_AMPM'])
     if not tempDatetime:
         valid_data = False
         flash("That Date and Start Time are not valid")
     else:
         rec.start_date = tempDatetime
             
-    tempDatetime =coerse_time(request.form.get("task_date",""),request.form.get('end_time',''),request.form['end_time_AMPM'])
+    tempDatetime =coerce_datetime(request.form.get("task_date",""),request.form.get('end_time',''),request.form['end_time_AMPM'])
     if not tempDatetime:
         valid_data = False
         flash("That Date and End Time are not valid")
@@ -183,7 +183,9 @@ def valid_input(rec):
     return valid_data
     
     
-def coerse_time(date_str,time_str,ampm):
+def coerce_datetime(date_str,time_str,ampm):
+    """Convert a string date and a string time into a datetime object
+    if ampm is None, assume 24 hour time else 12 hour"""
     #import pdb;pdb.set_trace()
     
     tempDatetime = None
@@ -197,8 +199,11 @@ def coerse_time(date_str,time_str,ampm):
                 time_parts[key] = "0" + time_parts[key]
                     
         time_parts.extend(["00","00"])
-        if ampm == 'PM' and int(time_parts[0])<13:
-            time_parts[0] = str(int(time_parts[0]) + 12)            
+        if ampm != None:
+            if ampm.upper() == 'PM' and int(time_parts[0])<13:
+                time_parts[0] = str(int(time_parts[0]) + 12)            
+            if ampm.upper() == 'AM' and int(time_parts[0])> 12:
+                time_parts[0] = str(int(time_parts[0]) - 12)            
         time_str = ":".join(time_parts[:3])
         tempDatetime = getDatetimeFromString("{} {}".format(date_str,time_str))
         
