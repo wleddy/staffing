@@ -1,6 +1,6 @@
-# Staffing App Use Case
+# "Activities and Tasks" Use Case
 
-_Modified Jan. 20, 2018_
+_Modified Jan. 20, 2019_
 
 ## Overview
 
@@ -12,26 +12,25 @@ The central element of the system are the Activities. Activities don't have a da
 data domain. In our experience activities tend to repeat on a yearly or other basis. The dates and times of an Activity 
 are defined by [Tasks](/docs/tasks.md).
 
-An Activity must occur in only one Location.
+An Activity may only occur at one Location though there need not be a location specified.
 
 [More details.](/docs/activities.md)
 
 ### Tasks
 
-A Task is a record of what is required to fulfill a task that is part of an activity. A Task associated with an Activity
-has the following attributes:
+A Task is a record of what is required to fulfill a task that is part of an activity.
 
-* A date for the task
-* Start and end times for the task
-* The skills required of staff or volunteer
-* The number of people requested for the task at this skill level
+[More Details.](/docs/tasks.md)
 
 ### Locations
 
-The physical location of the Activity. Used to provide mapping features to staff and volunteers.
+The physical location of the Activity. Used to provide mapping features to staff and volunteers. An Activity may
+not occur at a specific location (such as work from home). In such as case there is no need to associate a location
+with an Activity.
 
+##Announcements and Reminders
 
-### Announce Tasks
+### Announcing Tasks
 
 #### Staff Announcements
 
@@ -47,33 +46,27 @@ with 1 month of upcoming Tasks.
 
 ## Signup
 
- From publicly accessable web page, a visitor may:
+From publicly accessable web page, a visitor may:
 
 1. Sign in if desired. Staff must sign in to see non-volunteer activities and tasks.  
 1. Select future Activity from a list 
 1. Select a volunteer task from list of tasks for Activity
 1. Sign in with email address (if not signed in)  
 1. Users with passwords set will be required to enter password.
-  *  If not known user collect info and create account
+  *  If not a registered user collect info and create account
 1. Acknowledge signup and send email with iCalendar activity
 1. Return visitor to tasks list
 
-## Reminders
+### Reminders
 
-Two days before task, send email and/or text to volunteers (who opt in) and staff.
+Two days before a task, an email and/or text will be automatically sent to volunteers (who opt in) and staff.
 
-## Attendance
+## Attendance and Thank Yous
 
-One day after activity, send email and/or text to volunteers (who opt in) and staff.
+Following an Activity the system will automatically contact the participants to thank volunteers and ask staff
+to confirm their hours.
 
-### Staff Response
-Staff will be asked to provide the hours they worked for each task. They may also report any issues or
-comments about the shift.
-
-### Volunteer Response
-The volunteer response is primarily a Thank You and a chance for them to report any issues or comments.
-
-> Responses will update attendance status automatically. 
+[More Details.](/docs/attendance.md)
 
 ### Manager Attendance Updates
 
@@ -88,15 +81,18 @@ The managers will have access to Attendance records from the web site.
 
 Managers may export an attendance report suitable to import into a spreadsheet
 
-1. Sign in as manager
+1. Sign in to an manager's account
 1. Select "Attendance Report"
 1. Select Activities to report
-1. 'csv' report file is downloaded to user.
+1. 'csv' report file is downloaded to user. The report may then be imported into a spreadsheet program such
+as Excel for additional analysis.
 
 ##Volunteer Access
 
 The system will provide an easy to use interface for the general public to discover and sign up for volunteer
-opportunities at SABA Activities. [More detail](/docs/volunteers.md)
+opportunities at SABA Activities. 
+
+[More Details](/docs/volunteers.md)
 
 ## Reports
 

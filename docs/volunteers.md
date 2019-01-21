@@ -1,6 +1,6 @@
-#Volunteers
-
 [Return to Index](/docs/use_case.md)
+
+#Volunteers
 
 ##Volunteer Access
 
@@ -39,3 +39,5 @@ A volunteer may wish to cancel their commitment.
 3. If not signed in, propt for email address.
     1. if not on file inform visitor, try again
 4. Present task record so volunteer my cancel or reduce their slot count.
+
+[Return to Index](/docs/use_case.md)
