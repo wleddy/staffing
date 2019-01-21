@@ -39,7 +39,7 @@
     <p class="w3-row w3-half" style="padding-right:6pt;">{{ select_field("skills","Skills Required", class="w3-border", extras=' multiple rows="5"') }}
             {% for role in roles %}
                 {% set role_test = ':' + role.id | string + ':' %}
-                <option value="{{role.id}}" {% if role_test in rec.role_list %}selected="selected" {% endif %}>{{role.name}}</option>
+                <option value="{{role.id}}" {% if role_test in rec.skill_list %}selected="selected" {% endif %}>{{role.name}}</option>
             {% endfor %}
         </select>
     </p>

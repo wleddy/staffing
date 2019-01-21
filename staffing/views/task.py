@@ -5,6 +5,7 @@ from shotglass2.users.models import Role
 from shotglass2.takeabeltof.utils import render_markdown_for, printException, cleanRecordID
 from shotglass2.takeabeltof.date_utils import date_to_string, getDatetimeFromString
 from staffing.models import Activity, Location, Task, UserTask
+from staffing.utils import pack_list_to_string, un_pack_string
 
 mod = Blueprint('task',__name__, template_folder='templates/task', url_prefix='/task')
 
@@ -67,15 +68,6 @@ def edit(id=0,activity_id=0):
         task.update(rec,request.form)
         rec.activity_id = cleanRecordID(request.form.get("activity_id"))
         if valid_input(rec):
-            skills = []
-            if 'skills' in request.form:
-                #delete all the users current roles
-                for role_id in request.form.getlist('skills'):
-                    skills.append(str(role_id))
-                    
-            # role_list will be a string formatted like ":1:4:16:" so that a statement like
-            #    'if ":16:" in role_list' will return True.
-            rec.role_list = ":" + ':'.join(skills) + ":" #every element is wrapped in colons
             task.save(rec)
             g.db.commit()
             return redirect(g.listURL)
@@ -180,10 +172,14 @@ def valid_input(rec):
         flash("The End Time can't be before the Start Time")
         
         
-    if not request.form.get('skills'):
+    # skill_list will be a string formatted like ":1:4:16:" so that a statement like
+    #    'if ":16:" in skill_list' will return True.
+    rec.skill_list = pack_list_to_string(skills_to_list()) #every element is wrapped in colons
+    
+    if not rec.skill_list:
         valid_data = False
         flash("You must select at least one Skill for the task.")
-        
+
     return valid_data
     
     
@@ -207,4 +203,14 @@ def coerse_time(date_str,time_str,ampm):
         tempDatetime = getDatetimeFromString("{} {}".format(date_str,time_str))
         
     return tempDatetime
+    
+def skills_to_list():
+    """Create a list of skill (role) ids from form"""
+    skills = []
+    if 'skills' in request.form:
+        #delete all the users current roles
+        for role_id in request.form.getlist('skills'):
+            skills.append(str(role_id))
+    
+    return skills
     

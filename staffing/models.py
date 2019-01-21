@@ -19,6 +19,7 @@ class Activity(SqliteTable):
             manager_name TEXT,
             manager_email TEXT,
             manager_phone TEXT,
+            tag_list TEXT,
             location_id INTEGER """
                 
         super().create_table(sql)
@@ -34,7 +35,7 @@ class Task(SqliteTable):
         super().__init__(db_connection)
         self.table_name = 'task'
         self.order_by_col = 'date(start_date) DESC, lower(title)'
-        self.defaults = {'max_staff':1}
+        self.defaults = {'max_staff':1,'skill_list':''}
         
     def create_table(self):
         """Define and create the table"""
@@ -42,7 +43,7 @@ class Task(SqliteTable):
         sql = """
             title TEXT NULL,
             description TEXT,
-            role_list TEXT,
+            skill_list TEXT,
             start_date DATETIME,
             end_date DATETIME,
             max_staff INTEGER,
