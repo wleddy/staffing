@@ -69,7 +69,7 @@ class UserTask(SqliteTable):
         sql = """
         user_id INTEGER NOT NULL,
         task_id INTEGER NOT NULL,
-        slot_count INTEGER,
+        positions INTEGER,
         user_comment TEXT,
         attendance_start DATETIME,
         attendance_end DATETIME,
