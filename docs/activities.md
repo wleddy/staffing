@@ -13,7 +13,7 @@ An Activity must occur in only one Location.
 1. Provide a detailed description of the activity. 
     The description may use [*Markdown*](https://www.markdownguide.org/basic-syntax) syntax to create an attractive
     presentation when viewed by visitors. (This document is created with Markdown)
-1. Specify Location from Location list
+1. Specify Location from Location list if appropriate.
 1. Update general activity description
 1. Specify Activity manager contact info
 1. Upload Image if desired
