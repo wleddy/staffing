@@ -91,10 +91,10 @@ def _before():
     # a header row must have the some permissions or higher than the items it heads
     g.admin.register(Activity,url_for('activity.display'),display_name='Staffing Admin',header_row=True,minimum_rank_required=500)
     g.admin.register(Activity,url_for('activity.display'),display_name='Activities',minimum_rank_required=500,roles=['admin',])
-    #location
-    g.admin.register(Location,url_for('location.display'),display_name='Locations',minimum_rank_required=500,roles=['admin',])
     #Tasks
     g.admin.register(Task,url_for('task.display'),display_name='Tasks',minimum_rank_required=500,roles=['admin',])
+    #location
+    g.admin.register(Location,url_for('location.display'),display_name='Locations',minimum_rank_required=500,roles=['admin',])
     
     shotglass.user_setup() # g.admin now holds access rules Users, Prefs and Roles
 
