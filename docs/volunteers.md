@@ -1,8 +1,8 @@
 [Return to Index](/docs/use_case.md)
 
-#Volunteers
+# Volunteers
 
-##Volunteer Access
+## Volunteer Access
 
 Provide a url that members of the public can view to see volunteer opportunities.
 
@@ -10,7 +10,7 @@ Provide a url that members of the public can view to see volunteer opportunities
 required to provide a user name or password. An email address and name are required as that is their only 
 sign in credential. A phone number will be requested but is optional.
 
-###Volunteer Signup
+### Volunteer Signup
 
 1. Go to site. A list of upcoming activities and tasks with roles for volunteers is displayed.
 2. Visitor selects an activity to see more info.
@@ -30,7 +30,7 @@ sign in credential. A phone number will be requested but is optional.
     2. email icalendar activity to Volunteer
 8. Volunteer sign up for more.
 
-###Volunteer Cancelation
+### Volunteer Cancelation
 
 A volunteer may wish to cancel their commitment.
 

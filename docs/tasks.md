@@ -1,6 +1,6 @@
 [Return to Index](/docs/use_case.md)
 
-#Tasks
+# Tasks
 
 A Task record describes what is needed to fulfill part of an Activity. A Task has the following attributes:
 
@@ -32,9 +32,38 @@ another Task and assign an appropriate Skill level to the Task.
 
 > Repeat for all Tasks for this Activity
 
-###Skills
+## Skills
+
+*Updated 1/21/2019*
 
 The list of skills available for Tasks is based on the the User Roles records. The site administrator will
-need to create Roles that represent the jobs that you need done.
+need to create Roles that represent the jobs that you need done. The following is my current proposal for
+some useful skills.
+
+**System Level Roles**
+* super _Level:_ 1000
+* admin _Level:_ 900
+
+**Activity Level Roles**
+* site manager _Level:_ 100
+    Similar access as admin
+* activity manager _Level:_ 90
+    May manage any activity
+
+**Staff Members**
+* <activity lead> _Level:_ 80 ~ 70
+    Actual name skill to describe the role
+    Create additional activity lead level roles with differing access levels as needed
+* <activity staff> _Level:_ 69 ~ 50
+    Staff members with specific qualifications but not usually supervised by a manager or lead
+
+**Volunteers**
+* <activity volunteer> _Level:_ 49 ~ 20
+    A volunteer with specific qualifications
+* volunteer _Level:_ 10
+    A general volunteer with no specific training
+
+
+
 
 [Return to Index](/docs/use_case.md)

@@ -28,7 +28,7 @@ The physical location of the Activity. Used to provide mapping features to staff
 not occur at a specific location (such as work from home). In such as case there is no need to associate a location
 with an Activity.
 
-##Announcements and Reminders
+## Announcements and Reminders
 
 ### Announcing Tasks
 
@@ -87,7 +87,7 @@ Managers may export an attendance report suitable to import into a spreadsheet
 1. 'csv' report file is downloaded to user. The report may then be imported into a spreadsheet program such
 as Excel for additional analysis.
 
-##Volunteer Access
+## Volunteer Access
 
 The system will provide an easy to use interface for the general public to discover and sign up for volunteer
 opportunities at SABA Activities. 
