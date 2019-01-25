@@ -1,5 +1,7 @@
 from shotglass2.takeabeltof.database import SqliteTable
 from shotglass2.takeabeltof.utils import cleanRecordID
+from shotglass2.takeabeltof.date_utils import local_datetime_now
+
         
 class Activity(SqliteTable):
     """Staffing Activity Table"""
@@ -69,11 +71,13 @@ class UserTask(SqliteTable):
         sql = """
         user_id INTEGER NOT NULL,
         task_id INTEGER NOT NULL,
+        created DATETIME,
+        modified DATETIME,
         positions INTEGER,
-        user_comment TEXT,
+        signup_comment TEXT,
         attendance_start DATETIME,
         attendance_end DATETIME,
-        attendance_note TEXT,
+        attendance_comment TEXT,
         FOREIGN KEY (user_id) REFERENCES user(id) ON DELETE CASCADE,
         FOREIGN KEY (task_id) REFERENCES user(id) ON DELETE CASCADE """
                 
@@ -82,6 +86,18 @@ class UserTask(SqliteTable):
     def init_table(self):
         """Create the table and initialize data"""
         self.create_table()
+        
+    def new(self):
+        """Setup a new record"""
+        rec = super().new()
+        rec.created = local_datetime_now()
+        rec.modified = rec.created
+        return rec
+        
+    def save(self,rec,**kwargs):
+        rec.modified = local_datetime_now()
+        return super().save(rec,**kwargs)
+        
 
 class Location(SqliteTable):
     """Staffing Location Table"""
