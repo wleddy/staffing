@@ -36,7 +36,7 @@ class Task(SqliteTable):
     def __init__(self,db_connection):
         super().__init__(db_connection)
         self.table_name = 'task'
-        self.order_by_col = 'date(start_date) DESC, lower(title)'
+        self.order_by_col = 'date(start_date), lower(title)'
         self.defaults = {'max_staff':1,'skill_list':''}
         
     def create_table(self):

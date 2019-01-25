@@ -1,0 +1,92 @@
+{% extends 'signup_layout.html' %}
+
+
+{% block body %}
+    {% if listing %}
+    {% for item in listing %}
+    {% set activity = item.activity %}
+    {% set tasks = item.tasks %}
+    {% set location = item.location %}
+    <div id="act-{{ activity.id }}" class="activity-contain w3-row-padding w3-secondary-color">        
+        <p  class="w3-col l2 m2 w3-hide-small" style="padding-top:12pt;">
+            {% if activity.image_url %}
+            <img class="w3-image" src="{{ activity.image_url }}">
+            {% else %}&nbsp;{% endif %}
+        </p>
+        <div class="w3-col w3-half w3-small" style="">
+               <p class="w3-large"><strong>{{ activity.title }}</strong></p>
+                {# render this as markdown #}
+               <p class="">{{ activity.description }}</p>
+        </div>
+        <div class="w3-third " style="padding-left:4pt;">
+            <p>
+                <em>When:</em> <strong>{{ tasks[0].start_date | short_day_and_date }}</strong>
+            </p>
+            <p>
+                <em>Where:</em> <strong>{{ location.title }}</strong> <a href="#">Map...</a>
+            </p>
+            <p class="w3-small">Filled: <a class="w3-button w3-primary-color w3-round-medium filled-bar" style="width:37%;">10 of 20</a></p>
+        </div>
+    </div>
+        {% if tasks %}
+            {% for task in tasks %}
+                <div id="task-head{{ task.id }}" class="w3-row w3-secondary-color task-contain " style="margin-top:-1px;">
+                    <div class="w3-col l2 m2 w3-hide-small">&nbsp;</div>
+                    <div class="w3-col l10 m10">
+                        <p class="w3-primary-color">
+                            <a onclick="$('#task-detail{{ task.id }}').show();$('#task-head{{ task.id }}').hide()" class="w3-button w3-primary-color">+</a>Task: <strong>{{ task.title }}</strong> 
+                            - {{ task.start_date | local_time_string }}<span class="w3-hide-small"> - {{ task.end_date | local_time_string }}</span>
+                        </p>
+                    </div>
+                </div>
+                
+                <div id="task-detail{{ task.id }}" class="w3-row w3-secondary-color task-contain " style="position:relative;top:-1px;display:none;">
+                    <hr class="w3-hide-small" style="margin-left:16.666%;">
+                    <div class="w3-col l2 m2 w3-hide-small">&nbsp;</div>
+                    <div class="w3-col w3-half w3-small">
+                        <p class="w3-medium"><a class="w3-button w3-round-medium w3-primary-color" 
+                            onclick="$('#task-detail{{ task.id }}').hide();$('#task-head{{ task.id }}').show()"
+                            >&ndash;</a>&nbsp;<strong>{{ task.title }}</strong></p>
+                        <p class="w3-small">
+                            {{ task.description }}
+                        </p>
+                        {% if False %}
+                            {# list participants #}
+                            <div class="w3-hide-small">
+                                <p><strong>Participants:</strong></p>
+                                <p style="margin:10pt"> 
+                                    <span class="w3-circle w3-primary-color participant-badge" >AC</span>
+                                </p>
+                            </div>
+                        {% endif %}
+                    </div>
+                    <div class="w3-third " >
+                        <div style="padding-left:4pt;">
+                            <p>
+                                <em>When:</em> <strong>{{ task.start_date | short_day_and_date }}</strong>
+                            </p>
+                            <p>
+                                <em>Shift:</em> <strong>{{ task.start_date | local_time_string }} - {{ task.end_date | local_time_string }}</strong>
+                            </p>
+                        </div>
+                        <div style="text-align:center;">
+                            <p>
+                                <strong>0 </strong> of <strong>1</strong> signed up
+                            </p>
+                            <p style="text-align:center">
+                                <a class="w3-button w3-primary-color w3-round-medium w3-medium" 
+                                onclick="editFromList('{{ url_for('signup.signup')}}/{{ task.id }}')"
+                                >Sign Up</a>
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+            </div>
+        {% else %}<h3>Sorry, there are no tasks for this activity</h3>{% endif %}
+    </div>
+    
+    {% endfor %}
+    {% else %} <h2>Sorry, there are no activities currently planned</h2>{% endif %}
+    
+{% endblock body %}

@@ -122,6 +122,8 @@ from staffing.views import location
 app.register_blueprint(location.mod)
 from staffing.views import task
 app.register_blueprint(task.mod)
+from staffing.views import signup
+app.register_blueprint(signup.mod)
 
 ## Setup the routes for users
 shotglass.register_users(app)
