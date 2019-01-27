@@ -8,6 +8,7 @@ A Task record describes what is needed to fulfill part of an Activity. A Task ha
 * Start and end times
 * The skills required of staff or volunteer to perform the task
 * The number of people requested for the task at the given skill level
+* An optional location
 
 A person signs up for a "Position" in the Task. There may be multiple Positions for a Task. 
 
@@ -29,12 +30,13 @@ another Task and assign an appropriate Skill level to the Task.
  5. Provide Start and End times
  6. Specify skills (user roles) required for the Task. At least one skill level is required.
  7. Specify maximum number of people requested.
+ 8. Select a location for this task if desired.  
+ If the Activity associated has a location, it will be used as the location for this task unless you specify
+ one here.
 
 > Repeat for all Tasks for this Activity
 
 ## Skills
-
-*Updated 1/21/2019*
 
 The list of skills available for Tasks is based on the the User Roles records. The site administrator will
 need to create Roles that represent the jobs that you need done. The following is my current proposal for

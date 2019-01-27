@@ -87,12 +87,12 @@ Managers may export an attendance report suitable to import into a spreadsheet
 1. 'csv' report file is downloaded to user. The report may then be imported into a spreadsheet program such
 as Excel for additional analysis.
 
-## Volunteer Access
+## Staff and Volunteer signup
 
-The system will provide an easy to use interface for the general public to discover and sign up for volunteer
-opportunities at SABA Activities. 
+The system will provide an easy to use interface for staff and the general public to discover and 
+sign up for SABA Activities. 
 
-[More Details](/docs/volunteers.md)
+[More Details](/docs/signups.md)
 
 ## Reports
 
