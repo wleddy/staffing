@@ -123,7 +123,7 @@ def delete(id=0):
     if rec:
         task.delete(rec.id)
         g.db.commit()
-        flash("{} Task Deleted from {}".format(rec.name,task.display_name))
+        flash("Task {} Deleted from {}".format(rec.title,task.display_name))
     
     return redirect(g.listURL)
     
@@ -132,8 +132,8 @@ def valid_input(rec):
     valid_data = True
     #import pdb;pdb.set_trace()
     
-    task_name = request.form.get('title','').strip()
-    if not task_name:
+    task_title = request.form.get('title','').strip()
+    if not task_title:
         valid_data = False
         flash("You must give the task a title")
         
@@ -190,9 +190,9 @@ def coerce_datetime(date_str,time_str,ampm):
     
     tempDatetime = None
     time_parts = time_str.split(":")
-    if len(time_parts) == 0:
+    if len(time_parts) == 0 or time_parts[0] == '':
         valid_data = False
-        flash("That is not a valid Start time")
+        flash("That is not a valid time")
     else:
         for key in range(len(time_parts)):
             if len(time_parts[key]) == 1:

@@ -2,91 +2,148 @@
 
 
 {% block body %}
-    {% if listing %}
-    {% for item in listing %}
-    {% set activity = item.activity %}
-    {% set tasks = item.tasks %}
-    {% set location = item.location %}
-    <div id="act-{{ activity.id }}" class="activity-contain w3-row-padding w3-secondary-color">        
+    <style>
+        .activity-contain{margin:6pt 0 0 0;padding:8pt 0;}
+        @media (min-width:993px){.activity-contain{margin:6pt 16.6666% 0 16.6666%;}}
+        .task-contain{margin:0;padding-bottom:6pt;}
+        @media (min-width:993px){.task-contain{margin:0 16.6666%;}}
+        .task-date-contain{padding:0;}
+        .participant-badge {padding:7pt;min-width:29pt;}
+        .filled-bar {cursor:text;padding:3pt 0pt}
+    </style>
+    
+
+    {% if not tasks %}
+    <div class="w3-row w3-secondary-color task-contain " style="margin-top:-1px;">
+         <h2>Sorry, there are no activities currently planned</h2>
+    </div>
+    {% else %}
+    {% set task_start_date = [''] %}
+    {% set activity_id = [0] %}
+    {% for task in tasks %}
+    {% if task.activity_id != activity_id[0] %}
+    <div id="act-{{ task.activity_id }}" class="activity-contain w3-row-padding w3-secondary-color">        
         <p  class="w3-col l2 m2 w3-hide-small" style="padding-top:12pt;">
-            {% if activity.image_url %}
-            <img class="w3-image" src="{{ activity.image_url }}">
+            {% if task.image_url %}
+            <img class="w3-image" src="{{ task.image_url }}">
             {% else %}&nbsp;{% endif %}
         </p>
         <div class="w3-col w3-half w3-small" style="">
-               <p class="w3-large"><strong>{{ activity.title }}</strong></p>
+               <p class="w3-large">
+                   <strong>{{ task.activity_title }}</strong>
+                   {% if is_admin %}<a class="w3-small" href="{{ url_for('activity.edit')}}{{task.activity_id}}/" target="_blank"><em>(edit)</em></a>{% endif %}
+               </p>
                 {# render this as markdown #}
-               <p class="">{{ activity.description }}</p>
+               <p class="">{{ task.activity_description }}</p>
         </div>
         <div class="w3-third " style="padding-left:4pt;">
             <p>
-                <em>When:</em> <strong>{{ tasks[0].start_date | short_day_and_date }}</strong>
+                <em>Where:</em> <strong>{{ task.act_loc_name | default("", True ) }}</strong> 
+                {% if task.act_loc_lat and task.act_loc_lng %}<a href="#">Map...</a>{% endif %}
             </p>
-            <p>
-                <em>Where:</em> <strong>{{ location.title }}</strong> <a href="#">Map...</a>
+            {% set width_pct = task.activity_filled_positions | default(0,True) / task.activity_max_positions * 74 %}
+            {% if width_pct > 25.0 %}
+            <p class="w3-small">Filled: 
+                <a class="w3-button w3-primary-color w3-round-medium filled-bar" style="width:{{ width_pct }}%;"
+                >{{ task.activity_filled_positions | default("0", True) }} of {{ task.activity_max_positions | default("0", True) }}</a>
             </p>
-            <p class="w3-small">Filled: <a class="w3-button w3-primary-color w3-round-medium filled-bar" style="width:37%;">10 of 20</a></p>
+            {% else %}
+            <p class="w3-small">Filled: 
+                <a class="w3-button w3-primary-color w3-round-medium filled-bar" style="width:{{ width_pct }}%;">&nbsp;</a>
+                &nbsp;{{ task.activity_filled_positions | default("0", True) }} of {{ task.activity_max_positions | default("0", True) }}
+            </p>
+            {% endif %}
         </div>
-    </div>
-        {% if tasks %}
-            {% for task in tasks %}
-                <div id="task-head{{ task.id }}" class="w3-row w3-secondary-color task-contain " style="margin-top:-1px;">
-                    <div class="w3-col l2 m2 w3-hide-small">&nbsp;</div>
-                    <div class="w3-col l10 m10">
-                        <p class="w3-primary-color">
-                            <a onclick="$('#task-detail{{ task.id }}').show();$('#task-head{{ task.id }}').hide()" class="w3-button w3-primary-color">+</a>Task: <strong>{{ task.title }}</strong> 
-                            - {{ task.start_date | local_time_string }}<span class="w3-hide-small"> - {{ task.end_date | local_time_string }}</span>
-                        </p>
-                    </div>
-                </div>
-                
-                <div id="task-detail{{ task.id }}" class="w3-row w3-secondary-color task-contain " style="position:relative;top:-1px;display:none;">
-                    <hr class="w3-hide-small" style="margin-left:16.666%;">
-                    <div class="w3-col l2 m2 w3-hide-small">&nbsp;</div>
-                    <div class="w3-col w3-half w3-small">
-                        <p class="w3-medium"><a class="w3-button w3-round-medium w3-primary-color" 
-                            onclick="$('#task-detail{{ task.id }}').hide();$('#task-head{{ task.id }}').show()"
-                            >&ndash;</a>&nbsp;<strong>{{ task.title }}</strong></p>
-                        <p class="w3-small">
-                            {{ task.description }}
-                        </p>
-                        {% if False %}
-                            {# list participants #}
-                            <div class="w3-hide-small">
-                                <p><strong>Participants:</strong></p>
-                                <p style="margin:10pt"> 
-                                    <span class="w3-circle w3-primary-color participant-badge" >AC</span>
-                                </p>
-                            </div>
-                        {% endif %}
-                    </div>
-                    <div class="w3-third " >
-                        <div style="padding-left:4pt;">
-                            <p>
-                                <em>When:</em> <strong>{{ task.start_date | short_day_and_date }}</strong>
-                            </p>
-                            <p>
-                                <em>Shift:</em> <strong>{{ task.start_date | local_time_string }} - {{ task.end_date | local_time_string }}</strong>
-                            </p>
-                        </div>
-                        <div style="text-align:center;">
-                            <p>
-                                <strong>0 </strong> of <strong>1</strong> signed up
-                            </p>
-                            <p style="text-align:center">
-                                <a class="w3-button w3-primary-color w3-round-medium w3-medium" 
-                                onclick="editFromList('{{ url_for('signup.signup')}}/{{ task.id }}')"
-                                >Sign Up</a>
-                            </p>
-                        </div>
-                    </div>
-                </div>
-            {% endfor %}
+        </div>
+        {% endif %}
+        {# don't show activity head again till activity changes #}
+        {% set _ = activity_id.pop() %}
+        {% set _ = activity_id.append(task.activity_id) %}
+        {# only show the date once within task list of same date #}
+        {% if task.start_date[:10] != task_start_date[0] %}
+        <div class="w3-row w3-secondary-color task-contain task-date-contain" style="margin-top:-1px;">
+            <div class="w3-col l2 m2 w3-hide-small">&nbsp;</div>
+            <div class="w3-col l10 m10">
+            <p>
+                <em>When:</em> <strong>{{ task.start_date[:10] | abbr_date_string }}</strong>
+            </p>
             </div>
-        {% else %}<h3>Sorry, there are no tasks for this activity</h3>{% endif %}
-    </div>
+        </div>
+        {% endif %}
+        {% set _ = task_start_date.pop() %}
+        {% set _ = task_start_date.append(task.start_date[:10]) %}
+        <div id="task-head{{ task.task_id }}" class="w3-row w3-secondary-color task-contain task-date-contain" style="margin-top:-1px;">
+            <div class="w3-col l2 m2 w3-hide-small">&nbsp;</div>
+            <div class="w3-col l10 m10">
+                <p class="w3-primary-color">
+                    <a onclick="$('#task-detail{{ task.task_id }}').show();$('#task-head{{ task.task_id }}').hide()" class="w3-button w3-primary-color">+</a><strong>{{ task.task_title }}</strong> 
+                    <span class="w3-small">- {{ task.start_date | local_time_string | lower }}
+                        <span class="w3-hide-small"> - {{ task.end_date | local_time_string | lower }}
+                    </span>
+                    {% if task.task_filled_positions >= task.max_positions %}<span class="w3-small"><em>(full)</em></span>{% endif %}
+                </span>
+                </p>
+            </div>
+        </div>
+        
+        <div id="task-detail{{ task.task_id }}" class="w3-row w3-secondary-color task-contain " style="position:relative;top:-1px;display:none;">
+            <hr class="w3-hide-small" style="margin-left:16.666%;margin-top:0">
+            <hr class="w3-hide-large w3-hide-medium" style="margin-top:0">
+            <div class="w3-col l2 m2 w3-hide-small">&nbsp;</div>
+            <div class="w3-col w3-half w3-small">
+                <p class="w3-medium"><a class="w3-button w3-round-medium w3-primary-color" 
+                    onclick="$('#task-detail{{ task.task_id }}').hide();$('#task-head{{ task.task_id }}').show()"
+                    >&ndash;</a>&nbsp;<strong>{{ task.task_title }}</strong></p>
+                <p class="w3-small">
+                    {{ task.task_description }}
+                </p>
+                {% set participant_list = [] %}
+                {% set initials_list = []%}
+                {% if task.participants[task.task_id] %}
+                {% set initials_list = task.participants[task.task_id]['initials']%}
+                {% set participant_list = task.participants[task.task_id]['users']%}
+                {% endif %}
+                {% if initials_list %}
+                    <div class="w3-hide-small">
+                        <p><strong>Participants:</strong></p>
+                        <p style="margin:10pt"> 
+                            {% for initials in initials_list %}
+                                <span class="w3-circle w3-primary-color participant-badge" >{{initials}}</span>
+                            {% endfor %}
+                        </p>
+                    </div>
+                {% endif %}
+            </div>
+            <div class="w3-third " >
+                <div style="padding-left:4pt;">
+                    <p>
+                        <em>Where:</em> <strong>{{ task.task_loc_name | default("", True ) }}</strong> 
+                        {% if task.task_loc_lat and task.task_loc_lng %}<a href="#">Map...</a>{% endif %}
+                    </p>
+                    <p>
+                        <em>When:</em> <strong>{{ task.start_date | short_day_and_date }}</strong>
+                    </p>
+                    <p>
+                        <em>Shift:</em> <strong>{{ task.start_date | local_time_string | lower }} - {{ task.end_date | local_time_string | lower }}</strong>
+                    </p>
+                </div>
+                <div style="text-align:center;">
+                    <p>
+                        <strong>{{ task.task_filled_positions | default('0',True) }}</strong> of <strong>{{ task.max_positions }}</strong> signed up
+                    </p>
+                    <p style="text-align:center">
+                        {% if task.task_filled_positions >= task.max_positions and session['user_id'] not in participant_list %}
+                        <a class="w3-button w3-grey w3-round-medium w3-medium" >This Assignment is Full</a>
+                        {% else %}
+                        <a class="w3-button w3-primary-color w3-round-medium w3-medium" 
+                        onclick="editFromList('{{ url_for('signup.signup')}}/{{ task.task_id }}')"
+                        >{% if session['user_id'] in participant_list %}My Assignment{% else %}Sign Up{% endif %}</a>
+                        {% endif %}
+                    </p>
+                </div>
+            </div>
+        </div>
+    {% endfor %} {# tasks #}
     
-    {% endfor %}
-    {% else %} <h2>Sorry, there are no activities currently planned</h2>{% endif %}
-    
+    {% endif %}{# end not tasks #}
 {% endblock body %}
