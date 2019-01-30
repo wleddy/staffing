@@ -31,22 +31,24 @@ def display():
 @mod.route('/edit/<int:id>/',methods=['GET','POST',])
 @mod.route('/edit/<int:id>/<int:activity_id>/',methods=['GET','POST',])
 @table_access_required(Task)
-def edit(id=0,activity_id=0):
+def edit(id=0,activity_id=0,edit_from_list=False):
     setExits()
     g.title = 'Edit Task Record'
+    #import pdb;pdb.set_trace()
+    
+    task_date=None
+    start_time=None
+    start_time_AMPM=None
+    end_time=None
+    end_time_AMPM=None
+    
+    if id == 0 and request.form:
+        id = request.form.get('id',0)
+        activity_id = request.form.get('activity_id',0)
+    
     id = cleanRecordID(id)
     activity_id = cleanRecordID(activity_id)
-    current_activity = None
-    if activity_id > 0:
-        current_activity = Activity(g.db).get(activity_id)
-        
-    activities =  Activity(g.db).select() # This should only return current or future activities
-    
-    if request.form:
-        id = cleanRecordID(request.form.get("id"))
-        
     task = Task(g.db)
-    #import pdb;pdb.set_trace()
     
     if id < 0:
         return abort(404)
@@ -56,20 +58,30 @@ def edit(id=0,activity_id=0):
         if not rec:
             flash("{} Record Not Found".format(task.display_name))
             return redirect(g.listURL)
+        activity_id = rec.activity_id
     else:
         rec = task.new()
         rec.activity_id = activity_id
-
+    
+    current_activity = Activity(g.db).get(activity_id)
+    activities = None
+    if not current_activity:
+        activities =  Activity(g.db).select() # This should only return current or future activities
+    
+    #import pdb;pdb.set_trace()
+    
     roles = Role(g.db).select()
     selected_roles = [] # this needs to be populated from TaskRoles
         
     
     if request.form:
         task.update(rec,request.form)
-        rec.activity_id = cleanRecordID(request.form.get("activity_id"))
+        #rec.activity_id = cleanRecordID(request.form.get("activity_id"))
         if valid_input(rec):
             task.save(rec)
             g.db.commit()
+            if edit_from_list:
+                return 'success'
             return redirect(g.listURL)
         else:
             task_date=request.form.get('task_date',"")
@@ -77,26 +89,24 @@ def edit(id=0,activity_id=0):
             start_time_AMPM=request.form.get('start_time_AMPM',"AM")
             end_time=request.form.get('end_time',"")
             end_time_AMPM=request.form.get('end_time_AMPM',"AM")
-        
-    task_date=None
-    start_time=None
-    start_time_AMPM=None
-    end_time=None
-    end_time_AMPM=None
+    else:
+        if rec.start_date and isinstance(rec.start_date,str):
+            rec.start_date = getDatetimeFromString(rec.start_date)
+        if rec.start_date:
+            task_date=date_to_string(rec.start_date,'date')
+            start_time=date_to_string(rec.start_date,'time')
+            start_time_AMPM=date_to_string(rec.start_date,'ampm').upper()
+        if rec.end_date and isinstance(rec.end_date,str):
+            rec.start_date = getDatetimeFromString(rec.end_date)
+        if rec.end_date:
+            end_time=date_to_string(rec.end_date,'time')
+            end_time_AMPM=date_to_string(rec.end_date,'ampm').upper()
+            
+    template = 'task_edit.html'
+    if edit_from_list:
+        template = 'task_embed_edit.html'
     
-    if rec.start_date and isinstance(rec.start_date,str):
-        rec.start_date = getDatetimeFromString(rec.start_date)
-    if rec.start_date:
-        task_date=date_to_string(rec.start_date,'date')
-        start_time=date_to_string(rec.start_date,'time')
-        start_time_AMPM=date_to_string(rec.start_date,'ampm').upper()
-    if rec.end_date and isinstance(rec.end_date,str):
-        rec.start_date = getDatetimeFromString(rec.end_date)
-    if rec.end_date:
-        end_time=date_to_string(rec.end_date,'time')
-        end_time_AMPM=date_to_string(rec.end_date,'ampm').upper()
-    
-    return render_template('task_edit.html',rec=rec,
+    return render_template(template,rec=rec,
             roles=roles,
             task_date=task_date,
             start_time=start_time,
@@ -128,6 +138,24 @@ def delete(id=0):
     return redirect(g.listURL)
     
     
+@mod.route('/edit_from_list/<int:id>/',methods=['GET','POST',])
+@mod.route('/edit_from_list/<int:id>',methods=['GET','POST',])
+@mod.route('/edit_from_list/<int:id>/<int:activity_id>/',methods=['GET','POST',])
+@mod.route('/edit_from_list/<int:id>/<int:activity_id>',methods=['GET','POST',])
+@mod.route('/edit_from_list/',methods=['GET','POST',])
+def edit_from_list(id=0,activity_id=0):
+    return edit(id,activity_id,True)
+    
+    
+@mod.route('/get_task_for_activity/',methods=['GET','POST',])
+@mod.route('/get_task_for_activity/<int:id>/',methods=['GET','POST',])
+def get_task_list_for_activity(id=0):
+    """Return a fully formated html table for use in the Activity edit form"""
+    id = cleanRecordID(id)
+    tasks = Task(g.db).select(where='activity_id = {}'.format(id))
+    return render_template('task_embed_list.html',tasks=tasks,activity_id=id)
+    
+    
 def valid_input(rec):
     valid_data = True
     #import pdb;pdb.set_trace()
@@ -137,7 +165,7 @@ def valid_input(rec):
         valid_data = False
         flash("You must give the task a title")
         
-    if not rec.activity_id or rec.activity_id < 1:
+    if not rec.activity_id or int(rec.activity_id) < 1:
         valid_data = False
         flash("You must select an activity for this task")
     else:
@@ -212,10 +240,16 @@ def coerce_datetime(date_str,time_str,ampm):
 def skills_to_list():
     """Create a list of skill (role) ids from form"""
     skills = []
-    if 'skills' in request.form:
-        #delete all the users current roles
-        for role_id in request.form.getlist('skills'):
+    for role_id in request.form.getlist('skills'):
+        skills.append(str(role_id))
+    if not skills:
+        # This is a hack that has to do with the way I submit the form via js
+        # The 'skills' elements in request.form have the name 'skills[]' only when submitted
+        #   via common.js.submitModalForm. Don't want to change it because it works elsewhere.
+        # This may be an artifact of the way php handles multiple select elements
+        for role_id in request.form.getlist('skills[]'):
             skills.append(str(role_id))
+        
     
     return skills
     

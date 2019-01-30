@@ -1,0 +1,20 @@
+<p><a onclick="editFromList('{{ url_for('task.edit_from_list')}}0/{{ activity_id }}')" href="#" >New Task...</a></p>
+{% if tasks %}
+<table class="datatable w3-table w3-striped w3-hoverable">
+<tr class="w3-primary-color">
+	<th>Task</th>
+	<th>Date</th>
+</tr>
+{% for task in tasks %}
+    <tr>
+        <td  onclick="editFromList('{{ url_for('task.edit_from_list') }}{{task.id}}/');">
+            {{ task.title | truncate(35)}}
+        </td>
+        <td  onclick="editFromList('{{ url_for('task.edit_from_list') }}{{task.id}}/');">
+             {{ task.start_date | short_date_string }}
+        </td>
+    </tr>
+{% endfor %}
+{% else %}
+<p>No Tasks Yet...</p>
+{% endif %}{# if tasks #}

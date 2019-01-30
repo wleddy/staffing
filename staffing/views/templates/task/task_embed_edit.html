@@ -1,0 +1,15 @@
+{# task form for response to AJAX request #}
+{% include "flasher.html"%}
+<form id="taskFromListForm"  action="" method="POST">
+        {% include "task_edit_form.html"%}
+		<p>
+		<a class="w3-button w3-cancel-button-color" onclick="cancelModalForm()">Cancel</a>
+		<input class="w3-button w3-save-button-color" type="button" 
+            onclick="submitModalForm('taskFromListForm', 
+            '{{ url_for('task.edit_from_list')}}{{rec.id | default(0,True)}}/', 
+            'task_list', 
+            '{{ url_for('task.get_task_list_for_activity')}}{{ rec.activity_id}}')" 
+            name="Save" value="Save" />
+		</p>
+</form>
+</div>

@@ -12,8 +12,8 @@
 		</tr>
 		{% for rec in recs %}
 	    <tr>
-			<td onclick="window.location='{{ g.editURL }}{{rec.id}}/'">{{ rec.id }}</a></td>
-			<td onclick="window.location='{{ g.editURL }}{{rec.id}}/'">{{ rec.title }}</a></td>
+			<td onclick="window.location='{{ g.editURL }}{{rec.id}}/'">{{ rec.id }}</td>
+			<td onclick="window.location='{{ g.editURL }}{{rec.id}}/'">{{ rec.title }}</td>
 			<td class="w3-hide-small" onclick="window.location='{{ g.editURL }}{{rec.id}}/'">{{ rec.description|default("",true) }}</td>
 		</tr>
 		{% endfor %}

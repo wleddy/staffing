@@ -5,6 +5,7 @@ from shotglass2.takeabeltof.utils import render_markdown_for, printException, cl
 from shotglass2.takeabeltof.date_utils import datetime_as_string
 from staffing.models import Activity, Location, Task, UserTask
 from shotglass2.users.models import User
+from staffing.views.task import get_task_list_for_activity
 
 mod = Blueprint('activity',__name__, template_folder='templates/activity', url_prefix='/activity')
 
@@ -56,6 +57,8 @@ def edit(id=0):
 
     locations = Location(g.db).select()
     
+    task_embed_list = get_task_list_for_activity(rec.id)
+    
     if request.form:
         activity.update(rec,request.form)
         rec.location_id = cleanRecordID(request.form.get('location_id',-1))
@@ -65,7 +68,7 @@ def edit(id=0):
             return redirect(g.listURL)
         
         
-    return render_template('activity_edit.html',rec=rec,locations=locations)
+    return render_template('activity_edit.html',rec=rec,locations=locations,task_embed_list=task_embed_list)
     
     
 @mod.route('/delete/',methods=['GET','POST',])
