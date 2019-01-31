@@ -6,7 +6,7 @@
 	<th>Date</th>
 </tr>
 {% for task in tasks %}
-    <tr>
+    <tr id="list-row-{{task.id}}">
         <td  onclick="editFromList('{{ url_for('task.edit_from_list') }}{{task.id}}/');">
             {{ task.title | truncate(35)}}
         </td>

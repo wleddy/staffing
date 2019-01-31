@@ -155,9 +155,22 @@ def delete(id=0):
 def edit_from_list(id=0,activity_id=0):
     return edit(id,activity_id,True)
     
+@mod.route('/delete_from_list/<int:id>/',methods=['GET','POST',])
+@mod.route('/delete_from_list/<int:id>',methods=['GET','POST',])
+@mod.route('/delete_from_list/',methods=['GET','POST',])
+@table_access_required(Task)
+def delete_from_list(id=0):
+    id = cleanRecordID(id)
+    if id > 0:
+        rec = Task(g.db).get(id)
+        if rec:
+            delete(id)
+            return "success"
+    return 'Could not find a Task with that ID'
+
     
-@mod.route('/get_task_for_activity/',methods=['GET','POST',])
-@mod.route('/get_task_for_activity/<int:id>/',methods=['GET','POST',])
+@mod.route('/get_task_list_for_activity/',methods=['GET','POST',])
+@mod.route('/get_task_list_for_activity/<int:id>/',methods=['GET','POST',])
 def get_task_list_for_activity(id=0):
     """Return a fully formated html table for use in the Activity edit form"""
     id = cleanRecordID(id)
