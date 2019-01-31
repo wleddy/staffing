@@ -3,6 +3,8 @@ from flask_mail import Mail
 from shotglass2 import shotglass
 from shotglass2.takeabeltof.database import Database
 from shotglass2.takeabeltof.jinja_filters import register_jinja_filters
+from shotglass2.takeabeltof.utils import cleanRecordID
+from shotglass2.users.views.login import setUserStatus
 from shotglass2.users.admin import Admin
 from staffing.models import Activity, Task, Location, ActivityType
 # Create app
@@ -82,8 +84,9 @@ def _before():
     
     # Is the user signed in?
     g.user = None
-    if 'user' in session:
-        g.user = session['user']
+    if 'user_id' in session and 'user' in session:
+        # Refresh the user session
+        setUserStatus(session['user'],cleanRecordID(session['user_id']))
         
         
     g.admin = Admin(g.db) # This is where user access rules are stored
