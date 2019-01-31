@@ -3,7 +3,7 @@ from flask import request, session, g, redirect, url_for, abort, \
 from shotglass2.users.admin import login_required, table_access_required
 from shotglass2.takeabeltof.utils import render_markdown_for, printException, cleanRecordID
 from shotglass2.takeabeltof.date_utils import datetime_as_string
-from staffing.models import Activity, Location, Task, UserTask
+from staffing.models import Activity, Location, ActivityType
 from shotglass2.users.models import User
 from staffing.views.task import get_task_list_for_activity
 
@@ -54,8 +54,13 @@ def edit(id=0):
         rec.manager_name = " ".join([user.first_name,user.last_name])
         rec.manager_email = user.email
         rec.manager_phone = user.phone
+        rec.title = "New Activity"
+        activity.save(rec)
+        g.cancelURL = url_for('.delete') + str(rec.id)
+        g.db.commit()
 
     locations = Location(g.db).select()
+    activity_types = ActivityType(g.db).select()
     
     task_embed_list = get_task_list_for_activity(rec.id)
     
@@ -68,7 +73,7 @@ def edit(id=0):
             return redirect(g.listURL)
         
         
-    return render_template('activity_edit.html',rec=rec,locations=locations,task_embed_list=task_embed_list)
+    return render_template('activity_edit.html',rec=rec,locations=locations,activity_types=activity_types,task_embed_list=task_embed_list)
     
     
 @mod.route('/delete/',methods=['GET','POST',])

@@ -76,7 +76,7 @@
             <div class="w3-col l2 m2 w3-hide-small">&nbsp;</div>
             <div class="w3-col l10 m10">
                 <p class="w3-primary-color">
-                    <a onclick="$('#task-detail{{ task.task_id }}').show();$('#task-head{{ task.task_id }}').hide()" class="w3-button w3-primary-color">+</a><strong>{{ task.task_title }}</strong> 
+                    <a onclick="$('#task-detail{{ task.task_id }}').show();$('#task-head{{ task.task_id }}').hide()" class="w3-button w3-primary-color">+</a><strong>{{ task.task_title | truncate(40) }}</strong> 
                     <span class="w3-small">- {{ task.start_date | local_time_string | lower }}
                         <span class="w3-hide-small"> - {{ task.end_date | local_time_string | lower }}
                     </span>
@@ -117,7 +117,7 @@
             <div class="w3-third " >
                 <div style="padding-left:4pt;">
                     <p>
-                        <em>Where:</em> <strong>{{ task.task_loc_name | default("", True ) }}</strong> 
+                        <em>Where:</em> <strong>{{ task.task_loc_name }}</strong> 
                         {% if task.task_loc_lat and task.task_loc_lng %}<a href="#">Map...</a>{% endif %}
                     </p>
                     <p>

@@ -17,9 +17,21 @@
                 {% endif %}
             </select>
         </p>
+        <p>{{ select_field("activity_type_id","Activity Type (optional)", class="w3-border") }}
+                <option value="0">Select an Activity Type</option>
+                {% if activity_types %}
+                {% for act_type in activity_types %}
+                    <option value="{{act_type.id}}" {% if act_type.id == rec.activity_type_id %}selected="selected" {% endif %}>{{act_type.type}}</option>
+                {% endfor %}
+                {% endif %}
+            </select>
+        </p>
         <p>{{ input_field(rec.manager_name,"manager_name")}}</p>
         <p>{{ input_field(rec.manager_email,"manager_email")}}</p>
         <p>{{ input_field(rec.manager_phone,"manager_phone")}}</p>
+        <p>{{ input_field(rec.client_name,"client_name")}}</p>
+        <p>{{ input_field(rec.client_email,"client_email")}}</p>
+        <p>{{ input_field(rec.client_phone,"client_phone")}}</p>
         <p>{{ input_field(rec.image_url,"image_url",label="Image URL")}}</p>
     
     </fieldset>

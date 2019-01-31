@@ -61,6 +61,13 @@ def edit(id=0,activity_id=0,edit_from_list=False):
         activity_id = rec.activity_id
     else:
         rec = task.new()
+        if 'last_task' in session:
+            # apply previous record
+            ses_rec = session['last_task']
+            for key,value in rec._asdict().items():
+                if key != 'id' and key in ses_rec:
+                    rec._update([(key,ses_rec[key])])
+            
         rec.activity_id = activity_id
     
     current_activity = Activity(g.db).get(activity_id)
@@ -80,6 +87,7 @@ def edit(id=0,activity_id=0,edit_from_list=False):
         if valid_input(rec):
             task.save(rec)
             g.db.commit()
+            session['last_task'] = rec._asdict()
             if edit_from_list:
                 return 'success'
             return redirect(g.listURL)
@@ -143,6 +151,7 @@ def delete(id=0):
 @mod.route('/edit_from_list/<int:id>/<int:activity_id>/',methods=['GET','POST',])
 @mod.route('/edit_from_list/<int:id>/<int:activity_id>',methods=['GET','POST',])
 @mod.route('/edit_from_list/',methods=['GET','POST',])
+@table_access_required(Task)
 def edit_from_list(id=0,activity_id=0):
     return edit(id,activity_id,True)
     
@@ -228,7 +237,7 @@ def coerce_datetime(date_str,time_str,ampm):
                     
         time_parts.extend(["00","00"])
         if ampm != None:
-            if ampm.upper() == 'PM' and int(time_parts[0])<13:
+            if ampm.upper() == 'PM' and int(time_parts[0])<12:
                 time_parts[0] = str(int(time_parts[0]) + 12)            
             if ampm.upper() == 'AM' and int(time_parts[0])> 12:
                 time_parts[0] = str(int(time_parts[0]) - 12)            

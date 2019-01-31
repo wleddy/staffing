@@ -75,7 +75,8 @@ class Task(SqliteTable):
             end_date DATETIME,
             max_positions INTEGER,
             activity_id INTEGER,
-            location_id INTEGER """
+            location_id INTEGER,
+            FOREIGN KEY (activity_id) REFERENCES activity(id) ON DELETE CASCADE """
                 
         super().create_table(sql)
         
