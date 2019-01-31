@@ -141,7 +141,7 @@ def delete(id=0):
     if rec:
         task.delete(rec.id)
         g.db.commit()
-        flash("Task {} Deleted from {}".format(rec.title,task.display_name))
+        #flash("Task {} Deleted from {}".format(rec.title,task.display_name))
     
     return redirect(g.listURL)
     
