@@ -41,6 +41,7 @@ def edit(id=0,activity_id=0,edit_from_list=False):
     start_time_AMPM=None
     end_time=None
     end_time_AMPM=None
+    locations = Location(g.db).select()
     
     if id == 0 and request.form:
         id = request.form.get('id',0)
@@ -85,6 +86,9 @@ def edit(id=0,activity_id=0,edit_from_list=False):
         task.update(rec,request.form)
         #rec.activity_id = cleanRecordID(request.form.get("activity_id"))
         if valid_input(rec):
+            if cleanRecordID(rec.location_id) <= 0:
+                rec.location_id = None
+            
             task.save(rec)
             g.db.commit()
             session['last_task'] = rec._asdict()
@@ -123,6 +127,7 @@ def edit(id=0,activity_id=0,edit_from_list=False):
             end_time_AMPM=end_time_AMPM,
             activities=activities,
             current_activity=current_activity,
+            locations=locations,
             )
     
     

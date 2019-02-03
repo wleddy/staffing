@@ -99,7 +99,7 @@ class UserTask(SqliteTable):
         super().__init__(db_connection)
         self.table_name = 'user_task'
         self.order_by_col = 'id'
-        self.defaults = {}
+        self.defaults = {'positions': 0,}
         
     def create_table(self):
         """Define and create the table"""

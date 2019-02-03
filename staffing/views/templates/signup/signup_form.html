@@ -1,0 +1,47 @@
+<form id="signupModalForm"  action="" method="POST">
+    <input type="hidden" name="id" value="{{task.id}}">
+	<div class="transaction-buttons data-element">
+        <div class="activity-contain w3-row-padding w3-secondary-color ">  
+        <!-- a simple tool to help in debugging layout issues -->
+        <!-- <div class="w3-hide-small"><div class="w3-col m1 w3-center w3-grey">1</div><div class="w3-col m1 w3-center">2</div><div class="w3-col m1 w3-center w3-grey">3</div><div class="w3-col m1 w3-center">4</div><div class="w3-col m1 w3-center w3-grey">5</div><div class="w3-col m1 w3-center">6</div><div class="w3-col m1 w3-center w3-grey">7</div><div class="w3-col m1 w3-center">8</div><div class="w3-col m1 w3-center w3-grey">9</div><div class="w3-col m1 w3-center">10</div><div class="w3-col m1 w3-center w3-grey">11</div><div class="w3-col m1 w3-center">12</div></div> -->
+        <div class="w3-col w3-half">
+            <p class="w3-medium"><strong>{{task.title}}</strong></p>
+            <p class="w3-small">{{ task.description }}</p>
+        </div>
+        <div class="w3-col w3-half " >
+            <div style="padding-left:4pt;">
+                <p>
+                    <em>When:</em> <strong>{{ task.start_date | abbr_date_string}}</strong>
+                </p>
+                <p>
+                    <em>Shift:</em> <strong>{{ task.start_date | local_time_string | lower }} - {{ task.end_date | local_time_string | lower }}</strong>
+                </p>
+            </div>
+            <div style="text-align:center;">
+                <p class="w3-small">Your Shifts:
+                <p>
+                    <a class="w3-button w3-primary-color w3-round-medium w3-xlarge" onclick="signup_count('#signup-count',-1,{{task.max_positions - filled_positions}})" style="padding:6pt;width:30pt;" title="Decrease Shifts">&ndash;</a>
+                    <input class="w3-xlarge" id="signup-count" type="num" name='positions' value="{{signup.positions | default}}" readonly style="padding:6pt;width:30pt;display:block-inline;text-align:center"/>
+                    <a class="w3-button w3-primary-color w3-round-medium w3-xlarge"  onclick="signup_count('#signup-count',1,{{task.max_positions - filled_positions}})" style="padding:6pt;width:30pt;" title="Increase Shifts">+</a>
+                </p>
+            <p style="text-align:left">
+                Comment:<br>
+                <textarea rows="4" style="width:100%" name="attendance_comment" >{{ signup.attendance_comment | default("", True) }}</textarea>
+            </p>
+                <div>
+            		<p>
+                		<a class="w3-button w3-primary-color w3-round-medium " onclick="cancelModalForm()">Cancel</a>
+                        &nbsp;&nbsp;
+                		<input class="w3-button w3-primary-color w3-round-medium " type="button" 
+                            onclick="submitModalForm('signupModalForm',
+                            '{{url_for('signup.signup')}}',
+                            'task-body{{ task.id }}',
+                            '{{url_for('signup.signup_success')}}{{task.id}}'
+                            )" 
+                            name="Save" value="Save" />
+            		</p>
+                </div>
+        </div>
+	</div>
+    </div>
+</form>

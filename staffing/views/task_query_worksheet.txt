@@ -5,8 +5,8 @@ location.lat,
 location.lng,
 (select datetime(task.start_date) from task where task.activity_id = activity.id 
     order by datetime(task.start_date) limit 1 ) as active_first_date, 
-(select coalesce(sum(user_task.positions),0) from user_task 
-    where task.id = user_task.task_id) as activity_filled_positions,
+    (select coalesce(sum(user_task.positions),0) from user_task
+        where user_task.task_id in (select id from task where task.activity_id = activity.id)) as activity_filled_positions,
 (select coalesce(sum(task.max_positions),1) from task 
     where task.activity_id = activity.id) as activity_max_positions,
 task.id as task_id,
@@ -70,3 +70,12 @@ join user on user.id = user_task.user_id
 where user_task.task_id = {}
 order by user.first_name, user.last_name
 
+
+    (select coalesce(sum(user_task.positions),0) from user_task 
+        where task.id = user_task.task_id) as activity_filled_positions,
+    (select coalesce(sum(task.max_positions),1) from task 
+        where task.activity_id = activity.id) as activity_max_positions
+
+
+select coalesce(sum(user_task.positions),0) from user_task
+where user_task.task_id in (select id from task where task.activity_id = 1)

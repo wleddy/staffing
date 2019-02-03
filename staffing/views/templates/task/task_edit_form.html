@@ -19,6 +19,15 @@
     <p>{{ input_field(rec.title,'title',req=True)}}</p>
     <p>{{ label_only(label="Description of duties (may include markdown)")}}</p>
     <p><textarea rows="5" name="description" style="width:100%;">{{rec.description |default('',True)}}</textarea></p>
+    <p>{{ select_field("location_id","Location", class="w3-border") }}
+            <option value="0">Same as Activity Location</option>
+            {% if locations %}
+            {% for loc in locations %}
+                <option value="{{loc.id}}" {% if loc.id == rec.location_id %}selected="selected" {% endif %}>{{loc.location_name}}</option>
+            {% endfor %}
+            {% endif %}
+        </select>
+    </p>
     <p>{{ input_field(task_date,'task_date',label="Date",placeholder="MM/DD/YY")}}</p>
     <p class="w3-row w3-quarter" style="padding-right:3pt;">{{ input_field(start_time,'start_time', label="Start Time", placeholder="8:00")}}</p>
     <p class="w3-row w3-quarter" style="padding-left:3pt;">{{ select_field("start_time_AMPM",label='AM/PM')}}
