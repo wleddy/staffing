@@ -17,4 +17,24 @@ The volunteer response is primarily a Thank You and a chance for them to report 
 
 > Responses to emails and texts will update the attendance records automatically. 
 
+### Manager Attendance Updates
+
+The managers will have access to Attendance records from the web site.
+
+1. Sign in as manager.
+1. Select "Manage Attendance"
+1. Select Activity and Task
+1. Select user record and update attendance info.
+
+> Repeat as needed.
+
+Managers may export an attendance report suitable to import into a spreadsheet
+
+1. Sign in to an manager's account
+1. Select "Attendance Report"
+1. Select Activities to report
+1. 'csv' report file is downloaded to user. The report may then be imported into a spreadsheet program such
+as Excel for additional analysis.
+
+
 [Return to Index](/docs/use_case.md)

@@ -1,6 +1,6 @@
 # "Activities and Tasks" Use Case
 
-_Modified Jan. 20, 2019_
+_Modified Jan. 27, 2019_
 
 ## Overview
 
@@ -12,7 +12,7 @@ The central element of the system are the Activities. Activities don't have a da
 data domain. In our experience activities tend to repeat on a yearly or other basis. The dates and times of an Activity 
 are defined by [Tasks](/docs/tasks.md).
 
-An Activity may only occur at one Location though there need not be a location specified.
+An Activity may occur at one Location or each Task may specify a different location. A specific location is not requried.
 
 [More details.](/docs/activities.md)
 
@@ -44,18 +44,12 @@ Weekly announcements will be automatically sent to all staff with 1 month of upc
 Automated announcements will be sent to volunteers who have opted in for text and/or email announcements 
 with 1 month of upcoming Tasks.
 
-## Signup
+## Staff and Volunteer signup
 
-From publicly accessable web page, a visitor may:
+The system will provide an easy to use interface for staff and the general public to discover and 
+sign up for SABA Activities. 
 
-1. Sign in if desired. Staff must sign in to see non-volunteer activities and tasks.  
-1. Select future Activity from a list 
-1. Select a volunteer task from list of tasks for Activity
-1. Sign in with email address (if not signed in)  
-1. Users with passwords set will be required to enter password.
-  *  If not a registered user collect info and create account
-1. Acknowledge signup and send email with iCalendar activity
-1. Return visitor to tasks list
+[More Details](/docs/signups.md)
 
 ### Reminders
 
@@ -67,32 +61,6 @@ Following an Activity the system will automatically contact the participants to 
 to confirm their hours.
 
 [More Details.](/docs/attendance.md)
-
-### Manager Attendance Updates
-
-The managers will have access to Attendance records from the web site.
-
-1. Sign in as manager.
-1. Select "Manage Attendance"
-1. Select Activity and Task
-1. Select user record and update attendance info.
-
-> Repeat as needed.
-
-Managers may export an attendance report suitable to import into a spreadsheet
-
-1. Sign in to an manager's account
-1. Select "Attendance Report"
-1. Select Activities to report
-1. 'csv' report file is downloaded to user. The report may then be imported into a spreadsheet program such
-as Excel for additional analysis.
-
-## Staff and Volunteer signup
-
-The system will provide an easy to use interface for staff and the general public to discover and 
-sign up for SABA Activities. 
-
-[More Details](/docs/signups.md)
 
 ## Reports
 
