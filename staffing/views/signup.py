@@ -70,7 +70,7 @@ def signup(task_id=None):
     if not g.user:
         next = request.url
         rec = User(g.db).new()
-        return render_template('signup_login.html',rec=rec,next=next)
+        return render_template('signup_login.html',rec=rec,next=next,submit_script = 'submitModalToModalForm',from_main=0)
     
     # get user_id
     user_id = None
