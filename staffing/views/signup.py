@@ -1,10 +1,11 @@
 from flask import request, session, g, redirect, url_for, abort, \
      render_template, flash, Blueprint
 from shotglass2.shotglass import get_app_config
-from shotglass2.takeabeltof.utils import render_markdown_for, printException, cleanRecordID
+from shotglass2.takeabeltof.utils import render_markdown_for, printException, cleanRecordID, looksLikeEmailAddress, formatted_phone_number
 from shotglass2.takeabeltof.date_utils import date_to_string, getDatetimeFromString, local_datetime_now
 from shotglass2.users.admin import login_required, table_access_required
 from shotglass2.users.models import Role, User
+from shotglass2.users.views.login import authenticate_user, setUserStatus
 from staffing.models import Activity, Location, Task, UserTask
 from staffing.utils import pack_list_to_string, un_pack_string
 
@@ -38,19 +39,14 @@ def display():
                     if rec.rank >= 90: #activity manager
                         is_admin = True
                         break
-                    pass
             
-    if not user_skills:
-        # user the default skills required
-        user_skill_list = get_app_config().get('DEFAULT_USER_ROLES',['volunteer','user'])
-        for skill in user_skill_list:
-            rec = Role(g.db).get(skill)
-            if rec:
-                user_skills.append(rec.id)
+    #all visitors get basic skills even if not logged in
+    user_skill_list = get_app_config().get('DEFAULT_USER_ROLES',['volunteer','user'])
+    for skill in user_skill_list:
+        rec = Role(g.db).get(skill)
+        if rec and rec.id not in user_skills:
+            user_skills.append(rec.id)
                 
-    if not user_skills:
-        raise ValueError("Could not determine user_skills")
-    
     where = "date(task.start_date) >= date('{}')".format(local_datetime_now().isoformat()[:10],)
     tasks = get_task_rows(where,user_skills,is_admin)
             
@@ -68,7 +64,13 @@ def signup(task_id=None):
     signup = None
     activity = None
     filled_positions = 0
+    
     # if user not logged in, get that first
+    #import pdb;pdb.set_trace()
+    if not g.user:
+        next = request.url
+        rec = User(g.db).new()
+        return render_template('signup_login.html',rec=rec,next=next)
     
     # get user_id
     user_id = None
@@ -86,7 +88,6 @@ def signup(task_id=None):
     if not task:
         return 'failure: That is not a valid task id'
         
-    #import pdb;pdb.set_trace()
     # get the user's signup
     signup = UserTask(g.db).select_one(where='user_id = {} and task_id = {}'.format(user_id,task_id))
     if not signup:
@@ -131,10 +132,14 @@ def signup(task_id=None):
 @mod.route('/signup_success/<int:id>',methods=['GET','POST',])
 @mod.route('/signup_success/',methods=['GET','POST',])
 def signup_success(id=0):
+    """Return a single row of task with the just updated data"""
     #import pdb;pdb.set_trace()
     id = cleanRecordID(id)
-
-    tasks = get_task_rows("task.id = {}".format(id))
+    
+    # because the user got access to this task from the main display,
+    # Set is_admin to true to display the updated version of the record
+    tasks = get_task_rows("task.id = {}".format(id),is_admin=True)
+    
     if tasks and len(tasks) > 0:
         task = tasks[0]
     else:
@@ -142,6 +147,108 @@ def signup_success(id=0):
         
     return render_template('signup_task.html',task=task,show_detail=True)
     
+    
+@mod.route('/login',methods=['GET','POST',])
+@mod.route('/login/',methods=['GET','POST',])
+def login():
+    # no password is required for volunteer login
+    ready_to_login = False
+    password_required = False
+    
+    #import pdb;pdb.set_trace()
+    user_rec = User(g.db).get(request.form.get('email','').strip())
+    if user_rec:
+        ready_to_login = True
+        # Check for a password
+        user_password = request.form.get('login_password')
+        if user_rec.password:
+            if not user_password:
+                # redisplay the form with a password box
+                ready_to_login = False
+                password_required = True
+                flash("You must enter your password.")
+            else:
+                #validate the user login
+                if authenticate_user(user_rec.email,user_password) > 0:
+                    #User is logged in
+                    ready_to_login = True
+                else:
+                    ready_to_login = False
+                    flash("Password did not match your record")
+                    password_required = True
+    else:
+        flash("Could not find your account")
+
+    if ready_to_login:
+        # if login user without a password if they don't have one
+        if not g.user:
+            setUserStatus(user_rec.email,user_rec.id)
+        
+        return 'success'
+        
+    # Redisplay form
+    rec = User(g.db).new()
+    next = "/page-not-found/"
+    if request.form:
+        User(g.db).update(rec,request.form)
+        next=request.form.get('next',next)
+        
+    return render_template('signup_login.html',rec=rec,next=next,password_required=password_required)
+    
+
+@mod.route('/register',methods=['GET','POST',])
+@mod.route('/register/',methods=['GET','POST',])
+def register():
+    """Allow volunteers to create an account"""
+    ready_to_login = True
+    next=request.form.get('next','/page-not-found/')
+    rec = User(g.db).new()
+    
+    # all fields are required
+    required_fields = ['first_name','last_name','email','phone']
+    for key, value in request.form.items():
+        if key in required_fields and not value:
+            flash("All fields are required")
+            ready_to_login = False
+            break
+    
+    User(g.db).update(rec,request.form)
+    #import pdb;pdb.set_trace()
+    
+    # email address must look like one...
+    if ready_to_login:
+        if not looksLikeEmailAddress(rec.email):
+            flash("{} doesn't look like an email address".format(rec.email))
+            ready_to_login = False
+    # Check the phone number
+    if ready_to_login:
+        formatted_phone = formatted_phone_number(rec.phone)
+        if not formatted_phone:
+            flash("{} doesn't look like an phone number. Be sure to include the area code".format(rec.phone))
+            ready_to_login = False
+        else:
+            rec.phone = formatted_phone
+    # test that email address is not in use
+    if ready_to_login:
+        test_user = User(g.db).get(rec.email)
+        if test_user:
+            flash("Someone with that email address (probably you) is already registered. Try login in instead")
+            ready_to_login = False
+    # create account and log user in
+    if ready_to_login:
+        User(g.db).save(rec)
+        # Try to give the user a couple roles
+        role = Role(g.db).get('volunteer')
+        if role:
+            User(g.db).add_role(rec.id,role.id)
+        role = Role(g.db).get('user')
+        if role:
+            User(g.db).add_role(rec.id,role.id)
+        g.db.commit()
+        setUserStatus(rec.email,rec.id)
+        return "success"
+
+    return render_template('signup_login.html',rec=rec,next=next,register=True)
 
 def populate_participant_list(task):
     """Add participant values to the task namedlist"""
@@ -221,7 +328,7 @@ def get_task_rows(where,user_skills=[],is_admin=False):
             # if user does not have skills requried, delete the row
             task_skills = un_pack_string(task.skill_list)
             if len(task_skills) > 0:
-                if not User(g.db).is_admin(g.user): #admins see all...
+                if not is_admin: #User(g.db).is_admin(g.user): #admins see all...
                     task_skills = [int(i) for i in task_skills.split(',')]
                     for skill in task_skills:
                         if skill not in user_skills:
