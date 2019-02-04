@@ -20,17 +20,17 @@
         
         <div id="signin-buttons">
     		<p>
-        		<a class="w3-button w3-primary-color w3-round-medium " onclick="cancelModalForm()">Cancel</a>
+        		<a class="w3-button w3-mobile  w3-primary-color w3-round-medium " onclick="cancelModalForm()">Cancel</a>
                 &nbsp;&nbsp;
-        		<input class="w3-button w3-primary-color w3-round-medium " type="button" 
-                    onclick="submitModalToModalForm('signupModalForm',
-                    '{{url_for('signup.login')}}',
-                    'modal-form',
+        		<input class="w3-button w3-mobile  w3-primary-color w3-round-medium " type="button" 
+                    onclick="{{ submit_script }}('signupModalForm',
+                    '{{url_for('signup.login')}}{{ from_main }}',
+                    {% if from_main %}''{% else %}'modal-form'{% endif %},
                     '{{next}}'
                     )" 
                     name="login" value="Login" />
                 &nbsp;&nbsp;
-        		Create a new Account: <a class="w3-button w3-primary-color w3-round-medium " 
+        		Create a new Account: <a class="w3-button w3-mobile  w3-primary-color w3-round-medium " 
                     onclick="
                     showRegistration()
                     ">Register</a>
@@ -50,12 +50,12 @@
                 {{ radio_field(0,"may_send_text","No Texts Please:",extras=extras ,right=True ) }}
             </p>
     		<p>
-        		<a class="w3-button w3-primary-color w3-round-medium " onclick="cancelModalForm()">Cancel</a>
+        		<a class="w3-button w3-mobile  w3-primary-color w3-round-medium " onclick="cancelModalForm()">Cancel</a>
                 &nbsp;&nbsp;
-        		<input class="w3-button w3-primary-color w3-round-medium " type="button" 
-                    onclick="submitModalToModalForm('signupModalForm',
-                    '{{url_for('signup.register')}}',
-                    'modal-form',
+        		<input class="w3-button w3-mobile  w3-primary-color w3-round-medium " type="button" 
+                    onclick="{{ submit_script }}('signupModalForm',
+                    '{{url_for('signup.register')}}{{ from_main }}',
+                    {% if from_main %}''{% else %}'modal-form'{% endif %},
                     '{{next}}'
                     )" 
                     name="register" value="Register" />

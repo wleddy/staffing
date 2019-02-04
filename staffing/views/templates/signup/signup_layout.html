@@ -30,5 +30,31 @@
     </style>
 {% endblock head %}
 
-{% block header %}{% endblock %}
-{% block page_header %}{% endblock %}
+{% block document_title %}Volunteer Signup{% endblock %}
+
+{% block header %}
+<div class="w3-container w3-primary-color w3-main" >
+    <p style="position:absolute;top:3pt;right:20pt;">
+        {% if not g.user %}
+        <a onclick="editFromList('{{ url_for('signup.login')}}1')">Sign in</a>
+        {% else %}
+        Hi {{ g.user }}!&nbsp;&nbsp;<a href="{{ url_for('signup.logout')}}">Sign Out</a>
+        {% endif %}
+    </p>
+     <h2 style="text-align:center;margin-top:10pt;">SABA Volunteer Signup</h2>
+</div>
+{% endblock header %}
+
+{% block page_header %}
+<div class="w3-panel w3-card-2 w3-secondary-color">
+    <p>Welcome to SABA Volunteer Signups.</p>
+    <p>
+        We depend on our volunteers to help us achieve the goal of continuing to make the Sacramento area 
+        a great place for bicycling.
+    </p>
+    <p>
+        Please take a look at the Activities we have coming up. We'd love to see you there!
+    </p>
+</div>
+
+{% endblock page_header %}

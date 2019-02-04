@@ -5,7 +5,7 @@ from shotglass2.takeabeltof.utils import render_markdown_for, printException, cl
 from shotglass2.takeabeltof.date_utils import date_to_string, getDatetimeFromString, local_datetime_now
 from shotglass2.users.admin import login_required, table_access_required
 from shotglass2.users.models import Role, User
-from shotglass2.users.views.login import authenticate_user, setUserStatus
+from shotglass2.users.views.login import authenticate_user, setUserStatus, logout as log_user_out
 from staffing.models import Activity, Location, Task, UserTask
 from staffing.utils import pack_list_to_string, un_pack_string
 
@@ -149,13 +149,24 @@ def signup_success(id=0):
     
     
 @mod.route('/login',methods=['GET','POST',])
+@mod.route('/login/<int:from_main>',methods=['GET','POST',])
 @mod.route('/login/',methods=['GET','POST',])
-def login():
+def login(from_main=0):
     # no password is required for volunteer login
+    setExits()
     ready_to_login = False
     password_required = False
-    
     #import pdb;pdb.set_trace()
+    if g.user:
+        log_user_out()
+        
+    if not 'first_pass' in session:
+        session['first_pass'] = True
+    else:
+        session['first_pass'] = False
+        
+    first_pass = session['first_pass']
+    
     user_rec = User(g.db).get(request.form.get('email','').strip())
     if user_rec:
         ready_to_login = True
@@ -177,29 +188,44 @@ def login():
                     flash("Password did not match your record")
                     password_required = True
     else:
-        flash("Could not find your account")
+        if not from_main or not first_pass:
+            flash("Could not find your account")
 
     if ready_to_login:
-        # if login user without a password if they don't have one
-        if not g.user:
-            setUserStatus(user_rec.email,user_rec.id)
-        
+        # login user without a password if they don't have one
+        log_user_out()
+        setUserStatus(user_rec.email,user_rec.id)
         return 'success'
         
     # Redisplay form
     rec = User(g.db).new()
+    submit_script = 'submitModalToModalForm'
     next = "/page-not-found/"
+    if from_main:
+        submit_script = 'submitModalForm'
+        next = g.listURL
+        
     if request.form:
         User(g.db).update(rec,request.form)
         next=request.form.get('next',next)
         
-    return render_template('signup_login.html',rec=rec,next=next,password_required=password_required)
+    return render_template('signup_login.html',rec=rec,next=next,password_required=password_required,submit_script=submit_script,from_main=from_main)
     
 
+@mod.route('/logout',methods=['GET',])
+@mod.route('/logout/',methods=['GET',])
+def logout():
+    setExits()
+    log_user_out()
+    return redirect(g.listURL)
+
+
 @mod.route('/register',methods=['GET','POST',])
+@mod.route('/register/<int:from_main>',methods=['GET','POST',])
 @mod.route('/register/',methods=['GET','POST',])
-def register():
+def register(from_main=0):
     """Allow volunteers to create an account"""
+    setExits()
     ready_to_login = True
     next=request.form.get('next','/page-not-found/')
     rec = User(g.db).new()
@@ -245,10 +271,17 @@ def register():
         if role:
             User(g.db).add_role(rec.id,role.id)
         g.db.commit()
+        log_user_out()
         setUserStatus(rec.email,rec.id)
         return "success"
+        
+        
+    submit_script = 'submitModalToModalForm'
+    if from_main:
+        submit_script = 'submitModalForm'
+        next = g.listURL
 
-    return render_template('signup_login.html',rec=rec,next=next,register=True)
+    return render_template('signup_login.html',rec=rec,next=next,register=True,submit_script=submit_script,from_main=from_main)
 
 def populate_participant_list(task):
     """Add participant values to the task namedlist"""

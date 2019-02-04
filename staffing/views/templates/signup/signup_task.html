@@ -1,7 +1,7 @@
         <div id="task-head{{ task.task_id }}" class="w3-row w3-secondary-color task-contain task-date-contain" style="margin-top:-1px;">
             <div class="w3-col l2 m2 w3-hide-small">&nbsp;</div>
             <div class="w3-col l10 m10">
-                <p onclick="$('#task-detail{{ task.task_id }}').show();$('#task-head{{ task.task_id }}').hide()" class="w3-primary-color" style="cursor:pointer;">
+                <p onclick="$('#task-detail{{ task.task_id }}').show();$('#task-head{{ task.task_id }}').hide()" class="w3-primary-color" style="cursor:pointer;margin-bottom:0;margin-top:6pt;">
                     <span class="w3-button">+</span><strong>{{ task.task_title | truncate(40) }}</strong>
                     <span class="w3-small">- {{ task.start_date | local_time_string | lower }}
                         <span class="w3-hide-small"> - {{ task.end_date | local_time_string | lower }}</span>

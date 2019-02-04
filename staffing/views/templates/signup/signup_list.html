@@ -11,7 +11,7 @@
     {% set activity_id = [0] %}
     {% for task in tasks %}
     {% if task.activity_id != activity_id[0] %}
-    <div id="act-{{ task.activity_id }}" class="activity-contain w3-row-padding w3-secondary-color">        
+    <div id="act-{{ task.activity_id }}" class="activity-contain w3-row-padding w3-secondary-color" style="padding-bottom:6pt;">        
         <p  class="w3-col l2 m2 w3-hide-small" style="padding-top:12pt;">
             {% if task.image_url %}
             <img class="w3-image" src="{{ task.image_url }}">
@@ -42,29 +42,40 @@
                 &nbsp;{{ task.activity_filled_positions | default("0", True) }} of {{ task.activity_max_positions | default("0", True) }}
             </p>
             {% endif %}
+            
         </div>
-        </div>
-        {% endif %}
-        {# don't show activity head again till activity changes #}
-        {% set _ = activity_id.pop() %}
-        {% set _ = activity_id.append(task.activity_id) %}
-        {# only show the date once within task list of same date #}
-        {% if task.start_date[:10] != task_start_date[0] %}
+    </div>
+    {% endif %} {# show activity head? #}
+    {# only show the date once within task list of same date #}
+    {% if task.start_date[:10] != task_start_date[0] %}
         <div class="w3-row w3-secondary-color task-contain task-date-contain" style="margin-top:-1px;">
             <div class="w3-col l2 m2 w3-hide-small">&nbsp;</div>
             <div class="w3-col l10 m10">
-            <p>
-                <em>When:</em> <strong>{{ task.start_date[:10] | abbr_date_string }}</strong>
-            </p>
+                <hr style="margin:0 0 3pt 0;position:relative;top:-1px;">
+                <p>
+                    <a class="w3-button w3-round-medium w3-primary-color task-date-more-{{task.start_date[:10]}}" 
+                    onclick="$('.task-date-container-{{task.start_date[:10]}}').show();$('.task-date-more-{{task.start_date[:10]}}').hide();"
+                    >+</a>
+                    <a class=" w3-button w3-round-medium w3-primary-color task-date-container-{{task.start_date[:10]}}" style="display:none;" 
+                    onclick="$('.task-date-container-{{task.start_date[:10]}}').hide();
+                    $('.task-date-more-{{task.start_date[:10]}}').show()">&ndash;</a>
+                    <em>When:</em> <strong>{{ task.start_date[:10] | abbr_date_string }}</strong>
+                </p>
+                <hr style="margin:0;">
             </div>
         </div>
-        {% endif %}
-        {% set _ = task_start_date.pop() %}
-        {% set _ = task_start_date.append(task.start_date[:10]) %}
-        <div id="task-body{{task.task_id}}">
+    {% endif %} {# show date? #}
+     <div class="task-date-container-{{task.start_date[:10]}}" style="display:none;">
+       <div id="task-body{{task.task_id}}">
             {% include 'signup_task.html' %}
         </div>
+    </div>
+    {# don't show activity head again till activity changes #}
+    {% set _ = activity_id.pop() %}
+    {% set _ = activity_id.append(task.activity_id) %}
+    {% set _ = task_start_date.pop() %}
+    {% set _ = task_start_date.append(task.start_date[:10]) %}
     {% endfor %} {# tasks #}
     
-    {% endif %}{# end not tasks #}
+    {% endif %}{# not tasks #}
 {% endblock body %}
