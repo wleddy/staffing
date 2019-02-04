@@ -39,7 +39,7 @@ class ActivityType(SqliteTable):
     def __init__(self,db_connection):
         super().__init__(db_connection)
         self.table_name = 'activity_type'
-        self.order_by_col = 'id'
+        self.order_by_col = 'type, id'
         self.defaults = {}
 
     def create_table(self):
@@ -140,7 +140,7 @@ class Location(SqliteTable):
     def __init__(self,db_connection):
         super().__init__(db_connection)
         self.table_name = 'location'
-        self.order_by_col = 'id'
+        self.order_by_col = 'location_name, id'
         self.defaults = {}
         
     def create_table(self):
