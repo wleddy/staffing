@@ -49,8 +49,8 @@
     {# only show the date once within task list of same date #}
     {% if task.start_date[:10] != task_start_date[0] %}
         <div class="w3-row w3-secondary-color task-contain task-date-contain" style="margin-top:-1px;">
-            <div class="w3-col l2 m2 w3-hide-small">&nbsp;</div>
-            <div class="w3-col l10 m10">
+            <div class="w3-col l1 m1 w3-hide-small">&nbsp;</div>
+            <div class="w3-col l11 m11">
                 <hr style="margin:0 0 3pt 0;position:relative;top:-1px;">
                 <p>
                     <a class="w3-button w3-round-medium w3-primary-color task-date-more-{{task.start_date[:10]}}" 
