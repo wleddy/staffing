@@ -15,7 +15,8 @@
     <tr id="list-row-{{task.id}}">
         <td style="width:12pt;padding:0;">&nbsp;</td>
         <td  onclick="editFromList('{{ url_for('task.edit_from_list') }}{{task.id}}/');">
-            {{ task.title | truncate(35)}}
+            {{ task.title | truncate(35)}}<br>
+            <span class="w3-small">{{ task.max_positions }} @ {{ task.start_date | local_time_string }} - {{ task.end_date | local_time_string }}</span>
         </td>
     </tr>
 {% set _ = event_date.pop() %}
