@@ -35,9 +35,9 @@
         <p>{{ input_field(rec.image_url,"image_url",label="Image URL")}}</p>
     
     </fieldset>
-    
-<div class="w3-col l5 m5 s12" style="margin-left:20pt;">
-    <div id="task_list" class="w3-card-4" >
+<div class="w3-col w3-hide-small" style="width:20pt;">&nbsp;</div>
+<div class="w3-col l5 m5 s12" >
+    <div id="task-list" class="w3-card-4" style="margin-top:6pt;">
         {{ task_embed_list | default("No Tasks Created Yet", True) | safe }}
     </div>
 </div>

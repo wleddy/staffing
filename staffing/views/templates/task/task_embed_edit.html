@@ -6,7 +6,7 @@
     	<input type="button" class="w3-btn w3-ripple w3-save-button-color w3-mobile w3-round-large"
             onclick="submitModalForm('taskFromListForm', 
             '{{ url_for('task.edit_from_list')}}{{rec.id | default(0,True)}}/', 
-            'task_list', 
+            'task-list', 
             '{{ url_for('task.get_task_list_for_activity')}}{{ rec.activity_id}}')" 
             name="Save" value="Save" />
         &nbsp;&nbsp;

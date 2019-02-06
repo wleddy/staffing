@@ -176,11 +176,70 @@ def delete_from_list(id=0):
     
 @mod.route('/get_task_list_for_activity/',methods=['GET','POST',])
 @mod.route('/get_task_list_for_activity/<int:id>/',methods=['GET','POST',])
+@mod.route('/get_task_list_for_activity/<int:id>',methods=['GET','POST',])
 def get_task_list_for_activity(id=0):
     """Return a fully formated html table for use in the Activity edit form"""
+    #import pdb;pdb.set_trace()
     id = cleanRecordID(id)
     tasks = Task(g.db).select(where='activity_id = {}'.format(id))
     return render_template('task_embed_list.html',tasks=tasks,activity_id=id)
+    
+    
+@mod.route('/manage/<int:id>/',methods=['GET','POST',])
+@mod.route('/manage/<int:id>',methods=['GET','POST',])
+@mod.route('/manage/',methods=['GET','POST',])
+@table_access_required(Task)
+def manage_task_set(id=None):
+    """Duplicate, move or delete a set of tasks that share an activity id and date"""
+    
+    #import pdb;pdb.set_trace()
+    action = request.args.get('action')
+    new_date=request.form.get('new_date')
+    
+    id = cleanRecordID(request.form.get('id',id))
+    
+    if id < 1:
+        return 'failure: That is not a valid task ID'
+        
+    if action not in [None,'copy','move','delete',]:
+        return 'failure: That is not a valid action request'
+    
+    task = Task(g.db)
+    rec = task.get(id)
+    if not rec:
+        return "failure: Task not found."
+        
+    dup_date = None
+    if request.form and action != 'delete':
+        try:
+            dup_date = coerce_datetime(request.form.get('new_date',''),'00:00:00')
+            if dup_date:
+                #convert it to a string
+                dup_date = date_to_string(dup_date,'iso_date') #'YYYY-MM-DD'
+            else:
+                flash("That is not a valid date")
+        except:
+            flash("Got an error while processing the date")
+            
+    if request.form and (dup_date or action == 'delete'):
+        recs = task.select(where="activity_id = {} and date(start_date) = date('{}')".format(rec.activity_id,rec.start_date))
+        if recs:
+            for rec in recs:
+                if action == 'delete':
+                    task.delete(rec.id)
+                else:
+                    if action == 'copy':
+                        rec.id = None
+                        
+                    rec.start_date = dup_date + rec.start_date[10:]
+                    rec.end_date = dup_date + rec.end_date[10:]
+                    task.save(rec)
+    
+            task.commit()
+
+            return 'success'
+        
+    return render_template('task_manage.html',rec=rec,new_date=new_date)
     
     
 def valid_input(rec):
@@ -238,7 +297,7 @@ def valid_input(rec):
     return valid_data
     
     
-def coerce_datetime(date_str,time_str,ampm):
+def coerce_datetime(date_str,time_str,ampm=None):
     """Convert a string date and a string time into a datetime object
     if ampm is None, assume 24 hour time else 12 hour"""
     #import pdb;pdb.set_trace()
