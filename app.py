@@ -118,11 +118,13 @@ def page_not_found(error):
 def server_error(error):
     return shotglass.server_error(error)
 
-#Register the static route
-app.add_url_rule('/static/<path:filename>','static',shotglass.static)
 
 #import pdb;pdb.set_trace()
 subdomain = 'signup'
+#Register the static route
+# seting the subdomain this way works in this case, but may not be the best solution
+app.add_url_rule('/static/<path:filename>','static',shotglass.static,subdomain=subdomain)
+
 from staffing.views import signup
 app.register_blueprint(signup.mod,subdomain=subdomain)
 
