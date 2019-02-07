@@ -10,7 +10,7 @@ from staffing.models import Activity, Location, Task, UserTask
 from staffing.utils import pack_list_to_string, un_pack_string
 
 
-mod = Blueprint('signup',__name__, template_folder='templates/signup', url_prefix='/signup')
+mod = Blueprint('signup',__name__, template_folder='templates/signup')
 
 
 def setExits():
@@ -18,11 +18,19 @@ def setExits():
     g.title = 'Signup'
 
 
+@mod.route('/signup/')
+@mod.route('/signup')
+def old_signup_url():
+    #Will be able to get rid of this after we go live
+    setExits()
+    return redirect(g.listURL)
+        
+            
 @mod.route('/')
 def display():
     """List Signup opportuniies"""
     setExits()
-        
+    
     #import pdb;pdb.set_trace()
     # get the current users role id's
     is_admin = False

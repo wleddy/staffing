@@ -10,7 +10,9 @@ from staffing.models import Activity, Task, Location, ActivityType
 # Create app
 # setting static_folder to None allows me to handle loading myself
 app = Flask(__name__, instance_relative_config=True,
-        static_folder=None)
+        static_folder=None,
+        subdomain_matching=True,
+        )
 app.config.from_pyfile('site_settings.py', silent=True)
 
 
@@ -120,31 +122,40 @@ def server_error(error):
 app.add_url_rule('/static/<path:filename>','static',shotglass.static)
 
 #import pdb;pdb.set_trace()
-from staffing.views import activity
-app.register_blueprint(activity.mod)
-from staffing.views import location
-app.register_blueprint(location.mod)
-from staffing.views import task
-app.register_blueprint(task.mod)
+subdomain = 'signup'
 from staffing.views import signup
-app.register_blueprint(signup.mod)
+app.register_blueprint(signup.mod,subdomain=subdomain)
+
+subdomain = 'admin'
+from staffing.views import activity
+app.register_blueprint(activity.mod,subdomain=subdomain)
+from staffing.views import location
+app.register_blueprint(location.mod,subdomain=subdomain)
+from staffing.views import task
+app.register_blueprint(task.mod,subdomain=subdomain)
 from staffing.views import activity_type
-app.register_blueprint(activity_type.mod)
+app.register_blueprint(activity_type.mod,subdomain=subdomain)
 
 ## Setup the routes for users
-shotglass.register_users(app)
+shotglass.register_users(app,subdomain=subdomain)
 
 # setup www.routes...
-shotglass.register_www(app)
+shotglass.register_www(app,subdomain=subdomain)
 
+@app.route('/')
+def default_home():
+    # if no subdomain
+    return "Know Whan Hom"
+    
 
 if __name__ == '__main__':
     
     with app.app_context():
         # create the default database if needed
         initalize_all_tables()
-        
+
     #app.run(host='localhost', port=8000)
-    app.run()
+    #app.run()
+    app.run(host='willie.local')
     
     
