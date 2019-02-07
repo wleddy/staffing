@@ -37,8 +37,6 @@
             </p>
                 <div>
             		<p>
-                		<a class="w3-button w3-primary-color w3-round-medium " onclick="cancelModalForm()">Cancel</a>
-                        &nbsp;&nbsp;
                 		<input class="w3-button w3-primary-color w3-round-medium " type="button" 
                             onclick="submitModalForm('signupModalForm',
                             '{{url_for('signup.signup')}}',
@@ -46,6 +44,8 @@
                             '{{url_for('signup.signup_success')}}{{task.id}}'
                             )" 
                             name="Save" value="Save" />
+                        &nbsp;&nbsp;
+                		<a class="w3-button w3-primary-color w3-round-medium " onclick="cancelModalForm()">Cancel</a>
             		</p>
                 </div>
         </div>

@@ -18,14 +18,6 @@ def setExits():
     g.title = 'Signup'
 
 
-@mod.route('/signup/')
-@mod.route('/signup')
-def old_signup_url():
-    #Will be able to get rid of this after we go live
-    setExits()
-    return redirect(g.listURL)
-        
-            
 @mod.route('/')
 def display():
     """List Signup opportuniies"""
