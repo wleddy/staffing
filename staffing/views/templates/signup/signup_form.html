@@ -18,10 +18,17 @@
                 </p>
             </div>
             <div style="text-align:center;">
-                <p class="w3-small">Your Shifts:
+                <p class="w3-small">
+                    {% set pos = signup.positions | default(0,True) | int %}
+                    {% if pos > 0 %}
+                        You have currently signed up {{signup.positions | default(0,True)}} {% if pos == 1%}person{% else %}people{% endif %}
+                        for this shift
+                    {% else %}
+                        Use the &quot;+&quot; button to add one or more people for this shift:
+                    {% endif %}
                 <p>
                     <a class="w3-button w3-primary-color w3-round-medium w3-xlarge" onclick="signup_count('#signup-count',-1,{{task.max_positions - filled_positions}})" style="padding:6pt;width:30pt;" title="Decrease Shifts">&ndash;</a>
-                    <input class="w3-xlarge" id="signup-count" type="num" name='positions' value="{{signup.positions | default}}" readonly style="padding:6pt;width:30pt;display:block-inline;text-align:center"/>
+                    <input class="w3-xlarge" id="signup-count" type="num" name='positions' value="{{signup.positions | default(0,True)}}" readonly style="padding:6pt;width:30pt;display:block-inline;text-align:center"/>
                     <a class="w3-button w3-primary-color w3-round-medium w3-xlarge"  onclick="signup_count('#signup-count',1,{{task.max_positions - filled_positions}})" style="padding:6pt;width:30pt;" title="Increase Shifts">+</a>
                 </p>
             <p style="text-align:left">

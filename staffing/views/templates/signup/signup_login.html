@@ -20,8 +20,6 @@
         
         <div id="signin-buttons">
     		<p>
-        		<a class="w3-button w3-mobile  w3-primary-color w3-round-medium " onclick="cancelModalForm()">Cancel</a>
-                &nbsp;&nbsp;
         		<input class="w3-button w3-mobile  w3-primary-color w3-round-medium " type="button" 
                     onclick="{{ submit_script }}('signupModalForm',
                     '{{url_for('signup.login')}}{{ from_main }}',
@@ -34,6 +32,8 @@
                     onclick="
                     showRegistration()
                     ">Register</a>
+                &nbsp;&nbsp;
+        		<a class="w3-button w3-mobile  w3-primary-color w3-round-medium " onclick="cancelModalForm()">Cancel</a>
     		</p>
         </div>
         
@@ -44,14 +44,12 @@
             <p class="w3-border-bottom w3-label-color" style="margin-bottom:6pt;margin-top:0;">
                 {% set extras = "" %}
                 {% if not rec.may_send_text or rec.may_send_text | int > 0 %}{% set extras = ' checked="checked"' %}{% endif %}
-                {{ radio_field(1,"may_send_text","May Send Texts:",extras=extras ,right=True) }}&nbsp;
-                {% set extras = "" %}
+                {{ radio_field(1,"may_send_text","May Send Texts",extras=extras ,right=False) }}&nbsp;
+                {% set extras = "" %}&nbsp;&nbsp;
                 {% if rec.may_send_text and rec.may_send_text | int < 1 %}{% set extras = ' checked="checked"' %}{% endif %}
-                {{ radio_field(0,"may_send_text","No Texts Please:",extras=extras ,right=True ) }}
+                {{ radio_field(0,"may_send_text","No Texts Please",extras=extras ,right=False ) }}
             </p>
     		<p>
-        		<a class="w3-button w3-mobile  w3-primary-color w3-round-medium " onclick="cancelModalForm()">Cancel</a>
-                &nbsp;&nbsp;
         		<input class="w3-button w3-mobile  w3-primary-color w3-round-medium " type="button" 
                     onclick="{{ submit_script }}('signupModalForm',
                     '{{url_for('signup.register')}}{{ from_main }}',
@@ -59,6 +57,8 @@
                     '{{next}}'
                     )" 
                     name="register" value="Register" />
+                &nbsp;&nbsp;
+        		<a class="w3-button w3-mobile  w3-primary-color w3-round-medium " onclick="cancelModalForm()">Cancel</a>
     		</p>
         </div>
     </div>
