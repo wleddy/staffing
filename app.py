@@ -110,6 +110,9 @@ def _teardown(exception):
         g.db.close()
 
 
+#######################
+# TODO -- the signup subdomain needs it's own error pages or maybe just it's own layout...
+#######################
 @app.errorhandler(404)
 def page_not_found(error):
     return shotglass.page_not_found(error)
@@ -120,15 +123,18 @@ def server_error(error):
 
 
 #import pdb;pdb.set_trace()
-subdomain = 'signup'
-#Register the static route
-# seting the subdomain this way works in this case, but may not be the best solution
-app.add_url_rule('/static/<path:filename>','static',shotglass.static,subdomain=subdomain)
+subdomain = app.config.get('SIGNUP_SUBDOMAIN','signup')
 
 from staffing.views import signup
 app.register_blueprint(signup.mod,subdomain=subdomain)
 
-subdomain = 'admin'
+#Register the static route
+# seting the subdomain this way works in this case, but may not be the best solution
+app.add_url_rule('/static/<path:filename>','static',shotglass.static,subdomain=subdomain)
+
+
+subdomain = app.config.get('ADMIN_SUBDOMAIN','admin')
+
 from staffing.views import activity
 app.register_blueprint(activity.mod,subdomain=subdomain)
 from staffing.views import location
