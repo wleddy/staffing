@@ -53,8 +53,17 @@ def display():
     return render_template('signup_list.html',tasks=tasks,is_admin=is_admin)
         
 
+############################
+##### The "passenger" WSGI system on A2 hosting may be why
+#####.   the extra 'signup/signup' routes are needed.
+##### I could almost swear that this worked ok at one time.
+###########################
+@mod.route('/signup/signup/<int:task_id>/',methods=['GET','POST',])
+@mod.route('/signup/signup/<int:task_id>',methods=['GET','POST',])
+@mod.route('/signup/signup',methods=['GET','POST',])
 @mod.route('/signup/<int:task_id>/',methods=['GET','POST',])
 @mod.route('/signup/<int:task_id>',methods=['GET','POST',])
+@mod.route('/signup/',methods=['GET','POST',])
 @mod.route('/signup',methods=['GET','POST',])
 def signup(task_id=None):
     """Add or remove a signup
@@ -88,6 +97,10 @@ def signup(task_id=None):
     if not task:
         return 'failure: That is not a valid task id'
         
+    task_data = get_task_rows("task.id = {}".format(task.id),is_admin=True)
+    if task_data:
+        filled_positions = task_data[0].task_filled_positions
+        
     # get the user's signup
     signup = UserTask(g.db).select_one(where='user_id = {} and task_id = {}'.format(user_id,task_id))
     if not signup:
@@ -104,6 +117,8 @@ def signup(task_id=None):
         if positions < signup.positions:
             # the number of positions has been reduced
             pass
+            # Dont allow reduction after the date of the event
+            #
             # if reducing committment and < 2 days to task,
             #.   If is staff... inform activity manager and email staff that they need to find a replacement?
             #.   if not staff, inform activity manager and record change
@@ -117,6 +132,9 @@ def signup(task_id=None):
                 
         # record change
         if positions > 0:
+            ##################
+            # TODO - Don't allow any change after the day of the event...
+            ###################
             UserTask(g.db).update(signup,request.form)
             signup.user_id = user_id
             signup.task_id = task_id
@@ -127,6 +145,7 @@ def signup(task_id=None):
     
     
     return render_template('signup_form.html',task=task,activity=activity,signup=signup,filled_positions=filled_positions)
+    
     
 @mod.route('/signup_success/<int:id>/',methods=['GET','POST',])
 @mod.route('/signup_success/<int:id>',methods=['GET','POST',])
