@@ -13,7 +13,7 @@
         function signup_count(which,howmany,maxcnt){
             var which = $(which)
             var cnt = parseInt(which.val())
-            cnt = parseInt(cnt) + howmany;
+            cnt = cnt + howmany;
             if(cnt >= 0 && cnt <= maxcnt ){
                 which.val(cnt.toString());
             }
