@@ -19,7 +19,7 @@ def setExits():
 @table_access_required(EventType)
 def display():
     setExits()
-    g.title="EventType List"
+    g.title="Event Type List"
     recs = EventType(g.db).select()
     
     return render_template('event_type_list.html',recs=recs)
