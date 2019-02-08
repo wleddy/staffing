@@ -1,6 +1,6 @@
 # staffing
 
-A proposed web application to help manage staffing for SABA activities.
+A proposed web application to help manage staffing for SABA events.
 
 Docs:
 

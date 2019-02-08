@@ -17,11 +17,11 @@ sign in credential. A phone number will be requested but is optional.
 
 ### Signup for a Position
 
-1. Go to site. A list of upcoming activities and tasks with roles for volunteers is displayed. Staff must 
+1. Go to site. A list of upcoming events and jobs with roles for volunteers is displayed. Staff must 
 sign in to see staff positions.
-2. Visitor selects an activity to see more info.
-    1. Selecting the Activity link will reveal more info about activity.
-3. Visitor selects link to sign up for a task.
+2. Visitor selects an event to see more info.
+    1. Selecting the Event link will reveal more info about event.
+3. Visitor selects link to sign up for a job.
 4. If not logged in, present Volunteer login page.
     1. Prompt for email address.
     2. If email not on file request account creation form:
@@ -29,23 +29,23 @@ sign in to see staff positions.
         2. First Name and Last name
         3. Phone (optional)
         4. Allow or deny permission for text reminders
-5. After login or signup give user option to signup for more than one slot in task (for a friend, etc.)
-6. Provide option to add a comment to activity manager.
+5. After login or signup give user option to signup for more than one slot in job (for a friend, etc.)
+6. Provide option to add a comment to event manager.
 7. Volunteer confirms sign up.
     1. Record Sign up
-    2. email icalendar activity to Volunteer
+    2. email icalendar event to Volunteer
 8. Volunteer may sign up for more.
 
 ### Cancel a Position
 
 A users may wish to cancel their commitment.
 
-1. Go to site. A list of upcoming activities and tasks with roles for volunteers is displayed. Staff must 
+1. Go to site. A list of upcoming events and jobs with roles for volunteers is displayed. Staff must 
 sign in to see staff positions.
-2. Visitor selects the Activity associated with the task they want to cancel.
+2. Visitor selects the Event associated with the job they want to cancel.
 3. If not signed in, propt for email address.
     1. if not on file inform visitor, try again
-4. Present task record so visitor my cancel or reduce their slot count.
-5. Alert Activity manager of cancelations within 2 days of event.
+4. Present job record so visitor my cancel or reduce their slot count.
+5. Alert Event manager of cancelations within 2 days of event.
 
 [Return to Index](/docs/use_case.md)

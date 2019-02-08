@@ -3,96 +3,96 @@ from flask import request, session, g, redirect, url_for, abort, \
 from shotglass2.users.admin import login_required, table_access_required
 from shotglass2.takeabeltof.utils import render_markdown_for, printException, cleanRecordID
 from shotglass2.takeabeltof.date_utils import datetime_as_string
-from staffing.models import Activity, Location, ActivityType
+from staffing.models import Event, Location, EventType
 from shotglass2.users.models import User
-from staffing.views.task import get_task_list_for_activity
+from staffing.views.job import get_job_list_for_event
 
-mod = Blueprint('activity',__name__, template_folder='templates/activity', url_prefix='/activity')
+mod = Blueprint('event',__name__, template_folder='templates/event', url_prefix='/event')
 
 
 def setExits():
     g.listURL = url_for('.display')
     g.editURL = url_for('.edit')
     g.deleteURL = url_for('.delete')
-    g.title = 'Activitys'
+    g.title = 'Events'
 
 
 @mod.route('/')
-@table_access_required(Activity)
+@table_access_required(Event)
 def display():
     setExits()
-    g.title="Activity List"
-    recs = Activity(g.db).select()
+    g.title="Event List"
+    recs = Event(g.db).select()
     
-    return render_template('activity_list.html',recs=recs)
+    return render_template('event_list.html',recs=recs)
     
     
 @mod.route('/edit/',methods=['GET','POST',])
 @mod.route('/edit/<int:id>/',methods=['GET','POST',])
-@table_access_required(Activity)
+@table_access_required(Event)
 def edit(id=0):
     setExits()
-    g.title = 'Edit Activity Record'
+    g.title = 'Edit Event Record'
     id = cleanRecordID(id)
     if request.form:
         id = cleanRecordID(request.form.get("id"))
         
-    activity = Activity(g.db)
+    event = Event(g.db)
     #import pdb;pdb.set_trace()
     
     if id < 0:
         return abort(404)
         
     if id > 0:
-        rec = activity.get(id)
+        rec = event.get(id)
         if not rec:
             flash("Record Not Found")
             return redirect(g.listURL)
     else:
-        rec = activity.new()
+        rec = event.new()
         user = User(g.db).get(g.user)
         rec.manager_name = " ".join([user.first_name,user.last_name])
         rec.manager_email = user.email
         rec.manager_phone = user.phone
-        rec.title = "New Activity"
-        activity.save(rec)
+        rec.title = "New Event"
+        event.save(rec)
         g.cancelURL = url_for('.delete') + str(rec.id)
         g.db.commit()
 
     locations = Location(g.db).select()
-    activity_types = ActivityType(g.db).select()
+    event_types = EventType(g.db).select()
     
-    task_embed_list = get_task_list_for_activity(rec.id)
+    job_embed_list = get_job_list_for_event(rec.id)
     
     if request.form:
-        activity.update(rec,request.form)
+        event.update(rec,request.form)
         rec.location_id = cleanRecordID(request.form.get('location_id',-1))
         if valid_input(rec):
-            activity.save(rec)
+            event.save(rec)
             g.db.commit()
             return redirect(g.listURL)
         
         
-    return render_template('activity_edit.html',rec=rec,locations=locations,activity_types=activity_types,task_embed_list=task_embed_list)
+    return render_template('event_edit.html',rec=rec,locations=locations,event_types=event_types,job_embed_list=job_embed_list)
     
     
 @mod.route('/delete/',methods=['GET','POST',])
 @mod.route('/delete/<int:id>/',methods=['GET','POST',])
-@table_access_required(Activity)
+@table_access_required(Event)
 def delete(id=0):
     setExits()
     id = cleanRecordID(id)
-    activity = Activity(g.db)
+    event = Event(g.db)
     if id <= 0:
         return abort(404)
         
     if id > 0:
-        rec = activity.get(id)
+        rec = event.get(id)
         
     if rec:
-        activity.delete(rec.id)
+        event.delete(rec.id)
         g.db.commit()
-        flash("{} Activity Deleted".format(rec.title))
+        flash("{} Event Deleted".format(rec.title))
     
     return redirect(g.listURL)
     
@@ -103,6 +103,6 @@ def valid_input(rec):
     title = request.form.get('title').strip()
     if not title:
         valid_data = False
-        flash("You must give the activity a title")
+        flash("You must give the event a title")
 
     return valid_data

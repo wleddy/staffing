@@ -1,0 +1,29 @@
+<p><a onclick="editFromList('{{ url_for('job.edit_from_list')}}0/{{ event_id }}')" >New Job...</a></p>
+<table class="datatable w3-table w3-striped w3-hoverable">
+<tr class="w3-primary-color">
+	<th colspan="2">Events</th>
+</tr>
+{% if jobs %}
+{% set event_date = ['']%}
+{% for job in jobs %}
+{% if event_date[0] != job.start_date[:10] %}
+    <td colspan="2" class="w3-secondary-color">
+        <p style="margin:0;"><strong>{{job.start_date | short_date_string }}</strong> &nbsp;&nbsp;&nbsp;
+            <a class="w3-button w3-primary-color w3-round-large" onclick="editFromList('{{ url_for('job.manage_job_set')}}{{ job.id }}')">Manage Set...</a></p>
+    </td>
+{% endif %}
+    <tr id="list-row-{{job.id}}">
+        <td style="width:12pt;padding:0;">&nbsp;</td>
+        <td  onclick="editFromList('{{ url_for('job.edit_from_list') }}{{job.id}}/');">
+            {{ job.title | truncate(35)}}<br>
+            <span class="w3-small">{{ job.max_positions }} @ {{ job.start_date | local_time_string }} - {{ job.end_date | local_time_string }}</span>
+        </td>
+    </tr>
+{% set _ = event_date.pop() %}
+{% set _ = event_date.append( job.start_date[:10] ) %}
+{% endfor %}
+</table>
+{% else %}
+</table>
+<p>No Jobs Yet...</p>
+{% endif %}{# if jobs #}

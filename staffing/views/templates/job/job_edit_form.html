@@ -2,25 +2,25 @@
 
 <fieldset>
     <p>{{ input_field(rec.id,"id",type="hidden",default=0)}}</p>
-    {% if activities and not current_activity %}
+    {% if events and not current_event %}
     <p>
-        {{ select_field("activity_id",label='Activity for this Task')}}
+        {{ select_field("event_id",label='Event for this Job')}}
         <option value="0"><em>Select one</em></option>
-        {% for activity in activities %}
-        <option value="{{activity.id}}" {% if activity.id == rec.activity_id %}selected="selected"{% endif %}>{{ activity.title}}</option>
+        {% for event in events %}
+        <option value="{{event.id}}" {% if event.id == rec.event_id %}selected="selected"{% endif %}>{{ event.title}}</option>
         {% endfor %}
         </select>
     </p>
     {% else %}
-		<input type=hidden name="activity_id" value="{{rec.activity_id|default('0',True )}}">
-        <h3 class="w3-container w3-panel w3-primary-color">{{current_activity.title}}</h3>
+		<input type=hidden name="event_id" value="{{rec.event_id|default('0',True )}}">
+        <h3 class="w3-container w3-panel w3-primary-color">{{current_event.title}}</h3>
     {% endif %}
     
     <p>{{ input_field(rec.title,'title',req=True)}}</p>
     <p>{{ label_only(label="Description of duties (may include markdown)")}}</p>
     <p><textarea rows="5" name="description" style="width:100%;">{{rec.description |default('',True)}}</textarea></p>
     <p>{{ select_field("location_id","Location", class="w3-border") }}
-            <option value="0">Same as Activity Location</option>
+            <option value="0">Same as Event Location</option>
             {% if locations %}
             {% for loc in locations %}
                 <option value="{{loc.id}}" {% if loc.id == rec.location_id %}selected="selected" {% endif %}>{{loc.location_name}}</option>
@@ -28,7 +28,7 @@
             {% endif %}
         </select>
     </p>
-    <p>{{ input_field(task_date,'task_date',label="Date",placeholder="MM/DD/YY")}}</p>
+    <p>{{ input_field(job_date,'job_date',label="Date",placeholder="MM/DD/YY")}}</p>
     <p class="w3-row w3-quarter" style="padding-right:3pt;">{{ input_field(start_time,'start_time', label="Start Time", placeholder="8:00")}}</p>
     <p class="w3-row w3-quarter" style="padding-left:3pt;">{{ select_field("start_time_AMPM",label='AM/PM')}}
         <option value="AM" {% if start_time_AMPM == "AM"%}selected="selected"{%endif%} >AM</option>

@@ -6,7 +6,7 @@ from shotglass2.takeabeltof.date_utils import date_to_string, getDatetimeFromStr
 from shotglass2.users.admin import login_required, table_access_required
 from shotglass2.users.models import Role, User
 from shotglass2.users.views.login import authenticate_user, setUserStatus, logout as log_user_out
-from staffing.models import Activity, Location, Task, UserTask
+from staffing.models import Event, Location, Job, UserJob
 from staffing.utils import pack_list_to_string, un_pack_string
 
 
@@ -34,9 +34,9 @@ def display():
         if recs:
             user_skills = [rec.id for rec in recs]
             if not is_admin:
-                #may be task admin
+                #may be job admin
                 for rec in recs:
-                    if rec.rank >= 90: #activity manager
+                    if rec.rank >= 90: #event manager
                         is_admin = True
                         break
             
@@ -47,10 +47,10 @@ def display():
         if rec and rec.id not in user_skills:
             user_skills.append(rec.id)
                 
-    where = "date(task.start_date) >= date('{}')".format(local_datetime_now().isoformat()[:10],)
-    tasks = get_task_rows(where,user_skills,is_admin)
+    where = "date(job.start_date) >= date('{}')".format(local_datetime_now().isoformat()[:10],)
+    jobs = get_job_rows(where,user_skills,is_admin)
             
-    return render_template('signup_list.html',tasks=tasks,is_admin=is_admin)
+    return render_template('signup_list.html',jobs=jobs,is_admin=is_admin)
         
 
 ############################
@@ -58,20 +58,20 @@ def display():
 #####.   the extra 'signup/signup' routes are needed.
 ##### I could almost swear that this worked ok at one time.
 ###########################
-@mod.route('/signup/signup/<int:task_id>/',methods=['GET','POST',])
-@mod.route('/signup/signup/<int:task_id>',methods=['GET','POST',])
+@mod.route('/signup/signup/<int:job_id>/',methods=['GET','POST',])
+@mod.route('/signup/signup/<int:job_id>',methods=['GET','POST',])
 @mod.route('/signup/signup',methods=['GET','POST',])
-@mod.route('/signup/<int:task_id>/',methods=['GET','POST',])
-@mod.route('/signup/<int:task_id>',methods=['GET','POST',])
+@mod.route('/signup/<int:job_id>/',methods=['GET','POST',])
+@mod.route('/signup/<int:job_id>',methods=['GET','POST',])
 @mod.route('/signup/',methods=['GET','POST',])
 @mod.route('/signup',methods=['GET','POST',])
-def signup(task_id=None):
+def signup(job_id=None):
     """Add or remove a signup
     May come from a modal dialog"""
     setExits()
-    task=None
+    job=None
     signup = None
-    activity = None
+    event = None
     filled_positions = 0
     
     # if user not logged in, get that first
@@ -88,23 +88,23 @@ def signup(task_id=None):
     else:
         redirect(abort(404))
     # setup for input form
-    if task_id == None and request.form:
-        task_id = request.form.get('id',-1)
+    if job_id == None and request.form:
+        job_id = request.form.get('id',-1)
         
-    task_id = cleanRecordID(task_id)
+    job_id = cleanRecordID(job_id)
     
-    task = Task(g.db).get(task_id)
-    if not task:
-        return 'failure: That is not a valid task id'
+    job = Job(g.db).get(job_id)
+    if not job:
+        return 'failure: That is not a valid job id'
         
-    task_data = get_task_rows("task.id = {}".format(task.id),is_admin=True)
-    if task_data:
-        filled_positions = task_data[0].task_filled_positions
+    job_data = get_job_rows("job.id = {}".format(job.id),is_admin=True)
+    if job_data:
+        filled_positions = job_data[0].job_filled_positions
         
     # get the user's signup
-    signup = UserTask(g.db).select_one(where='user_id = {} and task_id = {}'.format(user_id,task_id))
+    signup = UserJob(g.db).select_one(where='user_id = {} and job_id = {}'.format(user_id,job_id))
     if not signup:
-        signup = UserTask(g.db).new()
+        signup = UserJob(g.db).new()
         
         
     # if submitting form record signup
@@ -119,14 +119,14 @@ def signup(task_id=None):
             pass
             # Dont allow reduction after the date of the event
             #
-            # if reducing committment and < 2 days to task,
-            #.   If is staff... inform activity manager and email staff that they need to find a replacement?
-            #.   if not staff, inform activity manager and record change
+            # if reducing committment and < 2 days to job,
+            #.   If is staff... inform event manager and email staff that they need to find a replacement?
+            #.   if not staff, inform event manager and record change
             # if reducing and not within 2 days
             #   if not staff, just record the change
-            #   if Staff, Inform activity manager
+            #   if Staff, Inform event manager
         if signup.id and positions <= 0 and signup.id > 0:
-            UserTask(g.db).delete(signup.id)
+            UserJob(g.db).delete(signup.id)
             g.db.commit()
             return 'success'
                 
@@ -135,36 +135,36 @@ def signup(task_id=None):
             ##################
             # TODO - Don't allow any change after the day of the event...
             ###################
-            UserTask(g.db).update(signup,request.form)
+            UserJob(g.db).update(signup,request.form)
             signup.user_id = user_id
-            signup.task_id = task_id
+            signup.job_id = job_id
             signup.modified = local_datetime_now()
-            UserTask(g.db).save(signup)
+            UserJob(g.db).save(signup)
             g.db.commit()
         return 'success'
     
     
-    return render_template('signup_form.html',task=task,activity=activity,signup=signup,filled_positions=filled_positions)
+    return render_template('signup_form.html',job=job,event=event,signup=signup,filled_positions=filled_positions)
     
     
 @mod.route('/signup_success/<int:id>/',methods=['GET','POST',])
 @mod.route('/signup_success/<int:id>',methods=['GET','POST',])
 @mod.route('/signup_success/',methods=['GET','POST',])
 def signup_success(id=0):
-    """Return a single row of task with the just updated data"""
+    """Return a single row of job with the just updated data"""
     #import pdb;pdb.set_trace()
     id = cleanRecordID(id)
     
-    # because the user got access to this task from the main display,
+    # because the user got access to this job from the main display,
     # Set is_admin to true to display the updated version of the record
-    tasks = get_task_rows("task.id = {}".format(id),is_admin=True)
+    jobs = get_job_rows("job.id = {}".format(id),is_admin=True)
     
-    if tasks and len(tasks) > 0:
-        task = tasks[0]
+    if jobs and len(jobs) > 0:
+        job = jobs[0]
     else:
-        return "failure: Task Not Found"
+        return "failure: Job Not Found"
         
-    return render_template('signup_task.html',task=task,show_detail=True)
+    return render_template('signup_job.html',job=job,show_detail=True)
     
     
 @mod.route('/login',methods=['GET','POST',])
@@ -302,17 +302,17 @@ def register(from_main=0):
 
     return render_template('signup_login.html',rec=rec,next=next,register=True,submit_script=submit_script,from_main=from_main)
 
-def populate_participant_list(task):
-    """Add participant values to the task namedlist"""
+def populate_participant_list(job):
+    """Add participant values to the job namedlist"""
     sql = """
     select user.id as user_id, upper(substr(user.first_name,1,1) || substr(user.last_name,1,1)) as initials 
-    from user_task
-    join user on user.id = user_task.user_id
-    where user_task.task_id = {}
+    from user_job
+    join user on user.id = user_job.user_id
+    where user_job.job_id = {}
     order by user.first_name, user.last_name
-    """.format(task.task_id)
-    parts = Task(g.db).query(sql)
-    task.participants = {}
+    """.format(job.job_id)
+    parts = Job(g.db).query(sql)
+    job.participants = {}
     participant_list = []
     initials = []
     participant_skills = []
@@ -324,99 +324,99 @@ def populate_participant_list(task):
                 participant_list.append(part.user_id)
             
         
-        task.participants[task.task_id] = {'initials':initials, 'users':participant_list,}
-        task.skill_list = un_pack_string(task.skill_list) # convert to simple list
+        job.participants[job.job_id] = {'initials':initials, 'users':participant_list,}
+        job.skill_list = un_pack_string(job.skill_list) # convert to simple list
     
     
     
-def get_task_rows(where,user_skills=[],is_admin=False):
+def get_job_rows(where,user_skills=[],is_admin=False):
     sql = """
-    select activity.id as activity_id, activity.title as activity_title, activity.description as activity_description,
+    select event.id as event_id, event.title as event_title, event.description as event_description,
     act_location.id as act_loc_id,
     act_location.location_name as act_loc_name,
     act_location.lat as act_loc_lat,
     act_location.lng as act_loc_lng,
-    (select datetime(task.start_date) from task where task.activity_id = activity.id 
-        order by datetime(task.start_date) limit 1 ) as active_first_date, 
-    (select coalesce(sum(user_task.positions),0) from user_task
-        where user_task.task_id in (select id from task where task.activity_id = activity.id)) as activity_filled_positions,
+    (select datetime(job.start_date) from job where job.event_id = event.id 
+        order by datetime(job.start_date) limit 1 ) as active_first_date, 
+    (select coalesce(sum(user_job.positions),0) from user_job
+        where user_job.job_id in (select id from job where job.event_id = event.id)) as event_filled_positions,
     
-    (select coalesce(sum(task.max_positions),1) from task 
-        where task.activity_id = activity.id) as activity_max_positions,
-    (select distinct coalesce(count(task.id),1) from task 
-        where task.activity_id = activity.id and task.location_id not null and 
-        task.location_id <> activity.location_id) as unique_task_locations,
-    task.id as task_id,
-    task.title as task_title,
-    task.description as task_description,
-    task.start_date,
-    task.end_date,
-    task.max_positions,
-    task.skill_list,
-    task_location.id as task_loc_id,
-    task_location.location_name as task_loc_name,
-    task_location.lat as task_loc_lat,
-    task_location.lng as task_loc_lng,
+    (select coalesce(sum(job.max_positions),1) from job 
+        where job.event_id = event.id) as event_max_positions,
+    (select distinct coalesce(count(job.id),1) from job 
+        where job.event_id = event.id and job.location_id not null and 
+        job.location_id <> event.location_id) as unique_job_locations,
+    job.id as job_id,
+    job.title as job_title,
+    job.description as job_description,
+    job.start_date,
+    job.end_date,
+    job.max_positions,
+    job.skill_list,
+    job_location.id as job_loc_id,
+    job_location.location_name as job_loc_name,
+    job_location.lat as job_loc_lat,
+    job_location.lng as job_loc_lng,
 
     null as participants, -- just a place holder
-    (select coalesce(sum(user_task.positions),0) from user_task 
-        where task.id = user_task.task_id and task.activity_id = activity.id) as task_filled_positions
-    from task
-    join activity on activity.id = task.activity_id
-    left join location as act_location on act_location.id = activity.location_id
-    left join location as task_location on task_location.id = task.location_id
+    (select coalesce(sum(user_job.positions),0) from user_job 
+        where job.id = user_job.job_id and job.event_id = event.id) as job_filled_positions
+    from job
+    join event on event.id = job.event_id
+    left join location as act_location on act_location.id = event.location_id
+    left join location as job_location on job_location.id = job.location_id
     where {}
-    order by active_first_date, task.start_date
+    order by active_first_date, job.start_date
     """
     
-    tasks = Task(g.db).query(sql.format(where))
+    jobs = Job(g.db).query(sql.format(where))
 
-    if tasks:
-        for row in range(len(tasks)-1,-1,-1):
-            """ First, delete any tasks that this user won't be able to see. 
+    if jobs:
+        for row in range(len(jobs)-1,-1,-1):
+            """ First, delete any jobs that this user won't be able to see. 
             'Turkey Shoot' loop from end to first
             """
-            task = tasks[row]
+            job = jobs[row]
             # if user does not have skills requried, delete the row
-            task_skills = un_pack_string(task.skill_list)
-            if len(task_skills) > 0:
+            job_skills = un_pack_string(job.skill_list)
+            if len(job_skills) > 0:
                 if not is_admin: #User(g.db).is_admin(g.user): #admins see all...
-                    task_skills = [int(i) for i in task_skills.split(',')]
-                    for skill in task_skills:
+                    job_skills = [int(i) for i in job_skills.split(',')]
+                    for skill in job_skills:
                         if skill not in user_skills:
-                            del tasks[row]
+                            del jobs[row]
                             continue
         
             # Location resolution...
-            # task.act_loc_* and task.task_loc_* fields will all be populated for display
+            # job.act_loc_* and job.job_loc_* fields will all be populated for display
         
             # defaults
-            act_default_loc = task_default_loc = ('tbd',None,None) # location unkonown
+            act_default_loc = job_default_loc = ('tbd',None,None) # location unkonown
         
-            if task.act_loc_name and task.unique_task_locations == 0:
-                # The only loctation speicied is in the Activity Record
-                task_default_loc = (task.act_loc_name, task.act_loc_lat, task.act_loc_lng)
+            if job.act_loc_name and job.unique_job_locations == 0:
+                # The only loctation speicied is in the Event Record
+                job_default_loc = (job.act_loc_name, job.act_loc_lat, job.act_loc_lng)
             
-            if not task.act_loc_name and task.unique_task_locations == 1:
-                # location only in one task, set all to that loc
-                task_loc_rec = Task(g.db).select_one(where = 'activity_id = {} and location_id notnull'.format(task.activity_id))
-                if task_loc_rec:
-                    loc_rec = Location(g.db).get(task_loc_rec)
+            if not job.act_loc_name and job.unique_job_locations == 1:
+                # location only in one job, set all to that loc
+                job_loc_rec = Job(g.db).select_one(where = 'event_id = {} and location_id notnull'.format(job.event_id))
+                if job_loc_rec:
+                    loc_rec = Location(g.db).get(job_loc_rec)
                     if loc_rec:
-                        act_default_loc = task_default_loc = (loc_rec.name, loc_rec.lat, loc_rec.lng)
+                        act_default_loc = job_default_loc = (loc_rec.name, loc_rec.lat, loc_rec.lng)
                     
-            if task.unique_task_locations > 0:
+            if job.unique_job_locations > 0:
                 # More than one location specifed
                 act_default_loc = ('Multiple Locations',None,None)
                 
             # use defaults if needed
-            if task.act_loc_name == None or task.unique_task_locations > 0:
-                task.act_loc_name, task.act_loc_lat, task.act_loc_lng = act_default_loc
-            if task.task_loc_name == None:
-                task.task_loc_name, task.task_loc_lat, task.task_loc_lng = task_default_loc
+            if job.act_loc_name == None or job.unique_job_locations > 0:
+                job.act_loc_name, job.act_loc_lat, job.act_loc_lng = act_default_loc
+            if job.job_loc_name == None:
+                job.job_loc_name, job.job_loc_lat, job.job_loc_lng = job_default_loc
                     
             if g.user:
                 #if not logged in, can't see any of this anyway...
-                populate_participant_list(task)
+                populate_participant_list(job)
                 
-    return tasks
+    return jobs

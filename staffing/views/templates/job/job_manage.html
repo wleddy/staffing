@@ -1,4 +1,4 @@
-{# manage a set of tasks #}
+{# manage a set of jobs #}
 
 {% from "_form_helpers.html" import input_field, select_field, radio_field, checkbox_field, label_only %}
 
@@ -6,33 +6,33 @@
     {% include 'flasher.html' %}
     <div class="w3-col w3-quarter w3-hide-small">&nbsp;</div>
     <div class="w3-col l6 m6 s12">
-        <form id="manage_task_form"  method=post class="entry ">
+        <form id="manage_job_form"  method=post class="entry ">
     		{{ input_field(rec.id,'id',type="hidden") }}
-            <h3>Move, Copy or Delete the Tasks on {{ rec.start_date | local_date_string }}</h3>
+            <h3>Move, Copy or Delete the Jobs on {{ rec.start_date | local_date_string }}</h3>
             <p>{{input_field(new_date,'new_date',label="New Date to use in Move or Copy",placeholder="mm/dd/yy")}}</p>
             <p>
                 <a class="w3-btn w3-ripple w3-save-button-color w3-mobile w3-round-large" 
                 onclick="submitModalForm(
-                'manage_task_form','{{url_for('task.manage_task_set')}}?action=move',
-                'task-list',
-                '{{ url_for('task.get_task_list_for_activity')}}{{ rec.activity_id}}')"
-                title="Move the tasks on this date to the new date"
+                'manage_job_form','{{url_for('job.manage_job_set')}}?action=move',
+                'job-list',
+                '{{ url_for('job.get_job_list_for_event')}}{{ rec.event_id}}')"
+                title="Move the jobs on this date to the new date"
                 >Move</a>
                 &nbsp;&nbsp;
                 <a class="w3-btn w3-ripple w3-delete-button-color w3-mobile w3-round-large" 
                 onclick="submitModalForm(
-                'manage_task_form','{{url_for('task.manage_task_set')}}?action=copy',
-                'task-list',
-                '{{ url_for('task.get_task_list_for_activity')}}{{ rec.activity_id}}')"
-                title="Copy the tasks on this date to the new date"
+                'manage_job_form','{{url_for('job.manage_job_set')}}?action=copy',
+                'job-list',
+                '{{ url_for('job.get_job_list_for_event')}}{{ rec.event_id}}')"
+                title="Copy the jobs on this date to the new date"
                 >Copy</a>
                 &nbsp;&nbsp;
                 <a class="w3-btn w3-ripple w3-delete-button-color w3-mobile w3-round-large" 
                 onclick="if(confirmRecordDelete()){submitModalForm(
-                'manage_task_form','{{url_for('task.manage_task_set')}}?action=delete',
-                'task-list',
-                '{{ url_for('task.get_task_list_for_activity')}}{{ rec.activity_id}}');}else{cancelModalForm();}"
-                title="Delete the task set from this activity"
+                'manage_job_form','{{url_for('job.manage_job_set')}}?action=delete',
+                'job-list',
+                '{{ url_for('job.get_job_list_for_event')}}{{ rec.event_id}}');}else{cancelModalForm();}"
+                title="Delete the job set from this event"
                 >Delete</a>
                 &nbsp;&nbsp;
                 <a  class="w3-btn w3-ripple w3-cancel-button-color w3-mobile w3-round-large" 

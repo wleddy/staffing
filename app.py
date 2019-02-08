@@ -6,7 +6,7 @@ from shotglass2.takeabeltof.jinja_filters import register_jinja_filters
 from shotglass2.takeabeltof.utils import cleanRecordID
 from shotglass2.users.views.login import setUserStatus
 from shotglass2.users.admin import Admin
-from staffing.models import Activity, Task, Location, ActivityType
+from staffing.models import Event, Job, Location, EventType
 # Create app
 # setting static_folder to None allows me to handle loading myself
 app = Flask(__name__, instance_relative_config=True,
@@ -39,8 +39,8 @@ def initalize_all_tables(db=None):
     shotglass.initalize_user_tables(db)
     
     ### setup any other tables you need here....
-    from staffing.models import init_activity_db
-    init_activity_db(db)
+    from staffing.models import init_event_db
+    init_event_db(db)
     
 def get_db(filespec=None):
     """Return a connection to the database.
@@ -92,15 +92,15 @@ def _before():
         
         
     g.admin = Admin(g.db) # This is where user access rules are stored
-    #Activities
+    #Events
     # a header row must have the some permissions or higher than the items it heads
-    g.admin.register(Activity,url_for('activity.display'),display_name='Staffing Admin',header_row=True,minimum_rank_required=500)
-    g.admin.register(Activity,url_for('activity.display'),display_name='Activities',minimum_rank_required=500,roles=['admin',])
-    #Tasks
-    g.admin.register(Task,url_for('task.display'),display_name='Tasks',minimum_rank_required=500,roles=['admin',])
+    g.admin.register(Event,url_for('event.display'),display_name='Staffing Admin',header_row=True,minimum_rank_required=500)
+    g.admin.register(Event,url_for('event.display'),display_name='Events',minimum_rank_required=500,roles=['admin',])
+    #Jobs
+    g.admin.register(Job,url_for('job.display'),display_name='Jobs',minimum_rank_required=500,roles=['admin',])
     #location
     g.admin.register(Location,url_for('location.display'),display_name='Locations',minimum_rank_required=500,roles=['admin',])
-    g.admin.register(ActivityType,url_for('activity_type.display'),display_name='Activity Types',minimum_rank_required=500,roles=['admin',])
+    g.admin.register(EventType,url_for('event_type.display'),display_name='Event Types',minimum_rank_required=500,roles=['admin',])
     
     shotglass.user_setup() # g.admin now holds access rules Users, Prefs and Roles
 
@@ -135,14 +135,14 @@ app.add_url_rule('/static/<path:filename>','static',shotglass.static,subdomain=s
 
 subdomain = app.config.get('ADMIN_SUBDOMAIN','admin')
 
-from staffing.views import activity
-app.register_blueprint(activity.mod,subdomain=subdomain)
+from staffing.views import event
+app.register_blueprint(event.mod,subdomain=subdomain)
 from staffing.views import location
 app.register_blueprint(location.mod,subdomain=subdomain)
-from staffing.views import task
-app.register_blueprint(task.mod,subdomain=subdomain)
-from staffing.views import activity_type
-app.register_blueprint(activity_type.mod,subdomain=subdomain)
+from staffing.views import job
+app.register_blueprint(job.mod,subdomain=subdomain)
+from staffing.views import event_type
+app.register_blueprint(event_type.mod,subdomain=subdomain)
 
 ## Setup the routes for users
 shotglass.register_users(app,subdomain=subdomain)

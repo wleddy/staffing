@@ -3,11 +3,11 @@ from shotglass2.takeabeltof.utils import cleanRecordID
 from shotglass2.takeabeltof.date_utils import local_datetime_now
 
         
-class Activity(SqliteTable):
-    """Staffing Activity Table"""
+class Event(SqliteTable):
+    """Staffing Event Table"""
     def __init__(self,db_connection):
         super().__init__(db_connection)
-        self.table_name = 'activity'
+        self.table_name = 'event'
         self.order_by_col = 'lower(title)'
         self.defaults = {}
         
@@ -24,7 +24,7 @@ class Activity(SqliteTable):
             client_contact TEXT,
             client_email TEXT,
             client_phone TEXT,
-            activity_type_id INTEGER,
+            event_type_id INTEGER,
             location_id INTEGER """
                 
         super().create_table(sql)
@@ -34,11 +34,11 @@ class Activity(SqliteTable):
         self.create_table()
         
         
-class ActivityType(SqliteTable):
-    """Categorize activities"""
+class EventType(SqliteTable):
+    """Categorize events"""
     def __init__(self,db_connection):
         super().__init__(db_connection)
-        self.table_name = 'activity_type'
+        self.table_name = 'event_type'
         self.order_by_col = 'type, id'
         self.defaults = {}
 
@@ -56,11 +56,11 @@ class ActivityType(SqliteTable):
         self.create_table()
 
 
-class Task(SqliteTable):
-    """Staffing Task Table"""
+class Job(SqliteTable):
+    """Staffing Job Table"""
     def __init__(self,db_connection):
         super().__init__(db_connection)
-        self.table_name = 'task'
+        self.table_name = 'job'
         self.order_by_col = 'date(start_date), lower(title)'
         self.defaults = {'max_positions':1,'skill_list':''}
         
@@ -74,9 +74,9 @@ class Task(SqliteTable):
             start_date DATETIME,
             end_date DATETIME,
             max_positions INTEGER,
-            activity_id INTEGER,
+            event_id INTEGER,
             location_id INTEGER,
-            FOREIGN KEY (activity_id) REFERENCES activity(id) ON DELETE CASCADE """
+            FOREIGN KEY (event_id) REFERENCES event(id) ON DELETE CASCADE """
                 
         super().create_table(sql)
         
@@ -84,20 +84,20 @@ class Task(SqliteTable):
         """Create the table and initialize data"""
         self.create_table()
         
-    def filled(self,task_id):
-        """Return the number positions filled for this task"""
+    def filled(self,job_id):
+        """Return the number positions filled for this job"""
         out = 0
-        cnt = self.db.execute('select sum(positions) as cnt from user_task where task_id=?',(task_id,)).fetchone()[0]
+        cnt = self.db.execute('select sum(positions) as cnt from user_job where job_id=?',(job_id,)).fetchone()[0]
         #import pdb;pdb.set_trace()
         if cnt:
             out = cnt
         return out
         
-class UserTask(SqliteTable):
-    """Staffing User_Task Table"""
+class UserJob(SqliteTable):
+    """Staffing User_Job Table"""
     def __init__(self,db_connection):
         super().__init__(db_connection)
-        self.table_name = 'user_task'
+        self.table_name = 'user_job'
         self.order_by_col = 'id'
         self.defaults = {'positions': 0,}
         
@@ -106,7 +106,7 @@ class UserTask(SqliteTable):
         
         sql = """
         user_id INTEGER NOT NULL,
-        task_id INTEGER NOT NULL,
+        job_id INTEGER NOT NULL,
         created DATETIME,
         modified DATETIME,
         positions INTEGER,
@@ -115,7 +115,7 @@ class UserTask(SqliteTable):
         attendance_comment TEXT,
         attendance_mileage FLOAT,
         FOREIGN KEY (user_id) REFERENCES user(id) ON DELETE CASCADE,
-        FOREIGN KEY (task_id) REFERENCES task(id) ON DELETE CASCADE """
+        FOREIGN KEY (job_id) REFERENCES job(id) ON DELETE CASCADE """
                 
         super().create_table(sql)
         
@@ -164,10 +164,10 @@ class Location(SqliteTable):
         self.create_table()
 
 
-def init_activity_db(db):
+def init_event_db(db):
     """Create a intial user record."""
-    Activity(db).init_table()
-    ActivityType(db).init_table()
-    Task(db).init_table()
-    UserTask(db).init_table()
+    Event(db).init_table()
+    EventType(db).init_table()
+    Job(db).init_table()
+    UserJob(db).init_table()
     Location(db).init_table()
