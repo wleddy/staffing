@@ -78,7 +78,7 @@ def edit(id=0,event_id=0,edit_from_list=False):
     
     #import pdb;pdb.set_trace()
     
-    roles = Role(g.db).select()
+    roles = Role(g.db).select(where='name <> "admin" and name <> "super"')
     selected_roles = [] # this needs to be populated from JobRoles
         
     
