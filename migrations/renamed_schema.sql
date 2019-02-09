@@ -51,14 +51,14 @@ CREATE TABLE IF NOT EXISTS "user_job" (
         FOREIGN KEY (job_id) REFERENCES "job"(id) ON DELETE CASCADE
             );
 
-insert into event select * from event;
-insert into event_type select * from event_type;
-insert into job select * from job;
-insert into user_job select * from user_job;
+insert into event select * from activity;
+insert into event_type select * from activity_type;
+insert into job select * from task;
+insert into user_job select * from user_task;
     
-drop table event;
-drop table event_type;
-drop table job;
-drop table user_job;
+drop table activity;
+drop table activity_type;
+drop table task;
+drop table user_task;
 
 commit;
