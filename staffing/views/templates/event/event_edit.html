@@ -26,13 +26,19 @@
                 {% endif %}
             </select>
         </p>
-        <p>{{ input_field(rec.manager_name,"manager_name")}}</p>
-        <p>{{ input_field(rec.manager_email,"manager_email")}}</p>
-        <p>{{ input_field(rec.manager_phone,"manager_phone")}}</p>
+        <p>{{ select_field("manager_user_id","Event Manager", class="w3-border") }}
+                <option value="0">Select an Event Manager</option>
+                {% if event_managers %}
+                {% for manager in event_managers %}
+                    <option value="{{manager.id}}" {% if manager.id == rec.manager_user_id %}selected="selected" {% endif %}>{{manager.first_name}} {{manager.last_name}}</option>
+                {% endfor %}
+                {% endif %}
+            </select>
+        </p>
+
         <p>{{ input_field(rec.client_name,"client_name")}}</p>
         <p>{{ input_field(rec.client_email,"client_email")}}</p>
         <p>{{ input_field(rec.client_phone,"client_phone")}}</p>
-        <p>{{ input_field(rec.image_url,"image_url",label="Image URL")}}</p>
     
     </fieldset>
 <div class="w3-col w3-hide-small" style="width:20pt;">&nbsp;</div>

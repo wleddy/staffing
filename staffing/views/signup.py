@@ -22,7 +22,7 @@ def setExits():
 def display():
     """List Signup opportuniies"""
     setExits()
-    
+    app_config = get_app_config()
     #import pdb;pdb.set_trace()
     # get the current users role id's
     is_admin = False
@@ -36,12 +36,12 @@ def display():
             if not is_admin:
                 #may be job admin
                 for rec in recs:
-                    if rec.rank >= 90: #event manager
+                    if rec.rank >= app_config.get('MINIMUM_MANAGER_RANK',70): #event manager
                         is_admin = True
                         break
             
     #all visitors get basic skills even if not logged in
-    user_skill_list = get_app_config().get('DEFAULT_USER_ROLES',['volunteer','user'])
+    user_skill_list = app_config.get('DEFAULT_USER_ROLES',['volunteer','user'])
     for skill in user_skill_list:
         rec = Role(g.db).get(skill)
         if rec and rec.id not in user_skills:

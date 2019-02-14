@@ -17,10 +17,7 @@ class Event(SqliteTable):
         sql = """
             title TEXT NULL,
             description TEXT,
-            image_url TEXT,
-            manager_name TEXT,
-            manager_email TEXT,
-            manager_phone TEXT,
+            manager_user_id INTEGER,
             client_contact TEXT,
             client_email TEXT,
             client_phone TEXT,

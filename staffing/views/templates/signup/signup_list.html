@@ -13,9 +13,8 @@
     {% if job.event_id != event_id[0] %}
     <div id="act-{{ job.event_id }}" class="event-contain w3-row-padding w3-secondary-color w3-topbar" style="padding-bottom:6pt;">        
         <p  class="w3-col l2 m2 w3-hide-small" style="padding-top:12pt;">
-            {% if job.image_url %}
-            <img class="w3-image" src="{{ job.image_url }}">
-            {% else %}&nbsp;{% endif %}
+            <!-- an image may or may not display here in the future -->
+            &nbsp;
         </p>
         <div class="w3-col w3-half w3-small" style="">
                <p class="w3-large">

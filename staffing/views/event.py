@@ -1,5 +1,6 @@
 from flask import request, session, g, redirect, url_for, abort, \
      render_template, flash, Blueprint
+from shotglass2.shotglass import get_app_config
 from shotglass2.users.admin import login_required, table_access_required
 from shotglass2.takeabeltof.utils import render_markdown_for, printException, cleanRecordID
 from shotglass2.takeabeltof.date_utils import datetime_as_string
@@ -51,9 +52,7 @@ def edit(id=0):
     else:
         rec = event.new()
         user = User(g.db).get(g.user)
-        rec.manager_name = " ".join([user.first_name,user.last_name])
-        rec.manager_email = user.email
-        rec.manager_phone = user.phone
+        rec.manager_user_id = user.id
         rec.title = "New Event"
         event.save(rec)
         g.cancelURL = url_for('.delete') + str(rec.id)
@@ -61,7 +60,9 @@ def edit(id=0):
 
     locations = Location(g.db).select()
     event_types = EventType(g.db).select()
-    
+    # only users of sufficient rank can manage an event
+    where = "user.id in (select user_id from user_role where role_id in (select role.id from role where rank >= {}))".format(get_app_config().get('MINIMUM_MANAGER_RANK',70))
+    event_managers = User(g.db).select(where=where)
     job_embed_list = get_job_list_for_event(rec.id)
     
     if request.form:
@@ -73,7 +74,7 @@ def edit(id=0):
             return redirect(g.listURL)
         
         
-    return render_template('event_edit.html',rec=rec,locations=locations,event_types=event_types,job_embed_list=job_embed_list)
+    return render_template('event_edit.html',rec=rec,locations=locations,event_types=event_types,event_managers=event_managers,job_embed_list=job_embed_list)
     
     
 @mod.route('/delete/',methods=['GET','POST',])

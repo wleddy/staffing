@@ -94,13 +94,13 @@ def _before():
     g.admin = Admin(g.db) # This is where user access rules are stored
     #Events
     # a header row must have the some permissions or higher than the items it heads
-    g.admin.register(Event,url_for('event.display'),display_name='Staffing Admin',header_row=True,minimum_rank_required=500)
-    g.admin.register(Event,url_for('event.display'),display_name='Events',minimum_rank_required=500,roles=['admin',])
+    g.admin.register(Event,url_for('event.display'),display_name='Staffing Admin',header_row=True,minimum_rank_required=500,roles=['admin','event manager'])
+    g.admin.register(Event,url_for('event.display'),display_name='Events',minimum_rank_required=500,roles=['admin','event manager'])
     #Jobs
-    g.admin.register(Job,url_for('job.display'),display_name='Jobs',minimum_rank_required=500,roles=['admin',])
+    g.admin.register(Job,url_for('job.display'),display_name='Jobs',minimum_rank_required=500,roles=['admin','event manager'])
     #location
-    g.admin.register(Location,url_for('location.display'),display_name='Locations',minimum_rank_required=500,roles=['admin',])
-    g.admin.register(EventType,url_for('event_type.display'),display_name='Event Types',minimum_rank_required=500,roles=['admin',])
+    g.admin.register(Location,url_for('location.display'),display_name='Locations',minimum_rank_required=500,roles=['admin','event manager'])
+    g.admin.register(EventType,url_for('event_type.display'),display_name='Event Types',minimum_rank_required=500,roles=['admin','event manager'])
     
     shotglass.user_setup() # g.admin now holds access rules Users, Prefs and Roles
 
