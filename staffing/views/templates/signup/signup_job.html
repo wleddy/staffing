@@ -1,8 +1,8 @@
         <div id="job-head{{ job.job_id }}" class="w3-row w3-secondary-color job-contain job-date-contain" style="margin-top:-1px;">
             <div class="w3-col l2 m2 w3-hide-small">&nbsp;</div>
             <div class="w3-col l10 m10">
-                <p onclick="$('#job-detail{{ job.job_id }}').show();$('#job-head{{ job.job_id }}').hide()" class="w3-primary-color" style="cursor:pointer;margin-bottom:0;margin-top:6pt;">
-                    <span class="w3-button">+</span><strong>{{ job.job_title | truncate(40) }}</strong>
+                <p onclick="$('#job-detail{{ job.job_id }}').show();$('#job-head{{ job.job_id }}').hide()" class="" style="cursor:pointer;margin-bottom:0;margin-top:6pt;">
+                    <span class="w3-button w3-primary-color w3-round-medium">+</span><strong>&nbsp;{{ job.job_title | truncate(40) }}</strong>
                     <span class="w3-small">- {{ job.start_date | local_time_string | lower }}
                         <span class="w3-hide-small"> - {{ job.end_date | local_time_string | lower }}</span>
                         {% if job.job_filled_positions >= job.max_positions %}<em>(full)</em>{% endif %}
@@ -12,14 +12,14 @@
         </div>
         
         <div id="job-detail{{ job.job_id }}" class="w3-row w3-secondary-color job-contain " style="position:relative;top:-1px;display:none;">
-            <hr class="w3-hide-small" style="margin-left:16.666%;margin-top:0">
-            <hr class="w3-hide-large w3-hide-medium" style="margin-top:0">
+            <div class="w3-col l2 m2 w3-hide-small">&nbsp;</div>
+            <p class="w3-col l10 m10 s12 w3-medium w3-button w3-round-medium w3-primary-color"
+                onclick="$('#job-detail{{ job.job_id }}').hide();$('#job-head{{ job.job_id }}').show()"
+                style="cursor:pointer;text-align:left;margin-top:3pt;white-space:normal;"
+                >&ndash;&nbsp;<strong>{{ job.job_title }}</strong>
+            </p>
             <div class="w3-col l2 m2 w3-hide-small">&nbsp;</div>
             <div class="w3-col w3-half w3-small">
-                <p class="w3-medium"><a class="w3-button w3-round-medium w3-primary-color" 
-                    onclick="$('#job-detail{{ job.job_id }}').hide();$('#job-head{{ job.job_id }}').show()"
-                    >&ndash;</a>&nbsp;<strong>{{ job.job_title }}</strong>
-                </p>
                 <p class="w3-small">
                     {{ job.job_description }}
                 </p>
