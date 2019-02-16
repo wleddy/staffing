@@ -159,8 +159,11 @@ def signup(job_id=None):
                     location = job_data.job_loc_name
                     
                 description = event.description + '\n\n' + job.description
-                latitude = None
-                longitude = None
+                description += '\n\n*location:*\n\n{}'.format(job_data.job_loc_name)
+
+                if  job_data.job_loc_street_address and job_data.job_loc_city and job_data.job_loc_state:
+                    description += '\n\n{}  {}'.format(', '.join([job_data.job_loc_street_address, job_data.job_loc_city]), job_data.job_loc_state.upper())
+
                 map_url = None
                 geo = None
                 
@@ -196,9 +199,8 @@ def signup(job_id=None):
                 email_html = render_markdown_for('announce/email/signup_announce.md',
                     bp=mod,
                     ical=ical,
+                    description=description,
                     job_data=job_data,
-                    signup=signup,
-                    map_url=map_url,
                     )
                 subject = 'Your assignment for {}'.format(event.title)
                 attachment = None
@@ -549,32 +551,10 @@ def get_job_rows(where,user_skills=[],is_admin=False):
     
 def cal(**kwargs):
     """Return the text of an icalendar object or None"""
-    
-    """ it might look something like this
-    BEGIN:VCALENDAR
-    VERSION:2.0
-    X-PRIMARY-CALENDAR:TRUE
-    CALSCALE:GREGORIAN
-    PRODID:iCalendar-Ruby
-    BEGIN:VEVENT
-    CREATED:20190205T163638Z
-    DESCRIPTION:Organizer Name: Jim Brown\nOrganizer Email: volunteer@sacbike.o
-     rg\n\nDescription: You will be using the Bike and Walk online counting syst
-     em to count bikes at the corner of 19th & Q Streets.For more information on
-      the Bike and Walk system go to http://bikeandwalk.org\n\n
-    DTEND:20190219T180000
-    DTSTAMP:20190205T163910Z
-    DTSTART:20190219T160000
-    LOCATION:19th & Q and 24th & K in midtown Sacramento
-    SEQUENCE:0
-    SUMMARY:Midtown Bike Count: 19th & Q Bike Count
-    UID:51842910_96849628
-    END:VEVENT
-    END:VCALENDAR
-    """
     import random
     from icalendar import Calendar, Event
     #import pdb;pdb.set_trace()
+    
     event = kwargs.get('event',None) # a dict of event data
     events = kwargs.get('events',None) # a list of event dicts
     out = None
@@ -596,19 +576,6 @@ def cal(**kwargs):
     for event in events:
         if event:
             ev = Event()
-            #uid = event.get('uid',''.join(random.choices('kjlsdkfjwpijfojoiejw9p8w93j89siojhw89wpjwdd',k=12)))
-            #dtstart = event.get('dtstart',local_datetime_now())
-            #dtend = event.get('dtend',local_datetime_now())
-            #summary = event.get('summary',"An Event")
-            #        
-            #ev.add('uid',uid)
-            #if isinstance(dtstart,str):
-            #    dtstart = getDatetimeFromString(dtstart)
-            #ev.add('dtstart',dtstart)
-            #if isinstance(dtend,str):
-            #    dtend = getDatetimeFromString(dtend)
-            #ev.add('dtend',dtend)
-            #ev.add('summary',summary)
             
             minumum_properties = True
             # Minimum required properties
@@ -629,21 +596,6 @@ def cal(**kwargs):
                 if value:
                     ev.add(key,value)
                 
-            #if description:
-            #    ev.add('description',description)
-            #if location:
-            #    ev.add('location',location)
-            #    
-            #    #ev.add('location','3145 17th St., Sacramento, ca')
-            #    
-            ## GEO does not seem to be supported in apple ical
-            #if latitude and longitude:
-            #    ev.add('GEO',(latitude,longitude))
-            #
-            ##ev.add('GEO',(37.386013,-122.082932))
-            #if url:
-            #    ev.add('url',url)
-                
             ev.add('DTSTAMP',local_datetime_now('UTC'))
             calendar.add_component(ev)
             event_count += 1
@@ -657,6 +609,7 @@ def cal(**kwargs):
 def make_event_dict(uid,start,end,summary,**kwargs):
     """Return a dictionary suitable for use when creating a calendar event"""
     ical_event = {}
+    # the required fields
     ical_event['uid'] = uid
     ical_event['dtstart'] = start
     ical_event['dtend'] = end
