@@ -28,10 +28,10 @@ order by active_first_date, job.start_date
 
 -- Try to get location for event and job
 select event.id as event_id, event.title as event_title, event.description as event_description,
-act_location.id as act_loc_id,
-act_location.location_name as act_loc_name,
-act_location.lat as act_loc_lat,
-act_location.lng as act_loc_lng,
+event_location.id as event_loc_id,
+event_location.location_name as event_loc_name,
+event_location.lat as event_loc_lat,
+event_location.lng as event_loc_lng,
 (select datetime(job.start_date) from job where job.event_id = event.id 
     order by datetime(job.start_date) limit 1 ) as active_first_date, 
 (select coalesce(sum(user_job.positions),0) from user_job 
@@ -57,7 +57,7 @@ null as participants, -- just a place holder
     where job.id = user_job.job_id and job.event_id = event.id) as job_filled_positions
 from job
 join event on event.id = job.event_id
-left join location as act_location on act_location.id = event.location_id
+left join location as event_location onevent_location.id = event.location_id
 left join location as job_location on job_location.id = job.location_id
 where date(job.start_date) >= date('{}')
 order by active_first_date, job.start_date

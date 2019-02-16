@@ -1,7 +1,7 @@
 from flask import request, session, g, redirect, url_for, abort, \
      render_template, flash, Blueprint
 from shotglass2.shotglass import get_app_config
-from shotglass2.takeabeltof.utils import render_markdown_for, printException, cleanRecordID, looksLikeEmailAddress, formatted_phone_number
+from shotglass2.takeabeltof.utils import render_markdown_for, render_markdown_text, printException, cleanRecordID, looksLikeEmailAddress, formatted_phone_number
 from shotglass2.takeabeltof.date_utils import date_to_string, getDatetimeFromString, local_datetime_now
 from shotglass2.users.admin import login_required, table_access_required
 from shotglass2.users.models import Role, User
@@ -69,9 +69,11 @@ def signup(job_id=None):
     """Add or remove a signup
     May come from a modal dialog"""
     setExits()
+    app_config = get_app_config()
     job=None
     signup = None
     event = None
+    user = None
     filled_positions = 0
     
     # if user not logged in, get that first
@@ -85,8 +87,12 @@ def signup(job_id=None):
     user_id = None
     if 'user_id' in session:
         user_id = session['user_id']
+        user = User(g.db).get(user_id)
+        if not user:
+            return 'failure: That is not a valid user id'
     else:
         redirect(abort(404))
+        
     # setup for input form
     if job_id == None and request.form:
         job_id = request.form.get('id',-1)
@@ -96,10 +102,15 @@ def signup(job_id=None):
     job = Job(g.db).get(job_id)
     if not job:
         return 'failure: That is not a valid job id'
-        
+    
+    event = Event(g.db).get(job.event_id)
+    if not event:
+        return 'failure: That is not a valid event id'
+            
     job_data = get_job_rows("job.id = {}".format(job.id),is_admin=True)
     if job_data:
-        filled_positions = job_data[0].job_filled_positions
+        job_data = job_data[0]
+        filled_positions = job_data.job_filled_positions
         
     # get the user's signup
     signup = UserJob(g.db).select_one(where='user_id = {} and job_id = {}'.format(user_id,job_id))
@@ -109,26 +120,14 @@ def signup(job_id=None):
         
     # if submitting form record signup
     if request.form:
+        #import pdb;pdb.set_trace()
         positions = cleanRecordID(request.form.get('positions',0))
-        if positions > 0 and signup.positions == 0:
-            # if adding first slot, send email with ical attachement
-            pass
-            
-        if positions < signup.positions:
-            # the number of positions has been reduced
-            pass
-            # Dont allow reduction after the date of the event
-            #
-            # if reducing committment and < 2 days to job,
-            #.   If is staff... inform event manager and email staff that they need to find a replacement?
-            #.   if not staff, inform event manager and record change
-            # if reducing and not within 2 days
-            #   if not staff, just record the change
-            #   if Staff, Inform event manager
+        previous_positions = signup.positions
+        submission_ok = True # set for success
         if signup.id and positions <= 0 and signup.id > 0:
+            positions = -1 # indicates a cancellation of all positions
             UserJob(g.db).delete(signup.id)
             g.db.commit()
-            return 'success'
                 
         # record change
         if positions > 0:
@@ -141,7 +140,99 @@ def signup(job_id=None):
             signup.modified = local_datetime_now()
             UserJob(g.db).save(signup)
             g.db.commit()
-        return 'success'
+            
+        if submission_ok:
+            # send some notices
+            from shotglass2.takeabeltof.mailer import send_message
+            
+            if positions > 0 and not previous_positions:
+                # if adding first slot, send email with ical attachement
+            
+                # generate the ical text #### the new signup record must exist so I can create a UID
+                uid='{}_{}_{}'.format(
+                    '000000{}'.format(event.id)[-6:],
+                    '000000{}'.format(job.id)[-6:],
+                    '000000{}'.format(user.id)[-6:],
+                    )
+                location = ''
+                if job_data.job_loc_name:
+                    location = job_data.job_loc_name
+                    
+                description = event.description + '\n\n' + job.description
+                latitude = None
+                longitude = None
+                map_url = None
+                geo = None
+                
+                if job_data.job_loc_lat and job_data.job_loc_lng or app_config['DEBUG']:
+
+                    ### Apple Calender does not seem to use geo to set map location
+                    ### it uses the value in location to try a reverse geocode lookup
+                    geo = (job_data.job_loc_lat,job_data.job_loc_lng)
+                        
+                    #########################
+                    #### for inital Testing
+                    ########################
+                    if app_config['DEBUG']:
+                        geo = (37.386013,-122.082932)
+                    
+                    # Create a mapping uri
+                    ############################
+                    ## TODO - This should place a pin at least
+                    ##        Maybe try to use apple maps if on iOS
+                    ############################
+                    map_url = "https://www.google.com/maps/place/@{},{},17z".format(geo[0],geo[1])
+                    description = description + '\n\n' + 'Map: {}'.format(map_url)
+                
+                ical_event = make_event_dict(uid,job.start_date,job.end_date,job.title,
+                        description=description,
+                        location=location,
+                        geo=geo,
+                        )
+                    
+                ical = cal(event=ical_event)
+
+                # generate the text of the email with ical as an attachment
+                email_html = render_markdown_for('announce/email/signup_announce.md',
+                    bp=mod,
+                    ical=ical,
+                    job_data=job_data,
+                    signup=signup,
+                    map_url=map_url,
+                    )
+                subject = 'Your assignment for {}'.format(event.title)
+                attachment = None
+                if ical:
+                    attachment = ("{}.ics".format(job.title.replace(' ','_')), "text/calendar", ical)
+                        
+                # send that puppy!
+                send_result = send_message([(user.email,' '.join([user.first_name,user.last_name]))],
+                                subject=subject,
+                                body_is_html=True,
+                                body=email_html,
+                                attachment=attachment,
+                                )
+                if not send_result[0]:
+                    #Error occured
+                    send_message(None,body="An error occored while trying to send signup email. Err: {}".format(send_result[1]))
+                        
+            if previous_positions and positions < previous_positions:
+                # the number of positions has been reduced
+                pass
+                # Dont allow reduction after the date of the event
+                #
+                # if reducing committment and < 2 days to job,
+                #.   If is staff... inform event manager and email staff that they need to find a replacement?
+                #.   if not staff, inform event manager and record change
+                # if reducing and not within 2 days
+                #   if not staff, just record the change
+                #   if Staff, Inform event manager
+            
+        if submission_ok:
+            return 'success'
+        else:
+            # return the form with flashed message?
+            pass
     
     
     return render_template('signup_form.html',job=job,event=event,signup=signup,filled_positions=filled_positions)
@@ -332,10 +423,14 @@ def populate_participant_list(job):
 def get_job_rows(where,user_skills=[],is_admin=False):
     sql = """
     select event.id as event_id, event.title as event_title, event.description as event_description,
-    act_location.id as act_loc_id,
-    act_location.location_name as act_loc_name,
-    act_location.lat as act_loc_lat,
-    act_location.lng as act_loc_lng,
+    event_location.id as event_loc_id,
+    event_location.location_name as event_loc_name,
+    event_location.street_address as event_loc_street_address,
+    event_location.city as event_loc_city,
+    event_location.state as event_loc_state,
+    event_location.zip as event_loc_zip,
+    event_location.lat as event_loc_lat,
+    event_location.lng as event_loc_lng,
     (select datetime(job.start_date) from job where job.event_id = event.id 
         order by datetime(job.start_date) limit 1 ) as active_first_date, 
     (select coalesce(sum(user_job.positions),0) from user_job
@@ -355,6 +450,10 @@ def get_job_rows(where,user_skills=[],is_admin=False):
     job.skill_list,
     job_location.id as job_loc_id,
     job_location.location_name as job_loc_name,
+    job_location.street_address as job_loc_street_address,
+    job_location.city as job_loc_city,
+    job_location.state as job_loc_state,
+    job_location.zip as job_loc_zip,
     job_location.lat as job_loc_lat,
     job_location.lng as job_loc_lng,
 
@@ -363,7 +462,7 @@ def get_job_rows(where,user_skills=[],is_admin=False):
         where job.id = user_job.job_id and job.event_id = event.id) as job_filled_positions
     from job
     join event on event.id = job.event_id
-    left join location as act_location on act_location.id = event.location_id
+    left join location as event_location on event_location.id = event.location_id
     left join location as job_location on job_location.id = job.location_id
     where {}
     order by active_first_date, job.start_date
@@ -388,35 +487,183 @@ def get_job_rows(where,user_skills=[],is_admin=False):
                             continue
         
             # Location resolution...
-            # job.act_loc_* and job.job_loc_* fields will all be populated for display
+            # job.event_loc_* and job.job_loc_* fields will all be populated for display
         
             # defaults
-            act_default_loc = job_default_loc = ('tbd',None,None) # location unkonown
-        
-            if job.act_loc_name and job.unique_job_locations == 0:
-                # The only loctation speicied is in the Event Record
-                job_default_loc = (job.act_loc_name, job.act_loc_lat, job.act_loc_lng)
+            event_default_loc = job_default_loc = ('tbd',None,None) # location unkonown
+            event_default_loc_street_address = ''
+            event_default_loc_city = ''
+            event_default_loc_state = ''
+            event_default_loc_zip = ''
             
-            if not job.act_loc_name and job.unique_job_locations == 1:
+            job_default_loc_street_address = ''
+            job_default_loc_city = ''
+            job_default_loc_state = ''
+            job_default_loc_zip = ''
+        
+            if job.event_loc_name and job.unique_job_locations == 0:
+                # The only loctation speicied is in the Event Record
+                job_default_loc = (job.event_loc_name, job.event_loc_lat, job.event_loc_lng)
+                job_default_loc_street_address = job.event_loc_street_address
+                job_default_loc_city = job.event_loc_city
+                job_default_loc_state = job.event_loc_state
+                job_default_loc_zip = job.event_loc_zip
+            
+            if not job.event_loc_name and job.unique_job_locations == 1:
                 # location only in one job, set all to that loc
                 job_loc_rec = Job(g.db).select_one(where = 'event_id = {} and location_id notnull'.format(job.event_id))
                 if job_loc_rec:
                     loc_rec = Location(g.db).get(job_loc_rec)
                     if loc_rec:
-                        act_default_loc = job_default_loc = (loc_rec.name, loc_rec.lat, loc_rec.lng)
+                        event_default_loc = job_default_loc = (loc_rec.name, loc_rec.lat, loc_rec.lng)
+                        event_default_loc_street_address = loc_rec.street_address
+                        event_default_loc_city = loc_rec.city
+                        event_default_loc_state = loc_rec.state
+                        event_default_loc_zip = loc_rec.zip
                     
             if job.unique_job_locations > 0:
                 # More than one location specifed
-                act_default_loc = ('Multiple Locations',None,None)
+                event_default_loc = ('Multiple Locations',None,None)
                 
             # use defaults if needed
-            if job.act_loc_name == None or job.unique_job_locations > 0:
-                job.act_loc_name, job.act_loc_lat, job.act_loc_lng = act_default_loc
+            if job.event_loc_name == None or job.unique_job_locations > 0:
+                job.event_loc_name, job.event_loc_lat, job.event_loc_lng = event_default_loc
+                job.event_loc_street_address = job_default_loc_street_address
+                job.event_loc_city = job_default_loc_city
+                job.event_loc_state = job_default_loc_state
+                job.event_loc_zip = job_default_loc_zip
+                
             if job.job_loc_name == None:
                 job.job_loc_name, job.job_loc_lat, job.job_loc_lng = job_default_loc
+                job.job_loc_street_address = event_default_loc_street_address
+                job.job_loc_city = event_default_loc_city
+                job.job_loc_state = event_default_loc_state
+                job.job_loc_zip = event_default_loc_zip
                     
             if g.user:
                 #if not logged in, can't see any of this anyway...
                 populate_participant_list(job)
                 
     return jobs
+    
+    
+def cal(**kwargs):
+    """Return the text of an icalendar object or None"""
+    
+    """ it might look something like this
+    BEGIN:VCALENDAR
+    VERSION:2.0
+    X-PRIMARY-CALENDAR:TRUE
+    CALSCALE:GREGORIAN
+    PRODID:iCalendar-Ruby
+    BEGIN:VEVENT
+    CREATED:20190205T163638Z
+    DESCRIPTION:Organizer Name: Jim Brown\nOrganizer Email: volunteer@sacbike.o
+     rg\n\nDescription: You will be using the Bike and Walk online counting syst
+     em to count bikes at the corner of 19th & Q Streets.For more information on
+      the Bike and Walk system go to http://bikeandwalk.org\n\n
+    DTEND:20190219T180000
+    DTSTAMP:20190205T163910Z
+    DTSTART:20190219T160000
+    LOCATION:19th & Q and 24th & K in midtown Sacramento
+    SEQUENCE:0
+    SUMMARY:Midtown Bike Count: 19th & Q Bike Count
+    UID:51842910_96849628
+    END:VEVENT
+    END:VCALENDAR
+    """
+    import random
+    from icalendar import Calendar, Event
+    #import pdb;pdb.set_trace()
+    event = kwargs.get('event',None) # a dict of event data
+    events = kwargs.get('events',None) # a list of event dicts
+    out = None
+    
+    if events:
+        if not isinstance(events,list):
+            events = [events]
+        events.extend([event])
+    elif event:
+        events = [event]
+    
+    calendar = Calendar()
+    calendar.add('version','2.0')
+    calendar.add('calscale','GREGORIAN')
+    calendar.add('prodid','net.williesworkshop.calendar')
+    calendar.add('x-priamry-calendar','TRUE')
+    
+    event_count = 0
+    for event in events:
+        if event:
+            ev = Event()
+            #uid = event.get('uid',''.join(random.choices('kjlsdkfjwpijfojoiejw9p8w93j89siojhw89wpjwdd',k=12)))
+            #dtstart = event.get('dtstart',local_datetime_now())
+            #dtend = event.get('dtend',local_datetime_now())
+            #summary = event.get('summary',"An Event")
+            #        
+            #ev.add('uid',uid)
+            #if isinstance(dtstart,str):
+            #    dtstart = getDatetimeFromString(dtstart)
+            #ev.add('dtstart',dtstart)
+            #if isinstance(dtend,str):
+            #    dtend = getDatetimeFromString(dtend)
+            #ev.add('dtend',dtend)
+            #ev.add('summary',summary)
+            
+            minumum_properties = True
+            # Minimum required properties
+            for key in ['uid','dtstart','dtend','summary',]:
+                if key not in event:
+                    minumum_properties = False
+                    break
+                value = event.pop(key)
+                if isinstance(value,str) and key in ['dtstart','dtend',]:
+                    value = getDatetimeFromString(value)
+                    
+                ev.add(key,value)
+                
+            if not minumum_properties:
+                break
+                
+            for key, value in event.items():
+                if value:
+                    ev.add(key,value)
+                
+            #if description:
+            #    ev.add('description',description)
+            #if location:
+            #    ev.add('location',location)
+            #    
+            #    #ev.add('location','3145 17th St., Sacramento, ca')
+            #    
+            ## GEO does not seem to be supported in apple ical
+            #if latitude and longitude:
+            #    ev.add('GEO',(latitude,longitude))
+            #
+            ##ev.add('GEO',(37.386013,-122.082932))
+            #if url:
+            #    ev.add('url',url)
+                
+            ev.add('DTSTAMP',local_datetime_now('UTC'))
+            calendar.add_component(ev)
+            event_count += 1
+            
+    if event_count > 0:
+        out = calendar.to_ical()
+    
+    return out
+    
+    
+def make_event_dict(uid,start,end,summary,**kwargs):
+    """Return a dictionary suitable for use when creating a calendar event"""
+    ical_event = {}
+    ical_event['uid'] = uid
+    ical_event['dtstart'] = start
+    ical_event['dtend'] = end
+    ical_event['summary'] = summary
+    
+    for key, value in kwargs.items():
+        ical_event[key] = value
+        
+    return ical_event
+    
