@@ -147,19 +147,18 @@ def signup(job_id=None):
             
             if positions > 0 and not previous_positions:
                 # if adding first slot, send email with ical attachement
-            
+                #import pdb;pdb.set_trace()
                 # generate the ical text #### the new signup record must exist so I can create a UID
                 uid='{}_{}_{}'.format(
                     '000000{}'.format(event.id)[-6:],
                     '000000{}'.format(job.id)[-6:],
                     '000000{}'.format(user.id)[-6:],
                     )
-                location = ''
+                location = None
+                description = event.description + '\n\n' + job.description
                 if job_data.job_loc_name:
                     location = job_data.job_loc_name
-                    
-                description = event.description + '\n\n' + job.description
-                description += '\n\n*location:*\n\n{}'.format(job_data.job_loc_name)
+                    description += '\n\n*location:*\n\n{}'.format(job_data.job_loc_name)
 
                 if  job_data.job_loc_street_address and job_data.job_loc_city and job_data.job_loc_state:
                     description += '\n\n{}  {}'.format(', '.join([job_data.job_loc_street_address, job_data.job_loc_city]), job_data.job_loc_state.upper())
@@ -187,8 +186,12 @@ def signup(job_id=None):
                     map_url = "https://www.google.com/maps/place/@{},{},17z".format(geo[0],geo[1])
                     description = description + '\n\n' + 'Map: {}'.format(map_url)
                 
+                cal_desc = None
+                if description:
+                    cal_desc = description.replace('\n\n','\n') #remove teh double returns that markdown needs
+                    
                 ical_event = make_event_dict(uid,job.start_date,job.end_date,job.title,
-                        description=description,
+                        description=cal_desc,
                         location=location,
                         geo=geo,
                         )
@@ -490,7 +493,7 @@ def get_job_rows(where,user_skills=[],is_admin=False):
         
             # Location resolution...
             # job.event_loc_* and job.job_loc_* fields will all be populated for display
-        
+            #import pdb;pdb.set_trace()
             # defaults
             event_default_loc = job_default_loc = ('tbd',None,None) # location unkonown
             event_default_loc_street_address = ''
@@ -537,10 +540,10 @@ def get_job_rows(where,user_skills=[],is_admin=False):
                 
             if job.job_loc_name == None:
                 job.job_loc_name, job.job_loc_lat, job.job_loc_lng = job_default_loc
-                job.job_loc_street_address = event_default_loc_street_address
-                job.job_loc_city = event_default_loc_city
-                job.job_loc_state = event_default_loc_state
-                job.job_loc_zip = event_default_loc_zip
+                job.job_loc_street_address = job_default_loc_street_address
+                job.job_loc_city = job_default_loc_city
+                job.job_loc_state = job_default_loc_state
+                job.job_loc_zip = job_default_loc_zip
                     
             if g.user:
                 #if not logged in, can't see any of this anyway...
