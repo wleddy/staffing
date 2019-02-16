@@ -165,8 +165,11 @@ def signup(job_id=None):
 
                 map_url = None
                 geo = None
-                
-                if job_data.job_loc_lat and job_data.job_loc_lng or app_config['DEBUG']:
+                w3w = None
+                if job_data.job_loc_w3w:
+                    map_url = 'https://w3w.co/{}'.format(job_data.job_loc_w3w)
+                    
+                if job_data.job_loc_lat and job_data.job_loc_lng:
 
                     ### Apple Calender does not seem to use geo to set map location
                     ### it uses the value in location to try a reverse geocode lookup
@@ -183,7 +186,11 @@ def signup(job_id=None):
                     ## TODO - This should place a pin at least
                     ##        Maybe try to use apple maps if on iOS
                     ############################
-                    map_url = "https://www.google.com/maps/place/@{},{},17z".format(geo[0],geo[1])
+                    if not map_url:
+                        # don't replace the w3w link
+                        map_url = "https://www.google.com/maps/place/@{},{},17z".format(geo[0],geo[1])
+                    
+                if map_url:
                     description = description + '\n\n' + 'Map: {}'.format(map_url)
                 
                 cal_desc = None
@@ -436,6 +443,7 @@ def get_job_rows(where,user_skills=[],is_admin=False):
     event_location.zip as event_loc_zip,
     event_location.lat as event_loc_lat,
     event_location.lng as event_loc_lng,
+    event_location.w3w as event_loc_w3w,
     (select datetime(job.start_date) from job where job.event_id = event.id 
         order by datetime(job.start_date) limit 1 ) as active_first_date, 
     (select coalesce(sum(user_job.positions),0) from user_job
@@ -461,6 +469,7 @@ def get_job_rows(where,user_skills=[],is_admin=False):
     job_location.zip as job_loc_zip,
     job_location.lat as job_loc_lat,
     job_location.lng as job_loc_lng,
+    job_location.w3w as job_loc_w3w,
 
     null as participants, -- just a place holder
     (select coalesce(sum(user_job.positions),0) from user_job 
@@ -500,11 +509,13 @@ def get_job_rows(where,user_skills=[],is_admin=False):
             event_default_loc_city = ''
             event_default_loc_state = ''
             event_default_loc_zip = ''
+            event_default_loc_w3w = ''
             
             job_default_loc_street_address = ''
             job_default_loc_city = ''
             job_default_loc_state = ''
             job_default_loc_zip = ''
+            job_default_loc_w3w = ''
         
             if job.event_loc_name and job.unique_job_locations == 0:
                 # The only loctation speicied is in the Event Record
@@ -513,6 +524,7 @@ def get_job_rows(where,user_skills=[],is_admin=False):
                 job_default_loc_city = job.event_loc_city
                 job_default_loc_state = job.event_loc_state
                 job_default_loc_zip = job.event_loc_zip
+                job_default_loc_w3w = job.event_loc_w3w
             
             if not job.event_loc_name and job.unique_job_locations == 1:
                 # location only in one job, set all to that loc
@@ -525,6 +537,7 @@ def get_job_rows(where,user_skills=[],is_admin=False):
                         event_default_loc_city = loc_rec.city
                         event_default_loc_state = loc_rec.state
                         event_default_loc_zip = loc_rec.zip
+                        event_default_loc_w3w = loc_rec.w3w
                     
             if job.unique_job_locations > 0:
                 # More than one location specifed
@@ -537,6 +550,7 @@ def get_job_rows(where,user_skills=[],is_admin=False):
                 job.event_loc_city = job_default_loc_city
                 job.event_loc_state = job_default_loc_state
                 job.event_loc_zip = job_default_loc_zip
+                job.event_loc_w3w = job_default_loc_w3w
                 
             if job.job_loc_name == None:
                 job.job_loc_name, job.job_loc_lat, job.job_loc_lng = job_default_loc
@@ -544,6 +558,7 @@ def get_job_rows(where,user_skills=[],is_admin=False):
                 job.job_loc_city = job_default_loc_city
                 job.job_loc_state = job_default_loc_state
                 job.job_loc_zip = job_default_loc_zip
+                job.job_loc_w3w = job_default_loc_w3w
                     
             if g.user:
                 #if not logged in, can't see any of this anyway...
