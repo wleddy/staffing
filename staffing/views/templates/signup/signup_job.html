@@ -44,7 +44,8 @@
                 <div style="padding-left:4pt;">
                     <p>
                         <em>Where:</em> <strong>{{ job.job_loc_name }}</strong> 
-                        {% if job.job_loc_lat and job.job_loc_lng %}<a href="#">Map...</a>{% endif %}
+                        {% if job.job_loc_w3w %}<a href="https://w3w.co/{{job.job_loc_w3w}}" target="_w3w" >Map...</a>
+                        {% elif job.job_loc_lat and job.job_loc_lng %}<a href="#">Map...</a>{% endif %}
                     </p>
                     <p>
                         <em>When:</em> <strong>{{ job.start_date | short_day_and_date }}</strong>
