@@ -517,8 +517,8 @@ def get_job_rows(where,user_skills=[],is_admin=False):
             job_default_loc_zip = ''
             job_default_loc_w3w = ''
         
-            if job.event_loc_name and job.unique_job_locations == 0:
-                # The only loctation speicied is in the Event Record
+            if job.event_loc_name:
+                # Set the job default loc to event loc
                 job_default_loc = (job.event_loc_name, job.event_loc_lat, job.event_loc_lng)
                 job_default_loc_street_address = job.event_loc_street_address
                 job_default_loc_city = job.event_loc_city
