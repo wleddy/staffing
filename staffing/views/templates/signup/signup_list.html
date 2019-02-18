@@ -51,9 +51,9 @@
             <div class="w3-col l1 m1 w3-hide-small">&nbsp;</div>
             <div class="w3-col l11 m11">
                 <hr style="margin:0 0 3pt 0;position:relative;top:-1px;">
-                <p onclick="$('.job-date-container-{{ job.event_id }}-{{job.start_date[:10]}},.job-date-more-{{job.start_date[:10]}}').toggle();"
+                <p onclick="$('.job-date-container-{{ job.event_id }}-{{job.start_date[:10]}},.job-date-more-{{ job.event_id }}-{{job.start_date[:10]}}').toggle();"
                 style="cursor:pointer;">
-                    <span class="w3-button w3-round-medium w3-primary-color job-date-more-{{job.start_date[:10]}}" 
+                    <span class="w3-button w3-round-medium w3-primary-color job-date-more-{{ job.event_id }}-{{job.start_date[:10]}}" 
                     >+</span>
                     <span class=" w3-button w3-round-medium w3-primary-color job-date-container-{{ job.event_id }}-{{job.start_date[:10]}}" style="display:none;" 
                     >&ndash;</span>
