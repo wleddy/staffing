@@ -26,8 +26,9 @@
         </div>
         <div class="w3-third " style="padding-left:4pt;">
             <p>
-                <em>Where:</em> <strong>{{ job.act_loc_name | default("", True ) }}</strong> 
-                {% if job.act_loc_lat and job.act_loc_lng %}<a href="#">Map...</a>{% endif %}
+                <em>Where:</em> <strong>{{ job.event_loc_name | default("", True ) }}</strong> 
+                {% if job.event_loc_w3w %}<a href="https://w3w.co/{{job.event_loc_w3w}}" target="_w3w" >Map...</a>
+                {% elif job.event_loc_lat and job.event_loc_lng %}<a href="#">Map...</a>{% endif %}
             </p>
             {% set width_pct = job.event_filled_positions | default(0,True) / job.event_max_positions * 74 %}
             {% if width_pct > 25.0 %}
