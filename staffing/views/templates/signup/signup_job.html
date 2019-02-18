@@ -1,7 +1,7 @@
-        <div id="job-head{{ job.job_id }}" class="w3-row w3-secondary-color job-contain job-date-contain" style="margin-top:-1px;">
+        <div id="job-head{{ job.job_id }}" class="w3-row w3-secondary-color job-contain job-date-contain" >
             <div class="w3-col l2 m2 w3-hide-small">&nbsp;</div>
             <div class="w3-col l10 m10">
-                <p onclick="$('#job-detail{{ job.job_id }}').show();$('#job-head{{ job.job_id }}').hide()" class="" style="cursor:pointer;margin-bottom:0;margin-top:6pt;">
+                <p onclick="$('#job-detail{{ job.job_id }}').show();$('#job-head{{ job.job_id }}').hide()" style="cursor:pointer;margin-bottom:6pt;margin-top:0;">
                     <span class="w3-button w3-primary-color w3-round-medium">+</span><strong>&nbsp;{{ job.job_title | truncate(40) }}</strong>
                     <span class="w3-small">- {{ job.start_date | local_time_string | lower }}
                         <span class="w3-hide-small"> - {{ job.end_date | local_time_string | lower }}</span>
@@ -11,7 +11,7 @@
             </div>
         </div>
         
-        <div id="job-detail{{ job.job_id }}" class="w3-row w3-secondary-color job-contain " style="position:relative;top:-1px;display:none;">
+        <div id="job-detail{{ job.job_id }}" class="w3-row w3-secondary-color job-contain " style="display:none;">
             <div class="w3-col l2 m2 s1">&nbsp;</div>
             <p class="w3-col l10 m10 s11 w3-medium w3-button w3-round-medium w3-primary-color"
                 onclick="$('#job-detail{{ job.job_id }}').hide();$('#job-head{{ job.job_id }}').show()"
