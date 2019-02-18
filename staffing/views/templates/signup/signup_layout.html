@@ -36,7 +36,7 @@
 <div class="w3-container w3-primary-color w3-main" >
     <p style="position:absolute;top:3pt;right:20pt;">
         {% if not g.user %}
-        <a onclick="editFromList('{{ url_for('signup.login')}}1')">Sign in</a>
+        <a href="#" onclick="editFromList('{{ url_for('signup.login')}}1')">Sign in</a>
         {% else %}
         Hi {{ g.user }}!&nbsp;&nbsp;<a href="{{ url_for('signup.logout')}}">Sign Out</a>
         {% endif %}
