@@ -33,7 +33,9 @@
                 </p>
             <p style="text-align:left">
                 Comment:<br>
-                <textarea rows="4" style="width:100%" name="attendance_comment" >{{ signup.attendance_comment | default("", True) }}</textarea>
+                <textarea class="w3-small" rows="4" style="width:100%" name="attendance_comment" 
+                placeholder="If signing up for more than one person, you can tell us who it is here... or anything else."
+                >{{ signup.attendance_comment | default("", True) }}</textarea>
             </p>
                 <div>
             		<p>
