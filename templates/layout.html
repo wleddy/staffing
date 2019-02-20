@@ -47,36 +47,39 @@
     </div>
     {% endblock dialog %}
     
+    {% block header %}
+        {% include "header.html"%}
         {% if config.SIGNUP_SUBDOMAIN in config.HOST_NAME %}
-            {# display the signup header #}
-            {% block signup_header %}
-            <div class="w3-container w3-primary-color w3-main" >
-                {% set header_space = '28' %}
-                <p style="position:absolute;top:3pt;right:20pt;text-align:right;">
-                    {% if not g.user %}
-                    <a href="#" onclick="editFromList('{{ url_for('signup.login')}}1')">Sign in</a>
-                    {% else %}
-                    Hi {{ g.user | truncate(22) }}!<br><a href="{{ url_for('signup.logout')}}">Sign Out</a>
-                    {% if is_admin %}{% set header_space = '48' %}
-                    <br><a href="{{ url_for('signup.roster' )}}">View Roster</a>{% endif %}
-                    {% endif %}
-                </p>
-                 <h2 style="text-align:center;margin-top:{{header_space}}pt;">{{ g.title }}</h2>
+            {# signup has a special menu #}
+            <div id="nav" style="overflow:hidden;">
+              <div class="w3-sidebar w3-bar-block w3-collapse w3-right w3-card w3-animate-right w3-secondary-color menu_width" style="height:100vh;overflow:scroll;position:absolute;right:0;top:0pt;" id="primary-nav">
+                  <a href="javascript:void(0)" onclick="w3_close('primary-nav');w3_show('hamburger');" 
+                    class="w3-button w3-bar-item w3-hide-large w3-text-grey ">Close &times;</a>
+                        {% if not g.user %}
+                            <a class="w3-bar-item w3-button w3-border w3-secondary-color w3-primary-hover-color" href="#" onclick="editFromList('{{ url_for('signup.login')}}1')">Sign in</a>
+                        {% else %}
+                        <a class="w3-bar-item w3-button w3-border w3-secondary-color w3-primary-hover-color" >Hi {{ g.user | truncate(18) }}!</a>
+                        {% endif %}
+                          <a class="w3-bar-item w3-button w3-border w3-secondary-color w3-primary-hover-color" href="/">Home</a>
+                          <a class="w3-bar-item w3-button w3-border w3-secondary-color w3-primary-hover-color" href="{{ url_for('signup.about')}}">About</a>
+                          <a class="w3-bar-item w3-button w3-border w3-secondary-color w3-primary-hover-color" href="{{ url_for('signup.contact')}}">Contact Us</a>
+                          <a class="w3-bar-item w3-button w3-border w3-secondary-color w3-primary-hover-color" href="{{ url_for('signup.help')}}">Help</a>
+                        {% if g.user %}
+                        {% if is_admin %}
+                        <a class="w3-bar-item w3-button w3-border w3-drop-menu-color w3-drop-menu-hover-color" href="{{ url_for('signup.roster' )}}">View Roster</a>
+                        {% endif %}
+                            <a  class="w3-bar-item w3-button w3-border w3-drop-menu-color w3-drop-menu-hover-color" href="{{ url_for('signup.logout')}}">Sign Out</a>
+                        {% endif %}
+                </div>
             </div>
-            {% endblock signup_header %}
+            {# end signup menu #}
+        
         {% else %}
-            {% block header %}
-                    {# display the normal header #}
-                    {% include "header.html"%}
-                    {% if g.user or True %}
-                        {% include "top-nav.html"%}
-                        <div class="w3-main menu_space">
-                    {% else %}
-                        <div>
-                    {% endif %}
-            {% endblock header %}
-        {% endif %} {# signup header#}
-    
+            {% include "top-nav.html"%}
+        {% endif %}
+            <div class="w3-main menu_space">
+    {% endblock header %}
+
         <div class="w3-container">
             {% block page_header %}
                 {% if not g.suppress_page_header %}

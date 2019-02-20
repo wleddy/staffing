@@ -36,6 +36,12 @@ def contact():
     """Delecate the actual contact function to wwww"""
     return home_contact()
 
+@mod.route('/help/')
+@mod.route('/help')
+def help():
+    return "No help yet"
+
+
 @mod.route('/')
 def display():
     """List Signup opportuniies"""
