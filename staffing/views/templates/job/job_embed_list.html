@@ -1,7 +1,7 @@
-<p><a onclick="editFromList('{{ url_for('job.edit_from_list')}}0/{{ event_id }}')" >New Job...</a></p>
+<p><a href="javascript:void(0)" onclick="editFromList('{{ url_for('job.edit_from_list')}}0/{{ event_id }}')" >New Job...</a></p>
 <table class="datatable w3-table w3-striped w3-hoverable">
 <tr class="w3-primary-color">
-	<th colspan="2">Events</th>
+	<th colspan="2">Jobs</th>
 </tr>
 {% if jobs %}
 {% set event_date = ['']%}
