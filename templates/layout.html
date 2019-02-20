@@ -1,0 +1,96 @@
+{# modified layout for signup site #}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<title>{% block document_title %}{% block title%}{{g.title}}{% endblock %} - {{ config.SITE_NAME | default("",True) }}{% endblock document_title%}</title> 
+	<link rel="icon" type="image/png" href="{{ url_for('static', filename='favicon.png') }}" >
+    <link rel="SHORTCUT ICON" type="image/vnd.microsoft.icon" href="{{ url_for('static', filename='favicon.ico') }}" >
+    <link rel="apple-touch-icon" type="image/png" sizes="57x57" href="{{ url_for('static', filename='apple-touch-icon-57.png') }}"><!-- iPhone -->
+    <link rel="apple-touch-icon" type="image/png" sizes="72x72" href="{{ url_for('static', filename='apple-touch-icon-72.png') }}"><!-- iPad -->
+    <link rel="apple-touch-icon" type="image/png" sizes="114x114" href="{{ url_for('static', filename='apple-touch-icon-114.png') }}"><!-- iPhone4 -->
+    <link rel="apple-touch-icon" type="image/png" sizes="120x120" href="{{ url_for('static', filename='apple-touch-icon-120.png') }}"><!-- iPhone7? -->
+    <link rel="icon" type="image/png" href="{{ url_for('static', filename='apple-touch-icon-114.png') }}"><!-- Opera Speed Dial, at least 144×114 px -->
+    
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!--  <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">   -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='w3.css' )}}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='default_style.css' )}}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css' )}}">
+	
+	<script src="{{ url_for('static', filename='jquery.1.10.1.js') }}"></script>
+	<script src="{{ url_for('static', filename='common.js') }}"></script>
+
+    <script>
+        // for navigation buttons
+    function w3_open(id_name) {
+        document.getElementById(id_name).style.display = "block";
+    }
+    function w3_close(id_name) {
+        document.getElementById(id_name).style.display = "none";
+    }
+    function w3_hide(id_name) {
+        document.getElementById(id_name).style.visibility = "hidden";
+    }
+    function w3_show(id_name) {
+        document.getElementById(id_name).style.visibility = "visible";
+    }
+    </script>
+
+    {% block head%}{% endblock %}
+</head>
+<body>
+<div id="contain" >
+    {% block dialog %}
+    <div id="dialog"></div>
+    <div id="modal-form-contain" class="w3-modal" style="overflow:hidden;padding-top:20pt!important;">
+        <div id="modal-form" class="w3-container w3-modal-content w3-card-4 w3-animate-top" style="max-height:95vh;overflow:scroll;"></div>
+    </div>
+    {% endblock dialog %}
+    
+        {% if config.SIGNUP_SUBDOMAIN in config.HOST_NAME %}
+            {# display the signup header #}
+            {% block signup_header %}
+            <div class="w3-container w3-primary-color w3-main" >
+                {% set header_space = '28' %}
+                <p style="position:absolute;top:3pt;right:20pt;text-align:right;">
+                    {% if not g.user %}
+                    <a href="#" onclick="editFromList('{{ url_for('signup.login')}}1')">Sign in</a>
+                    {% else %}
+                    Hi {{ g.user | truncate(22) }}!<br><a href="{{ url_for('signup.logout')}}">Sign Out</a>
+                    {% if is_admin %}{% set header_space = '48' %}
+                    <br><a href="{{ url_for('signup.roster' )}}">View Roster</a>{% endif %}
+                    {% endif %}
+                </p>
+                 <h2 style="text-align:center;margin-top:{{header_space}}pt;">{{ g.title }}</h2>
+            </div>
+            {% endblock signup_header %}
+        {% else %}
+            {% block header %}
+                    {# display the normal header #}
+                    {% include "header.html"%}
+                    {% if g.user or True %}
+                        {% include "top-nav.html"%}
+                        <div class="w3-main menu_space">
+                    {% else %}
+                        <div>
+                    {% endif %}
+            {% endblock header %}
+        {% endif %} {# signup header#}
+    
+        <div class="w3-container">
+            {% block page_header %}
+                {% if not g.suppress_page_header %}
+                {% include "page_header.html" %}
+                {% endif %}
+            {% endblock page_header %}
+        
+            {% block flasher %}{% include "flasher.html" %}{% endblock flasher%}
+        
+            {% block body %}{% endblock %}
+            
+            {% block footer %}{% endblock footer%}
+        </div>
+    </div>
+</div>
+</body>
+</html>

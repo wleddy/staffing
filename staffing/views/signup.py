@@ -6,6 +6,7 @@ from shotglass2.takeabeltof.date_utils import date_to_string, getDatetimeFromStr
 from shotglass2.users.admin import login_required, table_access_required
 from shotglass2.users.models import Role, User
 from shotglass2.users.views.login import authenticate_user, setUserStatus, logout as log_user_out
+from shotglass2.www.views.home import contact as home_contact
 from staffing.models import Event, Location, Job, UserJob
 from staffing.utils import pack_list_to_string, un_pack_string
 from datetime import timedelta
@@ -16,7 +17,24 @@ mod = Blueprint('signup',__name__, template_folder='templates/signup')
 def setExits():
     g.listURL = url_for('.display')
     g.title = 'Volunteer Signup'
+    
+@mod.route('/home/', methods=['GET','POST',])
+def home():
+    """So we can use www routes in this blueprint"""
+    return redirect(url_for('.display'))
+    
+@mod.route('/about/')
+@mod.route('/about')
+def about():
+    """So we can use www routes here"""
+    g.title = "About"
+    return render_template('about_signup.html')
 
+@mod.route('/contact/', methods=['GET','POST',])
+@mod.route('/contact', methods=['GET','POST',])
+def contact():
+    """Delecate the actual contact function to wwww"""
+    return home_contact()
 
 @mod.route('/')
 def display():

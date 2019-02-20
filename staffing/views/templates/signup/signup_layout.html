@@ -32,21 +32,6 @@
 
 {% block document_title %}{{ g.title }}{% endblock %}
 
-{% block header %}
-<div class="w3-container w3-primary-color w3-main" >
-    {% set header_space = '28' %}
-    <p style="position:absolute;top:3pt;right:20pt;text-align:right;">
-        {% if not g.user %}
-        <a href="#" onclick="editFromList('{{ url_for('signup.login')}}1')">Sign in</a>
-        {% else %}
-        Hi {{ g.user | truncate(22) }}!<br><a href="{{ url_for('signup.logout')}}">Sign Out</a>
-        {% if is_admin %}{% set header_space = '48' %}
-        <br><a href="{{ url_for('signup.roster' )}}">View Roster</a>{% endif %}
-        {% endif %}
-    </p>
-     <h2 style="text-align:center;margin-top:{{header_space}}pt;">{{ g.title }}</h2>
-</div>
-{% endblock header %}
 
 {% block page_header %}
 <div class="w3-panel w3-card-2 w3-secondary-color">
