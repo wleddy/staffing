@@ -8,14 +8,14 @@ from shotglass2.users.models import Role, User
 from shotglass2.users.views.login import authenticate_user, setUserStatus, logout as log_user_out
 from staffing.models import Event, Location, Job, UserJob
 from staffing.utils import pack_list_to_string, un_pack_string
-
+from datetime import timedelta
 
 mod = Blueprint('signup',__name__, template_folder='templates/signup')
 
 
 def setExits():
     g.listURL = url_for('.display')
-    g.title = 'Signup'
+    g.title = 'Volunteer Signup'
 
 
 @mod.route('/')
@@ -47,7 +47,11 @@ def display():
         if rec and rec.id not in user_skills:
             user_skills.append(rec.id)
                 
-    where = "date(job.start_date) >= date('{}')".format(local_datetime_now().isoformat()[:10],)
+    where = "date(job.start_date) >= date('{}') and date(job.end_date) <= date('{}')".format(
+        local_datetime_now().isoformat()[:10],
+        (local_datetime_now() + timedelta(days=app_config.get('ROSTER_END_DAYS',30))).isoformat()[:10],
+        )
+        
     jobs = get_job_rows(where,user_skills,is_admin)
             
     return render_template('signup_list.html',jobs=jobs,is_admin=is_admin)
@@ -150,7 +154,7 @@ def signup(job_id=None):
                 #import pdb;pdb.set_trace()
                 # generate the ical text #### the new signup record must exist so I can create a UID
                 uid='{}_{}_{}'.format(
-                    '000000{}'.format(event.id)[-6:],
+                    '000000{}'.format(job.event_id)[-6:],
                     '000000{}'.format(job.id)[-6:],
                     '000000{}'.format(user.id)[-6:],
                     )
@@ -247,7 +251,7 @@ def signup(job_id=None):
             pass
     
     
-    return render_template('signup_form.html',job=job,event=event,signup=signup,filled_positions=filled_positions)
+    return render_template('signup_form.html',job=job,signup=signup,filled_positions=filled_positions)
     
     
 @mod.route('/signup_success/<int:id>/',methods=['GET','POST',])
@@ -268,6 +272,50 @@ def signup_success(id=0):
         return "failure: Job Not Found"
         
     return render_template('signup_job.html',job=job,show_detail=True)
+    
+@mod.route('/roster',methods=['GET',])
+@mod.route('/roster/',methods=['GET',])
+@table_access_required(Job)
+def roster():
+    """Display the roster of all current events
+    for now, define current as jobs that occure on today or within the next 2 weeks.
+    """
+    
+    setExits()
+    g.title='Signup Roster'
+    app_config = get_app_config()
+    # get the current users role id's
+    is_admin = False
+    user_skills = []
+    if g.user and session.get('user_id',False):
+        is_admin = User(g.db).is_admin(session['user_id'])
+            
+        recs = User(g.db).get_roles(session['user_id'])
+        if recs:
+            user_skills = [rec.id for rec in recs]
+            if not is_admin:
+                #may be job admin
+                for rec in recs:
+                    if rec.rank >= app_config.get('MINIMUM_MANAGER_RANK',70): #event manager
+                        is_admin = True
+                        break
+            
+    #all visitors get basic skills even if not logged in
+    user_skill_list = app_config.get('DEFAULT_USER_ROLES',['volunteer','user'])
+    for skill in user_skill_list:
+        rec = Role(g.db).get(skill)
+        if rec and rec.id not in user_skills:
+            user_skills.append(rec.id)
+    
+    
+    #import pdb;pdb.set_trace()
+    where = "date(job.start_date) >= date('{}') and date(job.end_date) <= date('{}')".format(
+        local_datetime_now().isoformat()[:10],
+        (local_datetime_now() + timedelta(days=app_config.get('ROSTER_END_DAYS',30))).isoformat()[:10],
+        )
+    jobs = get_job_rows(where,user_skills,is_admin)
+                
+    return render_template('roster.html',jobs=jobs,is_admin=is_admin)
     
     
 @mod.route('/login',methods=['GET','POST',])
@@ -408,7 +456,8 @@ def register(from_main=0):
 def populate_participant_list(job):
     """Add participant values to the job namedlist"""
     sql = """
-    select user.id as user_id, upper(substr(user.first_name,1,1) || substr(user.last_name,1,1)) as initials 
+    select user.id as user_id, upper(substr(user.first_name,1,1) || substr(user.last_name,1,1)) as initials,
+    (user.first_name || ' '  || user.last_name ) as user_name, user.phone as phone, user.email as email
     from user_job
     join user on user.id = user_job.user_id
     where user_job.job_id = {}
@@ -419,15 +468,17 @@ def populate_participant_list(job):
     participant_list = []
     initials = []
     participant_skills = []
+    user_data_list = []
     if parts:
         for part in parts:
             if part.initials not in initials:
                 initials.append(part.initials)
             if part.user_id not in participant_list:
                 participant_list.append(part.user_id)
+                user_data_list.append({'user_name':part.user_name,'phone':part.phone,'email':part.email})
             
         
-        job.participants[job.job_id] = {'initials':initials, 'users':participant_list,}
+        job.participants[job.job_id] = {'initials':initials, 'users':participant_list, 'user_data': user_data_list}
         job.skill_list = un_pack_string(job.skill_list) # convert to simple list
     
     
