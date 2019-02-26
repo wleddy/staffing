@@ -31,9 +31,10 @@
                     <table class="w3-table">
                     {% for participant in participant_list %}
                     <tr>
-                    <td><p>{{ participant.user_name }}
+                    <td>{{ participant.user_name }}
                     <a href="tel:{{participant.phone}}">{{participant.phone | default('No Phone')}}</a><br>
-                    <a href="mailto:{{participant.email}}">{{participant.email | default("No Email")}}</a></p>
+                    <a href="mailto:{{participant.email}}">{{participant.email | default("No Email")}}</a>
+                    {% if participant.positions > 1 %}({{participant.positions}}) People{% endif %}
                 </td>
                      </tr>
                     {% endfor %}

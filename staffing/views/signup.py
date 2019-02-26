@@ -9,6 +9,7 @@ from shotglass2.users.views.login import authenticate_user, setUserStatus, logou
 from shotglass2.www.views.home import contact as home_contact
 from staffing.models import Event, Location, Job, UserJob
 from staffing.utils import pack_list_to_string, un_pack_string
+from staffing.views.announcements import send_signup_email
 from datetime import timedelta
 
 mod = Blueprint('signup',__name__, template_folder='templates/signup')
@@ -176,86 +177,9 @@ def signup(job_id=None):
             if positions > 0 and not previous_positions:
                 # if adding first slot, send email with ical attachement
                 #import pdb;pdb.set_trace()
-                # generate the ical text #### the new signup record must exist so I can create a UID
-                uid='{}_{}_{}'.format(
-                    '000000{}'.format(job.event_id)[-6:],
-                    '000000{}'.format(job.id)[-6:],
-                    '000000{}'.format(user.id)[-6:],
-                    )
-                location = None
-                description = event.description + '\n\n' + job.description
-                if job_data.job_loc_name:
-                    location = job_data.job_loc_name
-                    description += '\n\n*location:*\n\n{}'.format(job_data.job_loc_name)
-
-                if  job_data.job_loc_street_address and job_data.job_loc_city and job_data.job_loc_state:
-                    description += '\n\n{}  {}'.format(', '.join([job_data.job_loc_street_address, job_data.job_loc_city]), job_data.job_loc_state.upper())
-
-                map_url = None
-                geo = None
-                w3w = None
-                if job_data.job_loc_w3w:
-                    map_url = 'https://w3w.co/{}'.format(job_data.job_loc_w3w)
-                    
-                if job_data.job_loc_lat and job_data.job_loc_lng:
-
-                    ### Apple Calender does not seem to use geo to set map location
-                    ### it uses the value in location to try a reverse geocode lookup
-                    geo = (job_data.job_loc_lat,job_data.job_loc_lng)
-                        
-                    #########################
-                    #### for inital Testing
-                    ########################
-                    if app_config['DEBUG']:
-                        geo = (37.386013,-122.082932)
-                    
-                    # Create a mapping uri
-                    ############################
-                    ## TODO - This should place a pin at least
-                    ##        Maybe try to use apple maps if on iOS
-                    ############################
-                    if not map_url:
-                        # don't replace the w3w link
-                        map_url = "https://www.google.com/maps/place/@{},{},17z".format(geo[0],geo[1])
-                    
-                if map_url:
-                    description = description + '\n\n' + 'Map: {}'.format(map_url)
                 
-                cal_desc = None
-                if description:
-                    cal_desc = description.replace('\n\n','\n') #remove teh double returns that markdown needs
-                    
-                ical_event = make_event_dict(uid,job.start_date,job.end_date,job.title,
-                        description=cal_desc,
-                        location=location,
-                        geo=geo,
-                        )
-                    
-                ical = cal(event=ical_event)
-
-                # generate the text of the email with ical as an attachment
-                email_html = render_markdown_for('announce/email/signup_announce.md',
-                    bp=mod,
-                    ical=ical,
-                    description=description,
-                    job_data=job_data,
-                    )
-                subject = 'Your assignment for {}'.format(event.title)
-                attachment = None
-                if ical:
-                    attachment = ("{}.ics".format(job.title.replace(' ','_')), "text/calendar", ical)
-                        
-                # send that puppy!
-                send_result = send_message([(user.email,' '.join([user.first_name,user.last_name]))],
-                                subject=subject,
-                                body_is_html=True,
-                                body=email_html,
-                                attachment=attachment,
-                                )
-                if not send_result[0]:
-                    #Error occured
-                    send_message(None,body="An error occored while trying to send signup email. Err: {}".format(send_result[1]))
-                        
+                send_signup_email(job_data,user,'announce/email/signup_announce.md',mod)
+                         
             if previous_positions and positions < previous_positions:
                 # the number of positions has been reduced
                 pass
@@ -481,7 +405,8 @@ def populate_participant_list(job):
     """Add participant values to the job namedlist"""
     sql = """
     select user.id as user_id, upper(substr(user.first_name,1,1) || substr(user.last_name,1,1)) as initials,
-    (user.first_name || ' '  || user.last_name ) as user_name, user.phone as phone, user.email as email
+    (user.first_name || ' '  || user.last_name ) as user_name, user.phone as phone, user.email as email,
+    user_job.positions
     from user_job
     join user on user.id = user_job.user_id
     where user_job.job_id = {}
@@ -499,7 +424,7 @@ def populate_participant_list(job):
                 initials.append(part.initials)
             if part.user_id not in participant_list:
                 participant_list.append(part.user_id)
-                user_data_list.append({'user_name':part.user_name,'phone':part.phone,'email':part.email})
+                user_data_list.append({'user_name':part.user_name,'phone':part.phone,'email':part.email,'positions':part.positions,})
             
         
         job.participants[job.job_id] = {'initials':initials, 'users':participant_list, 'user_data': user_data_list}
