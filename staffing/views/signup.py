@@ -1,6 +1,6 @@
 from flask import request, session, g, redirect, url_for, abort, \
      render_template, flash, Blueprint
-from shotglass2.shotglass import get_app_config
+from shotglass2.shotglass import get_site_config
 from shotglass2.takeabeltof.mailer import send_message
 from shotglass2.takeabeltof.utils import render_markdown_for, render_markdown_text, printException, cleanRecordID, looksLikeEmailAddress, formatted_phone_number
 from shotglass2.takeabeltof.date_utils import date_to_string, getDatetimeFromString, local_datetime_now
@@ -48,7 +48,7 @@ def help():
 def display():
     """List Signup opportuniies"""
     setExits()
-    app_config = get_app_config()
+    site_config = get_site_config()
     #import pdb;pdb.set_trace()
     # get the current users role id's
     is_admin = False
@@ -62,12 +62,12 @@ def display():
             if not is_admin:
                 #may be job admin
                 for rec in recs:
-                    if rec.rank >= app_config.get('MINIMUM_MANAGER_RANK',70): #event manager
+                    if rec.rank >= site_config.get('MINIMUM_MANAGER_RANK',70): #event manager
                         is_admin = True
                         break
             
     #all visitors get basic skills even if not logged in
-    user_skill_list = app_config.get('DEFAULT_USER_ROLES',['volunteer','user'])
+    user_skill_list = site_config.get('DEFAULT_USER_ROLES',['volunteer','user'])
     for skill in user_skill_list:
         rec = Role(g.db).get(skill)
         if rec and rec.id not in user_skills:
@@ -75,7 +75,7 @@ def display():
                 
     where = "date(job.start_date) >= date('{}') and date(job.end_date) <= date('{}')".format(
         local_datetime_now().isoformat()[:10],
-        (local_datetime_now() + timedelta(days=app_config.get('ROSTER_END_DAYS',30))).isoformat()[:10],
+        (local_datetime_now() + timedelta(days=site_config.get('ROSTER_END_DAYS',30))).isoformat()[:10],
         )
         
     jobs = get_job_rows(where,user_skills,is_admin)
@@ -99,7 +99,7 @@ def signup(job_id=None):
     """Add or remove a signup
     May come from a modal dialog"""
     setExits()
-    app_config = get_app_config()
+    site_config = get_site_config()
     job=None
     signup = None
     event = None
@@ -231,7 +231,7 @@ def roster():
     
     setExits()
     g.title='Signup Roster'
-    app_config = get_app_config()
+    site_config = get_site_config()
     # get the current users role id's
     is_admin = False
     user_skills = []
@@ -244,12 +244,12 @@ def roster():
             if not is_admin:
                 #may be job admin
                 for rec in recs:
-                    if rec.rank >= app_config.get('MINIMUM_MANAGER_RANK',70): #event manager
+                    if rec.rank >= site_config.get('MINIMUM_MANAGER_RANK',70): #event manager
                         is_admin = True
                         break
             
     #all visitors get basic skills even if not logged in
-    user_skill_list = app_config.get('DEFAULT_USER_ROLES',['volunteer','user'])
+    user_skill_list = site_config.get('DEFAULT_USER_ROLES',['volunteer','user'])
     for skill in user_skill_list:
         rec = Role(g.db).get(skill)
         if rec and rec.id not in user_skills:
@@ -259,7 +259,7 @@ def roster():
     #import pdb;pdb.set_trace()
     where = "date(job.start_date) >= date('{}') and date(job.end_date) <= date('{}')".format(
         local_datetime_now().isoformat()[:10],
-        (local_datetime_now() + timedelta(days=app_config.get('ROSTER_END_DAYS',30))).isoformat()[:10],
+        (local_datetime_now() + timedelta(days=site_config.get('ROSTER_END_DAYS',30))).isoformat()[:10],
         )
     jobs = get_job_rows(where,user_skills,is_admin)
                 
@@ -344,7 +344,7 @@ def logout():
 def register(from_main=0):
     """Allow volunteers to create an account"""
     setExits()
-    app_config = get_app_config()
+    site_config = get_site_config()
     ready_to_login = True
     next=request.form.get('next','/page-not-found/')
     rec = User(g.db).new()
@@ -393,7 +393,7 @@ def register(from_main=0):
         # Treat this as a confirmed account. Inform Admin
         #inform the admin
         to=None # send to admin
-        subject = 'New account created from - {}'.format(app_config['SITE_NAME'])
+        subject = 'New account created from - {}'.format(site_config['SITE_NAME'])
         html_template = 'email/new_account_alert.html'
         send_message(to,subject=subject,html_template=html_template,rec=rec)
         
@@ -573,76 +573,4 @@ def get_job_rows(where,user_skills=[],is_admin=False):
                 populate_participant_list(job)
                 
     return jobs
-    
-    
-def cal(**kwargs):
-    """Return the text of an icalendar object or None"""
-    import random
-    from icalendar import Calendar, Event
-    #import pdb;pdb.set_trace()
-    
-    event = kwargs.get('event',None) # a dict of event data
-    events = kwargs.get('events',None) # a list of event dicts
-    out = None
-    
-    if events:
-        if not isinstance(events,list):
-            events = [events]
-        events.extend([event])
-    elif event:
-        events = [event]
-    
-    calendar = Calendar()
-    calendar.add('version','2.0')
-    calendar.add('calscale','GREGORIAN')
-    calendar.add('prodid','net.williesworkshop.calendar')
-    calendar.add('x-priamry-calendar','TRUE')
-    
-    event_count = 0
-    for event in events:
-        if event:
-            ev = Event()
-            
-            minumum_properties = True
-            # Minimum required properties
-            for key in ['uid','dtstart','dtend','summary',]:
-                if key not in event:
-                    minumum_properties = False
-                    break
-                value = event.pop(key)
-                if isinstance(value,str) and key in ['dtstart','dtend',]:
-                    value = getDatetimeFromString(value)
-                    
-                ev.add(key,value)
-                
-            if not minumum_properties:
-                break
-                
-            for key, value in event.items():
-                if value:
-                    ev.add(key,value)
-                
-            ev.add('DTSTAMP',local_datetime_now('UTC'))
-            calendar.add_component(ev)
-            event_count += 1
-            
-    if event_count > 0:
-        out = calendar.to_ical()
-    
-    return out
-    
-    
-def make_event_dict(uid,start,end,summary,**kwargs):
-    """Return a dictionary suitable for use when creating a calendar event"""
-    ical_event = {}
-    # the required fields
-    ical_event['uid'] = uid
-    ical_event['dtstart'] = start
-    ical_event['dtend'] = end
-    ical_event['summary'] = summary
-    
-    for key, value in kwargs.items():
-        ical_event[key] = value
-        
-    return ical_event
     

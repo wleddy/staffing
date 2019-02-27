@@ -1,6 +1,6 @@
 from flask import request, session, g, redirect, url_for, abort, \
      render_template, flash, Blueprint
-from shotglass2.shotglass import get_app_config
+from shotglass2.shotglass import get_site_config
 from shotglass2.users.admin import login_required, table_access_required
 from shotglass2.takeabeltof.utils import render_markdown_for, printException, cleanRecordID
 from shotglass2.takeabeltof.date_utils import datetime_as_string
@@ -61,7 +61,7 @@ def edit(id=0):
     locations = Location(g.db).select()
     event_types = EventType(g.db).select()
     # only users of sufficient rank can manage an event
-    where = "user.id in (select user_id from user_role where role_id in (select role.id from role where rank >= {}))".format(get_app_config().get('MINIMUM_MANAGER_RANK',70))
+    where = "user.id in (select user_id from user_role where role_id in (select role.id from role where rank >= {}))".format(get_site_config().get('MINIMUM_MANAGER_RANK',70))
     event_managers = User(g.db).select(where=where)
     job_embed_list = get_job_list_for_event(rec.id)
     

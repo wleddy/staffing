@@ -1,7 +1,7 @@
 from flask import request, session, g, redirect, url_for, abort, \
      render_template, flash, Blueprint
 from shotglass2.users.admin import login_required, table_access_required
-from shotglass2.users.models import Role
+from shotglass2.users.models import Role, User
 from shotglass2.takeabeltof.utils import render_markdown_for, printException, cleanRecordID
 from shotglass2.takeabeltof.date_utils import date_to_string, getDatetimeFromString
 from staffing.models import Event, Location, Job, UserJob
@@ -42,6 +42,8 @@ def edit(id=0,event_id=0,edit_from_list=False):
     end_time=None
     end_time_AMPM=None
     locations = Location(g.db).select()
+    slots_filled = 0
+    users = None
     
     if id == 0 and request.form:
         id = request.form.get('id',0)
@@ -60,6 +62,8 @@ def edit(id=0,event_id=0,edit_from_list=False):
             flash("{} Record Not Found".format(job.display_name))
             return redirect(g.listURL)
         event_id = rec.event_id
+        #slots_filled = job.slots_filled(rec.id)
+        
     else:
         rec = job.new()
         if 'last_job' in session:
@@ -80,6 +84,8 @@ def edit(id=0,event_id=0,edit_from_list=False):
     
     roles = Role(g.db).select(where='name <> "admin" and name <> "super"')
     selected_roles = [] # this needs to be populated from JobRoles
+    # get a list of users who can fill this job
+    #users = Users(g.db).
         
     
     if request.form:
@@ -128,6 +134,8 @@ def edit(id=0,event_id=0,edit_from_list=False):
             events=events,
             current_event=current_event,
             locations=locations,
+            slots_filled=slots_filled,
+            users=users,
             )
     
     

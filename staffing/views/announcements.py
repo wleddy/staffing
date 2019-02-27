@@ -11,7 +11,7 @@ def send_signup_email(job_data,user,template_path,bp):
     param: user is a single instance of a User record
     param: template_path, obviously the path to a template... but absolute or relative to what?
     """
-    from shotglass2.shotglass import get_app_config
+    from shotglass2.shotglass import get_site_config
     
     uid=get_uid(job_data,user)
     location = get_location(job_data)
@@ -48,7 +48,7 @@ def send_signup_email(job_data,user,template_path,bp):
                     )
     if not send_result[0]:
         #Error occured
-        email_admin(subject="Error sending signup confirmation at {}".format(get_app_config()['SITE_NAME']),message="An error occored while trying to send signup email. Err: {}".format(send_result[1]))
+        email_admin(subject="Error sending signup confirmation at {}".format(get_site_config()['SITE_NAME']),message="An error occored while trying to send signup email. Err: {}".format(send_result[1]))
     
     
 def get_ical_text(**kwargs):

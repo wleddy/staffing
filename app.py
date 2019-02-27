@@ -64,6 +64,12 @@ def get_db(filespec=None):
     return g.db
 
 
+@app.context_processor
+def inject_site_config():
+    # Add 'site_config' dict to template context
+    return {'site_config':shotglass.get_site_config()}
+    
+    
 @app.before_request
 def _before():
     # Force all connections to be secure
@@ -78,7 +84,7 @@ def _before():
     
     get_db()
         
-    shotglass.get_app_config(app)
+    shotglass.get_site_config(app)
     
     
     shotglass.set_template_dirs(app)
@@ -164,6 +170,6 @@ if __name__ == '__main__':
 
     #app.run(host='localhost', port=8000)
     #app.run()
-    app.run(host='willie.local')
+    app.run(host='admin.willie.local')
     
     
