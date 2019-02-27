@@ -7,6 +7,7 @@ from shotglass2.takeabeltof.utils import cleanRecordID
 from shotglass2.users.views.login import setUserStatus
 from shotglass2.users.admin import Admin
 from staffing.models import Event, Job, Location, EventType
+
 # Create app
 # setting static_folder to None allows me to handle loading myself
 app = Flask(__name__, instance_relative_config=True,
@@ -47,7 +48,7 @@ def get_db(filespec=None):
     If the db path does not exist, create it and initialize the db"""
     
     if not filespec:
-        filespec = app.config['DATABASE_PATH']
+        filespec = shotglass.get_site_config()['DATABASE_PATH']
         
     # This is probobly a good place to change the
     # filespec if you want to use a different database
