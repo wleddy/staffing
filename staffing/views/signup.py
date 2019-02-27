@@ -1,6 +1,7 @@
 from flask import request, session, g, redirect, url_for, abort, \
      render_template, flash, Blueprint
 from shotglass2.shotglass import get_app_config
+from shotglass2.takeabeltof.mailer import send_message
 from shotglass2.takeabeltof.utils import render_markdown_for, render_markdown_text, printException, cleanRecordID, looksLikeEmailAddress, formatted_phone_number
 from shotglass2.takeabeltof.date_utils import date_to_string, getDatetimeFromString, local_datetime_now
 from shotglass2.users.admin import login_required, table_access_required
@@ -172,7 +173,6 @@ def signup(job_id=None):
             
         if submission_ok:
             # send some notices
-            from shotglass2.takeabeltof.mailer import send_message
             
             if positions > 0 and not previous_positions:
                 # if adding first slot, send email with ical attachement
@@ -344,6 +344,7 @@ def logout():
 def register(from_main=0):
     """Allow volunteers to create an account"""
     setExits()
+    app_config = get_app_config()
     ready_to_login = True
     next=request.form.get('next','/page-not-found/')
     rec = User(g.db).new()
@@ -389,8 +390,15 @@ def register(from_main=0):
         if role:
             User(g.db).add_role(rec.id,role.id)
         g.db.commit()
-        log_user_out()
-        setUserStatus(rec.email,rec.id)
+        # Treat this as a confirmed account. Inform Admin
+        #inform the admin
+        to=None # send to admin
+        subject = 'New account created from - {}'.format(app_config['SITE_NAME'])
+        html_template = 'email/new_account_alert.html'
+        send_message(to,subject=subject,html_template=html_template,rec=rec)
+        
+        log_user_out() # just to clear session...
+        setUserStatus(rec.email,rec.id) #log new user in
         return "success"
         
         

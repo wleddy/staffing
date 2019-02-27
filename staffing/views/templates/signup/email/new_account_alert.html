@@ -1,0 +1,28 @@
+{# email to alert admin that a new account was created in signup #}
+
+<h3>New Volunteer Account Created</h3>
+<p>A new volunteer user account has been created.</p>
+<p>Click this link to <a href="{{url_for('user.edit')}}{{ rec.id }}">Modify this Account</a></p>
+
+<p>User Info:</p>
+<table>
+    <tr><th>Name</th><td>&nbsp;&nbsp;&nbsp;{{rec.first_name}} {{rec.last_name}}</td></tr>
+    <tr><th>Email</th><td>&nbsp;&nbsp;&nbsp;{{rec.email|default('None',True)}}</td></tr>
+    <tr><th>username</th><td>&nbsp;&nbsp;&nbsp;{{rec.username|default('None',True)}}</td></tr>
+    <tr><th>password</th>
+        <td>&nbsp;&nbsp;&nbsp;
+            {% if rec.password %}
+            Password provided
+            {% else %}
+            None
+            {% endif %}
+        </td>
+    </tr>
+    <tr><th>Address</th><td>&nbsp;&nbsp;&nbsp;{{rec.address|default('None',True)}}</td></tr>
+    <tr><th>Address 2</th><td>&nbsp;&nbsp;&nbsp;{{rec.address2|default('None',True)}}</td></tr>
+    <tr><th>City</th><td>&nbsp;&nbsp;&nbsp;{{rec.city|default('None',True)}}</td></tr>
+    <tr><th>State</th><td>&nbsp;&nbsp;&nbsp;{{rec.state|default('None',True)}}</td></tr>
+    <tr><th>Zip</th><td>&nbsp;&nbsp;&nbsp;{{rec.zip|default('None',True)}}</td></tr>
+</table>
+
+<p>Click this link to <a href="{{url_for('user.delete')}}{{rec.id}}">Delete this account</a></p>
