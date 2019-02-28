@@ -452,8 +452,7 @@ def get_job_rows(where,user_skills=[],is_admin=False):
     event_location.lat as event_loc_lat,
     event_location.lng as event_loc_lng,
     event_location.w3w as event_loc_w3w,
-    (select datetime(job.start_date) from job where job.event_id = event.id 
-        order by datetime(job.start_date) limit 1 ) as active_first_date, 
+    (select min(job.start_date) from job where job.event_id = event.id) as active_first_date, 
     (select coalesce(sum(user_job.positions),0) from user_job
         where user_job.job_id in (select id from job where job.event_id = event.id)) as event_filled_positions,
     
@@ -487,7 +486,7 @@ def get_job_rows(where,user_skills=[],is_admin=False):
     left join location as event_location on event_location.id = event.location_id
     left join location as job_location on job_location.id = job.location_id
     where {}
-    order by active_first_date, job.start_date
+    order by active_first_date, event_title, job.start_date
     """
     
     jobs = Job(g.db).query(sql.format(where))

@@ -11,6 +11,12 @@
         {% set event_id = [0] %}
         {% for job in jobs %}
             {% if job.event_id != event_id[0] %}
+            {# don't show event head again till event changes #}
+            {% set _ = event_id.pop() %}
+            {% set _ = event_id.append(job.event_id) %}
+            {% set _ = job_start_date.pop() %}
+            {% set _ = job_start_date.append('') %}
+            
             <div id="act-{{ job.event_id }}" class="event-contain w3-row-padding w3-secondary-color w3-topbar" style="padding-bottom:6pt;">        
                 <p  class="w3-col l2 m2 w3-hide-small" style="padding-top:12pt;">
                     <!-- an image may or may not display here in the future -->
@@ -47,6 +53,8 @@
             {% endif %} {# show event head? #}
             {# only show the date once within job list of same date #}
             {% if job.start_date[:10] != job_start_date[0] %}
+                {% set _ = job_start_date.pop() %}
+                {% set _ = job_start_date.append(job.start_date[:10]) %}
                 <div class="w3-row w3-secondary-color job-contain job-date-contain" style="margin-top:-1px;">
                     <div class="w3-col l1 m1 w3-hide-small">&nbsp;</div>
                     <div class="w3-col l11 m11">
@@ -67,12 +75,6 @@
                     {% include 'signup_job.html' %}
                 </div>
             </div>
-    
-            {# don't show event head again till event changes #}
-            {% set _ = event_id.pop() %}
-            {% set _ = event_id.append(job.event_id) %}
-            {% set _ = job_start_date.pop() %}
-            {% set _ = job_start_date.append(job.start_date[:10]) %}
         {% endfor %} {# jobs #}
     {% endif %}{# not jobs #}
 {% endblock body %}
