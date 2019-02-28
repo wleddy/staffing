@@ -526,12 +526,12 @@ def get_job_rows(where,user_skills=[],is_admin=False):
         
             if job.event_loc_name:
                 # Set the job default loc to event loc
-                job_default_loc = (job.event_loc_name, job.event_loc_lat, job.event_loc_lng)
-                job_default_loc_street_address = job.event_loc_street_address
-                job_default_loc_city = job.event_loc_city
-                job_default_loc_state = job.event_loc_state
-                job_default_loc_zip = job.event_loc_zip
-                job_default_loc_w3w = job.event_loc_w3w
+                job_default_loc = event_default_loc = (job.event_loc_name, job.event_loc_lat, job.event_loc_lng)
+                job_default_loc_street_address = event_default_loc_street_address = job.event_loc_street_address
+                job_default_loc_city =  event_default_loc_city = job.event_loc_city
+                job_default_loc_state = event_default_loc_state = job.event_loc_state
+                job_default_loc_zip = event_default_loc_zip = job.event_loc_zip
+                job_default_loc_w3w = event_default_loc_w3w = job.event_loc_w3w
             
             if not job.event_loc_name and job.unique_job_locations == 1:
                 # location only in one job, set all to that loc
@@ -546,7 +546,7 @@ def get_job_rows(where,user_skills=[],is_admin=False):
                         event_default_loc_zip = loc_rec.zip
                         event_default_loc_w3w = loc_rec.w3w
                     
-            if job.unique_job_locations > 0:
+            if not job.event_loc_name and job.unique_job_locations > 1:
                 # More than one location specifed
                 event_default_loc = ('Multiple Locations',None,None)
                 
