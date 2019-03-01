@@ -443,6 +443,7 @@ def populate_participant_list(job):
 def get_job_rows(where,user_skills=[],is_admin=False):
     sql = """
     select event.id as event_id, event.title as event_title, event.description as event_description,
+    event.client_contact,event.client_email,event.client_phone,event.client_website,
     event_location.id as event_loc_id,
     event_location.location_name as event_loc_name,
     event_location.street_address as event_loc_street_address,

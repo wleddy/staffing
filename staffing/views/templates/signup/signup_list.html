@@ -27,8 +27,7 @@
                            <strong>{{ job.event_title }}</strong>
                            {% if is_admin %}<a class="w3-small" href="{{ url_for('event.edit')}}{{job.event_id}}/" target="_blank"><em>(edit)</em></a>{% endif %}
                        </p>
-                        {# render this as markdown #}
-                       <p class="">{{ job.event_description }}</p>
+                       <p>{{ job.event_description }}{% if job.client_website %}<br>Event website: {{job.client_website | weblink_blank }}{%endif%}</p>
                 </div>
                 <div class="w3-third " style="padding-left:4pt;">
                     <p>

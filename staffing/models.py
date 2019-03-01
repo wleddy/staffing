@@ -17,10 +17,12 @@ class Event(SqliteTable):
         sql = """
             title TEXT NULL,
             description TEXT,
+            staff_info TEXT,
             manager_user_id INTEGER,
             client_contact TEXT,
             client_email TEXT,
             client_phone TEXT,
+            client_website TEXT,
             event_type_id INTEGER,
             location_id INTEGER """
                 
