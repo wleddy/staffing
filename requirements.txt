@@ -4,4 +4,5 @@ mistune
 namedlist
 pytest
 pytz
+icalendar
 
