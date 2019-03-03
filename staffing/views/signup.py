@@ -11,7 +11,7 @@ from shotglass2.www.views.home import contact as home_contact
 from staffing.models import Event, Location, Job, UserJob
 from staffing.utils import pack_list_to_string, un_pack_string
 from staffing.views.announcements import send_signup_email
-from datetime import timedelta
+from datetime import timedelta, datetime
 
 mod = Blueprint('signup',__name__, template_folder='templates/signup')
 
@@ -73,12 +73,10 @@ def display():
         if rec and rec.id not in user_skills:
             user_skills.append(rec.id)
                 
-    where = "date(job.start_date) >= date('{}') and date(job.end_date) <= date('{}')".format(
-        local_datetime_now().isoformat()[:10],
-        (local_datetime_now() + timedelta(days=site_config.get('ROSTER_END_DAYS',30))).isoformat()[:10],
-        )
+    start_date, end_date = get_display_date_range()
+    where = ''
         
-    jobs = get_job_rows(where,user_skills,is_admin)
+    jobs = get_job_rows(start_date,end_date,where,user_skills,is_admin)
             
     return render_template('signup_list.html',jobs=jobs,is_admin=is_admin)
         
@@ -137,7 +135,7 @@ def signup(job_id=None):
     if not event:
         return 'failure: That is not a valid event id'
             
-    job_data = get_job_rows("job.id = {}".format(job.id),is_admin=True)
+    job_data = get_job_rows(None,None,"job.id = {}".format(job.id),[],is_admin=True)
     if job_data:
         job_data = job_data[0]
         filled_positions = job_data.job_filled_positions
@@ -212,8 +210,7 @@ def signup_success(id=0):
     
     # because the user got access to this job from the main display,
     # Set is_admin to true to display the updated version of the record
-    jobs = get_job_rows("job.id = {}".format(id),is_admin=True)
-    
+    jobs = get_job_rows(None,None,"job.id = {}".format(job.id),[],is_admin=True)    
     if jobs and len(jobs) > 0:
         job = jobs[0]
     else:
@@ -257,11 +254,10 @@ def roster():
     
     
     #import pdb;pdb.set_trace()
-    where = "date(job.start_date) >= date('{}') and date(job.end_date) <= date('{}')".format(
-        local_datetime_now().isoformat()[:10],
-        (local_datetime_now() + timedelta(days=site_config.get('ROSTER_END_DAYS',30))).isoformat()[:10],
-        )
-    jobs = get_job_rows(where,user_skills,is_admin)
+        
+    start_date, end_date = get_display_date_range()
+
+    jobs = get_job_rows(start_date,end_date,"",user_skills,is_admin)
                 
     return render_template('roster.html',jobs=jobs,is_admin=is_admin)
     
@@ -438,9 +434,75 @@ def populate_participant_list(job):
         job.participants[job.job_id] = {'initials':initials, 'users':participant_list, 'user_data': user_data_list}
         job.skill_list = un_pack_string(job.skill_list) # convert to simple list
     
+def get_display_date_range(days=None):
+    """Return a tuple of the start and end dates for job display"""
+    if not days:
+        site_config = get_site_config()
+        days = site_config.get('ROSTER_END_DAYS',30)
+        
+    start_date = local_datetime_now().isoformat()[:10]
+    end_date = (local_datetime_now() + timedelta(days=days)).isoformat()[:10]
+    return start_date, end_date
+
+
+def get_job_rows(start_date=None,end_date=None,where='',user_skills=[],is_admin=False):
+    """
+    Make a row list for job and event records
+
+    where = some text for the basic where cluase. May be augmented by additional parameters
+    user_skills = a list of role id values. Limit the display of jobs users with these roles may see.
+    start_date = first job start_date to include
+    end_date = last job end_date to include
+    is_admin = is the current user an administrator for the purposes of this selection.
     
+    Query happens in 2 steps, first find the jobs that require the skills in user_skills,
+    Then use that selection to reduce the list of jobs to just those jobs.
+    """
     
-def get_job_rows(where,user_skills=[],is_admin=False):
+    site_config = get_site_config()
+    
+    #import pdb;pdb.set_trace()
+    
+    # from this point, use date strings
+    if isinstance(start_date,datetime):
+        start_date = start_date.isoformat()[:10]
+    elif not start_date:
+        start_date = '1970-01-01'
+    if isinstance(end_date,datetime):
+        end_date = end_date.isoformat()[:10]
+    elif not end_date:
+        end_date = '2051-02-08'
+        
+    where_date_range = " and date(job.start_date) >= date('{}') and date(job.end_date) <= date('{}') ".format(start_date,end_date)
+        
+    
+    where_skills = ''
+    if not is_admin:
+        if not user_skills:
+            #visitors get basic skills even if not logged in
+            user_skills = [] #just be sure it's a list
+            default_skill_list = site_config.get('DEFAULT_USER_ROLES',['volunteer','user'])
+            for skill in default_skill_list:
+                rec = Role(g.db).get(skill)
+                if rec and rec.id not in user_skills:
+                    user_skills.append(rec.id)
+            
+        # limit job selection to only jobs the user can do
+        job_ids = []
+        for skill in user_skills:
+            skill = ":" + str(skill) + ":"
+            jobs = Job(g.db).select(where='skill_list like "%{}%"'.format(skill))
+            if jobs:
+                job_ids.extend([str(job.id) for job in jobs if str(job.id) not in job_ids])
+        
+        if job_ids:
+            where_skills = ' and job.id in ({})'.format(','.join(job_ids))
+        
+    if not where:
+        where = "1 "
+    
+    where = where + where_date_range + where_skills
+    
     sql = """
     select event.id as event_id, event.title as event_title, event.description as event_description,
     event.client_contact,event.client_email,event.client_phone,event.client_website,
@@ -453,15 +515,15 @@ def get_job_rows(where,user_skills=[],is_admin=False):
     event_location.lat as event_loc_lat,
     event_location.lng as event_loc_lng,
     event_location.w3w as event_loc_w3w,
-    (select min(job.start_date) from job where job.event_id = event.id) as active_first_date, 
+    (select min(job.start_date) from job where job.event_id = event.id {where_date_range} {where_skills}) as active_first_date, 
     (select coalesce(sum(user_job.positions),0) from user_job
-        where user_job.job_id in (select id from job where job.event_id = event.id)) as event_filled_positions,
+        where user_job.job_id in (select id from job where job.event_id = event.id {where_date_range} {where_skills} )) as event_filled_positions,
     
     (select coalesce(sum(job.max_positions),1) from job 
-        where job.event_id = event.id) as event_max_positions,
+        where job.event_id = event.id {where_date_range} {where_skills}) as event_max_positions,
     (select distinct coalesce(count(job.id),1) from job 
         where job.event_id = event.id and job.location_id not null and 
-        job.location_id <> event.location_id) as unique_job_locations,
+        job.location_id <> event.location_id {where_date_range} {where_skills}) as unique_job_locations,
     job.id as job_id,
     job.title as job_title,
     job.description as job_description,
@@ -481,50 +543,30 @@ def get_job_rows(where,user_skills=[],is_admin=False):
 
     null as participants, -- just a place holder
     (select coalesce(sum(user_job.positions),0) from user_job 
-        where job.id = user_job.job_id and job.event_id = event.id) as job_filled_positions
+        where job.id = user_job.job_id and job.event_id = event.id {where_date_range} {where_skills}) as job_filled_positions
     from job
     join event on event.id = job.event_id
     left join location as event_location on event_location.id = event.location_id
     left join location as job_location on job_location.id = job.location_id
-    where {}
+    where {where}
     order by active_first_date, event_title, job.start_date
     """
     
-    jobs = Job(g.db).query(sql.format(where))
+    #import pdb;pdb.set_trace()
+    jobs = Job(g.db).query(sql.format(where=where, where_date_range=where_date_range,where_skills=where_skills))
 
     if jobs:
-        for row in range(len(jobs)-1,-1,-1):
-            """ First, delete any jobs that this user won't be able to see. 
-            'Turkey Shoot' loop from end to first
-            """
-            job = jobs[row]
-            # if user does not have skills requried, delete the row
-            job_skills = un_pack_string(job.skill_list)
-            if len(job_skills) > 0:
-                if not is_admin: #User(g.db).is_admin(g.user): #admins see all...
-                    job_skills = [int(i) for i in job_skills.split(',')]
-                    for skill in job_skills:
-                        if skill not in user_skills:
-                            del jobs[row]
-                            continue
-        
+        for job in jobs:
             # Location resolution...
             # job.event_loc_* and job.job_loc_* fields will all be populated for display
-            #import pdb;pdb.set_trace()
             # defaults
-            event_default_loc = job_default_loc = ('tbd',None,None) # location unkonown
-            event_default_loc_street_address = ''
-            event_default_loc_city = ''
-            event_default_loc_state = ''
-            event_default_loc_zip = ''
-            event_default_loc_w3w = ''
+            job_default_loc = event_default_loc = ('tbd',None,None) # location unkonown
+            job_default_loc_street_address = event_default_loc_street_address = ''
+            job_default_loc_city = event_default_loc_city = ''
+            job_default_loc_state = event_default_loc_state = ''
+            job_default_loc_zip = event_default_loc_zip = ''
+            job_default_loc_w3w = event_default_loc_w3w = ''
             
-            job_default_loc_street_address = ''
-            job_default_loc_city = ''
-            job_default_loc_state = ''
-            job_default_loc_zip = ''
-            job_default_loc_w3w = ''
-        
             if job.event_loc_name:
                 # Set the job default loc to event loc
                 job_default_loc = event_default_loc = (job.event_loc_name, job.event_loc_lat, job.event_loc_lng)
