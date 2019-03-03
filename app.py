@@ -85,7 +85,7 @@ def _before():
     
     get_db()
         
-    shotglass.get_site_config(app)
+    #shotglass.get_site_config(app)
     
     
     shotglass.set_template_dirs(app)
@@ -99,17 +99,25 @@ def _before():
         
         
     g.admin = Admin(g.db) # This is where user access rules are stored
-    #Events
-    # a header row must have the some permissions or higher than the items it heads
-    g.admin.register(Event,url_for('event.display'),display_name='Staffing Admin',header_row=True,minimum_rank_required=500,roles=['admin','event manager'])
-    g.admin.register(Event,url_for('event.display'),display_name='Events',minimum_rank_required=500,roles=['admin','event manager'])
-    #Jobs
-    g.admin.register(Job,url_for('job.display'),display_name='Jobs',minimum_rank_required=500,roles=['admin','event manager'])
-    #location
-    g.admin.register(Location,url_for('location.display'),display_name='Locations',minimum_rank_required=500,roles=['admin','event manager'])
-    g.admin.register(EventType,url_for('event_type.display'),display_name='Event Types',minimum_rank_required=500,roles=['admin','event manager'])
     
-    shotglass.user_setup() # g.admin now holds access rules Users, Prefs and Roles
+    if "//" + app.config.get("SIGNUP_SUBDOMAIN",'signup') in request.url_root:
+        # this is the signup subdomaine
+        g.admin.register(Job,url_for('signup.roster'),display_name='View Roster',minimum_rank_required=80)
+        
+    else:
+        # Admin subdomain
+        #Events
+        # a header row must have the some permissions or higher than the items it heads
+        g.admin.register(Event,url_for('event.display'),display_name='Staffing Admin',header_row=True,minimum_rank_required=500,roles=['admin','event manager'])
+        g.admin.register(Event,url_for('event.display'),display_name='Events',minimum_rank_required=500,roles=['admin','event manager'])
+        #Jobs
+        g.admin.register(Job,url_for('job.display'),display_name='Jobs',minimum_rank_required=500,roles=['admin','event manager'])
+        #location
+        g.admin.register(Location,url_for('location.display'),display_name='Locations',minimum_rank_required=500,roles=['admin','event manager'])
+        g.admin.register(EventType,url_for('event_type.display'),display_name='Event Types',minimum_rank_required=500,roles=['admin','event manager'])
+    
+        shotglass.user_setup() # g.admin now holds access rules Users, Prefs and Roles
+
 
 @app.teardown_request
 def _teardown(exception):

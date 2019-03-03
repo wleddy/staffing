@@ -51,29 +51,7 @@
         {% include "header.html"%}
         {% if site_config.SIGNUP_SUBDOMAIN in site_config.HOST_NAME %}
             {# signup has a special menu #}
-            <div id="nav" style="overflow:hidden;">
-              <div class="w3-sidebar w3-bar-block w3-collapse w3-right w3-card w3-animate-right w3-secondary-color menu_width" style="height:100vh;overflow:scroll;position:absolute;right:0;top:0pt;" id="primary-nav">
-                  <a href="javascript:void(0)" onclick="w3_close('primary-nav');w3_show('hamburger');" 
-                    class="w3-button w3-bar-item w3-hide-large w3-text-grey ">Close &times;</a>
-                        {% if not g.user %}
-                            <a class="w3-bar-item w3-button w3-border w3-secondary-color w3-primary-hover-color" href="#" onclick="editFromList('{{ url_for('signup.login')}}1')">Sign in</a>
-                        {% else %}
-                        <a class="w3-bar-item w3-button w3-border w3-secondary-color w3-primary-hover-color" >Hi {{ g.user | truncate(18) }}!</a>
-                        {% endif %}
-                          <a class="w3-bar-item w3-button w3-border w3-secondary-color w3-primary-hover-color" href="/">Home</a>
-                          <a class="w3-bar-item w3-button w3-border w3-secondary-color w3-primary-hover-color" href="{{ url_for('signup.about')}}">About</a>
-                          <a class="w3-bar-item w3-button w3-border w3-secondary-color w3-primary-hover-color" href="{{ url_for('signup.contact')}}">Contact Us</a>
-                          <a class="w3-bar-item w3-button w3-border w3-secondary-color w3-primary-hover-color" href="{{ url_for('signup.help')}}">Help</a>
-                        {% if g.user %}
-                        {% if is_admin %}
-                        <a class="w3-bar-item w3-button w3-border w3-drop-menu-color w3-drop-menu-hover-color" href="{{ url_for('signup.roster' )}}">View Roster</a>
-                        {% endif %}
-                            <a  class="w3-bar-item w3-button w3-border w3-drop-menu-color w3-drop-menu-hover-color" href="{{ url_for('signup.logout')}}">Sign Out</a>
-                        {% endif %}
-                </div>
-            </div>
-            {# end signup menu #}
-        
+            {% include "signup-nav.html" %}
         {% else %}
             {% include "top-nav.html"%}
         {% endif %}
