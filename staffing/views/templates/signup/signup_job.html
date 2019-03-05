@@ -1,77 +1,51 @@
         <div id="job-head{{ job.job_id }}" class="w3-row w3-secondary-color job-contain job-date-contain" >
             <div class="w3-col l2 m2 w3-hide-small">&nbsp;</div>
             <div class="w3-col l10 m10">
-                <p onclick="$('#job-detail{{ job.job_id }}').show();$('#job-head{{ job.job_id }}').hide()" style="cursor:pointer;margin-bottom:6pt;margin-top:0;">
-                    <span class="w3-button w3-primary-color w3-round-medium">+</span><strong>&nbsp;{{ job.job_title | truncate(40) }}</strong>
+            {% set participant_list = [] %}
+            {% if job.participants[job.job_id] %}
+            {% set participant_list = job.participants[job.job_id]['users']%}
+            {% endif %}
+                <p  style="margin-bottom:6pt;margin-top:0;">
+                    <strong>{{ job.job_title | truncate(40) }}</strong>
                     <span class="w3-small">- {{ job.start_date | local_time_string | lower }}
                         <span class="w3-hide-small"> - {{ job.end_date | local_time_string | lower }}</span>
-                        {% if job.job_filled_positions >= job.max_positions %}<em>(full)</em>{% endif %}
+                        {% if session['user_id'] in participant_list %}<em>(Yours)</em>
+                        {% elif job.job_filled_positions >= job.max_positions %}<em>(Full)</em>{% endif %}
                     </span>
                 </p>
             </div>
-        </div>
-        
-        <div id="job-detail{{ job.job_id }}" class="w3-row w3-secondary-color job-contain " style="display:none;">
-            <div class="w3-col l2 m2 s1">&nbsp;</div>
-            <p class="w3-col l10 m10 s11 w3-medium w3-button w3-round-medium w3-primary-color"
-                onclick="$('#job-detail{{ job.job_id }}').hide();$('#job-head{{ job.job_id }}').show()"
-                style="cursor:pointer;text-align:left;margin-top:3pt;white-space:normal;"
-                >&ndash;&nbsp;<strong>{{ job.job_title }}</strong>
-            </p>
-            <div class="w3-col l2 m2 w3-hide-small">&nbsp;</div>
-            <div class="w3-col w3-half w3-small">
-                <p class="w3-small">
-                    {{ job.job_description }}
-                </p>
+            <div class="w3-row ">
+                <div class="w3-col l2 m2 w3-hide-small">&nbsp;</div>
+                <div class="w3-col l6 m6 s4">
                 <div id="job_{{job.job_id}}_participants" >
                     {% set initials_list = []%}
                     {% if job.participants[job.job_id] %}
                     {% set initials_list = job.participants[job.job_id]['initials']%}
                     {% endif %}
-                    {% if initials_list %}
                         <div class="w3-hide-small">
-                            <p><strong>Participants:</strong></p>
+                            {% if initials_list %}
                             <p style="margin:10pt"> 
                                 {% for initials in initials_list %}
                                     <span class="w3-circle w3-primary-color participant-badge" >{{initials}}</span>
                                 {% endfor %}
                             </p>
+                            {% else %}
+                            &nbsp;
+                            {% endif %}
                         </div>
-                    {% endif %}
                 </div>
-            </div>
-            <div class="w3-third " >
-                <div style="padding-left:4pt;">
-                    <p>
-                        <em>Where:</em> <strong>{{ job.job_loc_name }}</strong> 
-                        {% if job.job_loc_w3w %}<a href="https://w3w.co/{{job.job_loc_w3w}}" target="_w3w" >Map...</a>
-                        {% elif job.job_loc_lat and job.job_loc_lng %}<a href="#">Map...</a>{% endif %}
-                    </p>
-                    <p>
-                        <em>When:</em> <strong>{{ job.start_date | short_day_and_date }}</strong>
-                    </p>
-                    <p>
-                        <em>Shift:</em> <strong>{{ job.start_date | local_time_string | lower }} - {{ job.end_date | local_time_string | lower }}</strong>
-                    </p>
                 </div>
-                <div id="job_{{job.job_id}}_button" style="text-align:center;">
-                    {% set participant_list = [] %}
-                    {% if job.participants[job.job_id] %}
-                    {% set participant_list = job.participants[job.job_id]['users']%}
-                    {% endif %}
-                    <p>
-                        <strong>{{ job.job_filled_positions | default('0',True) }}</strong> of <strong>{{ job.max_positions }}</strong> signed up
-                    </p>
+                <div class="w3-col l2 m2 s4">
                     <p style="text-align:center">
                         {% if job.job_filled_positions >= job.max_positions and session['user_id'] not in participant_list %}
-                        <a class="w3-button w3-grey w3-round-medium w3-medium" >This Assignment is Full</a>
+                        <a class="w3-button w3-grey w3-round-medium w3-medium" >Full</a>
                         {% else %}
                         <a class="w3-button w3-primary-color w3-round-medium w3-medium" 
                         onclick="editFromList('{{ url_for('signup.signup')}}/{{ job.job_id }}')"
-                        >{% if session['user_id'] in participant_list %}My Assignment{% else %}Sign Up{% endif %}</a>
+                        >{% if session['user_id'] in participant_list %}Your Spot{% else %}Sign Up{% endif %}</a>
                         {% endif %}
                     </p>
                 </div>
             </div>
         </div>
-        {% if show_detail %}<script>$('#job-detail{{ job.job_id }}').show();$('#job-head{{ job.job_id }}').hide()</script>{% endif %}
+        

@@ -17,63 +17,83 @@
             {% set _ = job_start_date.pop() %}
             {% set _ = job_start_date.append('') %}
             
+            {% if g._more_info_event_id %}
+            <div class="event-contain">        
+                    <p><a href="{{ url_for('signup.display')}}" class="w3-button w3-primary-color w3-round-medium w3-medium">Show All Events</a></p>
+            </div>
+            {% endif %}
+            
             <div id="act-{{ job.event_id }}" class="event-contain w3-row-padding w3-secondary-color w3-topbar" style="padding-bottom:6pt;">        
-                <p  class="w3-col l2 m2 w3-hide-small" style="padding-top:12pt;">
-                    <!-- an image may or may not display here in the future -->
-                    &nbsp;
-                </p>
                 <div class="w3-col w3-half w3-small" >
-                       <p class="w3-large">
+                       <p class="w3-medium">
                            <strong>{{ job.event_title }}</strong>
                            {% if is_admin %}<a class="w3-small" href="{{ url_for('event.edit')}}{{job.event_id}}/" target="_blank"><em>(edit)</em></a>{% endif %}
                        </p>
+                       {% if job.event_date_list %}
+                       <p>
+                           {% for i in range(job.event_date_list|length)%}
+                           {{ job.event_date_list[i] | short_abbr_date_string }}{% if i < (job.event_date_list | length) -1 %},{% endif %}
+                           {% endfor %}
+                       </p>
+                       {% endif %}
                        <p>{{ job.event_description }}{% if job.client_website %}<br>Event website: {{job.client_website | weblink }}{%endif%}</p>
                 </div>
-                <div class="w3-third " style="padding-left:4pt;">
-                    <p>
+                <div class="w3-half w3-small" style="padding-left:4pt;">
+                    <p class="w3-medium">
                         <em>Where:</em> <strong>{{ job.event_loc_name | default("", True ) }}</strong> 
                         {% if job.event_loc_w3w %}<a href="https://w3w.co/{{job.event_loc_w3w}}" target="_w3w" >Map...</a>
                         {% elif job.event_loc_lat and job.event_loc_lng %}<a href="#">Map...</a>{% endif %}
                     </p>
                     {% set width_pct = job.event_filled_positions | default(0,True) / job.event_max_positions * 74 %}
                     {% if width_pct > 25.0 %}
-                    <p class="w3-small">Filled: 
+                    <p>Filled: 
                         <a class="w3-button w3-primary-color w3-round-medium filled-bar" style="width:{{ width_pct }}%;"
                         >{{ job.event_filled_positions | default("0", True) }} of {{ job.event_max_positions | default("0", True) }}</a>
                     </p>
                     {% else %}
-                    <p class="w3-small">Filled: 
+                    <p>Filled: 
                         <a class="w3-button w3-primary-color w3-round-medium filled-bar" style="width:{{ width_pct }}%;">&nbsp;</a>
                         &nbsp;{{ job.event_filled_positions | default("0", True) }} of {{ job.event_max_positions | default("0", True) }}
                     </p>
                     {% endif %}
+                    {% if not g._more_info_event_id %}
+                        <p style="margin-top:10pt;" >
+                    {% if not g.user %}
+                        To see details or signup you must login...<br>
+                        <a class="w3-button w3-primary-color w3-round-medium w3-medium" href="#" onclick="editFromList('{{ url_for('signup.login')}}1')">Login / Register</a>
+                    {% else %}
+                        <a class="w3-button w3-primary-color w3-round-medium w3-medium" href="{{ url_for('signup.more_info')}}{{job.event_id}}/" >More Info...</a></p>
+                    {% endif %}
+                    {% endif %}
                 </div>
             </div>
             {% endif %} {# show event head? #}
-            {# only show the date once within job list of same date #}
-            {% if job.start_date[:10] != job_start_date[0] %}
-                {% set _ = job_start_date.pop() %}
-                {% set _ = job_start_date.append(job.start_date[:10]) %}
-                <div class="w3-row w3-secondary-color job-contain job-date-contain" style="margin-top:-1px;">
-                    <div class="w3-col l1 m1 w3-hide-small">&nbsp;</div>
-                    <div class="w3-col l11 m11">
-                        <hr style="margin:0 0 6pt 0;">
-                        <p onclick="$('.job-date-container-{{ job.event_id }}-{{job.start_date[:10]}},.job-date-more-{{ job.event_id }}-{{job.start_date[:10]}}').toggle();"
-                        style="cursor:pointer;">
-                            <span class="w3-button w3-round-medium w3-primary-color job-date-more-{{ job.event_id }}-{{job.start_date[:10]}}" 
-                            >+</span>
-                            <span class=" w3-button w3-round-medium w3-primary-color job-date-container-{{ job.event_id }}-{{job.start_date[:10]}}" style="display:none;" 
-                            >&ndash;</span>
-                            <em>When:</em> <strong>{{ job.start_date[:10] | abbr_date_string }}</strong>
-                        </p>
+            
+            {# When displaying a single event, show the dates for signup #}
+            {% if g._more_info_event_id %}
+            
+                {# only show the date once within job list of same date #}
+                {% if job.start_date[:10] != job_start_date[0] %}
+                    {% set _ = job_start_date.pop() %}
+                    {% set _ = job_start_date.append(job.start_date[:10]) %}
+                    <div class="w3-row w3-secondary-color job-contain job-date-contain" style="margin-top:-1px;">
+                        <div class="w3-col l1 m1 w3-hide-small">&nbsp;</div>
+                        <div class="w3-col l11 m11">
+                            <hr style="margin:0 0 6pt 0;">
+                            <p onclick="$('.job-date-container-{{ job.event_id }}-{{job.start_date[:10]}},.job-date-more-{{ job.event_id }}-{{job.start_date[:10]}}').toggle();"
+                            style="cursor:pointer;">
+                                  <strong>{{ job.start_date[:10] | abbr_date_string }}</strong>
+                            </p>
+                        </div>
+                    </div>
+                {% endif %} {# show date? #}
+            
+                 <div class="job-date-container-{{ job.event_id }}-{{job.start_date[:10]}}" style="display:none;">
+                   <div id="job-body{{job.job_id}}">
+                        {% include 'signup_job.html' %}
                     </div>
                 </div>
-            {% endif %} {# show date? #}
-             <div class="job-date-container-{{ job.event_id }}-{{job.start_date[:10]}}" style="display:none;">
-               <div id="job-body{{job.job_id}}">
-                    {% include 'signup_job.html' %}
-                </div>
-            </div>
+            {% endif %} {#  g._more_info_event_id #}
         {% endfor %} {# jobs #}
     {% endif %}{# not jobs #}
 {% endblock body %}

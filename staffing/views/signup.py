@@ -42,7 +42,19 @@ def contact():
 @mod.route('/help')
 def help():
     return "No help yet"
-
+    
+    
+@mod.route('/more_info')
+@mod.route('/more_info/')
+@mod.route('/more_info/<int:event_id>/')
+def more_info(event_id=0):
+    event_id = cleanRecordID(event_id)
+    
+    if event_id > 0:
+        g._more_info_event_id = event_id
+        return display()
+        
+    return redirect(url_for('signup.display'))
 
 @mod.route('/')
 def display():
@@ -75,6 +87,10 @@ def display():
                 
     start_date, end_date = get_display_date_range()
     where = ''
+    event_id = g.get('_more_info_event_id',0)
+    if event_id:
+        where = 'event.id = {}'.format(event_id)
+    
         
     jobs = get_job_rows(start_date,end_date,where,user_skills,is_admin)
             
@@ -210,13 +226,13 @@ def signup_success(id=0):
     
     # because the user got access to this job from the main display,
     # Set is_admin to true to display the updated version of the record
-    jobs = get_job_rows(None,None,"job.id = {}".format(job.id),[],is_admin=True)    
+    jobs = get_job_rows(None,None,"job.id = {}".format(id),[],is_admin=True)    
     if jobs and len(jobs) > 0:
         job = jobs[0]
     else:
         return "failure: Job Not Found"
         
-    return render_template('signup_job.html',job=job,show_detail=True)
+    return render_template('signup_job.html',job=job)
     
 @mod.route('/roster',methods=['GET',])
 @mod.route('/roster/',methods=['GET',])
@@ -515,6 +531,7 @@ def get_job_rows(start_date=None,end_date=None,where='',user_skills=[],is_admin=
     event_location.lat as event_loc_lat,
     event_location.lng as event_loc_lng,
     event_location.w3w as event_loc_w3w,
+    null as event_date_list, -- a list of dates for this event
     (select min(job.start_date) from job where job.event_id = event.id {where_date_range} {where_skills}) as active_first_date, 
     (select coalesce(sum(user_job.positions),0) from user_job
         where user_job.job_id in (select id from job where job.event_id = event.id {where_date_range} {where_skills} )) as event_filled_positions,
@@ -613,6 +630,17 @@ def get_job_rows(start_date=None,end_date=None,where='',user_skills=[],is_admin=
             if g.user:
                 #if not logged in, can't see any of this anyway...
                 populate_participant_list(job)
+                
+                
+            # generate a list of all dates fo this event in this selection of jobs
+            # get a selection of jobs for this event
+            job_dates = Job(g.db).select(where='event_id = {} {} {}'.format(job.event_id,where_date_range,where_skills),order_by="job.start_date")
+            #put into list
+            job.event_date_list = []
+            for job_date in job_dates:
+                if job_date.start_date[:10] not in job.event_date_list:
+                    job.event_date_list.append(job_date.start_date[:10])
+                    
                 
     return jobs
     
