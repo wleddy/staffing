@@ -478,6 +478,7 @@ def get_job_rows(start_date=None,end_date=None,where='',user_skills=[],is_admin=
     site_config = get_site_config()
     
     #import pdb;pdb.set_trace()
+    user_id = session.get('user_id',0)
     
     # from this point, use date strings
     if isinstance(start_date,datetime):
@@ -559,8 +560,12 @@ def get_job_rows(start_date=None,end_date=None,where='',user_skills=[],is_admin=
     job_location.w3w as job_loc_w3w,
 
     null as participants, -- just a place holder
+    0 as user_event_positions,
+    0 as user_job_positions,
     (select coalesce(sum(user_job.positions),0) from user_job 
-        where job.id = user_job.job_id and job.event_id = event.id {where_date_range} {where_skills}) as job_filled_positions
+        where job.id = user_job.job_id and job.event_id = event.id {where_date_range} {where_skills}) 
+        as job_filled_positions
+        
     from job
     join event on event.id = job.event_id
     left join location as event_location on event_location.id = event.location_id
@@ -641,6 +646,30 @@ def get_job_rows(start_date=None,end_date=None,where='',user_skills=[],is_admin=
                 if job_date.start_date[:10] not in job.event_date_list:
                     job.event_date_list.append(job_date.start_date[:10])
                     
+                    
+            ##################
+            ## There really ought to be a way to do these 2 queries within the main query
+            ## but I can't figure it out
+            ##################
+            # set the number of positions the current user has for this job
+            sql = """
+            select coalesce(sum(user_job.positions),0) as temp from user_job
+            where user_job.user_id = {} and user_job.job_id = {}
+            
+            """.format(user_id,job.job_id)
+            UJPos = UserJob(g.db).query(sql)
+            if UJPos:
+                job.user_job_positions = UJPos[0].temp
                 
+            # set the number of positions the current user has for the event this job is a part of
+            sql = """
+            select coalesce(sum(user_job.positions),0) as temp from user_job
+            join job on job.id = user_job.job_id
+            where user_job.user_id = {} and job.event_id = {}
+            """.format(user_id,job.event_id)
+            UJPos = UserJob(g.db).query(sql)
+            if UJPos:
+                job.user_event_positions = UJPos[0].temp
+            
     return jobs
     

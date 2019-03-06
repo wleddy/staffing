@@ -27,7 +27,9 @@
                 <div class="w3-col w3-half w3-small" >
                        <p class="w3-medium">
                            <strong>{{ job.event_title }}</strong>
+                           {% if job.user_event_positions %}Your Signup ({{ job.user_event_positions }}){% endif %}
                            {% if is_admin %}<a class="w3-small" href="{{ url_for('event.edit')}}{{job.event_id}}/" target="_blank"><em>(edit)</em></a>{% endif %}
+
                        </p>
                        {% if job.event_date_list %}
                        <p>
@@ -88,7 +90,7 @@
                     </div>
                 {% endif %} {# show date? #}
             
-                 <div class="job-date-container-{{ job.event_id }}-{{job.start_date[:10]}}" style="display:none;">
+                 <div class="job-date-container-{{ job.event_id }}-{{job.start_date[:10]}}" {%if not job.user_event_positions %}style="display:none;"{% endif %}>
                    <div id="job-body{{job.job_id}}">
                         {% include 'signup_job.html' %}
                     </div>
