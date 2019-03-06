@@ -18,13 +18,22 @@
                 <div class="w3-col l6 m6 s4">
                 <div id="job_{{job.job_id}}_participants" >
                     {% set initials_list = []%}
+                    {% set user_data_list = []%}
                     {% if job.participants[job.job_id] %}
                     {% set initials_list = job.participants[job.job_id]['initials']%}
+                    {% set user_data_list = job.participants[job.job_id]['user_data'] %}
                     {% endif %}
-                        <div class="w3-hide-small">
+                        <div class="w3-small">
                             {% if job.user_job_positions %}<p>You have signed up for this job</p>{% endif %}
+                            {% if is_admin and  user_data_list %}
+                            <p style="margin:10pt"> 
+                                <strong>Users:</strong>
+                               {% for i in range(user_data_list|length)%}
+                                    {{user_data_list[i].user_name}}{% if i < (user_data_list | length) -1 %},{% endif %}
+                                {% endfor %}
+                            </p>
                             
-                            {% if initials_list %}
+                            {% elif initials_list %}
                             <p style="margin:10pt"> 
                                 {% for initials in initials_list %}
                                     <span class="w3-circle w3-primary-color participant-badge" >{{initials}}</span>
