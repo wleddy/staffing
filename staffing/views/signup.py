@@ -65,18 +65,11 @@ def display():
     # get the current users role id's
     is_admin = False
     user_skills = []
-    if g.user and session.get('user_id',False):
-        is_admin = User(g.db).is_admin(session['user_id'])
-            
-        recs = User(g.db).get_roles(session['user_id'])
-        if recs:
-            user_skills = [rec.id for rec in recs]
-            if not is_admin:
-                #may be job admin
-                for rec in recs:
-                    if rec.rank >= site_config.get('MINIMUM_MANAGER_RANK',70): #event manager
-                        is_admin = True
-                        break
+    recs = User(g.db).get_roles(session.get('user_id',-1))
+    if recs:
+        user_skills = [rec.id for rec in recs]
+        
+    is_admin = is_user_admin()
             
     #all visitors get basic skills even if not logged in
     user_skill_list = site_config.get('DEFAULT_USER_ROLES',['volunteer','user'])
@@ -232,7 +225,7 @@ def signup_success(id=0):
     else:
         return "failure: Job Not Found"
         
-    return render_template('signup_job.html',job=job)
+    return render_template('signup_job.html',job=job,is_admin=is_user_admin())
     
 @mod.route('/roster',methods=['GET',])
 @mod.route('/roster/',methods=['GET',])
@@ -246,21 +239,12 @@ def roster():
     g.title='Signup Roster'
     site_config = get_site_config()
     # get the current users role id's
-    is_admin = False
+    is_admin = is_user_admin()
     user_skills = []
-    if g.user and session.get('user_id',False):
-        is_admin = User(g.db).is_admin(session['user_id'])
-            
-        recs = User(g.db).get_roles(session['user_id'])
-        if recs:
-            user_skills = [rec.id for rec in recs]
-            if not is_admin:
-                #may be job admin
-                for rec in recs:
-                    if rec.rank >= site_config.get('MINIMUM_MANAGER_RANK',70): #event manager
-                        is_admin = True
-                        break
-            
+    recs = User(g.db).get_roles(session.get('user_id',-1))
+    if recs:
+        user_skills = [rec.id for rec in recs]
+                
     #all visitors get basic skills even if not logged in
     user_skill_list = site_config.get('DEFAULT_USER_ROLES',['volunteer','user'])
     for skill in user_skill_list:
@@ -446,7 +430,6 @@ def populate_participant_list(job):
                 participant_list.append(part.user_id)
                 user_data_list.append({'user_name':part.user_name,'phone':part.phone,'email':part.email,'positions':part.positions,})
             
-        
         job.participants[job.job_id] = {'initials':initials, 'users':participant_list, 'user_data': user_data_list}
         job.skill_list = un_pack_string(job.skill_list) # convert to simple list
     
@@ -460,6 +443,22 @@ def get_display_date_range(days=None):
     end_date = (local_datetime_now() + timedelta(days=days)).isoformat()[:10]
     return start_date, end_date
 
+
+def is_user_admin():
+    is_admin = False
+    if g.user and session.get('user_id',False):
+        is_admin = User(g.db).is_admin(session['user_id'])
+            
+        if not is_admin:
+            site_config = get_site_config()
+            #may be job admin
+            recs = User(g.db).get_roles(session['user_id'])
+            for rec in recs:
+                if rec.rank >= site_config.get('MINIMUM_MANAGER_RANK',70): #event manager
+                    is_admin = True
+                    break
+    
+    return is_admin
 
 def get_job_rows(start_date=None,end_date=None,where='',user_skills=[],is_admin=False):
     """
