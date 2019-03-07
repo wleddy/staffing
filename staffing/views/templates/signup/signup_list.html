@@ -1,5 +1,12 @@
 {% extends 'signup_layout.html' %}
 
+{% macro back_to_list() %}
+    {% if g._more_info_event_id %}
+    <div class="event-contain">        
+            <p><a href="{{ url_for('signup.display')}}" class="w3-button w3-primary-color w3-round-medium w3-medium">&larr; All Signups</a></p>
+    </div>
+    {% endif %}
+{% endmacro %}
 
 {% block body %}
     {% if not jobs %}
@@ -17,11 +24,7 @@
             {% set _ = job_start_date.pop() %}
             {% set _ = job_start_date.append('') %}
             
-            {% if g._more_info_event_id %}
-            <div class="event-contain">        
-                    <p><a href="{{ url_for('signup.display')}}" class="w3-button w3-primary-color w3-round-medium w3-medium">Show All Events</a></p>
-            </div>
-            {% endif %}
+            {{ back_to_list() }}
             
             <div id="act-{{ job.event_id }}" class="event-contain w3-row-padding w3-secondary-color w3-topbar" style="padding-bottom:6pt;">        
                 <div class="w3-col w3-half w3-small" >
@@ -98,4 +101,7 @@
             {% endif %} {#  g._more_info_event_id #}
         {% endfor %} {# jobs #}
     {% endif %}{# not jobs #}
+    
+    {{ back_to_list() }}
+    
 {% endblock body %}
