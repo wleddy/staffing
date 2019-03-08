@@ -3,8 +3,14 @@
   <div class="w3-mobile w3-bar w3-collapse w3-primary-color w3-hide-small w3-hide-medium" id="primary-nav">
               <a href="javascript:void(0)" onclick="primary_nav_toggle()" 
                 class="w3-button w3-bar-item w3-hide-large">Close &times;</a>
-              <a class="w3-bar-item w3-button w3-border w3-primary-color w3-secondary-hover-color" href="http://sacbike.org">SABA Home</a>
-              <a class="w3-bar-item w3-button w3-border w3-primary-color w3-secondary-hover-color" href="/">Staffing Home</a>
+            <div class="w3-dropdown-hover w3-bar-block">
+                <a href="/" class="w3-button w3-border w3-primary-color w3-drop-menu-section-hover-color">Home</a>
+                <div class="w3-dropdown-content">
+                    <a  class="w3-bar-item w3-button w3-border w3-drop-menu-color w3-drop-menu-hover-color" href="/">Admin Home</a>
+                    <a  class="w3-bar-item w3-button w3-border w3-drop-menu-color w3-drop-menu-hover-color" href="http://signup.sacbike.org">Signup Home</a>
+                    <a  class="w3-bar-item w3-button w3-border w3-drop-menu-color w3-drop-menu-hover-color" href="http://sacbike.org">SABA Home</a>
+                </div>
+            </div>
               <a class="w3-bar-item w3-button w3-border w3-primary-color w3-secondary-hover-color" href="{{ url_for('www.about')}}">About</a>
               <a class="w3-bar-item w3-button w3-border w3-primary-color w3-secondary-hover-color" href="{{ url_for('www.contact')}}">Contact Us</a>
               <a class="w3-bar-item w3-button w3-border w3-primary-color w3-secondary-hover-color" href="{{ url_for('www.docs')}}">Docs</a>

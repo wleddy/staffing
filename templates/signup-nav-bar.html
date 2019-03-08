@@ -1,11 +1,19 @@
 {# nav menu for Signup subdomain #}
 <div id="nav" style="overflow:hidden;">
 <div id="nav-placeholder" class="w3-mobile w3-bar w3-collapse w3-primary-color w3-hide-large">&nbsp;</div>
-  <div class="w3-mobile w3-bar w3-collapse w3-primary-color w3-hide-small w3-hide-medium"  id="primary-nav">
+  <div class="w3-mobile w3-bar w3-collapse w3-primary-color w3-hide-small w3-hide-medium"  id="primary-nav" style="min-width:50%">
               <a href="javascript:void(0)" onclick="primary_nav_toggle()" 
                 class="w3-button w3-bar-item w3-hide-large">Close &times;</a>
-              <a class="w3-bar-item w3-button w3-border w3-primary-color w3-secondary-hover-color" href="http://sacbike.org">SABA Home</a>
-              <a class="w3-bar-item w3-button w3-border w3-primary-color w3-secondary-hover-color" href="/">Signup Home</a>
+            <div class="w3-dropdown-hover w3-bar-block">
+                <a href="/" class="w3-button w3-border w3-primary-color w3-drop-menu-section-hover-color">Home</a>
+                <div class="w3-dropdown-content">
+                    <a  class="w3-bar-item w3-button w3-border w3-drop-menu-color w3-drop-menu-hover-color" href="/">Signup Home</a>
+                    {% if g.admin and g.admin.has_user_table_access(g.user) %}
+                    <a  class="w3-bar-item w3-button w3-border w3-drop-menu-color w3-drop-menu-hover-color" href="http://admin.sacbike.org">Admin Home</a>
+                    {% endif %}
+                    <a  class="w3-bar-item w3-button w3-border w3-drop-menu-color w3-drop-menu-hover-color" href="http://sacbike.org">SABA Home</a>
+                </div>
+            </div>
               <!-- <a class="w3-bar-item w3-button w3-border w3-primary-color w3-secondary-hover-color" href="{{ url_for('signup.about')}}">About</a> -->
               <a class="w3-bar-item w3-button w3-border w3-primary-color w3-secondary-hover-color" href="{{ url_for('signup.contact')}}">Contact Us</a>
               <!-- <a class="w3-bar-item w3-button w3-border w3-primary-color w3-secondary-hover-color" href="{{ url_for('signup.help')}}">Help</a> -->
