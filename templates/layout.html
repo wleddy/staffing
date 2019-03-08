@@ -84,7 +84,7 @@
         <div class="w3-container">
             {% block page_header %}
                 {% if not g.suppress_page_header %}
-                {% include "page_header.html" %}
+                    {% include "page_header.html" %}
                 {% endif %}
             {% endblock page_header %}
         
@@ -92,8 +92,10 @@
         
             {% block body %}{% endblock %}
             
-            {% block footer %}{% endblock footer%}
         </div>
+            {% block footer %}
+            {% include "footer.html" %}
+            {% endblock footer%}
     </div>
 </div>
 </body>

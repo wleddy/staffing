@@ -1,16 +1,17 @@
-    {% if g.user or True%}
 <button id="hamburger" class="w3-button w3-xlarge  w3-hide-large w3-primary-color w3-secondary-hover-color" style="position:fixed;top:3pt;right:6pt;" onclick="primary_nav_toggle()">&#9776;</button>
-<div class="w3-container w3-main menu_space" style="padding:2%;max-padding:12pt;">
-    {% else %}
-<div class="w3-container w3-main" style="padding:2%;max-padding:12pt">
-    {% endif %}
-    <div class="w3-quarter w3-hide-small" style="max-width:120pt;">
+<div class="menu_space" style="padding:1.5%;max-padding:8pt;">
+    <div class="w3-hide-small">
         <a id="header_home" href="/">
-              <img style="width:100%;max-width:120pt;max-height:80pt;object-fit: scale-down;" id="headerlogo" src="{{ url_for('static', filename='images/header-logo.jpg') }}" />
+              <img id="headerlogo" src="{{ url_for('static', filename='images/logo.png') }}" alt="SABA Logo"/>
         </a>
     </div>
-    <div class="w3-container w3-threequarter">
-        <h1 class="w3-xxxlarge" style="line-height:.9;margin-right:24pt;"><a style="text-decoration:none;" href="/">{{ site_config.SITE_NAME }}</a></h1>
+    <div class="w3-container w3-hide-medium w3-hide-large">
+       <h3 style="line-height:.9;"><a id="header_home" href="/" style="text-decoration:none;">
+            Sacramento Area Bicycle Advocates
+        </a></h3>
+    </div>
+    <div class="w3-container">
+        <h3 style="line-height:.9;margin:0;"><a style="text-decoration:none;" href="/">{{ site_config.SITE_NAME }}</a></h3>
     </div>
 </div>
 
