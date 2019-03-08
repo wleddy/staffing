@@ -4,6 +4,7 @@ from shotglass2.users.admin import login_required, table_access_required
 from shotglass2.users.models import Role, User
 from shotglass2.takeabeltof.utils import render_markdown_for, printException, cleanRecordID
 from shotglass2.takeabeltof.date_utils import date_to_string, getDatetimeFromString
+from shotglass2.shotglass import get_site_config
 from staffing.models import Event, Location, Job, UserJob
 from staffing.utils import pack_list_to_string, un_pack_string
 
@@ -159,13 +160,13 @@ def delete(id=0):
     return redirect(g.listURL)
     
     
-@mod.route('/edit_from_list/<int:id>/',methods=['GET','POST',])
-@mod.route('/edit_from_list/<int:id>',methods=['GET','POST',])
-@mod.route('/edit_from_list/<int:id>/<int:event_id>/',methods=['GET','POST',])
-@mod.route('/edit_from_list/<int:id>/<int:event_id>',methods=['GET','POST',])
-@mod.route('/edit_from_list/',methods=['GET','POST',])
+@mod.route('/edit_job_from_list/<int:id>/',methods=['GET','POST',])
+@mod.route('/edit_job_from_list/<int:id>',methods=['GET','POST',])
+@mod.route('/edit_job_from_list/<int:id>/<int:event_id>/',methods=['GET','POST',])
+@mod.route('/edit_job_from_list/<int:id>/<int:event_id>',methods=['GET','POST',])
+@mod.route('/edit_job_from_list/',methods=['GET','POST',])
 @table_access_required(Job)
-def edit_from_list(id=0,event_id=0):
+def edit_job_from_list(id=0,event_id=0):
     return edit(id,event_id,True)
     
 @mod.route('/delete_from_list/<int:id>/',methods=['GET','POST',])
@@ -250,6 +251,86 @@ def manage_job_set(id=None):
     return render_template('job_manage.html',rec=rec,new_date=new_date)
     
     
+@mod.route('/assignment_manager/<int:job_id>',methods=['GET',])
+@mod.route('/assignment_manager/<int:job_id>/',methods=['GET',])
+@mod.route('/assignment_manager',methods=['POST',])
+@mod.route('/assignment_manager/',methods=['POST',])
+@table_access_required(Job)
+def assignment_manager(job_id=0):
+    """Add or remove a signup initiated by a manager
+    Comes from a modal dialog but unlike most times, this method will not close
+    the dialog on "success". The Dlog remains open until the user cancels it."""
+    
+    setExits()
+    site_config = get_site_config()
+    job=None
+    signup = None
+    assigned_users = None
+    filled_positions = None
+    from staffing.views.signup import get_job_rows
+    
+    #import pdb;pdb.set_trace()
+
+    #Get the job id
+    if not job_id and request.form:
+        job_id = request.form.get('id',None)
+    
+    # Sanatize job_id
+    job_id = cleanRecordID(job_id)
+    if job_id < 1:
+        return "failure: That is not a valid job id"
+
+    #if Post, create assignment
+    if request.form:
+        assigned_user_id = cleanRecordID(request.form.get('assigned_user_id',None))
+        signup = UserJob(g.db).select_one(where='user_id = {} and job_id = {}'.format(assigned_user_id,job_id))
+        if not signup:
+            signup = UserJob(g.db).new()
+            signup.user_id = assigned_user_id
+            signup.job_id = job_id
+        
+        UserJob(g.db).update(signup,request.form)
+        signup.modified = local_datetime_now()
+        UserJob(g.db).save(signup)
+        g.db.commit()
+    else:
+        signup = UserJob(g.db).new()
+        signup.job_id = job_id
+        signup.positions=0
+        
+    #Get the job to display
+    job_data = get_job_rows(None,None,"job.id = {}".format(job_id),[],is_admin=True)
+    role_list=[0] #will return none
+    if job_data:
+        job_data = job_data[0]
+        filled_positions = job_data.job_filled_positions
+        # get skills for this job
+        role_list = un_pack_string(job_data.skill_list) # convert to comma separated string
+        role_list = role_list.split(',') #convert it to a list
+            
+    # Get all the users who can do this job
+    skilled_users = User(g.db).get_with_roles(role_list)
+    #get all users currently assigned
+    assigned_users = UserJob(g.db).get_assigned_users(job_id)
+
+    return render_template('assignment_manager.html',
+            job=job_data,
+            signup=signup,
+            assigned_users=assigned_users,
+            skilled_users=skilled_users,
+            filled_positions=filled_positions,
+            )
+
+    
+@mod.route('/assignment_manager_success/<int:job_id>/',methods=['GET',])
+@mod.route('/assignment_manager_success/<int:job_id>',methods=['GET',])
+@mod.route('/assignment_manager_success/',methods=['GET','POST',])
+@mod.route('/assignment_manager_success',methods=['GET','POST',])
+@table_access_required(Job)
+def assignment_manager_success(job_id=0):
+    return "is this really needed?"
+
+
 def valid_input(rec):
     valid_data = True
     #import pdb;pdb.set_trace()

@@ -227,6 +227,7 @@ def signup_success(id=0):
         
     return render_template('signup_job.html',job=job,is_admin=is_user_admin())
     
+    
 @mod.route('/roster',methods=['GET',])
 @mod.route('/roster/',methods=['GET',])
 @table_access_required(Job)

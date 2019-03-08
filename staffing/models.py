@@ -1,7 +1,7 @@
 from shotglass2.takeabeltof.database import SqliteTable
 from shotglass2.takeabeltof.utils import cleanRecordID
 from shotglass2.takeabeltof.date_utils import local_datetime_now
-
+from shotglass2.users.models import User
         
 class Event(SqliteTable):
     """Staffing Event Table"""
@@ -133,6 +133,17 @@ class UserJob(SqliteTable):
         rec.modified = local_datetime_now()
         return super().save(rec,**kwargs)
         
+        
+    def get_assigned_users(self,job_id):
+        """Return a namedlist of user records assigned to this job or None"""
+        #import pdb;pdb.set_trace()
+        user_jobs = self.select(where='job_id = {}'.format(job_id))
+        if user_jobs:
+            user_ids = [str(user_job.user_id) for user_job in user_jobs]
+            users = User(self.db).select(where='id in ({})'.format(','.join(user_ids)))
+            return users
+        else:
+            return None
 
 class Location(SqliteTable):
     """Staffing Location Table"""

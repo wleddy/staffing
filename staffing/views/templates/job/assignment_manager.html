@@ -1,0 +1,61 @@
+
+<div id="assignment_manager_layout">
+    <div id="assignment_head">
+        <h4>{{ job.event_title }}</h4>
+        <h4>{{ job.job_title }} <span class="w3-small">{{ job.start_date | short_abbr_date_string }} {{ job.start_date | local_time_string | lower }} - {{ job.end_date | local_time_string | lower }}</span></h4>
+    </div>
+
+    <div id="assignment_attendee_table">
+    	<table class="datatable w3-table w3-striped w3-hoverable">
+    	{%if assigned_users %}
+    		{% for user in assigned_users %}
+    	    <tr>
+    			<td>{{ user.first_name }} {{ user.last_name }}</td>
+                <td><a onclick="confirm('Are You Sure?');" class="w3-red-text w3-xlarge">X</a></td>
+    		</tr>
+    		{% endfor %}
+            {% else %}
+            <tr>
+    			<td>No Assignments</td>
+            </tr>
+            {% endif %}
+    	  </table>
+    </div>
+
+    <div id="assignment_user_search">
+        <p><input type="text" name="user_name" value="" class="w3-input" /></p>
+        <div id="search_results" class="w3-border" style="width:80%;min-height:80pt;z-index:10000;">
+            <p>Some user...</p>
+        </div>
+    </div>
+
+    <div id="assignment_details">
+        <form id="assignmentModalForm"  action="" method="POST">
+            <input type="hidden" name="id" value="{{job.id}}">
+            <input id="assignment_user_id" type="hidden" name="assignment_user_id" value="0">
+            <p>
+                <a class="w3-button w3-primary-color w3-round-medium w3-xlarge" onclick="signup_count('#signup-count',-1,{{signup.positions}})" style="padding:6pt;width:30pt;" title="Decrease Shifts">&ndash;</a>
+                <input class="w3-xlarge" id="signup-count" type="num" name='positions' value="{{signup.positions | default(0,True)}}" readonly style="padding:6pt;width:30pt;display:block-inline;text-align:center"/>
+                <a class="w3-button w3-primary-color w3-round-medium w3-xlarge"  onclick="signup_count('#signup-count',1,{{job.max_positions - filled_positions + signup.positions}})" style="padding:6pt;width:30pt;" title="Increase Shifts">+</a>
+            </p>
+            <p style="text-align:left">
+                Comment:<br>
+                <textarea class="w3-small" rows="4" style="width:100%" name="attendance_comment" 
+                placeholder="If signing up for more than one person, you can tell us who it is here... or anything else."
+                >{{ signup.attendance_comment | default("", True) }}</textarea>
+            </p>
+        	<p>
+        		<input class="w3-button w3-primary-color w3-round-medium " type="button" 
+                    onclick="submitModalForm('assignmentModalForm',
+                    '{{url_for('job.assignment_manager')}}',
+                    'assignment_manager_layout',
+                    '{{url_for('job.assignment_manager_success')}}{{job.id}}'
+                    )" 
+                    name="Add" value="Add" />
+        	</p>
+            <p>
+        		<a class="w3-button w3-primary-color w3-round-medium " onclick="cancelModalForm()">Done</a>
+            </p>
+        </form>
+    </div>
+</div>
