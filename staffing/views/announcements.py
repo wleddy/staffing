@@ -1,30 +1,37 @@
 # Send communications to users
+from shotglass2.shotglass import get_site_config
 from shotglass2.takeabeltof.date_utils import getDatetimeFromString, local_datetime_now
 from shotglass2.takeabeltof.utils import render_markdown_for
 from shotglass2.takeabeltof.mailer import send_message, email_admin
 
 
-def send_signup_email(job_data,user,template_path,bp):
+def send_signup_email(job_data,user,template_path,bp,**kwargs):
     """Send an email confirming a single user's signup
     currently this only generates one email
     param: job_data is the result of the query in staffing.signup.get_job_rows (a list of recs)
     param: user is a single instance of a User record
     param: template_path, obviously the path to a template... but absolute or relative to what?
-    """
-    from shotglass2.shotglass import get_site_config
     
+    'subject' may be included in kwargs
+    if 'cancellation' is in kwargs, this is a notice of cancellation do don't include the ical attachement
+    
+    if values are supplied in kwargs they are passed to the template as additional context
+    """
+    #import pdb;pdb.set_trace()
     uid=get_uid(job_data,user)
     location = get_location(job_data)
     geo = get_geo(job_data)    
     description = get_description(job_data,geo,location)
-            
-    ical_event = make_event_dict(uid,job_data.start_date,job_data.end_date,job_data.job_title,
-            description=description.replace('\n\n','\n'),
-            location=location,
-            geo=geo,
-            )
+    ical = None
+    
+    if not kwargs.get('cancellation',False):            
+        ical_event = make_event_dict(uid,job_data.start_date,job_data.end_date,job_data.job_title,
+                description=description.replace('\n\n','\n'),
+                location=location,
+                geo=geo,
+                )
 
-    ical = get_ical_text(event=ical_event)
+        ical = get_ical_text(event=ical_event)
     
     # generate the text of the email with ical as an attachment
     email_html = render_markdown_for(template_path,
@@ -32,9 +39,12 @@ def send_signup_email(job_data,user,template_path,bp):
         ical=ical,
         description=description,
         job_data=job_data,
+        **kwargs
         )
         
-    subject = 'Your assignment for {}'.format(job_data.event_title)
+    subject = kwargs.pop('subject','')
+    if not subject:
+        subject = 'Your assignment for {}'.format(job_data.event_title)
     attachment = None
     if ical:
         attachment = ("{}.ics".format(job_data.job_title.replace(' ','_')), "text/calendar", ical)

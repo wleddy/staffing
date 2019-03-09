@@ -7,6 +7,8 @@ from shotglass2.takeabeltof.date_utils import date_to_string, getDatetimeFromStr
 from shotglass2.shotglass import get_site_config
 from staffing.models import Event, Location, Job, UserJob
 from staffing.utils import pack_list_to_string, un_pack_string
+from staffing.views.announcements import send_signup_email
+from staffing.views.signup import get_job_rows
 
 mod = Blueprint('job',__name__, template_folder='templates/job', url_prefix='/job')
 
@@ -267,7 +269,6 @@ def assignment_manager(job_id=0):
     signup = None
     assigned_users = None
     filled_positions = None
-    from staffing.views.signup import get_job_rows
     
     #import pdb;pdb.set_trace()
 
@@ -280,6 +281,19 @@ def assignment_manager(job_id=0):
     if job_id < 1:
         return "failure: That is not a valid job id"
 
+    #Get the job to display
+    job_data = get_job_rows(None,None,"job.id = {}".format(job_id),[],is_admin=True)
+    role_list=[0] #will return none
+    if job_data:
+        job_data = job_data[0]
+        filled_positions = job_data.job_filled_positions
+        # get skills for this job
+        role_list = un_pack_string(job_data.skill_list) # convert to comma separated string
+        role_list = role_list.split(',') #convert it to a list
+        
+    # Get all the users who can do this job
+    skilled_users = User(g.db).get_with_roles(role_list)
+        
     #if Post, create assignment
     if request.form:
         assignment_user_id = cleanRecordID(request.form.get('assignment_user_id',None))
@@ -299,6 +313,13 @@ def assignment_manager(job_id=0):
         signup.modified = local_datetime_now()
         UserJob(g.db).save(signup)
         g.db.commit()
+        
+        # send a special email to the user to inform them of the assignment.
+        manager_rec = User(g.db).get(session.get('user_id',0))
+        user_rec = User(g.db).get(assignment_user_id)
+        subject = "[SABA] {} {} has given you an assignment".format(manager_rec.first_name,manager_rec.last_name)
+        send_signup_email(job_data,user_rec,'email/inform_user_of_assignment.html',mod,manager=manager_rec,subject=subject)
+        
         # The form is going to be redisplayed so clear the signup record
         signup = None
 
@@ -307,21 +328,9 @@ def assignment_manager(job_id=0):
         signup.job_id = job_id
         signup.positions=0
         
-    #Get the job to display
-    job_data = get_job_rows(None,None,"job.id = {}".format(job_id),[],is_admin=True)
-    role_list=[0] #will return none
-    if job_data:
-        job_data = job_data[0]
-        filled_positions = job_data.job_filled_positions
-        # get skills for this job
-        role_list = un_pack_string(job_data.skill_list) # convert to comma separated string
-        role_list = role_list.split(',') #convert it to a list
-            
     #get all users currently assigned
     assigned_users = UserJob(g.db).get_assigned_users(job_id)
-    # Get all the users who can do this job
-    skilled_users = User(g.db).get_with_roles(role_list)
-    
+
     #remove users already assigned from skilled users
     if assigned_users:
         for au in assigned_users:
@@ -330,7 +339,7 @@ def assignment_manager(job_id=0):
                     if skilled_users[i].id == au.id:
                         del skilled_users[i]
                         break
-
+        
     return render_template('assignment_manager.html',
             job=job_data,
             signup=signup,
@@ -355,8 +364,19 @@ def assignment_manager_delete(job_id=0,user_id=0):
         if signup:
             UserJob(g.db).delete(signup.id)
             g.db.commit()
-    
+
+            job_data = get_job_rows(None,None,"job.id = {}".format(job_id),[],is_admin=True)
+            if job_data:
+                job_data = job_data[0]
+                # send a special email to the user to inform them of the assignment.
+                manager_rec = User(g.db).get(session.get('user_id',0))
+                user_rec = User(g.db).get(user_id)
+                subject = "[SABA] {} {} has cancelled your assignment".format(manager_rec.first_name,manager_rec.last_name)
+                send_signup_email(job_data,user_rec,'email/inform_user_of_cancellation.html',mod,manager=manager_rec,subject=subject,cancellation=True)
+
             return assignment_manager(job_id)
+            
+        return "failure: User_Job record could not be found"
             
     return "failure: Invalid User or Job id"
 
