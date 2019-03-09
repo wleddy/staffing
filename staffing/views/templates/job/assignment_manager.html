@@ -1,17 +1,43 @@
+<style>
+/* width */
+::-webkit-scrollbar {
+  width: 10px;
+}
+
+/* Track */
+::-webkit-scrollbar-track {
+  background: #f1f1f1; 
+}
+ 
+/* Handle */
+::-webkit-scrollbar-thumb {
+  background: #888; 
+}
+
+/* Handle on hover */
+::-webkit-scrollbar-thumb:hover {
+  background: #555; 
+}
+</style>
 
 <div id="assignment_manager_layout">
     <div id="assignment_head">
-        <h4>{{ job.event_title }}</h4>
-        <h4>{{ job.job_title }} <span class="w3-small">{{ job.start_date | short_abbr_date_string }} {{ job.start_date | local_time_string | lower }} - {{ job.end_date | local_time_string | lower }}</span></h4>
+        <h3 class="w3-primary-color" style="padding-left:6pt;">{{ job.event_title }}</h3>
+        <h4>{{ job.job_title }}&nbsp;&nbsp;&mdash;&nbsp;&nbsp;{{ job.start_date | short_abbr_date_string }}, {{ job.start_date | local_time_string | lower }} - {{ job.end_date | local_time_string | lower }}</h4>
     </div>
 
-    <div id="assignment_attendee_table">
-    	<table class="datatable w3-table w3-striped w3-hoverable">
+    <div id="assignment_attendee_table" style="height:120pt;max-heignt:120pt;overflow-y:scroll;">
+    	<table class="datatable w3-table w3-striped w3-hoverable" >
+            <tr class="w3-secondary-color">
+            	<th>Assigned</th>
+                <th>Del.</th>
+            </tr>
+            
     	{%if assigned_users %}
     		{% for user in assigned_users %}
     	    <tr>
     			<td>{{ user.first_name }} {{ user.last_name }}</td>
-                <td><a onclick="confirm('Are You Sure?');" class="w3-red-text w3-xlarge">X</a></td>
+                <td><a href="javascript:void(0)" style="text-decoration:none;" onclick="if (confirm('Are You Sure?')){editFromList('{{url_for('job.assignment_manager_delete')}}{{ job.job_id }}/{{ user.id }}')}else{return false;}" class="w3-text-red w3-xlarge">X</a></td>
     		</tr>
     		{% endfor %}
             {% else %}
@@ -22,40 +48,70 @@
     	  </table>
     </div>
 
-    <div id="assignment_user_search">
-        <p><input type="text" name="user_name" value="" class="w3-input" /></p>
-        <div id="search_results" class="w3-border" style="width:80%;min-height:80pt;z-index:10000;">
-            <p>Some user...</p>
-        </div>
-    </div>
 
     <div id="assignment_details">
         <form id="assignmentModalForm"  action="" method="POST">
-            <input type="hidden" name="id" value="{{job.id}}">
+            <input type="hidden" name="id" value="{{job.job_id}}">
             <input id="assignment_user_id" type="hidden" name="assignment_user_id" value="0">
-            <p>
-                <a class="w3-button w3-primary-color w3-round-medium w3-xlarge" onclick="signup_count('#signup-count',-1,{{signup.positions}})" style="padding:6pt;width:30pt;" title="Decrease Shifts">&ndash;</a>
-                <input class="w3-xlarge" id="signup-count" type="num" name='positions' value="{{signup.positions | default(0,True)}}" readonly style="padding:6pt;width:30pt;display:block-inline;text-align:center"/>
-                <a class="w3-button w3-primary-color w3-round-medium w3-xlarge"  onclick="signup_count('#signup-count',1,{{job.max_positions - filled_positions + signup.positions}})" style="padding:6pt;width:30pt;" title="Increase Shifts">+</a>
-            </p>
-            <p style="text-align:left">
-                Comment:<br>
-                <textarea class="w3-small" rows="4" style="width:100%" name="attendance_comment" 
-                placeholder="If signing up for more than one person, you can tell us who it is here... or anything else."
-                >{{ signup.attendance_comment | default("", True) }}</textarea>
-            </p>
-        	<p>
-        		<input class="w3-button w3-primary-color w3-round-medium " type="button" 
+            <div class="w3-row">
+                <div class="w3-col w3-half">
+                <div id="assignment_user_search">
+                    <p>Find User:</p>
+                    <p>
+                        <input id="search_input" type="text" name="user_name" value="" class="w3-input w3-border" placeholder="Type name" 
+                        onkeyup="if (this.value.length > 0) {$('#search_results').show();table_search('search_input','skilled_users',1)} else {$('#search_results').hide();reset_table_search('skilled_users');}"
+                        onfocus="$('#search_results').show();" 
+                        />
+                    </p>
+                    <div id="search_results" class="w3-border" 
+                        style="z-index:10000;position:fixed;overflow-y: scroll;background-color:white;display:none">
+                        	<table id="skilled_users" class="datatable w3-table w3-striped w3-hoverable" >
+                        	{%if skilled_users %}
+                        		{% for user in skilled_users %}
+                        	    <tr onclick="$('#assignment_user_id').val({{user.id}});$('#search_input').val('{{ user.first_name }} {{ user.last_name }}');$('#search_results').hide();">
+                                    <td style="width:1pt;"><span style="display:none;">{{ user.id }}</span></td>
+                        			<td>{{ user.first_name }} {{ user.last_name }}</td>
+                        		</tr>
+                        		{% endfor %}
+                                {% else %}
+                                <tr>
+                        			<td>No Users with the required skills</td>
+                                </tr>
+                                {% endif %}
+                        	  </table>
+                    </div>
+                    </div>
+                    <p style="text-align:left">
+                        Comment:<br>
+                        <textarea class="w3-small" rows="4" style="width:100%" name="attendance_comment" 
+                        placeholder=""
+                        >{{ signup.attendance_comment | default("", True) }}</textarea>
+                    </p>
+                </div>
+                <p class="w3-col w3-half w3-center">
+                    {% set open_positions = job.max_positions - filled_positions + signup.positions %}
+                    {% if open_positions %}
+                        {{ open_positions }} positions open<br>
+                        <a class="w3-button w3-primary-color w3-round-medium w3-xlarge" onclick="signup_count('#signup-count',-1,{{ open_positions }})" style="padding:6pt;width:30pt;" title="Decrease Shifts">&ndash;</a>
+                        <input class="w3-xlarge" id="signup-count" type="num" id="positions" name='positions' value="1" readonly style="padding:6pt;width:30pt;display:block-inline;text-align:center"/>
+                        <a class="w3-button w3-primary-color w3-round-medium w3-xlarge"  onclick="signup_count('#signup-count',1,{{ open_positions | default(0,True)}})" style="padding:6pt;width:30pt;" title="Increase Shifts">+</a>
+                    {% else %}
+                        <span class="w3-button w3-primary-color w3-round-medium" >Positions Full</span><br>
+                        <script>$('#add_button').attr('disabled','disabled')</script>
+                    {% endif %}
+                </p>
+            </div>
+        	<p class="w3-right">
+        		<input class="w3-button w3-primary-color w3-round-medium" type="button" 
                     onclick="submitModalForm('assignmentModalForm',
                     '{{url_for('job.assignment_manager')}}',
                     'assignment_manager_layout',
-                    '{{url_for('job.assignment_manager_success')}}{{job.id}}'
+                    '{{url_for('job.assignment_manager')}}{{job.job_id}}'
                     )" 
-                    name="Add" value="Add" />
+                    name="Add" value="Add" id="add_button"/>
+                    &nbsp;&nbsp;
+                    <a class="w3-button w3-primary-color w3-round-medium " onclick="cancelModalForm()">Done</a>
         	</p>
-            <p>
-        		<a class="w3-button w3-primary-color w3-round-medium " onclick="cancelModalForm()">Done</a>
-            </p>
         </form>
     </div>
 </div>

@@ -3,7 +3,7 @@ from flask import request, session, g, redirect, url_for, abort, \
 from shotglass2.users.admin import login_required, table_access_required
 from shotglass2.users.models import Role, User
 from shotglass2.takeabeltof.utils import render_markdown_for, printException, cleanRecordID
-from shotglass2.takeabeltof.date_utils import date_to_string, getDatetimeFromString
+from shotglass2.takeabeltof.date_utils import date_to_string, getDatetimeFromString, local_datetime_now
 from shotglass2.shotglass import get_site_config
 from staffing.models import Event, Location, Job, UserJob
 from staffing.utils import pack_list_to_string, un_pack_string
@@ -282,18 +282,27 @@ def assignment_manager(job_id=0):
 
     #if Post, create assignment
     if request.form:
-        assigned_user_id = cleanRecordID(request.form.get('assigned_user_id',None))
-        signup = UserJob(g.db).select_one(where='user_id = {} and job_id = {}'.format(assigned_user_id,job_id))
+        assignment_user_id = cleanRecordID(request.form.get('assignment_user_id',None))
+        if assignment_user_id < 1:
+            return "failure: You need to select a user first."
+            
+        if cleanRecordID(request.form.get('positions')) < 1:
+            return "failure: The number of positions must be at least 1."
+            
+        signup = UserJob(g.db).select_one(where='user_id = {} and job_id = {}'.format(assignment_user_id,job_id))
         if not signup:
             signup = UserJob(g.db).new()
-            signup.user_id = assigned_user_id
+            signup.user_id = assignment_user_id
             signup.job_id = job_id
         
         UserJob(g.db).update(signup,request.form)
         signup.modified = local_datetime_now()
         UserJob(g.db).save(signup)
         g.db.commit()
-    else:
+        # The form is going to be redisplayed so clear the signup record
+        signup = None
+
+    if not signup:
         signup = UserJob(g.db).new()
         signup.job_id = job_id
         signup.positions=0
@@ -308,10 +317,19 @@ def assignment_manager(job_id=0):
         role_list = un_pack_string(job_data.skill_list) # convert to comma separated string
         role_list = role_list.split(',') #convert it to a list
             
-    # Get all the users who can do this job
-    skilled_users = User(g.db).get_with_roles(role_list)
     #get all users currently assigned
     assigned_users = UserJob(g.db).get_assigned_users(job_id)
+    # Get all the users who can do this job
+    skilled_users = User(g.db).get_with_roles(role_list)
+    
+    #remove users already assigned from skilled users
+    if assigned_users:
+        for au in assigned_users:
+            if skilled_users:
+                for i in range(len(skilled_users)):
+                    if skilled_users[i].id == au.id:
+                        del skilled_users[i]
+                        break
 
     return render_template('assignment_manager.html',
             job=job_data,
@@ -322,13 +340,25 @@ def assignment_manager(job_id=0):
             )
 
     
-@mod.route('/assignment_manager_success/<int:job_id>/',methods=['GET',])
-@mod.route('/assignment_manager_success/<int:job_id>',methods=['GET',])
-@mod.route('/assignment_manager_success/',methods=['GET','POST',])
-@mod.route('/assignment_manager_success',methods=['GET','POST',])
+@mod.route('/assignment_manager_delete/<int:job_id>/<int:user_id>',methods=['GET',])
+@mod.route('/assignment_manager_delete/<int:job_id>/<int:user_id>/',methods=['GET',])
+@mod.route('/assignment_manager_delete/',methods=['GET',])
 @table_access_required(Job)
-def assignment_manager_success(job_id=0):
-    return "is this really needed?"
+def assignment_manager_delete(job_id=0,user_id=0):
+    """Delete a job assignment"""
+    setExits()
+    #import pdb;pdb.set_trace()
+    job_id = cleanRecordID(job_id)
+    user_id = cleanRecordID(user_id)
+    if job_id > 0 and user_id > 0:
+        signup=UserJob(g.db).select_one(where='job_id = {} and user_id = {}'.format(job_id,user_id))
+        if signup:
+            UserJob(g.db).delete(signup.id)
+            g.db.commit()
+    
+            return assignment_manager(job_id)
+            
+    return "failure: Invalid User or Job id"
 
 
 def valid_input(rec):

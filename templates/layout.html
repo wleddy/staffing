@@ -19,41 +19,9 @@
 	
 	<script src="{{ url_for('static', filename='jquery.1.10.1.js') }}"></script>
 	<script src="{{ url_for('static', filename='common.js') }}"></script>
+	<script src="{{ url_for('static', filename='staffing.js') }}"></script>
 
     <script>
-        // for navigation buttons
-    function w3_open(id_name) {
-        document.getElementById(id_name).style.display = "block";
-    }
-    function w3_close(id_name) {
-        document.getElementById(id_name).style.display = "none";
-    }
-    function w3_hide(id_name) {
-        document.getElementById(id_name).style.visibility = "hidden";
-    }
-    function w3_show(id_name) {
-        document.getElementById(id_name).style.visibility = "visible";
-    }
-    function primary_nav_toggle() {
-        // this is envocked from the Hamburger
-        var nav = $("#primary-nav");
-        var placeholder = $('#nav-placeholder');
-        if (nav.hasClass('w3-hide-small')){
-            nav.removeClass('w3-hide-small').removeClass('w3-hide-medium');
-        } else {
-            nav.addClass('w3-hide-small').addClass('w3-hide-medium');
-        }
-        set_menu_style();
-    }
-    function set_menu_style(){
-        var nav = $("#primary-nav");
-        var w = nav.width()
-        if ( w < 993){
-            nav.removeClass('w3-bar').addClass('w3-bar-block').css({'max-height':'80vh',overflow:'scroll',position:'absolute',right:0,top:0});
-        } else {
-            nav.addClass('w3-bar').removeClass('w3-bar-block').css({position:'static'}).show()
-        }
-    }
     $(window).resize(
         set_menu_style()
     );

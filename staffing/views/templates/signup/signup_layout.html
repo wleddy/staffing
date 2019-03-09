@@ -9,17 +9,6 @@
 {% endblock dialog %}
 
 {% block head %}
-    <script>
-        function signup_count(which,howmany,maxcnt){
-            var which = $(which)
-            var cnt = parseInt(which.val())
-            cnt = cnt + howmany;
-            if(cnt >= 0 && cnt <= maxcnt ){
-                which.val(cnt.toString());
-            }
-        }
-    </script>
-    
     <style>
         .event-contain{margin:6pt 0 0 0;}
         @media (min-width:993px){.event-contain{margin:10pt 16.6666% 0 16.6666%;}}
