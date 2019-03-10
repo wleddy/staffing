@@ -22,9 +22,8 @@
 	<script src="{{ url_for('static', filename='staffing.js') }}"></script>
 
     <script>
-    $(window).resize(
-        set_menu_style()
-    );
+        $(window).resize(function(){set_menu_style();alert("resized");});
+        $(window).orientationchange(function(){set_menu_style();alert("reoriented");});
     </script>
 
     {% block head%}{% endblock %}
