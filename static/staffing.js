@@ -68,13 +68,14 @@ function toggle_table_search(input_field_id,table_id){
     var input = document.getElementById(input_field_id);
     var table = document.getElementById(table_id);
     
-    if (table.style.visibility != 'hidden'){ table.style.visibiltiy = 'hidden';}
+    if (table.style.display != 'none' && table.style.display != ''){ 
+        table.style.display = 'none';
+        table.style.position = 'static';
+    }
     else
     {
-        table.style.visibiltiy = 'visible';
-        var input_rect = input.getBoundingClientRect();
-        alert(input_rect);
-        $('#table_id').css({'top':input_rect.bottom,'left':input_rect.left}).show();
+        table.style.display = 'block';
+        table.style.position = 'absolute'
     }
 }
 
