@@ -37,6 +37,7 @@ function primary_nav_toggle() {
 }
 
 function set_menu_style(){
+    // this is called when scree nize changes
     var nav = $("#primary-nav");
     var w = document.body.offsetWidth
     if ( w < 993){
