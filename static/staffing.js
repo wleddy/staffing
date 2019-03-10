@@ -53,10 +53,28 @@ function set_menu_style(){
     }
 }
 
+function toggle_table_search(input_field_id,table_id){
+    /*
+    show the search table and move it into position below the input field
+    */
+    var input = document.getElementById(input_field_id);
+    var table = document.getElementById(table_id);
+    
+    if (table.style.visibility != 'hidden'){ table.style.visibiltiy = 'hidden';}
+    else
+    {
+        table.style.visibiltiy = 'visible';
+        var input_rect = input.getBoundingClientRect();
+        alert(input_rect);
+        $('#table_id').css({'top':input_rect.bottom,'left':input_rect.left}).show();
+    }
+}
+
+
 function reset_table_search(table_id){
     // ensure that all rows of the search table are visible
-    table = document.getElementById(table_id);
-    tr = table.getElementsByTagName("tr");
+    var table = document.getElementById(table_id);
+    var tr = table.getElementsByTagName("tr");
     for (i = 0; i < tr.length; i++) {
         tr[i].style.display = "";
     }
