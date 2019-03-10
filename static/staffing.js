@@ -28,7 +28,6 @@ function signup_count(which,howmany,maxcnt){
 function primary_nav_toggle() {
     // this is envocked from the Hamburger
     var nav = $("#primary-nav");
-    var placeholder = $('#nav-placeholder');
     if (nav.hasClass('w3-hide-small')){
         nav.removeClass('w3-hide-small').removeClass('w3-hide-medium');
     } else {
@@ -36,13 +35,16 @@ function primary_nav_toggle() {
     }
     set_menu_style();
 }
+
 function set_menu_style(){
     var nav = $("#primary-nav");
-    var w = nav.width()
+    var w = document.body.offsetWidth
     if ( w < 993){
+        // display the side menu block
         nav.removeClass('w3-bar').addClass('w3-bar-block').css({'max-height':'80vh',overflow:'scroll',position:'absolute',right:0,top:0});
     } else {
-        nav.addClass('w3-bar').removeClass('w3-bar-block').css({position:'static'}).show()
+        // display horizontal menu bar
+        nav.addClass('w3-bar').removeClass('w3-bar-block').css({position:'static'}).show();
     }
 }
 
