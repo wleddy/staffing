@@ -25,6 +25,14 @@ function signup_count(which,howmany,maxcnt){
     }
 }
 
+function show_hamburger(){
+    $('#hamburger').show();
+}
+
+function hide_hamburger(){
+    $('#hamburger').hide();
+}
+
 function primary_nav_toggle() {
     // this is envocked from the Hamburger
     var nav = $("#primary-nav");
