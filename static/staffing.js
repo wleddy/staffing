@@ -43,9 +43,13 @@ function set_menu_style(){
     if ( w < 993){
         // display the side menu block
         nav.removeClass('w3-bar').addClass('w3-bar-block').css({'min-height':'100vh',overflow:'auto',position:'absolute',right:0,top:0});
+        // dd content pushes lower items down when expanded
+        $('.w3-dropdown-content').css({'position':'relative'})
     } else {
         // display horizontal menu bar
         nav.addClass('w3-bar').removeClass('w3-bar-block').css({position:'static','min-height':0,}).show();
+        // dd content overlays
+        $('.w3-dropdown-content').css({'position':'absolute'})
     }
 }
 
