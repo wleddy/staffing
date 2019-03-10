@@ -280,19 +280,6 @@ def assignment_manager(job_id=0):
     job_id = cleanRecordID(job_id)
     if job_id < 1:
         return "failure: That is not a valid job id"
-
-    #Get the job to display
-    job_data = get_job_rows(None,None,"job.id = {}".format(job_id),[],is_admin=True)
-    role_list=[0] #will return none
-    if job_data:
-        job_data = job_data[0]
-        filled_positions = job_data.job_filled_positions
-        # get skills for this job
-        role_list = un_pack_string(job_data.skill_list) # convert to comma separated string
-        role_list = role_list.split(',') #convert it to a list
-        
-    # Get all the users who can do this job
-    skilled_users = User(g.db).get_with_roles(role_list)
         
     #if Post, create assignment
     if request.form:
@@ -317,6 +304,10 @@ def assignment_manager(job_id=0):
         # send a special email to the user to inform them of the assignment.
         manager_rec = User(g.db).get(session.get('user_id',0))
         user_rec = User(g.db).get(assignment_user_id)
+        # need a fresh copy of this
+        job_data = get_job_rows(None,None,"job.id = {}".format(job_id),[],is_admin=True)
+        if job_data:
+            job_data = job_data[0]
         subject = "[SABA] {} {} has given you an assignment".format(manager_rec.first_name,manager_rec.last_name)
         send_signup_email(job_data,user_rec,'email/inform_user_of_assignment.html',mod,manager=manager_rec,subject=subject)
         
@@ -327,6 +318,19 @@ def assignment_manager(job_id=0):
         signup = UserJob(g.db).new()
         signup.job_id = job_id
         signup.positions=0
+        
+    #Get the job to display
+    job_data = get_job_rows(None,None,"job.id = {}".format(job_id),[],is_admin=True)
+    role_list=[0] #will return none
+    if job_data:
+        job_data = job_data[0]
+        filled_positions = job_data.job_filled_positions
+        # get skills for this job
+        role_list = un_pack_string(job_data.skill_list) # convert to comma separated string
+        role_list = role_list.split(',') #convert it to a list
+    
+    # Get all the users who can do this job
+    skilled_users = User(g.db).get_with_roles(role_list)
         
     #get all users currently assigned
     assigned_users = UserJob(g.db).get_assigned_users(job_id)
