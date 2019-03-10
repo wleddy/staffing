@@ -41,10 +41,10 @@ function set_menu_style(){
     var w = document.body.offsetWidth
     if ( w < 993){
         // display the side menu block
-        nav.removeClass('w3-bar').addClass('w3-bar-block').css({'max-height':'80vh',overflow:'scroll',position:'absolute',right:0,top:0});
+        nav.removeClass('w3-bar').addClass('w3-bar-block').css({'min-height':'100vh',overflow:'auto',position:'absolute',right:0,top:0});
     } else {
         // display horizontal menu bar
-        nav.addClass('w3-bar').removeClass('w3-bar-block').css({position:'static'}).show();
+        nav.addClass('w3-bar').removeClass('w3-bar-block').css({position:'static','min-height':0,}).show();
     }
 }
 
