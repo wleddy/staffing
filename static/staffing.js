@@ -61,11 +61,10 @@ function set_menu_style(){
     }
 }
 
-function toggle_table_search(input_field_id,table_id){
+function toggle_table_search(table_id){
     /*
     show the search table and move it into position below the input field
     */
-    var input = document.getElementById(input_field_id);
     var table = document.getElementById(table_id);
     
     if (table.style.display != 'none' && table.style.display != ''){ 
