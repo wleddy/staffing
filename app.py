@@ -159,6 +159,19 @@ app.register_blueprint(job.mod,subdomain=subdomain)
 from staffing.views import event_type
 app.register_blueprint(event_type.mod,subdomain=subdomain)
 
+if app.config['TESTING']:
+    ## Setup routes that pytest will us.
+    ##### 
+    # The test server must be restarted before attempting to test
+    #####
+    
+    ## Setup the routes for users
+    shotglass.register_users(app)
+
+    # setup www.routes...
+    shotglass.register_www(app)
+
+
 ## Setup the routes for users
 shotglass.register_users(app,subdomain=subdomain)
 
