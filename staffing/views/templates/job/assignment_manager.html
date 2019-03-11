@@ -90,15 +90,13 @@
                 </div>
                 <p class="w3-col w3-half w3-center">
                     {% set open_positions = job.max_positions - filled_positions + signup.positions %}
-                    {% if open_positions %}
+                    {% if open_positions >= 0 %}
                         {{ open_positions }} positions open<br>
-                        <a class="w3-button w3-primary-color w3-round-medium w3-xlarge" onclick="signup_count('#signup-count',-1,{{ open_positions }})" style="padding:6pt;width:30pt;" title="Decrease Shifts">&ndash;</a>
-                        <input class="w3-xlarge" id="signup-count" type="num" id="positions" name='positions' value="1" readonly style="padding:6pt;width:30pt;display:block-inline;text-align:center"/>
-                        <a class="w3-button w3-primary-color w3-round-medium w3-xlarge"  onclick="signup_count('#signup-count',1,{{ open_positions | default(0,True)}})" style="padding:6pt;width:30pt;" title="Increase Shifts">+</a>
                     {% else %}
-                        <span class="w3-button w3-primary-color w3-round-medium" >Positions Full</span><br>
-                        <script>$('#add_button').attr('disabled','disabled')</script>
+                        {{ filled_positions }} positions filled. (requested max: {{ job.max_positions }})<br>
                     {% endif %}
+                    <strong>Assignment: </strong>
+                    <input class="w3-xlarge" id="signup-count" type="num" id="positions" name='positions' value="1" style="padding:6pt;width:40pt;display:block-inline;text-align:center"/>
                 </p>
             </div>
         	<p class="w3-right">

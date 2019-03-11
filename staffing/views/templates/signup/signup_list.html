@@ -50,6 +50,7 @@
                         {% elif job.event_loc_lat and job.event_loc_lng %}<a href="#">Map...</a>{% endif %}
                     </p>
                     {% set width_pct = job.event_filled_positions | default(0,True) / job.event_max_positions * 74 %}
+                    {% if width_pct > 100 %}{% set width_pct = 100 %}{% endif %}
                     {% if width_pct > 25.0 %}
                     <p>Filled: 
                         <a class="w3-button w3-primary-color w3-round-medium filled-bar" style="width:{{ width_pct }}%;"
