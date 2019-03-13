@@ -260,7 +260,7 @@ def roster():
 
     jobs = get_job_rows(start_date,end_date,"",user_skills,is_admin)
                 
-    return render_template('roster.html',jobs=jobs,is_admin=is_admin)
+    return render_template('signup_list.html',jobs=jobs,is_admin=is_admin,roster=True)
     
     
 @mod.route('/login',methods=['GET','POST',])

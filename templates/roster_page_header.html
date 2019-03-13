@@ -1,0 +1,44 @@
+{% from "_form_helpers.html" import select_field  %}
+
+<div class="w3-panel w3-card-2 w3-secondary-color">
+    <div class="w3-row">
+        <p class="w3-col l11 m11 s12" ><strong>Event Roster</strong></p>
+    </div>
+        <div class="w3-col l1 m1 w3-hide-small ">
+            <p style=""><img src="{{url_for('static',filename='images/bicycle.png')}}" /></p>
+        </div>
+        <form action="" method="post" >
+            <p class="w3-col l1 m1 s1">
+                Search:  
+            </p>
+            <p class="w3-col l2 m2" style="margin-right:10pt">
+                {{ select_field(display_start_days,"Start",extras="") }}
+                    <option {% if display_start_days == "0" %}selected{% endif %}   value="0">Today</option>
+                    <option {% if display_start_days == "30" %}selected{% endif %}  value="30">Next Month</option>
+                    <option {% if display_start_days == "-30" %}selected{% endif %} value="-30">Last Month</option>
+                </select>
+            </p>
+            <p class="w3-col l2 m2" style="margin-right:10pt">
+                {{ select_field(display_end_days,"End",extras="") }}
+                    <option {% if display_end_days == "0" %}selected{% endif %}  value="0">Today</option>
+                    <option {% if display_end_days == "7" %}selected{% endif %}  value="7">Next Week</option>
+                    <option {% if display_end_days == "-7" %}selected{% endif %} value="-7">Next Month</option>
+                </select>
+            </p>
+            <p class="w3-col l2 m2"  style="margin-right:10pt">
+                Type: {{ select_field(display_event_type_id,label="",extras="") }}
+                    <option value="all">All</option>
+                {% if event_types %}
+                    {% for event_type in event_types %}
+                    <option value="{{ event_type.id }}" {% if event_type.id == display_event_type_id | default(-1,True) %}selected{%endif%}>{{ event_type.type }}</option>
+                    {% endfor %}
+                {% endif %}
+                </select>
+            </p>
+            <p class="w3-col l2 m2">
+                <input class=" w3-button w3-primary-color w3-round-large" type="submit" value="Search">
+            </p>
+        </form>
+    </div>
+</div>
+

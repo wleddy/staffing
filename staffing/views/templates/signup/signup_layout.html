@@ -20,5 +20,9 @@
 {% endblock head %}
 
 {% block page_header %}
-{% include "signup_page_header.html"%}
+    {% if roster %}
+        {% include "roster_page_header.html" %}
+    {% else %}
+        {% include "signup_page_header.html"%}
+    {% endif %}
 {% endblock page_header %}

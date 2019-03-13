@@ -2,9 +2,19 @@
 
 {% macro back_to_list() %}
     {% if g._more_info_event_id %}
-    <div class="event-contain">        
+        {% if roster %}
+         <div class="event-contain">        
+            <p>
+                <a href="{{ url_for('signup.roster')}}" class="w3-button w3-primary-color w3-round-medium w3-medium">&larr; Roster</a>
+                &nbsp;&nbsp;
+                <a href="{{ url_for('signup.roster')}}" class="w3-button w3-primary-color w3-round-medium w3-medium">Print</a>
+            </p>
+        </div>
+        {% else %}
+        <div class="event-contain">        
             <p><a href="{{ url_for('signup.display')}}" class="w3-button w3-primary-color w3-round-medium w3-medium">&larr; All Signups</a></p>
-    </div>
+        </div>
+        {% endif %}
     {% endif %}
 {% endmacro %}
 
@@ -68,7 +78,12 @@
                         To see details or signup you must login...<br>
                         <a class="w3-button w3-primary-color w3-round-medium w3-medium" href="#" onclick="editFromList('{{ url_for('signup.login')}}1')">Login / Register</a>
                     {% else %}
+                    {% if roster %}
                         <a class="w3-button w3-primary-color w3-round-medium w3-medium" href="{{ url_for('signup.more_info')}}{{job.event_id}}/" >More Info...</a></p>
+                    {% else %}
+                        <a class="w3-button w3-primary-color w3-round-medium w3-medium" href="{{ url_for('signup.more_info')}}{{job.event_id}}/" >More Info...</a></p>
+                    {% endif %}
+                    
                     {% endif %}
                     {% endif %}
                 </div>
@@ -94,9 +109,13 @@
                     </div>
                 {% endif %} {# show date? #}
             
-                 <div class="job-date-container-{{ job.event_id }}-{{job.start_date[:10]}}" {%if not job.user_event_positions %}style="display:none;"{% endif %}>
-                   <div id="job-body{{job.job_id}}">
-                        {% include 'signup_job.html' %}
+                <div class="job-date-container-{{ job.event_id }}-{{job.start_date[:10]}}" {%if not job.user_event_positions %}style="display:none;"{% endif %}>
+                    <div id="job-body{{job.job_id}}">
+                        {% if roster %}
+                            {% include "roster_job.html" %}
+                        {% else %}
+                            {% include 'signup_job.html' %}
+                        {% endif %}
                     </div>
                 </div>
             {% endif %} {#  g._more_info_event_id #}
