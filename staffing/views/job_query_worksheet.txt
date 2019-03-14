@@ -22,7 +22,7 @@ null as participant_list, -- just a place holder
 from job
 join event on event.id = job.event_id
 left join location on location.id = event.location_id
-where date(job.start_date) >= date('{}')
+where date(job.start_date,'localtime') >= date('{}','localtime')
 order by active_first_date, job.start_date
 
 
@@ -59,7 +59,7 @@ from job
 join event on event.id = job.event_id
 left join location as event_location onevent_location.id = event.location_id
 left join location as job_location on job_location.id = job.location_id
-where date(job.start_date) >= date('{}')
+where date(job.start_date,'localtime') >= date('{}','localtime')
 order by active_first_date, job.start_date
 
 

@@ -490,7 +490,7 @@ def get_job_rows(start_date=None,end_date=None,where='',user_skills=[],is_admin=
     elif not end_date:
         end_date = '2051-02-08'
         
-    where_date_range = " and date(job.start_date) >= date('{}') and date(job.end_date) <= date('{}') ".format(start_date,end_date)
+    where_date_range = " and date(job.start_date,'localtime') >= date('{}','localtime') and date(job.end_date,'localtime') <= date('{}','localtime') ".format(start_date,end_date)
         
     
     where_skills = ''
