@@ -5,7 +5,7 @@
         class="w3-button w3-bar-item w3-hide-large w3-text-grey ">Close &times;</a>
               <a class="w3-bar-item w3-button w3-border w3-secondary-color w3-primary-hover-color" href="/">Signup Home</a>
               <!-- <a class="w3-bar-item w3-button w3-border w3-secondary-color w3-primary-hover-color" href="{{ url_for('signup.about')}}">About</a> -->
-              <a class="w3-bar-item w3-button w3-border w3-secondary-color w3-primary-hover-color" href="{{ url_for('signup.contact')}}">Contact Us</a>
+              <a class="w3-bar-item w3-button w3-border w3-secondary-color w3-primary-hover-color" href="{{ url_for('www.contact')}}">Contact Us</a>
               <!-- <a class="w3-bar-item w3-button w3-border w3-secondary-color w3-primary-hover-color" href="{{ url_for('signup.help')}}">Help</a> -->
               {% if not g.user %}
                   <a class="w3-bar-item w3-button w3-border w3-secondary-color w3-primary-hover-color" href="#" onclick="editFromList('{{ url_for('signup.login')}}1')">Login / Register</a>

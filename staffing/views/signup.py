@@ -20,23 +20,23 @@ def setExits():
     g.listURL = url_for('.display')
     g.title = 'Volunteer Signup'
     
-@mod.route('/home/', methods=['GET','POST',])
-def home():
-    """So we can use www routes in this blueprint"""
-    return redirect(url_for('.display'))
-    
+# @mod.route('/home/', methods=['GET','POST',])
+# def home():
+#     """So we can use www routes in this blueprint"""
+#     return redirect(url_for('.display'))
+#
 @mod.route('/about/')
 @mod.route('/about')
 def about():
     """So we can use www routes here"""
     g.title = "About"
     return render_template('about_signup.html')
-
-@mod.route('/contact/', methods=['GET','POST',])
-@mod.route('/contact', methods=['GET','POST',])
-def contact():
-    """Delecate the actual contact function to wwww"""
-    return home_contact()
+#
+# @mod.route('/contact/', methods=['GET','POST',])
+# @mod.route('/contact', methods=['GET','POST',])
+# def contact():
+#     """Delecate the actual contact function to wwww"""
+#     return home_contact()
 
 @mod.route('/help/')
 @mod.route('/help')
@@ -490,7 +490,7 @@ def get_job_rows(start_date=None,end_date=None,where='',user_skills=[],is_admin=
     elif not end_date:
         end_date = '2051-02-08'
         
-    where_date_range = " and date(job.start_date,'localtime') >= date('{}','localtime') and date(job.end_date,'localtime') <= date('{}','localtime') ".format(start_date,end_date)
+    where_date_range = " and date(job.start_date) >= date('{}') and date(job.end_date) <= date('{}') ".format(start_date,end_date)
         
     
     where_skills = ''
