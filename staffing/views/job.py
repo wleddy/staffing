@@ -233,7 +233,7 @@ def manage_job_set(id=None):
             flash("Got an error while processing the date")
             
     if request.form and (dup_date or action == 'delete'):
-        recs = job.select(where="event_id = {} and date(start_date) = date('{}')".format(rec.event_id,rec.start_date))
+        recs = job.select(where="event_id = {} and date(start_date,'localtime') = date('{}','localtime')".format(rec.event_id,rec.start_date))
         if recs:
             for rec in recs:
                 if action == 'delete':
