@@ -137,19 +137,20 @@ def server_error(error):
     return shotglass.server_error(error)
 
 
+
 #import pdb;pdb.set_trace()
+# Creates the routes for signup subdomain
 subdomain = app.config.get('SIGNUP_SUBDOMAIN','signup')
 
 from staffing.views import signup
 app.register_blueprint(signup.mod,subdomain=subdomain)
-# setup www.routes for signup subdomain
-shotglass.register_www(app,subdomain=subdomain)
 
 #Register the static route
 # seting the subdomain this way works in this case, but may not be the best solution
 app.add_url_rule('/static/<path:filename>','static',shotglass.static,subdomain=subdomain)
 
 
+# Create the routes for the admin Subdomain
 subdomain = app.config.get('ADMIN_SUBDOMAIN','admin')
 
 from staffing.views import event
@@ -161,24 +162,25 @@ app.register_blueprint(job.mod,subdomain=subdomain)
 from staffing.views import event_type
 app.register_blueprint(event_type.mod,subdomain=subdomain)
 
-if app.config['TESTING']:
-    ## Setup routes that pytest will us.
-    ##### 
-    # The test server must be restarted before attempting to test
-    #####
-    
-    ## Setup the routes for users
-    shotglass.register_users(app)
-
-    # setup www.routes...
-    shotglass.register_www(app)
-
-
 ## Setup the routes for users
 shotglass.register_users(app,subdomain=subdomain)
 
 # setup www.routes...
 shotglass.register_www(app,subdomain=subdomain)
+
+if app.config['TESTING']:
+    ## Setup routes that pytest will us.
+    ##### 
+    # The test server must be restarted before attempting to test
+    #####
+    ## Setup the routes for users
+    pass
+    
+shotglass.register_users(app)
+# setup www.routes...
+shotglass.register_www(app)
+
+
 
 @app.route('/')
 def default_home():

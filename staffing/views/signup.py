@@ -20,23 +20,23 @@ def setExits():
     g.listURL = url_for('.display')
     g.title = 'Volunteer Signup'
     
-# @mod.route('/home/', methods=['GET','POST',])
-# def home():
-#     """So we can use www routes in this blueprint"""
-#     return redirect(url_for('.display'))
-#
+@mod.route('/home/', methods=['GET','POST',])
+def home():
+    """So we can use www routes in this blueprint"""
+    return redirect(url_for('.display'))
+    
 @mod.route('/about/')
 @mod.route('/about')
 def about():
     """So we can use www routes here"""
     g.title = "About"
     return render_template('about_signup.html')
-#
-# @mod.route('/contact/', methods=['GET','POST',])
-# @mod.route('/contact', methods=['GET','POST',])
-# def contact():
-#     """Delecate the actual contact function to wwww"""
-#     return home_contact()
+
+@mod.route('/contact/', methods=['GET','POST',])
+@mod.route('/contact', methods=['GET','POST',])
+def contact():
+    """Delecate the actual contact function to wwww"""
+    return home_contact()
 
 @mod.route('/help/')
 @mod.route('/help')
