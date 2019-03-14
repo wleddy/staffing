@@ -60,7 +60,7 @@ class Job(SqliteTable):
     def __init__(self,db_connection):
         super().__init__(db_connection)
         self.table_name = 'job'
-        self.order_by_col = 'date(start_date), lower(title)'
+        self.order_by_col = 'start_date, lower(title)'
         self.defaults = {'max_positions':1,'skill_list':''}
         
     def create_table(self):
