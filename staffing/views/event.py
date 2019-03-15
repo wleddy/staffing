@@ -68,6 +68,12 @@ def edit(id=0):
     if request.form:
         event.update(rec,request.form)
         rec.location_id = cleanRecordID(request.form.get('location_id',-1))
+        # ensure that web address is absolute
+        if rec.client_website:
+            data_part = rec.client_website.partition("//")
+            if data_part[0][:4] != 'http':
+                rec.client_website = 'http://' + rec.client_website
+                
         if valid_input(rec):
             event.save(rec)
             g.db.commit()
