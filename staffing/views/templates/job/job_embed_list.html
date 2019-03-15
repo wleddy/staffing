@@ -9,24 +9,24 @@
 {% if event_date[0] != job.start_date[:10] %}
     <td colspan="2" class="w3-secondary-color">
         <p style="margin:0;"><strong>{{job.start_date | short_date_string }}</strong> &nbsp;&nbsp;&nbsp;
-            <a class="w3-button w3-primary-color w3-round-large" onclick="editFromList('{{ url_for('job.manage_job_set')}}{{ job.id }}')">Manage Jobs...</a></p>
+            <a class="w3-button w3-primary-color w3-round-large" onclick="editFromList('{{ url_for('job.manage_job_set')}}{{ job.job_id }}')">Manage Jobs...</a></p>
     </td>
 {% endif %}
-    <tr id="list-row-{{job.id}}">
+    <tr id="list-row-{{job.job_id}}">
         <td style="width:12pt;padding:0;">&nbsp;</td>
         <td>
             <div class="w3-row">
                 <p class="w3-col w3-half" >
-                    {{ job.title | truncate(35)}}<br>
-                    <span class="w3-small">{{ job.max_positions }} @ {{ job.start_date | local_time_string }} - {{ job.end_date | local_time_string }}</span>
+                    {{ job.job_title | truncate(35)}}<br>
+                    <span class="w3-small">{{ job.job_filled_positions }} of {{ job.max_positions }} @ {{ job.start_date | local_time_string }} - {{ job.end_date | local_time_string }}</span>
                 </p>
                <p class="w3-col w3-quarter">
-                    <a class="w3-button w3-primary-color w3-round-large" onclick="editFromList('{{ url_for('job.edit_job_from_list') }}{{job.id}}/');">
+                    <a class="w3-button w3-primary-color w3-round-large" onclick="editFromList('{{ url_for('job.edit_job_from_list') }}{{job.job_id}}/');">
                         Edit
                     </a>
                 </p>
                 <p class="w3-col w3-quarter" >
-                    <a class="w3-button w3-primary-color w3-round-large" onclick="editFromList('{{ url_for('job.assignment_manager')}}{{ job.id }}')">
+                    <a class="w3-button w3-primary-color w3-round-large" onclick="editFromList('{{ url_for('job.assignment_manager')}}{{ job.job_id }}')">
                         Assign
                     </a>
                 </p>

@@ -193,7 +193,9 @@ def get_job_list_for_event(id=0):
     #import pdb;pdb.set_trace()
     id = cleanRecordID(id)
     jobs = Job(g.db).select(where='event_id = {}'.format(id))
-    return render_template('job_embed_list.html',jobs=jobs,event_id=id)
+    job_data = get_job_rows(None,None,"job.event_id = {}".format(id),[],is_admin=True)
+    
+    return render_template('job_embed_list.html',jobs=job_data,event_id=id)
     
     
 @mod.route('/manage/<int:id>/',methods=['GET','POST',])
