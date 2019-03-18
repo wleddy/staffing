@@ -1,6 +1,6 @@
         <div id="job-head{{ job.job_id }}" class="w3-row w3-secondary-color job-contain job-date-contain" >
             <div class="w3-col l2 m2 w3-hide-small">&nbsp;</div>
-            <div class="w3-col l10 m10">
+            <div class="w3-col l10 m10 w3-topbar ">
             {% set participant_list = [] %}
             {% if job.participants[job.job_id] %}
             {% set participant_list = job.participants[job.job_id]['users']%}
@@ -23,7 +23,7 @@
             </div>
             <div class="w3-row ">
                 <div class="w3-col l2 m2 w3-hide-small">&nbsp;</div>
-                <div class="w3-col l6 m6 s4">
+                <div class="w3-col l6 m6 s6">
                 <p>
                     {{ job.job_description | render_markdown }}
                 </p>
@@ -56,7 +56,7 @@
                         </div>
                 </div>
                 </div>
-                <div class="w3-col l2 m2 s4">
+                <div class="w3-col l2 m2 s6">
                     <p style="text-align:center">
                         {% if job.job_filled_positions >= job.max_positions and session['user_id'] not in participant_list %}
                         <a class="w3-button w3-grey w3-round-medium w3-medium" >Full</a>
@@ -68,5 +68,4 @@
                     </p>
                 </div>
             </div>
-        </div>
         
