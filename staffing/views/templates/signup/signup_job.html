@@ -1,71 +1,72 @@
-        <div id="job-head{{ job.job_id }}" class="w3-row w3-secondary-color job-contain job-date-contain" >
-            <div class="w3-col l2 m2 w3-hide-small">&nbsp;</div>
-            <div class="w3-col l10 m10 w3-topbar ">
-            {% set participant_list = [] %}
-            {% if job.participants[job.job_id] %}
-            {% set participant_list = job.participants[job.job_id]['users']%}
-            {% endif %}
-                <p>
-                    <strong>{{ job.job_title | truncate(40) }}</strong>
-                    <span class="w3-small">- {{ job.start_date | local_time_string | lower }}
-                        <span class="w3-hide-small"> - {{ job.end_date | local_time_string | lower }}</span>
-                        {% if job.job_filled_positions >= job.max_positions %}<em>(Full)</em>{% endif %}
-                    </span>
-                </p>
-                {% if job.job_loc_id and job.job_loc_id != job.event_loc_id %}
-                <p class="w3-primary-color" style="padding-left:3pt;width:80%">
-                    <!-- job loc: {{job.job_loc_id}}, event loc: {{job.event_loc_id }} -->
-                    <em>Job location:</em> <strong>{{ job.job_loc_name | default("", True ) }}</strong> 
-                    {% if job.job_loc_w3w %}<a href="https://w3w.co/{{job.job_loc_w3w}}" target="_w3w" >Map...</a>
-                    {% elif job.job_loc_lat and job.job_loc_lng %}<a href="#">Map...</a>{% endif %}
-                </p>
-                {% endif %}
-            </div>
-            <div class="w3-row ">
-                <div class="w3-col l2 m2 w3-hide-small">&nbsp;</div>
-                <div class="w3-col l6 m6 s6">
-                <p>
+<div id="job-head{{ job.job_id }}" class="w3-row w3-secondary-color job-contain job-date-contain" >
+    <div class="w3-col l2 m2 w3-hide-small">&nbsp;</div>
+    <div class="w3-col l10 m10 w3-topbar ">
+        {% set participant_list = [] %}
+        {% if job.participants[job.job_id] %}
+        {% set participant_list = job.participants[job.job_id]['users']%}
+        {% endif %}
+        <p>
+            <strong>{{ job.job_title | truncate(40) }}</strong>
+            <span class="w3-small">- {{ job.start_date | local_time_string | lower }}
+            <span class="w3-hide-small"> - {{ job.end_date | local_time_string | lower }}</span>
+            {% if job.job_filled_positions >= job.max_positions %}<em>(Full)</em>{% endif %}
+            </span>
+        </p>
+        {% if job.job_loc_id and job.job_loc_id != job.event_loc_id %}
+        <p class="w3-primary-color" style="padding-left:3pt;width:80%">
+            <em>Job location:</em> <strong>{{ job.job_loc_name | default("", True ) }}</strong> 
+            {% if job.job_loc_w3w %}<a href="https://w3w.co/{{job.job_loc_w3w}}" target="_w3w" >Map...</a>
+            {% elif job.job_loc_lat and job.job_loc_lng %}<a href="#">Map...</a>{% endif %}
+        </p>
+        {% endif %}
+    </div>
+    <div class="w3-row ">
+        <div class="w3-col l2 m2 w3-hide-small">&nbsp;</div>
+            <div class="w3-col l6 m6 s6">
+                <div>
                     {{ job.job_description | render_markdown }}
-                </p>
+                </div>
                 <div id="job_{{job.job_id}}_participants" >
-                    {% set initials_list = []%}
-                    {% set user_data_list = []%}
-                    {% if job.participants[job.job_id] %}
-                        {% set initials_list = job.participants[job.job_id]['initials']%}
-                        {% set user_data_list = job.participants[job.job_id]['user_data'] %}
-                    {% endif %}
-                        <div class="w3-small">
-                            {% if job.user_job_positions %}<p>You have signed up for this job</p>{% endif %}
-                            {% if is_admin and  user_data_list %}
-                            <p style="margin:10pt"> 
-                                <strong>Users:</strong>
-                               {% for i in range(user_data_list|length)%}
-                                    {{user_data_list[i].user_name}}{% if i < (user_data_list | length) -1 %},{% endif %}
-                                {% endfor %}
-                            </p>
-                            
-                            {% elif initials_list %}
-                            <p style="margin:10pt"> 
-                                {% for initials in initials_list %}
-                                    <span class="w3-circle w3-primary-color participant-badge" >{{initials}}</span>
-                                {% endfor %}
-                            </p>
-                            {% else %}
-                            &nbsp;
-                            {% endif %}
-                        </div>
-                </div>
-                </div>
-                <div class="w3-col l2 m2 s6">
-                    <p style="text-align:center">
-                        {% if job.job_filled_positions >= job.max_positions and session['user_id'] not in participant_list %}
-                        <a class="w3-button w3-grey w3-round-medium w3-medium" >Full</a>
-                        {% else %}
-                        <a class="w3-button w3-primary-color w3-round-medium w3-medium" 
-                        onclick="editFromList('{{ url_for('signup.signup')}}/{{ job.job_id }}')"
-                        >{% if job.user_job_positions %}Your Spot{% else %}Sign Up{% endif %}</a>
-                        {% endif %}
+                {% set initials_list = []%}
+                {% set user_data_list = []%}
+                {% if job.participants[job.job_id] %}
+                {% set initials_list = job.participants[job.job_id]['initials']%}
+                {% set user_data_list = job.participants[job.job_id]['user_data'] %}
+                {% endif %}
+                <div class="w3-small">
+                {% if job.user_job_positions %}
+                    <p>You have signed up for this job</p>
+                {% endif %}
+                {% if is_admin and  user_data_list %}
+                    <p style="margin:10pt"> 
+                        <strong>Users:</strong>
+                        {% for i in range(user_data_list|length)%}
+                        {{user_data_list[i].user_name}}{% if i < (user_data_list | length) -1 %},{% endif %}
+                        {% endfor %}
                     </p>
+                    {% elif initials_list %}
+                    <p style="margin:10pt"> 
+                        {% for initials in initials_list %}
+                        <span class="w3-circle w3-primary-color participant-badge" >{{initials}}</span>
+                        {% endfor %}
+                    </p>
+                {% else %}
+                    &nbsp;
+                {% endif %}
                 </div>
             </div>
-        
+        </div>
+        <div class="w3-col l2 m2 s6">
+            <p style="text-align:center">
+                {% if job.job_filled_positions >= job.max_positions and session['user_id'] not in participant_list %}
+                <a class="w3-button w3-grey w3-round-medium w3-medium" >Full</a>
+                {% else %}
+                <a class="w3-button w3-primary-color w3-round-medium w3-medium" 
+                onclick="editFromList('{{ url_for('signup.signup')}}/{{ job.job_id }}')"
+                >{% if job.user_job_positions %}Your Spot{% else %}Sign Up{% endif %}</a>
+                {% endif %}
+            </p>
+        </div>
+    </div>
+</div>
+
