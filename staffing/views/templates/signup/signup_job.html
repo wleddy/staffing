@@ -39,7 +39,7 @@
                 {% endif %}
                 {% if is_admin and  user_data_list %}
                     <p style="margin:10pt"> 
-                        <strong>Users:</strong>
+                        <strong>Signed up:</strong>
                         {% for i in range(user_data_list|length)%}
                         {{user_data_list[i].user_name}}{% if i < (user_data_list | length) -1 %},{% endif %}
                         {% endfor %}
