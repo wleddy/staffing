@@ -100,7 +100,7 @@
                     <div class="w3-row w3-secondary-color job-contain job-date-contain" style="margin-top:3pt;">
                         <div class="w3-col l1 m1 w3-hide-small">&nbsp;</div>
                         <div class="w3-col l11 m11">
-                            <p onclick="$('.job-date-container-{{ job.event_id }}-{{job.start_date[:10]}},.job-date-more-{{ job.event_id }}-{{job.start_date[:10]}}').toggle();"
+                            <p onclick="$('.job-date-container-{{ job.event_id }}-{{job.start_date[:10]}}').toggle();"
                             style="cursor:pointer;">
                                   <strong>{{ job.start_date[:10] | abbr_date_string }}</strong>
                             </p>
