@@ -28,7 +28,7 @@
                     {% endif %}
                 <p>
                     <a class="w3-button w3-primary-color w3-round-medium w3-xlarge" onclick="signup_count('#signup-count',-1,{{signup.positions}})" style="padding:6pt;width:30pt;" title="Decrease Shifts">&ndash;</a>
-                    <input class="w3-xlarge" id="signup-count" type="num" name='positions' value="{{signup.positions | default(0,True)}}" readonly style="padding:6pt;width:30pt;display:block-inline;text-align:center"/>
+                    <input class="w3-xlarge" id="signup-count" type="num" name='positions' value="{{signup.positions | default(1,True)}}" readonly style="padding:6pt;width:30pt;display:block-inline;text-align:center"/>
                     <a class="w3-button w3-primary-color w3-round-medium w3-xlarge"  onclick="signup_count('#signup-count',1,{{job.max_positions - filled_positions + signup.positions}})" style="padding:6pt;width:30pt;" title="Increase Shifts">+</a>
                 </p>
             <p style="text-align:left">
