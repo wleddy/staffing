@@ -133,13 +133,16 @@ def make_event_dict(uid,start,end,summary,**kwargs):
 
 def get_description(job_data,geo,location):
     """Return the description text for the job"""
-    description = job_data.event_description + '\n\n' + job_data.job_description
+    description = ''
+    
     if job_data.job_loc_name:
         location = job_data.job_loc_name
-        description += '\n\n*location:*\n\n{}'.format(job_data.job_loc_name)
+        description += 'Location:\n\n{}'.format(job_data.job_loc_name)
 
     if  job_data.job_loc_street_address and job_data.job_loc_city and job_data.job_loc_state:
-        description += '\n\n{}  {}'.format(', '.join([job_data.job_loc_street_address, job_data.job_loc_city]), job_data.job_loc_state.upper())
+        if description:
+            description += '\n\n'
+        description += '{}  {}'.format(', '.join([job_data.job_loc_street_address, job_data.job_loc_city]), job_data.job_loc_state.upper())
 
     map_url = None
     
@@ -157,7 +160,12 @@ def get_description(job_data,geo,location):
             map_url = "https://www.google.com/maps/place/@{},{},17z".format(geo[0],geo[1])
         
     if map_url:
-        description = description + '\n\n' + 'Map: {}'.format(map_url)
+        if description:
+            description += '\n\n'
+        description += 'Map: {}'.format(map_url)
+    if description:
+        description += '\n\n\n'
+    description += job_data.event_description + '\n\n' + job_data.job_description
     
     return description
     
@@ -173,12 +181,16 @@ def get_geo(job_data):
     
 def get_location(job_data):
     location = ''
-    if job_data.job_loc_name:
-        location = job_data.job_loc_name
+    # if job_data.job_loc_name:
+    #     location = job_data.job_loc_name
 
     if  job_data.job_loc_street_address and job_data.job_loc_city and job_data.job_loc_state:
         if location:
-            location += '\n\n'
+            ## the location name may be getting prepended to the address without any
+            ##   separation on Android calendar.
+            ##   Just hang a comma on the end to force some kind of separation
+            location += ', \n'
+            
         location = location + '{}  {}'.format(', '.join([job_data.job_loc_street_address, job_data.job_loc_city]), job_data.job_loc_state.upper())
 
     return location
