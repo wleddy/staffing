@@ -144,27 +144,27 @@ def get_description(job_data,geo,location):
             description += '\n\n'
         description += '{}  {}'.format(', '.join([job_data.job_loc_street_address, job_data.job_loc_city]), job_data.job_loc_state.upper())
 
-    map_url = None
+    w3w_map_url = google_map_url = None
     
     if job_data.job_loc_w3w:
-        map_url = 'https://w3w.co/{}'.format(job_data.job_loc_w3w)
+        w3w_map_url = 'https://w3w.co/{}'.format(job_data.job_loc_w3w)
         
-        
-        # Create a mapping uri
-        ############################
-        ## TODO - This should place a pin at least
-        ##        Maybe try to use apple maps if on iOS
-        ############################
-        if not map_url and geo:
+        # Create a mapping uri for google maps
+        # Include maps for both w3w and goggle maps, let user decide
+        if geo:
             # don't replace the w3w link
-            map_url = "https://www.google.com/maps/place/@{},{},17z".format(geo[0],geo[1])
+            google_map_url = "https://www.google.com/maps/search/?api=1&query={},{}".format(geo[0],geo[1])
         
-    if map_url:
         if description:
             description += '\n\n'
-        description += 'Map: {}'.format(map_url)
+        if w3w_map_url:
+            description += 'W3W Map: {}\n\n\n'.format(w3w_map_url)
+        if google_map_url:
+            description += 'Google Map: {}\n\n'.format(google_map_url)
+            
+            
     if description:
-        description += '\n\n\n'
+        description += '\n\n'
     description += job_data.event_description + '\n\n' + job_data.job_description
     
     return description
