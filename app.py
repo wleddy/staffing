@@ -102,8 +102,8 @@ def _before():
     
     if "//" + app.config.get("SIGNUP_SUBDOMAIN",'signup') in request.url_root:
         # this is the signup subdomaine
-        g.admin.register(Job,url_for('signup.roster'),display_name='View Roster',minimum_rank_required=80)
-        
+        # g.admin.register(Job,url_for('signup.roster'),display_name='View Roster',minimum_rank_required=80)
+        pass
     else:
         # Admin subdomain
         #Events
