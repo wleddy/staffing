@@ -11,6 +11,7 @@ def send_signup_email(job_data,user,template_path,bp,**kwargs):
     param: job_data is the result of the query in staffing.signup.get_job_rows (a list of recs)
     param: user is a single instance of a User record
     param: template_path, obviously the path to a template... but absolute or relative to what?
+    param: bp, the Blueprint for the template. May be None
     
     'subject' may be included in kwargs
     if 'cancellation' is in kwargs, this is a notice of cancellation do don't include the ical attachement
