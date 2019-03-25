@@ -14,7 +14,7 @@ If you have questions, please feel free to [contact us.]({{url_for('www.contact'
 
 At some point in the future, your "Dashboard" of controls will appear here. For now, you'll just have to dream about it.
 
-In the mean time, check out the menu to the right (or the "Hamburger" above if your on your phone). You may have access
+In the mean time, check out the menu above (or the "Hamburger" icon if your on your phone). You may have access
 to Event and job records there.
 
 {% endif %}
