@@ -5,9 +5,8 @@
 
 {% block head %}
     {{ super() }}
-    <link rel="stylesheet" href="{{ url_for('static',filename='anytime/anytime.5.2.0.css')}}" />
-    <script src="{{ url_for('static',filename='anytime/anytime.5.2.0.js')}}"></script>
-    <script src="{{ url_for('static',filename='anytime/anytime_extras.js')}}"></script>
+    
+    {% include "anytime_head.html"%}
 {% endblock head %}
 
 {% block fieldset %}
@@ -102,15 +101,5 @@
             { format: "%l:%i%p" } );
         $("#end_time").AnyTime_picker(
             { format: "%l:%i%p" } );
-            
-        function addPicker(input_id,format){
-            $('#' + input_id).AnyTime_noPicker().AnyTime_picker({format: format}).focus();
-        }
     </script>
-    <style>
-        .DatePickerButton{
-            border:.5pt #aaa solid;
-            padding: 1.5pt 3pt 3pt 3pt;
-        }
-    </style>
 {% endblock fieldset %}
