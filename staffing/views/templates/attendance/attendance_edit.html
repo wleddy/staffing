@@ -1,0 +1,116 @@
+{% from "_form_helpers.html" import input_field, select_field, radio_field, checkbox_field, label_only %}
+
+
+{% extends "form_layout.html" %}
+
+{% block head %}
+    {{ super() }}
+    <link rel="stylesheet" href="{{ url_for('static',filename='anytime/anytime.5.2.0.css')}}" />
+    <script src="{{ url_for('static',filename='anytime/anytime.5.2.0.js')}}"></script>
+    <script src="{{ url_for('static',filename='anytime/anytime_extras.js')}}"></script>
+{% endblock head %}
+
+{% block fieldset %}
+    {{ input_field(rec.id,"id",type="hidden",default=-1)}}
+    <div class="w3-container" >
+        <h3 class="w3-panel w3-primary-color">{{rec.event_title}}</h3>
+        <h4>
+            Name: {{ rec.first_name}} {{rec.last_name}}<br>
+            Job: {{ rec.job_title }}<br>
+            Date: {{ rec.job_start_date | abbr_date_string }}, Sched.: {{ rec.job_start_date | local_time_string }} to {{ rec.job_end_date | local_time_string }}
+        </h4>
+        
+    {% if rec.attendance_start %}
+        {% set start_date = rec.attendance_start | short_date_string %}
+        {% set start_time = rec.attendance_start | local_time_string %}
+    {% else %}
+        {% set start_date = rec.job_start_date | short_date_string %}
+        {% set start_time = rec.job_start_date | local_time_string %}
+    {% endif %}
+    {% if rec.attendance_end %}
+        {% set end_date = rec.attendance_end | short_date_string %}
+        {% set end_time = rec.attendance_end | local_time_string %}
+    {% else %}
+        {% set end_date = rec.job_end_date | short_date_string %}
+        {% set end_time = rec.job_end_date | local_time_string %}
+    {% endif %}
+    
+    <p>{{ label_only("Enter your attendance start and end times")}}</p>
+    <div class="w3-row">
+            <div class="w3-col w3-half" style="padding-right:6pt">
+                <div class="w3-row">
+                    <div class="w3-col w3-half">
+                        <p style="padding-right:3pt">{{ label_only("Start Date") }}</p>
+                        <div class="w3-row">
+                            <p class="w3-col l8 m8 s8">
+                                {{ input_field(start_date,'att_start_date',type='text', id='start_date', label=None)}}
+                            </p>
+                            <p class="w3-col l2 m2 s2 ">
+                                <a href="javascript:addPicker('start_date','%m/%d/%y')"  class="DatePickerButton">
+                                  <img src="{{ url_for('static', filename='anytime/calendar.png' ) }}" alt="[calendar icon]"/>
+                                </a>
+                            </p>
+                        </div>
+                    </div>
+                   <div class="w3-col w3-half" >
+                        <p>{{ label_only("Start Time") }}</p>
+                        <div class="w3-row">
+                            <p class="w3-col" >
+                                {{ input_field(start_time,'att_start_time',id='start_time', label=None)}}
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        <div class="w3-col w3-half">
+            <div class="w3-row">
+                <div class="w3-col w3-half" >
+                    <p style="padding-right:3pt">{{ label_only("End Date") }}</p>
+                    <div class="w3-row">
+                        <p class="w3-col l8 m8 s8">
+                            {{ input_field(end_date,'att_end_date',type='text', id='end_date', label=None)}}
+                        </p>
+                        <p class="w3-col l2 m2 s2 ">
+                            <a href="javascript:addPicker('end_date','%m/%d/%y')"  class="DatePickerButton">
+                              <img src="{{ url_for('static', filename='anytime/calendar.png' ) }}" alt="[calendar icon]"/>
+                            </a>
+                        </p>
+                    </div>
+                </div>
+               <div class="w3-col w3-half" >
+                    <p>{{ label_only("End Time") }}</p>
+                    <div class="w3-row">
+                        <p class="w3-col" >
+                            {{ input_field(end_time,'att_end_time',id='end_time', label=None)}}
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="w3-row">
+        <p class="w3-col w3-third" style="padding-right:3pt">{{ input_field(rec.attendance_mileage,'attendance_mileage',label="Mileage",placeholder="Miles")}}</p>
+        <div   class="w3-col w3-twothird">
+            <p>{{ label_only("Comments")}}</p>
+            <p><textarea class="w3-input" name="attendance_comment" rows="5" placeholder="Anything Broken? Any problems?">{{ rec.attendance_comment }}</textarea></p>
+        </div>
+    </div>
+    
+    <script>
+        $("#start_time").AnyTime_picker(
+            { format: "%l:%i%p" } );
+        $("#end_time").AnyTime_picker(
+            { format: "%l:%i%p" } );
+            
+        function addPicker(input_id,format){
+            $('#' + input_id).AnyTime_noPicker().AnyTime_picker({format: format}).focus();
+        }
+    </script>
+    <style>
+        .DatePickerButton{
+            border:.5pt #aaa solid;
+            padding: 1.5pt 3pt 3pt 3pt;
+        }
+    </style>
+{% endblock fieldset %}

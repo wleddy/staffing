@@ -6,7 +6,7 @@ from shotglass2.takeabeltof.jinja_filters import register_jinja_filters
 from shotglass2.takeabeltof.utils import cleanRecordID
 from shotglass2.users.views.login import setUserStatus
 from shotglass2.users.admin import Admin
-from staffing.models import Event, Job, Location, EventType
+from staffing.models import Event, Job, Location, EventType, UserJob
 
 # Create app
 # setting static_folder to None allows me to handle loading myself
@@ -115,6 +115,8 @@ def _before():
         #location
         g.admin.register(Location,url_for('location.display'),display_name='Locations',minimum_rank_required=500,roles=['admin','event manager'])
         g.admin.register(EventType,url_for('event_type.display'),display_name='Event Types',minimum_rank_required=500,roles=['admin','event manager'])
+
+        g.admin.register(UserJob,url_for('attendance.display'),display_name='Attendance',minimum_rank_required=500,roles=['admin','event manager'])
     
         shotglass.user_setup() # g.admin now holds access rules Users, Prefs and Roles
 
@@ -161,6 +163,8 @@ from staffing.views import job
 app.register_blueprint(job.mod,subdomain=subdomain)
 from staffing.views import event_type
 app.register_blueprint(event_type.mod,subdomain=subdomain)
+from staffing.views import attendance
+app.register_blueprint(attendance.mod,subdomain=subdomain)
 
 ## Setup the routes for users
 shotglass.register_users(app,subdomain=subdomain)
