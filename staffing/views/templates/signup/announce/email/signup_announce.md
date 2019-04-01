@@ -1,3 +1,5 @@
+{# job_data_list should only contain one item #}
+{% if job_data_list %}{% set job_data = job_data_list[0] %}
 ## Thank you for helping us with {{ job_data.event_title }}!
 
 Your assignment is to help with {{ job_data.job_title }}.
@@ -7,6 +9,15 @@ and ends at {{ job_data.end_date | local_time_string }}.
 
 {{ description }}
 
-If you have questions about your shift please [contact us](http://{{config.HOST_NAME}}{{ url_for('signup.contact')}})
+If you have questions about your shift or you're unable to make it for some reason please [contact us](http://{{config.HOST_NAME}}{{ url_for('signup.contact')}})
 
 {% if ical %}The attached file will add your shift to your calendar. (Usually you can tap or double click to open it.){% endif %}
+{% else %}
+
+Humm... Something is wrong. There are no jobs to list...
+
+Please [contact us](http://{{config.HOST_NAME}}{{ url_for('signup.contact')}}) so we can look into it.
+
+_Thanks_
+
+{% endif %}

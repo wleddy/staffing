@@ -7,6 +7,8 @@
 # The basics...
 HOST_NAME = 'localhost:5000' 
 SITE_NAME = "My New Web Site"
+ORG_NAME = "Little 'ol Me"
+
 DEBUG = True
 
 ############################################

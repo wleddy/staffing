@@ -9,7 +9,7 @@ from staffing.models import StaffNotification, Job, Event, UserJob
 from datetime import datetime, timedelta
 
 
-def send_signup_email(job_data,user,template_path,bp,**kwargs):
+def send_signup_email(job_data_list,user,template_path,bp,**kwargs):
     """Send an email confirming a single user's signup
     currently this only generates one email
     param: job_data is the result of the query in staffing.signup.get_job_rows (a list of recs)
@@ -18,35 +18,44 @@ def send_signup_email(job_data,user,template_path,bp,**kwargs):
     param: bp, the Blueprint for the template. May be None
     
     'subject' may be included in kwargs
-    if 'cancellation' is in kwargs, this is a notice of cancellation do don't include the ical attachement
+    if 'no_calendar' is in kwargs, do don't include the ical attachement
     
     if values are supplied in kwargs they are passed to the template as additional context
     """
     #import pdb;pdb.set_trace()
-    uid=get_uid(job_data,user)
-    location = get_location(job_data)
-    geo = get_geo(job_data)    
-    description = get_description(job_data,geo,location)
+    if not isinstance(job_data_list,list):
+        job_data_list = [job_data_list]
+            
+            
     ical = None
+    ical_events = []
+    for job_data in job_data_list:
+        uid=get_uid(job_data,user)
+        location = get_location(job_data)
+        geo = get_geo(job_data)    
+        description = get_description(job_data,geo,location)
     
-    if not kwargs.get('cancellation',False):            
-        ical_event = make_event_dict(uid,job_data.start_date,job_data.end_date,job_data.job_title,
-                description=description.replace('\n\n','\n'),
-                location=location,
-                geo=geo,
+        if not kwargs.get('no_calendar',False):            
+            ical_events.append(make_event_dict(uid,job_data.start_date,job_data.end_date,job_data.job_title,
+                    description=description.replace('\n\n','\n'),
+                    location=location,
+                    geo=geo,
+                    )
                 )
 
-        ical = get_ical_text(events=ical_event)
+    if ical_events:
+        ical = get_ical_text(events=ical_events)
     
     # generate the text of the email with ical as an attachment
     email_html = render_markdown_for(template_path,
         bp=bp,
         ical=ical,
         description=description,
-        job_data=job_data,
+        job_data_list=job_data_list,
         **kwargs
         )
-        
+            
+
     subject = kwargs.pop('subject','')
     if not subject:
         subject = 'Your assignment for {}'.format(job_data.event_title)
@@ -65,13 +74,15 @@ def send_signup_email(job_data,user,template_path,bp,**kwargs):
         #Error occured
         email_admin(subject="Error sending signup confirmation at {}".format(get_site_config()['SITE_NAME']),message="An error occored while trying to send signup email. Err: {}".format(send_result[1]))
     
+    return send_result
+    
     
 def process_two_day_reminder():
     """Just what is says.
     Send a reminder notice to all volunteers and staff who have a 
     job scheduled in the next two days"""
     
-    import pdb;pdb.set_trace()
+    #import pdb;pdb.set_trace()
     
     from staffing.views.signup import mod as signup_blueprint, get_job_rows
     
@@ -79,12 +90,7 @@ def process_two_day_reminder():
         now = local_datetime_now()
         start_date = datetime_as_string(now)
         end_date = datetime_as_string(now + timedelta(days=2))
-        
-        #for testing...
-        start_date = '2019-03-01'
-        end_date = '2019-03-30'
-        
-        
+                
         trigger_function_name = "annoucements.send_two_day_reminder"
         notifications = StaffNotification(g.db)
         userjobs = UserJob(g.db)
@@ -131,14 +137,7 @@ def process_two_day_reminder():
                             send_result = send_signup_email(job_data,user_rec,template_path,signup_blueprint,subject=subject)
                             if send_result[0]:
                                 #send Ok, create some notification records
-                                for job in job_list:
-                                    rec = notifications.new()
-                                    rec.user_id = prev_user_id
-                                    rec.job_id = job
-                                    rec.trigger_function_name = trigger_function_name
-                                    rec.run_date = now
-                                    notifications.save(rec)
-                                g.db.commit()
+                                log_notifications(job_list,prev_user_id,trigger_function_name)
                             else:
                                 email_admin('Unable to send two day reminder to {}. Result: {}'.format((user_rec.first_name + ' ' + user_rec.last_name),send_result[1]))
                                     
@@ -158,6 +157,31 @@ def process_two_day_reminder():
         email_admin(mes)
         
     
+def log_notifications(job_list,user_id,trigger_function_name):
+    """Create StaffNotification records for the job ids in job_list
+    @param job_list = list of integer job ids
+    @param user_id = id of a user assigned to the job
+    @param trigger_function_name = the name of the method that sent the noticication
+    """
+    if not isinstance(job_list,list):
+        job_list = [job_list]
+        
+    now = local_datetime_now()
+    notifications = StaffNotification(g.db)
+    
+    for job in job_list:
+        job_rec = Job(g.db).get(job)
+        rec = notifications.new()
+        rec.user_id = user_id
+        rec.job_id = job
+        if job_rec:
+            rec.event_id = job_rec.event_id
+        rec.trigger_function_name = trigger_function_name
+        rec.run_date = now
+        notifications.save(rec)
+    g.db.commit()
+                                
+                                
 def get_ical_text(events):
     """Return the text of an icalendar object or None
     @param events = a list of dictionaries that each describ an event
