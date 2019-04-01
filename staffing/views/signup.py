@@ -10,7 +10,7 @@ from shotglass2.users.views.login import authenticate_user, setUserStatus, logou
 from shotglass2.www.views.home import contact as home_contact
 from staffing.models import Event, Location, Job, UserJob
 from staffing.utils import pack_list_to_string, un_pack_string
-from staffing.views.announcements import send_signup_email
+from staffing.views.announcements import send_signup_email, process_two_day_reminder
 from datetime import timedelta, datetime
 
 mod = Blueprint('signup',__name__, template_folder='templates/signup')
@@ -406,6 +406,34 @@ def register(from_main=0):
 
     return render_template('signup_login.html',rec=rec,next=next,register=True,submit_script=submit_script,from_main=from_main)
 
+
+@mod.route('/process_notifications',methods=['GET',])
+@mod.route('/process_notifications/',methods=['GET',])
+@login_required
+def process_notifications():
+    """Send Reminders and notifications to Volunteers and Staff
+    
+    Designed to be called by a chron job or other means. The 'staff_notification' table is
+    used to record when a particular notification was sent to a user so that re-running
+    method will not send it more than once.
+    
+    Notification functions are responsible for determining if a notification should be sent
+    and updating the staff_notification table as needed.
+    
+    This function will not attempt to process any request received 'in the middle of the night'.
+    """
+    
+    #import pdb;pdb.set_trace()
+    
+    now = local_datetime_now()
+    
+    # send between 9am and 9pm only
+    if now.hour >= 9 and now.hour <= 21:
+        process_two_day_reminder()
+        
+    return 'Ok' #Always Ok
+        
+        
 def populate_participant_list(job):
     """Add participant values to the job namedlist"""
     sql = """

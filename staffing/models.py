@@ -173,6 +173,33 @@ class Location(SqliteTable):
         """Create the table and initialize data"""
         self.create_table()
 
+class StaffNotification(SqliteTable):
+    """Staffing Notification Table
+    Record that a particular notification has been sent so we don't send it twice.
+    """
+    def __init__(self,db_connection):
+        super().__init__(db_connection)
+        self.table_name = 'staff_notification'
+        self.order_by_col = 'id'
+        self.defaults = {}
+        
+    def create_table(self):
+        """Define and create the table"""
+        
+        sql = """
+        trigger_function_name TEXT,
+        event_id INTEGER,
+        job_id INTEGER,
+        user_id  INTEGER,
+        job_start_date  DATETIME,
+        run_date DATETIME
+        """
+                
+        super().create_table(sql)
+        
+    def init_table(self):
+        """Create the table and initialize data"""
+        self.create_table()
 
 def init_event_db(db):
     """Create a intial user record."""
@@ -181,3 +208,4 @@ def init_event_db(db):
     Job(db).init_table()
     UserJob(db).init_table()
     Location(db).init_table()
+    StaffNotification(db).init_table()

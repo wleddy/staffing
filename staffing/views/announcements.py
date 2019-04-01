@@ -1,8 +1,12 @@
 # Send communications to users
+from flask import g
 from shotglass2.shotglass import get_site_config
-from shotglass2.takeabeltof.date_utils import getDatetimeFromString, local_datetime_now
-from shotglass2.takeabeltof.utils import render_markdown_for
+from shotglass2.takeabeltof.date_utils import getDatetimeFromString, local_datetime_now, datetime_as_string
+from shotglass2.takeabeltof.utils import render_markdown_for, printException
 from shotglass2.takeabeltof.mailer import send_message, email_admin
+from shotglass2.users.models import User
+from staffing.models import StaffNotification, Job, Event, UserJob
+from datetime import datetime, timedelta
 
 
 def send_signup_email(job_data,user,template_path,bp,**kwargs):
@@ -32,7 +36,7 @@ def send_signup_email(job_data,user,template_path,bp,**kwargs):
                 geo=geo,
                 )
 
-        ical = get_ical_text(event=ical_event)
+        ical = get_ical_text(events=ical_event)
     
     # generate the text of the email with ical as an attachment
     email_html = render_markdown_for(template_path,
@@ -62,22 +66,110 @@ def send_signup_email(job_data,user,template_path,bp,**kwargs):
         email_admin(subject="Error sending signup confirmation at {}".format(get_site_config()['SITE_NAME']),message="An error occored while trying to send signup email. Err: {}".format(send_result[1]))
     
     
-def get_ical_text(**kwargs):
-    """Return the text of an icalendar object or None"""
-    from icalendar import Calendar, Event
+def process_two_day_reminder():
+    """Just what is says.
+    Send a reminder notice to all volunteers and staff who have a 
+    job scheduled in the next two days"""
+    
+    import pdb;pdb.set_trace()
+    
+    from staffing.views.signup import mod as signup_blueprint, get_job_rows
+    
+    try:
+        now = local_datetime_now()
+        start_date = datetime_as_string(now)
+        end_date = datetime_as_string(now + timedelta(days=2))
+        
+        #for testing...
+        start_date = '2019-03-01'
+        end_date = '2019-03-30'
+        
+        
+        trigger_function_name = "annoucements.send_two_day_reminder"
+        notifications = StaffNotification(g.db)
+        userjobs = UserJob(g.db)
+    
+        # Get all jobs that are to start today ago or up to 2 days from now
+        sql = """
+        select
+        user_job.user_id,
+        user_job.job_id,
+        job.start_date as job_start_date
+
+        from user_job
+        join user on user.id = user_job.user_id
+        join job on job.id = user_job.job_id
+
+        where 
+            date(job_start_date,'localtime') >= date('{}','localtime') and
+            date(job_start_date,'localtime') <= date('{}','localtime') 
+    
+        order by
+            user_job.user_id,
+            job_start_date
+        """.format(start_date,end_date)
+        
+        reminder_jobs = userjobs.query(sql)
+        if reminder_jobs:
+            prev_user_id = None
+            job_list = []
+            for reminder in reminder_jobs:
+                # for each user compile a list of jobs to which they are assigned for which no notification has been sent
+                if prev_user_id == None:
+                    #first record
+                    prev_user_id = reminder.user_id
+                    
+                if reminder.user_id != prev_user_id:
+                    user_rec = User(g.db).get(prev_user_id) 
+                    if len(job_list) > 0 and user_rec:
+                            # send a reminder for the current user and job list
+                            subject = "Two Day Job Reminder"
+                            template_path = 'announce/email/two_day_reminder.md'
+                            job_list_as_string = ','.join([str(x) for x in job_list])
+                            job_data = get_job_rows(None,None,"job.id in ({})".format(job_list_as_string),[],is_admin=True)
+                            
+                            send_result = send_signup_email(job_data,user_rec,template_path,signup_blueprint,subject=subject)
+                            if send_result[0]:
+                                #send Ok, create some notification records
+                                for job in job_list:
+                                    rec = notifications.new()
+                                    rec.user_id = prev_user_id
+                                    rec.job_id = job
+                                    rec.trigger_function_name = trigger_function_name
+                                    rec.run_date = now
+                                    notifications.save(rec)
+                                g.db.commit()
+                            else:
+                                email_admin('Unable to send two day reminder to {}. Result: {}'.format((user_rec.first_name + ' ' + user_rec.last_name),send_result[1]))
+                                    
+                    prev_user_id = reminder.user_id
+                    job_list = []
+                        
+                # add job to job_list?
+                #test the log
+                where = 'user_id = {} and job_id = {} and trigger_function_name = "{}"'.format(reminder.user_id,reminder.job_id,trigger_function_name)
+                if not notifications.select(where=where):
+                    # No notification record found
+                    job_list.append(reminder.job_id)
+
+    except Exception as e:
+        mes = "An error occured while processing 2 Day renimders. Err: {}".format(str(e))
+        printException(mes)
+        email_admin(mes)
+        
+    
+def get_ical_text(events):
+    """Return the text of an icalendar object or None
+    @param events = a list of dictionaries that each describ an event
+        
+    """
+    from icalendar import Calendar, Event as IcalEvent
     #import pdb;pdb.set_trace()
 
-    event = kwargs.get('event',None) # a dict of event data
-    events = kwargs.get('events',None) # a list of event dicts
     out = None
-
-    if events:
-        if not isinstance(events,list):
-            events = [events]
-        events.extend([event])
-    elif event:
-        events = [event]
-
+    if not isinstance(events,list):
+        events = [events]
+ 
     calendar = Calendar()
     calendar.add('version','2.0')
     calendar.add('calscale','GREGORIAN')
@@ -87,7 +179,7 @@ def get_ical_text(**kwargs):
     event_count = 0
     for event in events:
         if event:
-            ev = Event()
+            ev = IcalEvent()
         
             minumum_properties = True
             # Minimum required properties
