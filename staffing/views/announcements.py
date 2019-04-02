@@ -87,9 +87,31 @@ def process_two_day_reminder():
     from staffing.views.signup import mod as signup_blueprint, get_job_rows
     
     try:
+        
+        def send_reminder(user_id,job_list):
+            user_rec = User(g.db).get(user_id) 
+            if len(job_list) > 0 and user_rec:
+                    # send a reminder for the current user and job list
+                    subject = "Two Day Job Reminder"
+                    template_path = 'announce/email/two_day_reminder.md'
+                    job_list_as_string = ','.join([str(x) for x in job_list])
+                    job_data = get_job_rows(None,None,"job.id in ({})".format(job_list_as_string),[],is_admin=True)
+                    
+                    send_result = send_signup_email(job_data,user_rec,template_path,signup_blueprint,subject=subject)
+                    if send_result[0]:
+                        #send Ok, create some notification records
+                        log_notifications(job_list,prev_user_id,trigger_function_name)
+                    else:
+                        email_admin('Unable to send two day reminder to {}. Result: {}'.format((user_rec.first_name + ' ' + user_rec.last_name),send_result[1]))
+            
+            
         now = local_datetime_now()
         start_date = datetime_as_string(now)
         end_date = datetime_as_string(now + timedelta(days=2))
+        
+        ###for testing
+        ##start_date = '2019-03-01'
+        ##end_date = '2019-04-01'
                 
         trigger_function_name = "annoucements.send_two_day_reminder"
         notifications = StaffNotification(g.db)
@@ -126,21 +148,7 @@ def process_two_day_reminder():
                     prev_user_id = reminder.user_id
                     
                 if reminder.user_id != prev_user_id:
-                    user_rec = User(g.db).get(prev_user_id) 
-                    if len(job_list) > 0 and user_rec:
-                            # send a reminder for the current user and job list
-                            subject = "Two Day Job Reminder"
-                            template_path = 'announce/email/two_day_reminder.md'
-                            job_list_as_string = ','.join([str(x) for x in job_list])
-                            job_data = get_job_rows(None,None,"job.id in ({})".format(job_list_as_string),[],is_admin=True)
-                            
-                            send_result = send_signup_email(job_data,user_rec,template_path,signup_blueprint,subject=subject)
-                            if send_result[0]:
-                                #send Ok, create some notification records
-                                log_notifications(job_list,prev_user_id,trigger_function_name)
-                            else:
-                                email_admin('Unable to send two day reminder to {}. Result: {}'.format((user_rec.first_name + ' ' + user_rec.last_name),send_result[1]))
-                                    
+                    send_reminder(prev_user_id,job_list)
                     prev_user_id = reminder.user_id
                     job_list = []
                         
@@ -150,6 +158,10 @@ def process_two_day_reminder():
                 if not notifications.select(where=where):
                     # No notification record found
                     job_list.append(reminder.job_id)
+                    
+            # check that there is nothing in the chamber
+            if job_list:
+                send_reminder(reminder.user_id,job_list)
 
     except Exception as e:
         mes = "An error occured while processing 2 Day renimders. Err: {}".format(str(e))

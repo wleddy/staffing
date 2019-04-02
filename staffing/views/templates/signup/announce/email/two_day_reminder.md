@@ -1,4 +1,4 @@
-## Your 2 Day Reminder from {{ site_config.ORG_NAME | default(site_config.SITE_NAME, True) }}
+## Your Reminder from {{ site_config.ORG_NAME | default(site_config.SITE_NAME, True) }}
 
 You have the following commitments coming up in the next couple days.
 
