@@ -4,6 +4,7 @@ from shotglass2.users.admin import login_required, table_access_required
 from shotglass2.users.models import Role, User
 from shotglass2.takeabeltof.utils import render_markdown_for, printException, cleanRecordID
 from shotglass2.takeabeltof.date_utils import date_to_string, getDatetimeFromString, local_datetime_now
+from shotglass2.takeabeltof.mailer import email_admin
 from shotglass2.shotglass import get_site_config
 from staffing.models import Event, Location, Job, UserJob
 from staffing.utils import pack_list_to_string, un_pack_string
@@ -310,9 +311,13 @@ def assignment_manager(job_id=0):
         job_data = get_job_rows(None,None,"job.id = {}".format(job_id),[],is_admin=True)
         if job_data:
             job_data = job_data[0]
-        subject = "[SABA] {} {} has given you an assignment".format(manager_rec.first_name,manager_rec.last_name)
-        send_signup_email(job_data,user_rec,'email/inform_user_of_assignment.html',mod,manager=manager_rec,subject=subject)
-        
+            subject = "[SABA] {} {} has given you an assignment".format(manager_rec.first_name,manager_rec.last_name)
+            send_signup_email(job_data,user_rec,'email/inform_user_of_assignment.html',mod,manager=manager_rec,subject=subject,job_data=job_data)
+        else:
+            # failed to get the job data... this should never happen
+            email_admin(subject="Alert from {}".format(site_config['SITE_NAME']),
+                message="Unable to send Manager Assignment email. 'job_data' is None? 'job_id' = {}, 'user_id'={}".format(job_id,assignment_user_id))
+            flash("Unable to send email to user. (Err: job_data is None)")
         # The form is going to be redisplayed so clear the signup record
         signup = None
 
@@ -362,6 +367,8 @@ def assignment_manager(job_id=0):
 def assignment_manager_delete(job_id=0,user_id=0):
     """Delete a job assignment"""
     setExits()
+    site_config = get_site_config()
+    
     #import pdb;pdb.set_trace()
     job_id = cleanRecordID(job_id)
     user_id = cleanRecordID(user_id)
@@ -378,7 +385,12 @@ def assignment_manager_delete(job_id=0,user_id=0):
                 manager_rec = User(g.db).get(session.get('user_id',0))
                 user_rec = User(g.db).get(user_id)
                 subject = "[SABA] {} {} has cancelled your assignment".format(manager_rec.first_name,manager_rec.last_name)
-                send_signup_email(job_data,user_rec,'email/inform_user_of_cancellation.html',mod,manager=manager_rec,subject=subject,no_calendar=True)
+                send_signup_email(job_data,user_rec,'email/inform_user_of_cancellation.html',mod,manager=manager_rec,subject=subject,job_data=job_data,no_calendar=True)
+            else:
+                # failed to get the job data... this should never happen
+                email_admin(subject="Alert from {}".format(site_config['SITE_NAME']),
+                    message="Unable to send Manager Cancellation email. 'job_data' is None? 'job_id' = {}, 'user_id'={}".format(job_id,user_id))
+                flash("Unable to send email to user. (Err: job_data is None)")
 
             return assignment_manager(job_id)
             
