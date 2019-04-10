@@ -7,7 +7,7 @@ Your assignment is to help with {{ job_data.job_title }}.
 Your shift starts on {{ job_data.start_date | abbr_date_string }} at: {{ job_data.start_date | local_time_string }}
 and ends at {{ job_data.end_date | local_time_string }}.
 
-{{ description }}
+{{ description | safe }}
 
 If you have questions about your shift or you're unable to make it for some reason please [contact us](http://{{config.HOST_NAME}}{{ url_for('signup.contact')}})
 
