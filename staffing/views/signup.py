@@ -84,7 +84,6 @@ def display():
     if event_id:
         where = 'event.id = {}'.format(event_id)
     
-        
     jobs = get_job_rows(start_date,end_date,where,user_skills,is_admin)
             
     return render_template('signup_list.html',jobs=jobs,is_admin=is_admin)
@@ -628,11 +627,11 @@ def get_job_rows(start_date=None,end_date=None,where='',user_skills=[],is_admin=
             
             if not job.event_loc_name and job.unique_job_locations == 1:
                 # location only in one job, set all to that loc
-                job_loc_rec = Job(g.db).select_one(where = 'event_id = {} and location_id notnull'.format(job.event_id))
+                job_loc_rec = Job(g.db).select_one(where = 'event_id = {} and location_id not null'.format(job.event_id))
                 if job_loc_rec:
-                    loc_rec = Location(g.db).get(job_loc_rec)
+                    loc_rec = Location(g.db).get(job_loc_rec.location_id)
                     if loc_rec:
-                        event_default_loc = job_default_loc = (loc_rec.name, loc_rec.lat, loc_rec.lng)
+                        event_default_loc = job_default_loc = (loc_rec.location_name, loc_rec.lat, loc_rec.lng)
                         event_default_loc_street_address = loc_rec.street_address
                         event_default_loc_city = loc_rec.city
                         event_default_loc_state = loc_rec.state
