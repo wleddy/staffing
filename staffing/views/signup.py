@@ -517,7 +517,8 @@ def get_job_rows(start_date=None,end_date=None,where='',user_skills=[],is_admin=
     elif not end_date:
         end_date = '2051-02-08'
         
-    where_date_range = " and date(job.start_date, 'localtime') >= date('{}', 'localtime') and date(job.end_date, 'localtime') <= date('{}', 'localtime') ".format(start_date,end_date)
+    ## Don't use 'localtime' modifier with date strings without timezone info
+    where_date_range = " and date(job.start_date, 'localtime') >= date('{}') and date(job.start_date, 'localtime') <= date('{}') ".format(start_date,end_date)
         
     
     where_skills = ''
@@ -608,6 +609,11 @@ def get_job_rows(start_date=None,end_date=None,where='',user_skills=[],is_admin=
     dates_list = []
     if jobs:
         for job in jobs:
+            
+            import pdb
+            if job.event_id == 12:
+                pdb.set_trace()
+                
             # this only needs to run once for each event id
             if job.event_id != last_event_id:
                 last_event_id = job.event_id
