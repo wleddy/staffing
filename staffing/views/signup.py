@@ -609,11 +609,6 @@ def get_job_rows(start_date=None,end_date=None,where='',user_skills=[],is_admin=
     dates_list = []
     if jobs:
         for job in jobs:
-            
-            import pdb
-            if job.event_id == 12:
-                pdb.set_trace()
-                
             # this only needs to run once for each event id
             if job.event_id != last_event_id:
                 last_event_id = job.event_id
