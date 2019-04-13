@@ -604,8 +604,26 @@ def get_job_rows(start_date=None,end_date=None,where='',user_skills=[],is_admin=
     #import pdb;pdb.set_trace()
     jobs = Job(g.db).query(sql.format(where=where, where_date_range=where_date_range,where_skills=where_skills))
 
+    last_event_id = 0
+    dates_list = []
     if jobs:
         for job in jobs:
+            # this only needs to run once for each event id
+            if job.event_id != last_event_id:
+                last_event_id = job.event_id
+                
+                # generate a list of all dates fo this event in this selection of jobs
+                # get a selection of jobs for this event
+                job_dates = Job(g.db).select(where='event_id = {} {} {}'.format(job.event_id,where_date_range,where_skills),order_by="job.start_date")
+                #put into list
+                dates_list = []
+                if job_dates:
+                    for job_date in job_dates:
+                        if job_date.start_date[:10] not in dates_list:
+                            dates_list.append(job_date.start_date[:10])
+                    
+            job.event_date_list = dates_list
+        
             # Location resolution...
             # job.event_loc_* and job.job_loc_* fields will all be populated for display
             # defaults
@@ -664,15 +682,6 @@ def get_job_rows(start_date=None,end_date=None,where='',user_skills=[],is_admin=
                 populate_participant_list(job)
                 
                 
-            # generate a list of all dates fo this event in this selection of jobs
-            # get a selection of jobs for this event
-            job_dates = Job(g.db).select(where='event_id = {} {} {}'.format(job.event_id,where_date_range,where_skills),order_by="job.start_date")
-            #put into list
-            job.event_date_list = []
-            for job_date in job_dates:
-                if job_date.start_date[:10] not in job.event_date_list:
-                    job.event_date_list.append(job_date.start_date[:10])
-                    
                     
             ##################
             ## There really ought to be a way to do these 2 queries within the main query
