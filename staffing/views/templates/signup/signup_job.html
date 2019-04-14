@@ -30,6 +30,7 @@
                 <div>
                     {{ job.job_description | render_markdown }}
                 </div>
+                <p>{{job.job_filled_positions}} of {{job.max_positions}} positions filled.</p>
                 <div id="job_{{job.job_id}}_participants" >
                 {% set initials_list = []%}
                 {% set user_data_list = []%}
