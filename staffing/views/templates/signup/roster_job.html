@@ -1,48 +1,35 @@
-        <div id="job-head{{ job.job_id }}" class="w3-row w3-secondary-color job-contain job-date-contain" >
-            <div class="w3-col l10 m10">
-                <p><strong>{{ job.job_title | truncate(40) }}</strong>
-                    <span class="w3-small">- {{ job.start_date | local_time_string | lower }}
-                        <span> - {{ job.end_date | local_time_string | lower }}</span>
-                    </span>
-                </p>
-            </div>
-        </div>
-        
-        <div id="job-detail{{ job.job_id }}" class="w3-row w3-secondary-color job-contain " >
-                {% if job.job_loc_w3w != job.event_loc_w3w and job.job_loc_lat != job.event_loc_lat %}
-            <div class="w3-col w3-third " >
-                <div style="padding-left:4pt;">
-                    <p>
-                        <em>Where:</em> <strong>{{ job.job_loc_name }}</strong> 
-                        {% if job.job_loc_w3w %}<a href="https://w3w.co/{{job.job_loc_w3w}}" target="_w3w" >Map...</a>
-                        {% elif job.job_loc_lat and job.job_loc_lng %}<a href="#">Map...</a>{% endif %}
-                    </p>
-                </div>
-            </div>
-                {% endif %}
-            <div class="w3-row" style="margin-left:10pt;">
-                {% set participant_list = [] %}
-                {% if job.participants[job.job_id] %}
-                {% set participant_list = job.participants[job.job_id]['user_data']%}
-                {% endif %}
-                <div class="w3-small" style="text-align:left;">
-                    {% if participant_list %}
-                    <p style="margin-bottom:0;">Signed Up:</p>
-                    <table class="w3-table">
-                    {% for participant in participant_list %}
-                    <tr>
-                    <td>{{ participant.user_name }}
-                    <a href="tel:{{participant.phone}}">{{participant.phone | default('No Phone')}}</a><br>
-                    <a href="mailto:{{participant.email}}">{{participant.email | default("No Email")}}</a>
-                    {% if participant.positions > 1 %}({{participant.positions}}) People{% endif %}
-                </td>
-                     </tr>
-                    {% endfor %}
-                </table>
-                    {% else%}
-                    <p>No one signed up.</p>
-                    {% endif %}
-            </div>
-        </div>
+<div id="job-head{{ job.job_id }}" class="w3-row-padding w3-secondary-color job-contain job-date-contain" >
+    <div class="w3-col l10 m10">
+        <p><strong>{{ job.job_title | truncate(40) }}</strong>
+            <span class="w3-small">- {{ job.start_date | local_time_string | lower }}
+                <span> - {{ job.end_date | local_time_string | lower }}</span>
+            </span>
+        </p>
     </div>
-        {% if show_detail %}<script>$('#job-detail{{ job.job_id }}').show();$('#job-head{{ job.job_id }}').hide()</script>{% endif %}
+</div>
+
+<div id="job-detail{{ job.job_id }}" class="w3-row w3-secondary-color job-contain " >
+    <div class="w3-row" style="margin-left:10pt;">
+        {% set participant_list = [] %}
+        {% if job.participants[job.job_id] %}
+        {% set participant_list = job.participants[job.job_id]['user_data']%}
+        {% endif %}
+        <div class="w3-small" style="text-align:left;">
+            {% if participant_list %}
+            <p style="margin-bottom:0;">Signed Up:</p>
+            <table class="w3-table">
+            {% for participant in participant_list %}
+            <tr>
+            <td>{{ participant.user_name }}
+            <a href="tel:{{participant.phone}}">{{participant.phone | default('No Phone')}}</a>
+            <a href="mailto:{{participant.email}}">{{participant.email | default("No Email")}}</a>
+            {% if participant.positions > 1 %}({{participant.positions}}) People{% endif %}
+        </td>
+             </tr>
+            {% endfor %}
+        </table>
+            {% else%}
+            <p>No one signed up.</p>
+            {% endif %}
+    </div>
+</div>

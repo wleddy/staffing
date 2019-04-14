@@ -1,16 +1,18 @@
 {% extends 'signup_layout.html' %}
 
 {% block page_header %}
+{% include 'roster_page_header.html' %}
 {% endblock page_header %}
 
 {% block body %}
     {% if not jobs or not is_admin %}
     <div class="w3-row w3-secondary-color job-contain " style="margin-top:-1px;">
-         <h2>Sorry, there are no events currently planned</h2>
+         <h3>Sorry, there are no events in that date range</h3>
     </div>
     {% else %}
-        {% set job_start_date = [''] %}
         {% set event_id = [0] %}
+        {% set job_start_date = [''] %}
+        {% set job_location_name = [''] %}
         {% for job in jobs %}
             {% if job.event_id != event_id[0] %}
             {# don't show event head again till event changes #}
@@ -18,30 +20,37 @@
             {% set _ = event_id.append(job.event_id) %}
             {% set _ = job_start_date.pop() %}
             {% set _ = job_start_date.append('') %}
-            <div id="act-{{ job.event_id }}" class="event-contain w3-row-padding w3-secondary-color w3-topbar" style="padding-bottom:6pt;">        
-                <div class="w3-col w3-half w3-small" >
+            {% set _ = job_location_name.pop() %}
+            {% set _ = job_location_name.append('') %}
+            <div id="act-{{ job.event_id }}" class="event-contain w3-row-padding w3-secondary-color w3-topbar" >        
+                <div class="w3-col w3-half" >
                        <p class="w3-large">
-                           <strong>{{ job.event_title }}</strong>
+                           <strong>{{ job.event_title }}</strong><br>
+                           <span class="w3-small">Filled: {{ job.event_filled_positions | default("0", True) }} of {{ job.event_max_positions | default("0", True) }}</span>
                        </p>
                 </div>
-                <div class="w3-third " style="padding-left:4pt;">
-                    <p>
-                        <em>Where:</em> <strong>{{ job.event_loc_name | default("", True ) }}</strong> 
-                        {% if job.event_loc_w3w %}<a href="https://w3w.co/{{job.event_loc_w3w}}" target="_w3w" >Map...</a>
-                        {% elif job.event_loc_lat and job.event_loc_lng %}<a href="#">Map...</a>{% endif %}
-                    </p>
-                    {% set width_pct = job.event_filled_positions | default(0,True) / job.event_max_positions * 74 %}
-                    {% if width_pct > 25.0 %}
-                    <p class="w3-small">Filled: 
-                        <a class="w3-button w3-primary-color w3-round-medium filled-bar" style="width:{{ width_pct }}%;"
-                        >{{ job.event_filled_positions | default("0", True) }} of {{ job.event_max_positions | default("0", True) }}</a>
-                    </p>
-                    {% else %}
-                    <p class="w3-small">Filled: 
-                        <a class="w3-button w3-primary-color w3-round-medium filled-bar" style="width:{{ width_pct }}%;">&nbsp;</a>
-                        &nbsp;{{ job.event_filled_positions | default("0", True) }} of {{ job.event_max_positions | default("0", True) }}
-                    </p>
-                    {% endif %}
+            </div>
+            <div class="event-contain w3-row-padding w3-secondary-color" style="margin-top:0;">        
+               <p class="w3-col w3-half w3-small" >
+                   {% if job.event_manager_last_name %}Event Manager: {{ job.event_manager_first_name | default("")}} {{job.event_manager_last_name}}<br>{% endif %}
+                   {% if job.event_manager_email %}Manager email: {{job.event_manager_email}}<br>{% endif %}
+                   {% if job.event_manager_phone %}Manager phone: {{job.event_manager_phone}}<br>{% endif %}
+               </p>
+                <p class="w3-col w3-half w3-small" style="margin-top:0;">
+                   {% if job.client_contact %}Client: {{job.client_contact}}<br>{% endif %}
+                   {% if job.client_email %}Client email: {{job.client_email}}<br>{% endif %}
+                   {% if job.client_phone %}Client phone: {{job.client_phone}}<br>{% endif %}
+                   {% if job.client_website %}Client web: {{job.client_website | weblink }}{% endif %}
+               </p>
+            </div>
+            {% if job.event_staff_info %}
+            <div class="event-contain w3-row-padding w3-secondary-color" style="margin-top:0;">
+                <div class="w3-col w3-half w3-small" >   
+                   <p><strong>Staff Only Info...</strong></p>
+                   <div class="w3-border" style="margin-left:6pt;padding:3pt;">
+                       {{ job.event_staff_info | render_markdown }}
+                   </div>
+                   {% endif %}
                 </div>
             </div>
             {% endif %} {# show event head? #}
@@ -49,24 +58,25 @@
             {% if job.start_date[:10] != job_start_date[0] %}
                 {% set _ = job_start_date.pop() %}
                 {% set _ = job_start_date.append(job.start_date[:10]) %}
-                <div class="w3-row w3-secondary-color job-contain job-date-contain" style="margin-top:-1px;">
-                    <div class="w3-col l11 m11">
-                        <hr style="margin:0 0 6pt 0;">
-                        <p onclick="$('.job-date-container-{{ job.event_id }}-{{job.start_date[:10]}},.job-date-more-{{ job.event_id }}-{{job.start_date[:10]}}').toggle();"
-                        style="cursor:pointer;">
-                            <span class="w3-button w3-round-medium w3-primary-color job-date-more-{{ job.event_id }}-{{job.start_date[:10]}}" 
-                            >+</span>
-                            <span class=" w3-button w3-round-medium w3-primary-color job-date-container-{{ job.event_id }}-{{job.start_date[:10]}}" style="display:none;" 
-                            >&ndash;</span>
-                            <em>When:</em> <strong>{{ job.start_date[:10] | abbr_date_string }}</strong>
-                        </p>
-                    </div>
-                </div>
+                {% set _ = job_location_name.pop() %}
+                {% set _ = job_location_name.append('') %}
+                <hr class="event-contain" style="margin-top:0;">
+                <p class="event-contain w3-row w3-secondary-color" style="margin-top:0">
+                    <strong>{{ job.start_date[:10] | abbr_date_string }}</strong>
+                </p>
             {% endif %} {# show date? #}
-             <div class="job-date-container-{{ job.event_id }}-{{job.start_date[:10]}}" style="display:none;">
-               <div id="job-body{{job.job_id}}">
-                    {% include 'roster_job.html' %}
-                </div>
+            
+            {% if job.job_loc_name != job_location_name[0] %}
+                {% set _ = job_location_name.pop() %}
+                {% set _ = job_location_name.append(job.job_loc_name) %}
+                <p class="event-contain w3-row w3-secondary-color" style="margin-top:0;">
+                    <strong>{{ job.job_loc_name }}</strong> 
+                    {% if job.job_loc_w3w %}<a href="https://w3w.co/{{job.job_loc_w3w}}" target="_w3w" >Map...</a>
+                    {% elif job.job_loc_lat and job.job_loc_lng %}<a href="#">Map...</a>{% endif %}
+                </p>
+            {% endif %} {# show loction? #}
+           <div id="job-body{{job.job_id}}">
+                {% include 'roster_job.html' %}
             </div>
     
         {% endfor %} {# jobs #}

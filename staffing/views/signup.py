@@ -227,19 +227,28 @@ def signup_success(id=0):
     return render_template('signup_job.html',job=job,is_admin=is_user_admin())
     
     
+@mod.route('/roster/<int:display_end_days>',methods=['GET','POST',])
+@mod.route('/roster/<int:display_end_days>/',methods=['GET','POST',])
 @mod.route('/roster',methods=['GET',])
-@mod.route('/roster/',methods=['GET',])
+@mod.route('/roster/',methods=['GET','POST',])
 @table_access_required(Job)
-def roster():
+def roster(display_end_days=0):
     """Display the roster of all current events
     for now, define current as jobs that occure on today or within the next 2 weeks.
     """
+    
+    #import pdb;pdb.set_trace()
     
     setExits()
     g.title='Signup Roster'
     site_config = get_site_config()
     # get the current users role id's
     is_admin = is_user_admin()
+    end_date = start_date = local_datetime_now()
+    display_end_days = cleanRecordID(request.form.get('display_end_days',request.args.get('display_end_days',0)))
+    if display_end_days > 0:
+        end_date = end_date + timedelta(days=display_end_days)
+    
     user_skills = []
     recs = User(g.db).get_roles(session.get('user_id',-1))
     if recs:
@@ -251,15 +260,10 @@ def roster():
         rec = Role(g.db).get(skill)
         if rec and rec.id not in user_skills:
             user_skills.append(rec.id)
-    
-    
-    #import pdb;pdb.set_trace()
-        
-    start_date, end_date = get_display_date_range()
-
+                
     jobs = get_job_rows(start_date,end_date,"",user_skills,is_admin)
                 
-    return render_template('signup_list.html',jobs=jobs,is_admin=is_admin,roster=True)
+    return render_template('roster.html',jobs=jobs,is_admin=is_admin,display_end_days=display_end_days)
     
     
 @mod.route('/login',methods=['GET','POST',])
@@ -551,6 +555,12 @@ def get_job_rows(start_date=None,end_date=None,where='',user_skills=[],is_admin=
     sql = """
     select event.id as event_id, event.title as event_title, event.description as event_description,
     event.client_contact,event.client_email,event.client_phone,event.client_website,
+    event.staff_info as event_staff_info,
+    event_manager.id as event_manager_user_id,
+    event_manager.first_name as event_manager_first_name,
+    event_manager.last_name as event_manager_last_name,
+    event_manager.email as event_manager_email,
+    event_manager.phone as event_manager_phone,
     event_location.id as event_loc_id,
     event_location.location_name as event_loc_name,
     event_location.street_address as event_loc_street_address,
@@ -598,6 +608,7 @@ def get_job_rows(start_date=None,end_date=None,where='',user_skills=[],is_admin=
     join event on event.id = job.event_id
     left join location as event_location on event_location.id = event.location_id
     left join location as job_location on job_location.id = job.location_id
+    left join user as event_manager on event_manager.id = event.manager_user_id
     where {where}
     order by active_first_date, event_title, job.start_date
     """
