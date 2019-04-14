@@ -4,7 +4,7 @@ from shotglass2.shotglass import get_site_config
 from shotglass2.takeabeltof.date_utils import getDatetimeFromString, local_datetime_now, datetime_as_string
 from shotglass2.takeabeltof.utils import render_markdown_for, printException
 from shotglass2.takeabeltof.mailer import send_message, email_admin
-from shotglass2.users.models import User
+from shotglass2.users.models import User, Pref
 from staffing.models import StaffNotification, Job, Event, UserJob
 from datetime import datetime, timedelta
 
@@ -77,10 +77,10 @@ def send_signup_email(job_data_list,user,template_path,bp,**kwargs):
     return send_result
     
     
-def process_two_day_reminder():
+def process_commitment_reminder():
     """Just what is says.
     Send a reminder notice to all volunteers and staff who have a 
-    job scheduled in the next two days"""
+    job scheduled in the next few days"""
     
     #import pdb;pdb.set_trace()
     
@@ -92,8 +92,8 @@ def process_two_day_reminder():
             user_rec = User(g.db).get(user_id) 
             if len(job_list) > 0 and user_rec:
                     # send a reminder for the current user and job list
-                    subject = "Two Day Job Reminder"
-                    template_path = 'announce/email/two_day_reminder.md'
+                    subject = "Commitment Reminder"
+                    template_path = 'announce/email/commitment_reminder.md'
                     job_list_as_string = ','.join([str(x) for x in job_list])
                     job_data = get_job_rows(None,None,"job.id in ({})".format(job_list_as_string),[],is_admin=True)
                     
@@ -102,18 +102,19 @@ def process_two_day_reminder():
                         #send Ok, create some notification records
                         log_notifications(job_list,prev_user_id,trigger_function_name)
                     else:
-                        email_admin('Unable to send two day reminder to {}. Result: {}'.format((user_rec.first_name + ' ' + user_rec.last_name),send_result[1]))
+                        email_admin('Unable to send commitment reminder to {}. Result: {}'.format((user_rec.first_name + ' ' + user_rec.last_name),send_result[1]))
             
             
         now = local_datetime_now()
         start_date = datetime_as_string(now)
-        end_date = datetime_as_string(now + timedelta(days=2))
+        reminder_days = int(Pref(g.db).get('Commitment Reminder Days',default=2).value)
+        end_date = datetime_as_string(now + timedelta(days=reminder_days))
         
         ###for testing
         ##start_date = '2019-03-01'
         ##end_date = '2019-04-01'
                 
-        trigger_function_name = "annoucements.send_two_day_reminder"
+        trigger_function_name = "annoucements.send_commitment_reminder"
         notifications = StaffNotification(g.db)
         userjobs = UserJob(g.db)
     

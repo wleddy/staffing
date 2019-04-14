@@ -10,7 +10,7 @@ from shotglass2.users.views.login import authenticate_user, setUserStatus, logou
 from shotglass2.www.views.home import contact as home_contact
 from staffing.models import Event, Location, Job, UserJob
 from staffing.utils import pack_list_to_string, un_pack_string
-from staffing.views.announcements import send_signup_email, process_two_day_reminder
+from staffing.views.announcements import send_signup_email, process_commitment_reminder
 from datetime import timedelta, datetime
 
 mod = Blueprint('signup',__name__, template_folder='templates/signup')
@@ -432,7 +432,7 @@ def process_notifications():
     
     # send between 9am and 9pm only
     if now.hour >= 9 and now.hour <= 21:
-        process_two_day_reminder()
+        process_commitment_reminder()
         
     return 'Ok' #Always Ok
         

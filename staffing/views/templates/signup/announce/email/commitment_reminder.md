@@ -1,6 +1,6 @@
 ## Your Reminder from {{ site_config.ORG_NAME | default(site_config.SITE_NAME, True) }}
 
-You have the following commitments coming up in the next couple days.
+You have the following commitments coming up in the next few days.
 
 If you are unable to make it to any of the events, please [contact us](http://{{config.HOST_NAME}}{{ url_for('signup.contact')}})
 as soon as possible so we can arrange for someone to take your place.
