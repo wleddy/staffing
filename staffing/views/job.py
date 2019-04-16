@@ -156,9 +156,24 @@ def delete(id=0):
     rec = job.get(id)
         
     if rec:
+        ## Don't delete if there are any assignmehnts
+        UJ = UserJob(g.db).select(where='job_id = {}'.format(id))
+        if UJ:
+            mes = "There are one or more users assigned to this job. You must remove the assignments first."
+            if request.is_xhr:
+                #this is an ajax request
+                return "failure: " + mes
+            else:
+                flash(mes)
+                return redirect(g.listURL)
+            
         job.delete(rec.id)
         g.db.commit()
+        if request.is_xhr:
+            return "success"
         #flash("Job {} Deleted from {}".format(rec.title,job.display_name))
+    else:
+        flash("That record could not be found")
     
     return redirect(g.listURL)
     
@@ -181,9 +196,8 @@ def delete_from_list(id=0):
     if id > 0:
         rec = Job(g.db).get(id)
         if rec:
-            delete(id)
-            return "success"
-    return 'Could not find a Job with that ID'
+           return delete(id)
+    return 'failure: Could not find a Job with that ID'
 
     
 @mod.route('/get_job_list_for_event/',methods=['GET','POST',])
@@ -240,6 +254,12 @@ def manage_job_set(id=None):
         if recs:
             for rec in recs:
                 if action == 'delete':
+                    ## Don't delete if there are any assignmehnts
+                    UJ = UserJob(g.db).select(where='job_id = {}'.format(rec.id))
+                    if UJ:
+                        g.db.rollback()
+                        return "failure: There are one or more users assigned to this job. You must remove the assignments first."
+                        
                     job.delete(rec.id)
                 else:
                     if action == 'copy':
@@ -337,8 +357,10 @@ def assignment_manager(job_id=0):
         role_list = role_list.split(',') #convert it to a list
     
     # Get all the users who can do this job
-    skilled_users = User(g.db).get_with_roles(role_list)
-        
+    #skilled_users = User(g.db).get_with_roles(role_list)
+    # 4/15/19 - let manager assign anyone they like. Show all users
+    skilled_users = User(g.db).select()
+ 
     #get all users currently assigned
     assigned_users = UserJob(g.db).get_assigned_users(job_id)
 
