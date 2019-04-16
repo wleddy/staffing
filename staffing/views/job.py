@@ -222,7 +222,7 @@ def manage_job_set(id=None):
     
     #import pdb;pdb.set_trace()
     action = request.args.get('action')
-    new_date=request.form.get('new_date')
+    new_date=request.form.get('new_date','')
     
     id = cleanRecordID(request.form.get('id',id))
     
@@ -239,15 +239,30 @@ def manage_job_set(id=None):
         
     dup_date = None
     if request.form and action != 'delete':
+        # validate the new date for a set
         try:
-            dup_date = coerce_datetime(request.form.get('new_date',''),'00:00:00')
+            dup_date = coerce_datetime(request.form.get('new_date',''),'23:00:00')
             if dup_date:
+                # You can't move a set into the past
+                if dup_date < local_datetime_now():
+                    return "failure: You can't move or copy a set into the past"
+                    
                 #convert it to a string
                 dup_date = date_to_string(dup_date,'iso_date') #'YYYY-MM-DD'
+            
+                ## if there is already a job for this event on that date, don't move or copy
+                sql = """select user_job.id, job.event_id, job.start_date from user_job
+                        join job on user_job.job_id = job.id
+                        where job.event_id = {} and 
+                        date(job.start_date,'localtime') = date('{}')""".format(rec.event_id,dup_date)
+                UJ = UserJob(g.db).query(sql)
+                if UJ:
+                    return "failure: There are already jobs on that date. You can't move or copy to there."
+                
             else:
-                flash("That is not a valid date")
+                return "failure: That is not a valid date"
         except:
-            flash("Got an error while processing the date")
+            return "failure: Got an error while processing the date"
             
     if request.form and (dup_date or action == 'delete'):
         recs = job.select(where="event_id = {} and date(start_date,'localtime') = date('{}','localtime')".format(rec.event_id,rec.start_date))
@@ -262,6 +277,7 @@ def manage_job_set(id=None):
                         
                     job.delete(rec.id)
                 else:
+                    ## copy or move
                     if action == 'copy':
                         rec.id = None
                         
