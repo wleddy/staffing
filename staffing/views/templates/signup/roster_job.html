@@ -6,7 +6,7 @@
             </span>
         </p>
         <p class="w3-small"><a href="javascript:void()" onclick="$(this).hide();$('#job-desc-{{job.job_id }}').show();">show description...</a></p>
-        <div id="job-desc-{{job.job_id}}" class="w3-small" style="display:none;">
+        <div id="job-desc-{{job.job_id}}" class="w3-small w3-white w3-border" style="display:none;padding:3pt;">
             {{ job.job_description | render_markdown }}
         </div>
     </div>
