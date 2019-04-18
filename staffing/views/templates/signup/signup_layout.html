@@ -8,21 +8,6 @@
 </div>
 {% endblock dialog %}
 
-{% block head %}
-    <style>
-        .event-contain{margin:6pt 0 0 0;}
-        @media (min-width:993px){.event-contain{margin:10pt 16.6666% 0 16.6666%;}}
-        .job-contain{margin:0;}
-        @media (min-width:993px){.job-contain{margin:0 16.6666%;}}
-        .participant-badge {padding:7pt;min-width:29pt;}
-        .filled-bar {cursor:text;padding:3pt 0pt}
-    </style>
-{% endblock head %}
-
 {% block page_header %}
-    {% if roster %}
-        {% include "roster_page_header.html" %}
-    {% else %}
-        {% include "signup_page_header.html"%}
-    {% endif %}
+    {% include "signup_page_header.html"%}
 {% endblock page_header %}

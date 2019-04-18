@@ -30,6 +30,15 @@ def display():
     
     return render_template('job_list.html',recs=recs)
     
+@mod.route('/roster',methods=['GET','POST'])
+@mod.route('/roster/',methods=['GET','POST'])
+@table_access_required(Job)
+def roster():
+    setExits()
+    
+    from staffing.views.signup import roster
+    return roster()
+    
     
 @mod.route('/edit/',methods=['GET','POST',])
 @mod.route('/edit/<int:id>/',methods=['GET','POST',])

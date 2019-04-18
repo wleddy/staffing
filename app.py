@@ -107,8 +107,9 @@ def _before():
         # a header row must have the some permissions or higher than the items it heads
         g.admin.register(Event,url_for('event.display'),display_name='Staffing Admin',header_row=True,minimum_rank_required=500,roles=['admin','event manager'])
         g.admin.register(Event,url_for('event.display'),display_name='Events',minimum_rank_required=500,roles=['admin','event manager'])
+        g.admin.register(Job,url_for('job.roster'),display_name='View Roster',minimum_rank_required=80)
         #Jobs
-        g.admin.register(Job,url_for('job.display'),display_name='Jobs',minimum_rank_required=500,roles=['admin','event manager'])
+    #g.admin.register(Job,url_for('job.display'),display_name='Jobs',minimum_rank_required=500,roles=['admin','event manager'])
         #location
         g.admin.register(Location,url_for('location.display'),display_name='Locations',minimum_rank_required=500,roles=['admin','event manager'])
         g.admin.register(EventType,url_for('event_type.display'),display_name='Event Types',minimum_rank_required=500,roles=['admin','event manager'])

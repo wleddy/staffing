@@ -18,6 +18,14 @@
     width:0px;
 }
 
+/* for signup pages */
+.event-contain{margin:6pt 0 0 0;}
+@media (min-width:993px){.event-contain{margin:10pt 16.6666% 0 16.6666%;}}
+.job-contain{margin:0;}
+@media (min-width:993px){.job-contain{margin:0 16.6666%;}}
+.participant-badge {padding:7pt;min-width:29pt;}
+.filled-bar {cursor:text;padding:3pt 0pt}
+
 
 /*p {margin-top:0;margin-bottom:.4em;}*/
 
