@@ -4,20 +4,30 @@
 
 <fieldset>
     <p>{{ input_field(rec.id,"id",type="hidden",default=0)}}</p>
-    {% if events and not current_event %}
-    <p>
-        {{ select_field("event_id",label='Event for this Job')}}
-        <option value="0"><em>Select one</em></option>
-        {% for event in events %}
-        <option value="{{event.id}}" {% if event.id == rec.event_id %}selected="selected"{% endif %}>{{ event.title}}</option>
-        {% endfor %}
-        </select>
-    </p>
-    {% else %}
-		<input type=hidden name="event_id" value="{{rec.event_id|default('0',True )}}">
-        <h3 class="w3-container w3-panel w3-primary-color">{{current_event.title}}</h3>
-    {% endif %}
-    
+    <div class="w3-row">
+        <div class="w3-col w3-threequarter"> 
+            {% if events and not current_event %}
+            <p>
+                {{ select_field("event_id",label='Event for this Job')}}
+                <option value="0"><em>Select one</em></option>
+                {% for event in events %}
+                <option value="{{event.id}}" {% if event.id == rec.event_id %}selected="selected"{% endif %}>{{ event.title}}</option>
+                {% endfor %}
+                </select>
+            </p>
+            {% else %}
+        		<input type=hidden name="event_id" value="{{rec.event_id|default('0',True )}}">
+                <h3 class="w3-container w3-panel w3-primary-color">{{current_event.title}}</h3>
+            {% endif %}
+        </div>
+        <p class="w3-col w3-quarter" style="padding-left:6pt;">{{ select_field("status","Job Status", class="w3-border") }}
+                {% for status in site_config.JOB_STATUS_VALUES %}
+                    <option value="{{status}}" {% if status == rec.status %}selected="selected" {% endif %}>{{status}}</option>
+                {% endfor %}
+            </select>
+        </p>
+        
+    </div>
     {# allow managers to add or remove staff/volunteers #}
     
     <!-- <p class="w3-large"></p> -->

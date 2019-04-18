@@ -492,7 +492,7 @@ def is_user_admin():
     
     return is_admin
 
-def get_job_rows(start_date=None,end_date=None,where='',user_skills=[],is_admin=False):
+def get_job_rows(start_date=None,end_date=None,where='',user_skills=[],is_admin=False,**kwargs):
     """
     Make a row list for job and event records
 
@@ -524,7 +524,8 @@ def get_job_rows(start_date=None,end_date=None,where='',user_skills=[],is_admin=
     ## Don't use 'localtime' modifier with date strings without timezone info
     where_date_range = " and date(job.start_date, 'localtime') >= date('{}') and date(job.start_date, 'localtime') <= date('{}') ".format(start_date,end_date)
         
-    
+    job_status_where = kwargs.get('job_status_where'," and lower(job.status) = 'active' ")
+        
     where_skills = ''
     if not is_admin:
         if not user_skills:
@@ -550,7 +551,7 @@ def get_job_rows(start_date=None,end_date=None,where='',user_skills=[],is_admin=
     if not where:
         where = "1 "
     
-    where = where + where_date_range + where_skills
+    where = where + job_status_where + where_date_range + where_skills
     
     sql = """
     select event.id as event_id, event.title as event_title, event.description as event_description,
@@ -582,6 +583,7 @@ def get_job_rows(start_date=None,end_date=None,where='',user_skills=[],is_admin=
         job.location_id <> event.location_id {where_date_range} {where_skills}) as unique_job_locations,
     job.id as job_id,
     job.title as job_title,
+    job.status as job_status,
     job.description as job_description,
     job.start_date,
     job.end_date,

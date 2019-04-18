@@ -75,6 +75,7 @@ class Job(SqliteTable):
             max_positions INTEGER,
             event_id INTEGER,
             location_id INTEGER,
+            status TEXT,
             FOREIGN KEY (event_id) REFERENCES event(id) ON DELETE CASCADE """
                 
         super().create_table(sql)

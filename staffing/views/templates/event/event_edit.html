@@ -6,8 +6,8 @@
     <fieldset class="w3-col w3-half w3-left">        
         <p>{{ input_field(rec.id,"id",type="hidden",default=0)}}</p>
         <p>{{ input_field(rec.title,'title',req=True)}}</p>
-        <p>{{ label_only(label="Description")}}</p>
-        <p><textarea rows="5" name="description" style="width:100%;">{{rec.description |default('',True)}}</textarea></p>
+        <p>{{ label_only(label="Description (Appears in Public Calendar)")}}</p>
+        <p><textarea rows="7" name="description" style="width:100%;">{{rec.description |default('',True)}}</textarea></p>
         <p>{{ label_only(label="Staff Only information (not visible to public)")}}</p>
         <p><textarea rows="5" name="staff_info" style="width:100%;" >{{rec.staff_info |default('',True)}}</textarea></p>
         <p>{{ select_field("location_id","Location", class="w3-border") }}

@@ -1,0 +1,7 @@
+BEGIN;
+
+ALTER TABLE job ADD COLUMN status TEXT;
+
+UPDATE OR ROLLBACK job SET status = 'Active';
+
+COMMIT;
