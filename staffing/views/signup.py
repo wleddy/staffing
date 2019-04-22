@@ -524,8 +524,9 @@ def get_job_rows(start_date=None,end_date=None,where='',user_skills=[],is_admin=
     ## Don't use 'localtime' modifier with date strings without timezone info
     where_date_range = " and date(job.start_date, 'localtime') >= date('{}') and date(job.start_date, 'localtime') <= date('{}') ".format(start_date,end_date)
         
-    job_status_where = kwargs.get('job_status_where'," and lower(job.status) = 'active' ")
-        
+    job_status_where = " " + kwargs.get('job_status_where'," and lower(job.status) = 'active' ") + " "
+    order_by = " " + kwargs.get('order_by'," active_first_date, event_title, job.start_date ") + " "
+    
     where_skills = ''
     if not is_admin:
         if not user_skills:
@@ -612,11 +613,11 @@ def get_job_rows(start_date=None,end_date=None,where='',user_skills=[],is_admin=
     left join location as job_location on job_location.id = job.location_id
     left join user as event_manager on event_manager.id = event.manager_user_id
     where {where}
-    order by active_first_date, event_title, job.start_date
+    order by {order_by}
     """
     
     #import pdb;pdb.set_trace()
-    jobs = Job(g.db).query(sql.format(where=where, where_date_range=where_date_range,where_skills=where_skills))
+    jobs = Job(g.db).query(sql.format(where=where, where_date_range=where_date_range,where_skills=where_skills,order_by=order_by))
 
     last_event_id = 0
     dates_list = []

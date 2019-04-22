@@ -1,0 +1,89 @@
+{% extends 'layout.html' %}
+{% block body %}
+<style>
+    .day-col{
+        width:14.2857142857142857%;
+    }
+    .day-content{
+            white-space: nowrap;
+            overflow:hidden;
+            text-overflow:ellipsis;
+    }
+    @media (min-width:993px){
+        .day-col{
+            width:11.9047619047619%;
+        }
+    }
+    .day-name, .month-name{
+        text-align:center;
+        font-weight:bold;
+    }
+    .month-name{
+        padding:6pt 0;
+    }
+    .calendar-contain .w3-row p.w3-col {
+        margin:0;
+    }
+    .day-cell{
+        min-height:80pt
+    }
+    .day-number{
+        text-align:right;
+        font-weight:bold;
+        padding-right:6pt;
+    }
+    .month_arrow{
+        text-decoration:none;
+    }
+</style>
+
+{% if cal_list %}
+    {% set _ = calendar.setfirstweekday(calendar.SUNDAY) %}
+    {% set start_month = start_date.month %}
+    {% set start_year = start_date.year %}
+<div class="calendar-contain">
+    <div class="w3-row">
+        <p class="w3-col l1 m1 w3-hide-small">&nbsp;</p>
+        <p class="w3-col l10 m10 s12 w3-large w3-primary-color month-name">
+            <a class="month_arrow" href="#">&#x3c;</a>&nbsp;&nbsp;
+            {{ calendar.month_name[start_month]}}
+            &nbsp;&nbsp;<a class="month_arrow" href="#">&#x3e;</a>
+        </p>
+        <p class="w3-col l1 m1 w3-hide-small">&nbsp;</p>
+    <div class="w3-row">
+        <p class="w3-col l1 m1 w3-hide-small">&nbsp;</p>
+        {%for day in calendar.weekheader(3).split(' ') %}
+        <p class="w3-col w3-border w3-secondary-color day-name day-col">{{ day }}</p>
+        {% endfor %}
+        <p class="w3-col l1 m1 w3-hide-small">&nbsp;</p>
+    </div>
+    {%for week in range(cal_list | length ) %}
+    <div class="w3-row">
+        <p class="w3-col l1 m1 w3-hide-small">&nbsp;</p>
+            {% for day in range(cal_list[week] | length ) %}
+            <div class="w3-col w3-border w3-white day-col day-cell" style="padding:0 2pt;max-length:">
+                <p class="day-number">
+                    {% if cal_list[week][day][0] != 0 %}{{ cal_list[week][day][0] }}{% else %}&nbsp;{% endif %}
+                </p>
+                <div class="w3-small">                    
+                    {% for x in range(cal_list[week][day][2] | length )%}
+                        {% if x <= 1 or cal_list[week][day][2] | length < 4 %}
+                        {% set job = job_data[cal_list[week][day][2][x]] %}
+                        <p class="day-content">{{job.event_title}}</p>
+                        {% endif %}
+                    {% endfor %}
+                    {# lump all the extra events into a "more" line #}
+                    {% if cal_list[week][day][2] | length > 3 %}
+                    <p class="day-content w3-red">&amp; {{ cal_list[week][day][2] | length - 2}} more...</p>
+                    {% endif %}
+                </div>
+            </div>
+            {% endfor %}
+        <p class="w3-col l1 m1 w3-hide-small">&nbsp;</p>
+    </div>
+    {% endfor %}
+</div>
+{% else %}
+<h3>Well, that's odd... there's no calendar to display...</h3>
+{% endif %}
+{% endblock body %}

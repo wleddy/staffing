@@ -142,8 +142,9 @@ def server_error(error):
 # Creates the routes for signup subdomain
 subdomain = app.config.get('SIGNUP_SUBDOMAIN','signup')
 
-from staffing.views import signup
+from staffing.views import signup, calendar
 app.register_blueprint(signup.mod,subdomain=subdomain)
+app.register_blueprint(calendar.mod,subdomain=subdomain)
 
 #Register the static route
 # seting the subdomain this way works in this case, but may not be the best solution
