@@ -1,0 +1,32 @@
+{% extends 'layout.html' %}
+
+{% block page_header %}
+<div class="w3-panel w3-card-2 w3-secondary-color">
+    <h2>
+        <img src="{{url_for('static',filename='images/bicycle.png')}}" />
+        {{ job.event_title | default("Event",True)}}
+    </h2>
+</div>
+{% endblock page_header %}
+
+{% block body %}
+<div class="w3-panel w3-card-2 w3-secondary-color">
+    <div class="w3-row">
+        <div id="map" class="w3-col w3-half w3-border" style="min-height:120px;">
+            <h3>A Map goes here...</h3>
+        </div>
+        <div class="w3-col w3-half w3-small">
+            {{ job.event_description | render_markdown }}
+            <p>
+                <em>Location:</em> {{ job.job_loc_street_address }}, {{ job.job_loc_city }}<br>
+                {% if job.job_loc_lat and job.job_loc_lng %}<em>Map:</em> <a href="https://www.google.com/maps/search/?api=1&query={{ job.job_loc_lat}},{{ job.job_loc_lng }}">Google Map</a><br>{% endif %}
+                <em>Date:</em> {{ job.start_date | short_day_and_date_string }}<br>
+                <em>Time:</em> {{ job.start_date | local_time_string }} - {{ job.end_date | local_time_string }}
+            </p>
+        </div>
+    </div>
+</div>
+<div class="w3-panel w3-card-2 w3-secondary-color">
+    <h3 style="text-align:center;cursor:pointer" onclick="location='{{ url_for('calendar.display')}}{{ job.start_date[5:7] |int }}/{{ job.start_date[:4] }}/'">&larr; Back</h3>
+</div>
+{% endblock body %}
