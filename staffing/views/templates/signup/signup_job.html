@@ -8,7 +8,7 @@
         <p>
             <strong>{{ job.job_title | truncate(40) }}</strong>
             <span class="w3-small">- {{ job.start_date | local_time_string | lower }}
-            <span class="w3-hide-small"> - {{ job.end_date | local_time_string | lower }}</span>
+            <span class=""> - {{ job.end_date | local_time_string | lower }}</span>
             {% if job.job_filled_positions >= job.max_positions %}<em>(Full)</em>{% endif %}
             </span>
         </p>
