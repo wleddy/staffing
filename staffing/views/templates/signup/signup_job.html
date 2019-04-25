@@ -7,16 +7,15 @@
         {% endif %}
         <p>
             <strong>{{ job.job_title | truncate(40) }}</strong>
-            <span class="w3-small">- {{ job.start_date | local_time_string | lower }}
-            <span class=""> - {{ job.end_date | local_time_string | lower }}</span>
+            <br><span class="w3-small"><em>Shift Time:</em> {{ job.start_date | local_time_string | lower }}
+            - {{ job.end_date | local_time_string | lower }}</span>
             {% if job.job_filled_positions >= job.max_positions %}<em>(Full)</em>{% endif %}
             </span>
         </p>
         {% if job.job_loc_id and job.job_loc_id != job.event_loc_id %}
-        <p class="w3-primary-color" style="padding-left:3pt;width:80%">
-            <em>Job location:</em> <strong>{{ job.job_loc_name | default("", True ) }}</strong> 
-            {% if job.job_loc_w3w %}<a href="https://w3w.co/{{job.job_loc_w3w}}" target="_w3w" >Map...</a>
-            {% elif job.job_loc_lat and job.job_loc_lng %}<a href="#">Map...</a>{% endif %}
+        <p class="w3-small" ><em>Job location:</em> 
+            <strong>{{ job.job_loc_name | default("", True ) }}</strong> 
+            {% if job.job_loc_lat and job.job_loc_lng %}<a href="https://www.google.com/maps/search/?api=1&query={{ job.job_loc_lat }},{{job.job_loc_lng}}" target="_blank">Map...</a>{% endif %}
         </p>
         {% elif not job.job_loc_id and not job.event_loc_id %}
         <p class="w3-primary-color" style="padding-left:3pt;width:80%">
@@ -27,8 +26,17 @@
     <div class="w3-row ">
         <div class="w3-col l2 m2 w3-hide-small">&nbsp;</div>
             <div class="w3-col l6 m6 s6">
-                <div>
-                    {{ job.job_description | render_markdown }}
+                <p class="w3-small" id="job_description_toggle_{{job.job_id}}" onclick="$('#job_description_{{job.job_id}}, #job_description_toggle_{{job.job_id}}').toggle();"
+                style="cursor:pointer;"><em>Show Job Description</em>
+                </p>
+                
+                <div id="job_description_{{job.job_id}}" style="display:none;">
+                    <p class="w3-small" onclick="$('#job_description_{{job.job_id}}, #job_description_toggle_{{job.job_id}}').toggle();"
+                    style="cursor:pointer;"><em>Hide Job Description</em>
+                    </p>
+                    <div class="w3-small w3-white w3-border">
+                        {{ job.job_description | render_markdown }}
+                    </div>
                 </div>
                 <p>{{job.job_filled_positions}} of {{job.max_positions}} positions filled.</p>
                 <div id="job_{{job.job_id}}_participants" >
