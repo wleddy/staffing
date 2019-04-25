@@ -182,8 +182,7 @@ if app.config['TESTING']:
 shotglass.register_users(app)
 # setup www.routes...
 shotglass.register_www(app)
-
-
+shotglass.register_maps(app)
 
 @app.route('/')
 def default_home():

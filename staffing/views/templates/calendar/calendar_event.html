@@ -12,14 +12,18 @@
 {% block body %}
 <div class="w3-panel w3-card-2 w3-secondary-color">
     <div class="w3-row">
-        <div id="map" class="w3-col w3-half w3-border" style="min-height:120px;">
-            <h3>A Map goes here...</h3>
+        {% if map_html %}
+        <div id="map" class="w3-col w3-half w3-border" style="margin-bottom:6pt;">
+            {{ map_html | safe }}
         </div>
-        <div class="w3-col w3-half w3-small">
+        {% endif %}
+        <div class="w3-col w3-half w3-small" style="padding-left:1%;">
+            <h3><strong>{{ job.event_title}}</strong></h3>
             {{ job.event_description | render_markdown }}
             <p>
-                <em>Location:</em> {{ job.job_loc_street_address }}, {{ job.job_loc_city }}<br>
-                {% if job.job_loc_lat and job.job_loc_lng %}<em>Map:</em> <a href="https://www.google.com/maps/search/?api=1&query={{ job.job_loc_lat}},{{ job.job_loc_lng }}">Google Map</a><br>{% endif %}
+                <em>Location:</em> <strong>{{ job.job_loc_name }}</strong><br>
+                {{ job.job_loc_street_address }}, {{ job.job_loc_city }}<br>
+                {% if job.job_loc_lat and job.job_loc_lng %}<em>Map:</em> <a href="https://www.google.com/maps/search/?api=1&query={{ job.job_loc_lat}},{{ job.job_loc_lng }}" target="_blank">Google Map</a><br>{% endif %}
                 <em>Date:</em> {{ job.start_date | short_day_and_date_string }}<br>
                 <em>Time:</em> {{ job.start_date | local_time_string }} - {{ job.end_date | local_time_string }}
             </p>

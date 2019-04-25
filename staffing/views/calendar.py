@@ -1,5 +1,6 @@
 from flask import request, session, g, redirect, url_for, abort, \
      render_template, flash, Blueprint
+from shotglass2.mapping.views.maps import simple_map
 from shotglass2.shotglass import get_site_config
 from shotglass2.users.admin import login_required, table_access_required
 from shotglass2.takeabeltof.utils import render_markdown_for, printException, cleanRecordID
@@ -138,8 +139,22 @@ def event(job_id=None):
                         )
     if not job:
         return redirect(url_for('.display'))
+        
+    job = job[0]
+    map_html = None
     
-    return render_template('calendar_event.html',job=job[0])
+    # get the map for this
+    if job.job_loc_lat and job.job_loc_lng:
+        # make a list of dict for the location
+        map_data = {'lat':job.job_loc_lat,'lng':job.job_loc_lng,
+        'title':job.event_title,
+        'description':job.event_description,
+        'UID':job.event_id,
+        'location_name':job.job_loc_name,
+        }
+        map_html = simple_map(map_data,target_id='map')
+        
+    return render_template('calendar_event.html',job=job,map_html=map_html,)
     
     
 def get_job_status_where():
