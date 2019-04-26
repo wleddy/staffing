@@ -25,7 +25,7 @@
                 {{ job.job_loc_street_address }}, {{ job.job_loc_city }}<br>
                 <em>Date:</em> {{ job.start_date | short_day_and_date_string }}<br>
                 <em>Time:</em> {{ job.start_date | local_time_string }} - {{ job.end_date | local_time_string }}<br>
-                {% if job.job_loc_lat and job.job_loc_lng %}<em>Directions:</em><br><a href="https://www.google.com/maps/search/?api=1&query={{ job.job_loc_lat}},{{ job.job_loc_lng }}" target="_blank">Google Maps</a><br>
+                {% if job.job_loc_lat and job.job_loc_lng %}<br><em>Directions:</em><br><a href="https://www.google.com/maps/search/?api=1&query={{ job.job_loc_lat}},{{ job.job_loc_lng }}" target="_blank">Google Maps</a><br>
                 <a href="http://maps.apple.com/?daddr={{job.job_loc_lat}},{{job.job_loc_lng }}" target="_blank">Apple Maps</a><br>{% endif %}
             </p>
         </div>
