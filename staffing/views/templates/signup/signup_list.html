@@ -14,8 +14,14 @@
          <h2>Sorry, there are no events currently planned</h2>
     </div>
     {% else %}
+        {% set job_date_header_list = []%}
+        {% set event_name_header_list = [] %}
         {% set job_start_date = [''] %}
         {% set event_id = [0] %}
+        <div id="scroll-header-contain" >
+                <p id="event-name-header" class="w3-primary-color" style="display:none;"></p>
+                <p id="job-date-header"class="w3-primary-color" style="display:none;"></p>
+        </div>
         {% for job in jobs %}
             {% if job.event_id != event_id[0] %}
             {# don't show event head again till event changes #}
@@ -23,13 +29,13 @@
             {% set _ = event_id.append(job.event_id) %}
             {% set _ = job_start_date.pop() %}
             {% set _ = job_start_date.append('') %}
+            {% set _ = event_name_header_list.append(job.event_id)%}
             
             {{ back_to_list() }}
-            
-            <div id="act-{{ job.event_id }}" class="event-contain w3-row-padding w3-secondary-color w3-topbar" style="padding-bottom:6pt;">        
+            <div id="event-{{ job.event_id }}" class="event-contain w3-row-padding w3-secondary-color w3-topbar" style="padding-bottom:6pt;">        
                 <div class="w3-col w3-half w3-small" >
                        <p class="w3-medium">
-                           <strong>{{ job.event_title }}</strong>
+                           <strong id="event-title-{{ job.event_id }}">{{ job.event_title }}</strong>
                            {% if job.user_event_positions %}Your Signup ({{ job.user_event_positions }}){% endif %}
                            {% if is_admin %}<a class="w3-small" href="{{ url_for('event.edit')}}{{job.event_id}}/" target="_blank"><em>(edit)</em></a>{% endif %}
 
@@ -81,12 +87,13 @@
                 {% if job.start_date[:10] != job_start_date[0] %}
                     {% set _ = job_start_date.pop() %}
                     {% set _ = job_start_date.append(job.start_date[:10]) %}
+                    {% set _ = job_date_header_list.append(job.job_id)  %}
                     <div class="w3-row w3-secondary-color job-contain job-date-contain" style="margin-top:3pt;">
                         <div class="w3-col l1 m1 w3-hide-small">&nbsp;</div>
                         <div class="w3-col l11 m11 w3-primary-color">
                             <p onclick="$('.job-date-container-{{ job.event_id }}-{{job.start_date[:10]}},#job-date-more-{{ job.event_id }}-{{job.start_date[:10]}},#job-date-less-{{ job.event_id }}-{{job.start_date[:10]}}').toggle();"
                             style="cursor:pointer;">
-                                  <strong>{{ job.start_date[:10] | abbr_date_string }}</strong>
+                                  <strong id="job-date-{{ job.job_id }}">{{ job.start_date[:10] | abbr_date_string }}</strong>
                                   <span class="w3-small" id="job-date-more-{{ job.event_id }}-{{job.start_date[:10]}}" style="display:none;">&nbsp;<em>More...</em></span>
                                   <span class="w3-small" id="job-date-less-{{ job.event_id }}-{{job.start_date[:10]}}" >&nbsp;<em>Less</em></span>
                             </p>
@@ -101,8 +108,16 @@
                 </div>
             {% endif %} {#  g._more_info_event_id #}
         {% endfor %} {# jobs #}
+        
+        {% if g._more_info_event_id %}
+        {# only show the headers and dates on the "More Info" page #}
+            {% include 'job_list_header_scroll.html' %}
+        {% endif %}
+        
     {% endif %}{# not jobs #}
     
     {{ back_to_list() }}
     
+
+
 {% endblock body %}
