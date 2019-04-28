@@ -58,11 +58,11 @@ def display(month=None,year=None):
     except:
         pass # use todays date
             
-    end_date = start_date + timedelta(days=calendar.monthrange(start_date.year,start_date.month)[1])
-    
-    
     #import pdb;pdb.set_trace()
-        
+    
+    eom = calendar.monthrange(start_date.year,start_date.month)[1]
+    end_date = start_date.replace(day=eom)    
+    
     job_data = get_job_rows(start_date,end_date,is_admin=True,
             job_status_where=get_job_status_where(),
             order_by="date(job.start_date,'localtime')")
