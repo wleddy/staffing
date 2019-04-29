@@ -349,20 +349,23 @@ def assignment_manager(job_id=0):
         UserJob(g.db).save(signup)
         g.db.commit()
         
-        # send a special email to the user to inform them of the assignment.
-        manager_rec = User(g.db).get(session.get('user_id',0))
-        user_rec = User(g.db).get(assignment_user_id)
-        # need a fresh copy of this
-        job_data = get_job_rows(None,None,"job.id = {}".format(job_id),[],is_admin=True,job_status_where='')
-        if job_data:
-            job_data = job_data[0]
-            subject = "[SABA] {} {} has given you an assignment".format(manager_rec.first_name,manager_rec.last_name)
-            send_signup_email(job_data,user_rec,'email/inform_user_of_assignment.html',mod,manager=manager_rec,subject=subject,job_data=job_data)
-        else:
-            # failed to get the job data... this should never happen
-            email_admin(subject="Alert from {}".format(site_config['SITE_NAME']),
-                message="Unable to send Manager Assignment email. 'job_data' is None? 'job_id' = {}, 'user_id'={}".format(job_id,assignment_user_id))
-            flash("Unable to send email to user. (Err: job_data is None)")
+        # Only send a notification if the job is in the future
+        assigned_job = Job(g.db).get(job_id)
+        if assigned_job and getDatetimeFromString(assigned_job.start_date) > local_datetime_now():
+            # send a special email to the user to inform them of the assignment.
+            manager_rec = User(g.db).get(session.get('user_id',0))
+            user_rec = User(g.db).get(assignment_user_id)
+            # need a fresh copy of this
+            job_data = get_job_rows(None,None,"job.id = {}".format(job_id),[],is_admin=True,job_status_where='')
+            if job_data:
+                job_data = job_data[0]
+                subject = "[SABA] {} {} has given you an assignment".format(manager_rec.first_name,manager_rec.last_name)
+                send_signup_email(job_data,user_rec,'email/inform_user_of_assignment.html',mod,manager=manager_rec,subject=subject,job_data=job_data)
+            else:
+                # failed to get the job data... this should never happen
+                email_admin(subject="Alert from {}".format(site_config['SITE_NAME']),
+                    message="Unable to send Manager Assignment email. 'job_data' is None? 'job_id' = {}, 'user_id'={}".format(job_id,assignment_user_id))
+                flash("Unable to send email to user. (Err: job_data is None)")
         # The form is going to be redisplayed so clear the signup record
         signup = None
 
@@ -415,29 +418,35 @@ def assignment_manager_delete(job_id=0,user_id=0):
     """Delete a job assignment"""
     setExits()
     site_config = get_site_config()
+    assigned_job = None
     
     #import pdb;pdb.set_trace()
     job_id = cleanRecordID(job_id)
     user_id = cleanRecordID(user_id)
     if job_id > 0 and user_id > 0:
+        assigned_job = Job(g.db).get(job_id) # need this later
+        
         signup=UserJob(g.db).select_one(where='job_id = {} and user_id = {}'.format(job_id,user_id))
         if signup:
             UserJob(g.db).delete(signup.id)
             g.db.commit()
 
-            job_data = get_job_rows(None,None,"job.id = {}".format(job_id),[],is_admin=True,job_status_where='')
-            if job_data:
-                job_data = job_data[0]
-                # send a special email to the user to inform them of the assignment.
-                manager_rec = User(g.db).get(session.get('user_id',0))
-                user_rec = User(g.db).get(user_id)
-                subject = "[SABA] {} {} has cancelled your assignment".format(manager_rec.first_name,manager_rec.last_name)
-                send_signup_email(job_data,user_rec,'email/inform_user_of_cancellation.html',mod,manager=manager_rec,subject=subject,job_data=job_data,no_calendar=True)
-            else:
-                # failed to get the job data... this should never happen
-                email_admin(subject="Alert from {}".format(site_config['SITE_NAME']),
-                    message="Unable to send Manager Cancellation email. 'job_data' is None? 'job_id' = {}, 'user_id'={}".format(job_id,user_id))
-                flash("Unable to send email to user. (Err: job_data is None)")
+            # Only send a notification if the job is in the future
+            #assigned_job = Job(g.db).get(job_id)
+            if assigned_job and getDatetimeFromString(assigned_job.start_date) > local_datetime_now():
+                job_data = get_job_rows(None,None,"job.id = {}".format(job_id),[],is_admin=True,job_status_where='')
+                if job_data:
+                    job_data = job_data[0]
+                    # send a special email to the user to inform them of the assignment.
+                    manager_rec = User(g.db).get(session.get('user_id',0))
+                    user_rec = User(g.db).get(user_id)
+                    subject = "[SABA] {} {} has cancelled your assignment".format(manager_rec.first_name,manager_rec.last_name)
+                    send_signup_email(job_data,user_rec,'email/inform_user_of_cancellation.html',mod,manager=manager_rec,subject=subject,job_data=job_data,no_calendar=True)
+                else:
+                    # failed to get the job data... this should never happen
+                    email_admin(subject="Alert from {}".format(site_config['SITE_NAME']),
+                        message="Unable to send Manager Cancellation email. 'job_data' is None? 'job_id' = {}, 'user_id'={}".format(job_id,user_id))
+                    flash("Unable to send email to user. (Err: job_data is None)")
 
             return assignment_manager(job_id)
             
