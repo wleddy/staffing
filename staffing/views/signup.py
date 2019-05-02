@@ -4,7 +4,7 @@ from shotglass2.shotglass import get_site_config
 from shotglass2.takeabeltof.mailer import send_message
 from shotglass2.takeabeltof.utils import render_markdown_for, render_markdown_text, printException, cleanRecordID, looksLikeEmailAddress, formatted_phone_number
 from shotglass2.takeabeltof.date_utils import date_to_string, getDatetimeFromString, local_datetime_now
-from shotglass2.users.admin import login_required, table_access_required
+from shotglass2.users.admin import login_required, table_access_required, silent_login
 from shotglass2.users.models import Role, User
 from shotglass2.users.views.login import authenticate_user, setUserStatus, logout as log_user_out
 from shotglass2.www.views.home import contact as home_contact
@@ -410,9 +410,9 @@ def register(from_main=0):
     return render_template('signup_login.html',rec=rec,next=next,register=True,submit_script=submit_script,from_main=from_main)
 
 
-@mod.route('/process_notifications',methods=['GET',])
-@mod.route('/process_notifications/',methods=['GET',])
-@login_required
+@mod.route('/process_notifications',methods=['GET','POST',])
+@mod.route('/process_notifications/',methods=['GET','POST',])
+@silent_login()
 def process_notifications():
     """Send Reminders and notifications to Volunteers and Staff
     
