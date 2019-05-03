@@ -1,0 +1,77 @@
+
+{# snippets to add the scrolling title and date headers to signup and roster #}
+<style>
+    #scroll-header-contain{
+        width:100%;
+        position:fixed;
+        top:0;
+        margin:0;
+    }
+    @media (min-width: 993px){
+        #scroll-header-contain{
+            width:40%;
+            margin:0 16.6666%;
+        }
+        
+    }
+    #event-name-header, #job-date-header{
+        padding:6pt;
+        margin-top:0 !important;
+        margin-bottom:0 !important;
+        font-weight:bold;
+        display:none;
+    }
+    #job-date-header{
+        padding:6pt 6pt 6pt 20pt;
+    }
+</style>
+
+<script>
+    var event_id_list = {{ event_name_header_list }};
+    var job_date_list = {{ job_date_header_list }}
+    var header_text = '';
+    var date_header_text = "";
+    var last_event_end_id = -1;
+    window.onscroll = function(){
+        var scrollDist = $(window).scrollTop();
+        var show_header = false;
+        var show_date_header = false;
+        var got_end_marker = false;
+        // find the end marker that is closest to but not past the top of screen
+        for(i=event_id_list.length-1; i > -1; i--){
+            var event_id = event_id_list[i];
+            var tail = document.getElementById("event_end_marker_" + event_id);
+            // var header = document.getElementById("event-" + event_id);
+            if (tail != undefined){
+                if (scrollDist >= tail.offsetTop - 120 && scrollDist < tail.offsetTop){
+                    // the end is near but not past the top... clear both headers
+                    got_end_marker = true;
+                    break
+                }
+            }
+        }
+        // get the text for the job that is just past the top of screen
+        for(i=job_date_list.length-1; i > -1; i--){
+            var job_id = job_date_list[i];
+            var header = document.getElementById("event-title-" + job_id);
+            var date_header = document.getElementById("job-date-" + job_id );
+            if (header != undefined && date_header != undefined){
+                if (scrollDist > header.offsetTop - 160){
+                    header_text = header.attributes.title.value;
+                    date_header_text = date_header.textContent;
+                    show_header = true;
+                    break;
+                }
+            }
+        }
+        
+        // finally show or hide the headers
+        if (show_header && !got_end_marker){
+            $('#event-name-header').html(header_text).show();
+            $('#job-date-header').html(date_header_text).show();
+        } else {
+            $('#event-name-header').html('').hide();
+            $('#job-date-header').html('').hide();
+        }
+    }
+</script>
