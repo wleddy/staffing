@@ -105,8 +105,8 @@
                     </div>
                 {% endif %} {# show date? #}
             
-                <div class="job-date-container-{{ job.event_id }}-{{job.start_date[:10]}}">
                     <p id="event-title-{{ job.job_id }}" title="{{ job.event_title }}" style="font-size:1pt;padding:0;margin:0;">&nbsp;<!-- A marker to hold the title --></p>
+                <div class="job-date-container-{{ job.event_id }}-{{job.start_date[:10]}}">
                     
                     <div id="job-body{{job.job_id}}" >
                         {% include 'signup_job.html' %}
