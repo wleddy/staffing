@@ -24,7 +24,9 @@
             {% if job.event_id != event_id[0] %}
             {# don't show event head again till event changes #}
             {% set last_event = event_id.pop() %}
-            <p id="event_end_marker_{{ last_event }}">A marker to show the end of event {{last_event}}</p>
+            {% if last_event > 0 %}
+            <p id="event_end_marker_{{ last_event }}" style="line-height:.25;">&nbsp;<!-- A marker to show the end of event {{last_event}} --></p>
+            {% endif %}
             {% set _ = event_id.append(job.event_id) %}
             {% set _ = job_start_date.pop() %}
             {% set _ = job_start_date.append('') %}
