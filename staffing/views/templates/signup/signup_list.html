@@ -117,7 +117,7 @@
         
         {% if g._more_info_event_id %}
         {# only show the headers and dates on the "More Info" page #}
-            <p id="event_end_marker_{{ event_id[0] }}" style="line-height:.25;">&nbsp;A marker to show the end of event {{event_id[0]}}</p>
+            <p id="event_end_marker_{{ event_id[0] }}" style="line-height:.25;">&nbsp;<!-- A marker to show the end of event {{event_id[0]}} --></p>
             {% include 'job_list_header_scroll.html' %}
         {% endif %}
         
