@@ -57,7 +57,7 @@
             var date_header = document.getElementById("job-date-" + job_id );
             if (header != undefined && date_header != undefined){
                 if (scrollDist > header.offsetTop - 160){
-                    header_text = header.textContent;
+                    header_text = header.attributes.title.value;
                     date_header_text = date_header.textContent;
                     show_header = true;
                     break;

@@ -73,7 +73,7 @@
                 {% set _ = job_date_header_list.append(job.job_id)  %}
                 <hr class="event-contain" style="margin-top:0;">
                 <p class="event-contain w3-row w3-secondary-color" style="margin-top:0">
-                    <span id="event-title-{{ job.job_id }}">{{ job.event_title }}</span>
+                    <span id="event-title-{{ job.job_id }}" title="{{job.event_title}}">{{ job.event_title }}</span>
                     <strong id="job-date-{{ job.job_id }}">{{ job.start_date[:10] | abbr_date_string }}</strong>
                 </p>
             {% endif %} {# show date? #}
