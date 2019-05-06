@@ -32,6 +32,8 @@ def display(month=None,year=None):
     g.title="Calendar"
     
     start_date = local_datetime_now()
+    today = date(start_date.year,start_date.month,start_date.day)
+    
     start_date = date(start_date.year,start_date.month,1)
     if month == None:
         month = start_date.month
@@ -110,6 +112,8 @@ def display(month=None,year=None):
         # year does not change
         next_month = date(start_date.year,start_date.month+1,1)
         last_month = date(start_date.year,start_date.month-1,1)
+        
+
     
     return render_template('calendar.html',
                             job_data=job_data,
@@ -118,6 +122,7 @@ def display(month=None,year=None):
                             start_date=start_date,
                             last_month=last_month,
                             next_month=next_month,
+                            today = today,
                             )
 
 

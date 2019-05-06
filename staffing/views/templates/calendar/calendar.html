@@ -44,6 +44,10 @@
         font-weight:bold;
         padding-right:6pt;
     }
+    .today {
+        color:white;
+        background-color:red;
+    }
     .month_arrow{
         text-decoration:none;
     }
@@ -104,7 +108,7 @@
                         {% endfor %}
                     </div>
                     {% endif %}
-                    <p class="day-number">
+                    <p class="day-number {% if today and start_date and today.day == day_number and today.month == start_date.month %}today{% endif %}">
                         {% if day_in_this_month %}{{ day_number }}{% else %}&nbsp;{% endif %}
                     </p>
                     <div class="w3-small">
