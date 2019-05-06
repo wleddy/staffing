@@ -27,8 +27,12 @@
                 {% for participant in participant_list %}
                 <tr>
                     <td>{{ row_count[0] }}. {{ participant.user_name }}
-                    <a href="tel:{{participant.phone}}">{{participant.phone | default('No Phone')}}</a>
-                    <a href="mailto:{{participant.email}}">{{participant.email | default("No Email")}}</a>
+                    {% if participant.phone %}
+                    <a href="tel:{{participant.phone}}">Call</a> / <a href="sms:{{participant.phone}}">Text</a>
+                    {% else %}No Phone{% endif %}
+                    {% if participant.email %}
+                    / <a href="mailto:{{participant.email}}">Email</a>
+                    {% else %} / No email{% endif %}
                     {% if participant.positions > 1 %}({{participant.positions}}) People{% endif %}
                     {% set _ = row_count.append(row_count.pop() + 1)%}
                     </td>

@@ -43,13 +43,13 @@
             <div class="event-contain w3-row-padding w3-secondary-color" style="margin-top:0;">        
                <p class="w3-col w3-half w3-small" >
                    {% if job.event_manager_last_name %}Event Manager: {{ job.event_manager_first_name | default("")}} {{job.event_manager_last_name}}<br>{% endif %}
-                   {% if job.event_manager_email %}Manager email: {{job.event_manager_email}}<br>{% endif %}
-                   {% if job.event_manager_phone %}Manager phone: {{job.event_manager_phone}}<br>{% endif %}
+                   {% if job.event_manager_email %}Manager email: <a href="mailto:{{job.event_manager_email}}">{{job.event_manager_email}}</a><br>{% endif %}
+                   {% if job.event_manager_phone %}Manager phone: <a href="tel:{{job.event_manager_phone}}">Call</a> / <a href="sms:{{job.event_manager_phone}}">Text</a><br>{% endif %}
                </p>
                 <p class="w3-col w3-half w3-small" style="margin-top:0;">
                    {% if job.client_contact %}Client: {{job.client_contact}}<br>{% endif %}
-                   {% if job.client_email %}Client email: {{job.client_email}}<br>{% endif %}
-                   {% if job.client_phone %}Client phone: {{job.client_phone}}<br>{% endif %}
+                   {% if job.client_email %}Client email: <a href="mailto:{{job.client_email}}">{{job.client_email}}</a><br>{% endif %}
+                   {% if job.client_phone %}Client phone: <a href="tel:{{job.client_phone}}">Call</a> / <a href="sms:{{job.client_phone}}">Text</a><br>{% endif %}
                    {% if job.client_website %}Client web: {{job.client_website | weblink }}{% endif %}
                </p>
             </div>
