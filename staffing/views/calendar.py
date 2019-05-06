@@ -127,7 +127,8 @@ def display(month=None,year=None):
 @mod.route('calendar/event/')
 def event(job_id=None):
     """Return a page with the event associated with the job"""
-    
+    setExits()
+    g.title = "Event Detail"
     #import pdb;pdb.set_trace()
     
     job_id = cleanRecordID(job_id)
