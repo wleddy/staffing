@@ -19,11 +19,11 @@
         {% set participant_list = job.participants[job.job_id]['user_data']%}
         {% endif %}
         <div class="w3-small" style="text-align:left;">
+            <p style="margin-bottom:0;">Signed Up:</p>
+            <table class="w3-table">
+            {# Jinja needs a complex var created outside the loops, Change the content of the var in loop. #}
+            {% set row_count = [1] %}
             {% if participant_list %}
-                <p style="margin-bottom:0;">Signed Up:</p>
-                <table class="w3-table">
-                {# Jinja needs a complex var created outside the loops, Change the content of the var in loop. #}
-                {% set row_count = [1] %}
                 {% for participant in participant_list %}
                 <tr>
                     <td>{{ row_count[0] }}. {{ participant.user_name }}
@@ -38,15 +38,13 @@
                     </td>
                 </tr>
                 {% endfor %}
-                {% if row_count[0] <=  job.max_positions %}
-                    {% for x in range(job.max_positions - 1)%}
-                    <tr><td>{{ row_count[0] }}. <em>&mdash; Open &mdash;</em></td></tr>
-                    {% set _ = row_count.append(row_count.pop() + 1)%}
-                    {% endfor %}
-                {% endif %}
-            </table>
-                {% else%}
-                <p>No one signed up.</p>
             {% endif %}
+            {% for x in range(job.max_positions+1)%}
+                {% if row_count[0] <= job.max_positions %}
+                <tr><td>{{ row_count[0] }}. <em>&mdash; Open &mdash;</em></td></tr>
+                {%endif%}{% set _ = row_count.append(row_count.pop() + 1)%}
+            {% endfor %}
+            </table>
+        </div>
     </div>
 </div>
