@@ -1,5 +1,6 @@
 from flask import request, session, g, redirect, url_for, abort, \
      render_template, flash, Blueprint
+from shotglass2.mapping.views.maps import simple_map
 from shotglass2.users.admin import login_required, table_access_required
 from shotglass2.takeabeltof.utils import render_markdown_for, printException, cleanRecordID
 from shotglass2.takeabeltof.date_utils import datetime_as_string
@@ -48,6 +49,7 @@ def edit(id=0):
             return redirect(g.listURL)
     else:
         rec = location.new()
+        rec.location_name = "New Location"
 
     locations = Location(g.db).select()
     
@@ -59,7 +61,31 @@ def edit(id=0):
             return redirect(g.listURL)
         
         
-    return render_template('location_edit.html',rec=rec,locations=locations)
+    map_html = None
+
+    #get the map for this
+    # make a list of dict for the location
+#     marker["dragable"] = point.get('dragable',False)
+#     marker['map_icon'] = point.get('map_icon')
+#     marker['lat'] = point.get('lat')
+#     marker['lng'] = point.get('lng')
+#     marker['UID'] = point.get('UID')
+#     marker['title'] = point.get('title')
+#     marker['location_name'] = point.get('location_name')
+#     # for getting lat and lng values interactively from map
+#     marker['latitudeFieldId'] = point.get('latitudeFieldId')
+#     marker['longitudeFieldId'] = point.get('longitudeFieldId')
+    
+    map_data = {'lat':rec.lat,'lng':rec.lng,
+    'title':rec.location_name,
+    'UID':rec.id,
+    'draggable':True,
+    'latitudeFieldId':'latitude',
+    'longitudeFieldId':'longitude',
+    }
+    map_html = simple_map(map_data,target_id='map')
+        
+    return render_template('location_edit.html',rec=rec,map_html=map_html,locations=locations)
     
     
 @mod.route('/delete/',methods=['GET','POST',])
