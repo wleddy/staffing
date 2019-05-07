@@ -7,10 +7,11 @@
         <select id="col_select">
             <option value="0">Id</option>
             <option value="1" selected >Name</option>
+            <option value="2">Address</option>
             <option value="3">City</option>
         </select>
             &nbsp;&nbsp;<input id="search_input" type="text" name="user_name" value="" class="w3-border" placeholder="Type anything" 
-            onkeyup="if (this.value.length > 0){ table_search('search_input','table_list',$('#col_select').prop('selectedIndex'));}else{reset_table_search('table_list')}"
+            onkeyup="if (this.value.length > 0){ table_search('search_input','table_list',$('#col_select').val());}else{reset_table_search('table_list')}"
             />
         </p>
 	{%if recs %}
@@ -18,14 +19,14 @@
 		<tr class="w3-primary-color">
 			<th>Id</th>
 			<th>Name</th>
-			<th class="w3-hide-small" >Location</th>
+			<th class="w3-hide-small" >Address</th>
 			<th class="w3-hide-small" >City</th>
 		</tr>
 		{% for rec in recs %}
 	    <tr>
 			<td onclick="window.location='{{ g.editURL }}{{rec.id}}/'">{{ rec.id }}</a></td>
 			<td onclick="window.location='{{ g.editURL }}{{rec.id}}/'">{{ rec.location_name }}</a></td>
-			<td class="w3-hide-small" onclick="window.location='{{ g.editURL }}{{rec.id}}/'">{{ rec.business_name|default(rec.street_address,true) }}</td>
+			<td class="w3-hide-small" onclick="window.location='{{ g.editURL }}{{rec.id}}/'">{{ rec.street_address|default("",true) }}</td>
 			<td class="w3-hide-small" onclick="window.location='{{ g.editURL }}{{rec.id}}/'">{{ rec.city|default("",true) }}</td>
 		</tr>
 		{% endfor %}

@@ -8,10 +8,10 @@
         <select id="col_select">
             <option value="0">Id</option>
             <option value="1" selected >Title</option>
-            <option value="0">Description</option>
+            <option value="2">Description</option>
         </select>
             &nbsp;&nbsp;<input id="search_input" type="text" name="user_name" value="" class="w3-border" placeholder="Type anything" 
-            onkeyup="if (this.value.length > 0){ table_search('search_input','table_list',$('#col_select').prop('selectedIndex'));}else{reset_table_search('table_list')}"
+            onkeyup="if (this.value.length > 0){ table_search('search_input','table_list',$('#col_select').val());}else{reset_table_search('table_list')}"
             />
         </p>
 	{%if recs %}
