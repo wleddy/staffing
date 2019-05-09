@@ -8,7 +8,7 @@
 {% for job in jobs %}
 {% if event_date[0] != job.start_date[:10] %}
     <td colspan="2" class="w3-secondary-color">
-        <p style="margin:0;"><strong>{{job.start_date | short_date_string }}</strong> &nbsp;&nbsp;&nbsp;
+        <p style="margin:0;"><strong>{{job.start_date | abbr_date_string }}</strong> &nbsp;&nbsp;&nbsp;
             <a class="w3-button w3-primary-color w3-round-large" onclick="editFromList('{{ url_for('job.manage_job_set')}}{{ job.job_id }}')">Manage Jobs...</a></p>
     </td>
 {% endif %}
