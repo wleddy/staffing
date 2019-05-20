@@ -184,7 +184,7 @@ def signup(job_id=None):
                 # if adding first slot, send email with ical attachement
                 #import pdb;pdb.set_trace()
                 
-                send_signup_email(job_data,user,'announce/email/signup_announce.md',mod)
+                send_signup_email(job_data,user,'announce/email/signup_announce.md',mod,escape=False)
                          
             if previous_positions and positions < previous_positions:
                 # the number of positions has been reduced

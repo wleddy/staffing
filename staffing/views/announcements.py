@@ -97,7 +97,7 @@ def process_commitment_reminder():
                     job_list_as_string = ','.join([str(x) for x in job_list])
                     job_data = get_job_rows(None,None,"job.id in ({})".format(job_list_as_string),[],is_admin=True)
                     
-                    send_result = send_signup_email(job_data,user_rec,template_path,signup_blueprint,subject=subject)
+                    send_result = send_signup_email(job_data,user_rec,template_path,signup_blueprint,subject=subject,escape=False)
                     if send_result[0]:
                         #send Ok, create some notification records
                         log_notifications(job_list,prev_user_id,trigger_function_name)
