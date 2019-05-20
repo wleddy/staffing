@@ -273,25 +273,7 @@ def get_description(job_data,geo,location):
         if description:
             description += '\n\n'
         description += '{}  {}'.format(', '.join([job_data.job_loc_street_address, job_data.job_loc_city]), job_data.job_loc_state.upper())
-
-    w3w_map_url = google_map_url = None
     
-    if job_data.job_loc_w3w:
-        w3w_map_url = 'https://w3w.co/{}'.format(job_data.job_loc_w3w)
-        
-    # Create a mapping uri for google maps
-    # Include maps for both w3w and goggle maps, let user decide
-    if geo:
-        # don't replace the w3w link
-        google_map_url = "https://www.google.com/maps/search/?api=1&query={},{}".format(geo[0],geo[1])
-        
-    if description and (w3w_map_url or google_map_url):
-        description += '\n\n'
-    if w3w_map_url:
-        description += 'W3W Map: {}\n\n\n'.format(w3w_map_url)
-    if google_map_url:
-        description += 'Google Map: {}\n\n'.format(google_map_url)
-            
     if description:
         description += '\n\n'
     description += job_data.event_description + '\n\n' + job_data.job_description

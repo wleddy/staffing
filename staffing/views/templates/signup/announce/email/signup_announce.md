@@ -1,13 +1,19 @@
 {# job_data_list should only contain one item #}
 {% if job_data_list %}{% set job_data = job_data_list[0] %}
+                {% from '_staffing_helper_macros.html' import directions_snippet %}
 ## Thank you for helping us with {{ job_data.event_title }}!
 
 Your assignment is to help with {{ job_data.job_title }}.
 
-Your shift starts on {{ job_data.start_date | abbr_date_string }} at: {{ job_data.start_date | local_time_string }}
+Your assignment Date: {{ job_data.start_date | abbr_date_string }}
+
+Your shift begins at {{ job_data.start_date | local_time_string }}
 and ends at {{ job_data.end_date | local_time_string }}.
 
+
 {{ description | safe }}
+
+{{ directions_snippet(job_data) | safe }}
 
 If you have questions about your shift or you're unable to make it for some reason please [contact us](http://{{config.HOST_NAME}}{{ url_for('signup.contact')}})
 

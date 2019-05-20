@@ -8,10 +8,10 @@ If you have any questions about the assignment please contact {{ manager.first_n
 ### A SABA staff member has *cancelled* your assignment for {{ job_data.event_title }}.
 {% endif %}
 
-Your assignment is to help with {{ job_data.job_title }}.
+Your assignment was {{ job_data.job_title }}.
 
 For reference, here is your previous shift information:
 
-* Start Time: {{ job_data.start_date | abbr_date_string }} at: {{ job_data.start_date | local_time_string }}
-* End Time: {{ job_data.end_date | local_time_string }}.
+* Date: {{ job_data.start_date | abbr_date_string }} 
+* Time: {{ job_data.start_date | local_time_string }} to {{ job_data.end_date | local_time_string }}.
 

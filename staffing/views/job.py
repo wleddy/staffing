@@ -360,7 +360,7 @@ def assignment_manager(job_id=0):
             if job_data:
                 job_data = job_data[0]
                 subject = "[SABA] {} {} has given you an assignment".format(manager_rec.first_name,manager_rec.last_name)
-                send_signup_email(job_data,user_rec,'email/inform_user_of_assignment.html',mod,manager=manager_rec,subject=subject,job_data=job_data)
+                send_signup_email(job_data,user_rec,'email/inform_user_of_assignment.html',mod,manager=manager_rec,subject=subject,job_data=job_data,escape=False)
             else:
                 # failed to get the job data... this should never happen
                 email_admin(subject="Alert from {}".format(site_config['SITE_NAME']),

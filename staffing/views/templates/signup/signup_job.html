@@ -12,11 +12,15 @@
             {% if job.job_filled_positions >= job.max_positions %}<em>(Full)</em>{% endif %}
             </span>
         </p>
+        
         {% if job.job_loc_id and job.job_loc_id != job.event_loc_id %}
-        <p class="w3-small" ><em>Job location:</em> 
-            <strong>{{ job.job_loc_name | default("", True ) }}</strong> 
-            {% if job.job_loc_lat and job.job_loc_lng %}<a href="https://www.google.com/maps/search/?api=1&query={{ job.job_loc_lat }},{{job.job_loc_lng}}" target="_blank">Map...</a>{% endif %}
-        </p>
+        <div class="w3-small">
+            <p><em>Job location:</em> 
+                <strong>{{ job.job_loc_name | default("", True ) }}</strong> 
+            </p>
+                {% from '_staffing_helper_macros.html' import directions_snippet %}
+                {{ directions_snippet(job) }}
+        </div>
         {% elif not job.job_loc_id and not job.event_loc_id %}
         <p class="w3-primary-color" style="padding-left:3pt;width:80%">
             <em>Job location:</em> <strong>tbd</strong> 

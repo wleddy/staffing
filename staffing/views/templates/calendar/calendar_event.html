@@ -26,10 +26,10 @@
                 {{ job.event_description | render_markdown }}
             </div>
             {% if job.job_loc_lat and job.job_loc_lng %}
-            <p style="margin-bottom:16pt;">
-                 <em>Directions:</em><br><a href="https://www.google.com/maps/search/?api=1&query={{ job.job_loc_lat}},{{ job.job_loc_lng }}" target="_blank">Google Maps</a><br>
-                <a href="http://maps.apple.com/?daddr={{job.job_loc_lat}},{{job.job_loc_lng }}" target="_blank">Apple Maps</a>
-            </p>
+            <div style="margin-bottom:16pt;">
+                {% from '_staffing_helper_macros.html' import directions_snippet %}
+                {{ directions_snippet(job) }}
+            </div>
             {% endif %}
         </div>
         {% if map_html %}

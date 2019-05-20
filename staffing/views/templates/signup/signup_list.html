@@ -56,7 +56,6 @@
                 <div class="w3-half w3-small" style="padding-left:4pt;">
                     <p class="w3-medium">
                         <em>Where:</em> <strong>{{ job.event_loc_name | default("", True ) }}</strong> 
-                        {% if job.event_loc_lat and job.event_loc_lng %}<a href="https://www.google.com/maps/search/?api=1&query={{ job.event_loc_lat }},{{job.event_loc_lng}}" target="_blank">Map...</a>{% endif %}
                     </p>
                     {% set width_pct = job.event_filled_positions | default(0,True) / job.event_max_positions * 74 %}
                     {% if width_pct > 100 %}{% set width_pct = 100 %}{% endif %}

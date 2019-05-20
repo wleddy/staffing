@@ -1,3 +1,5 @@
+{% from '_staffing_helper_macros.html' import directions_snippet_one_line %}
+
 {% extends 'layout.html' %}
 
 {% block page_header %}
@@ -81,11 +83,11 @@
             {% if job.job_loc_name != job_location_name[0] %}
                 {% set _ = job_location_name.pop() %}
                 {% set _ = job_location_name.append(job.job_loc_name) %}
-                <p class="event-contain w3-row w3-secondary-color" style="margin-top:0;padding-bottom:3pt;">
-                    <strong>{{ job.job_loc_name }}</strong> <span class="w3-small">{{job.job_loc_street_address}}, {{job.job_loc_city }}</span>
-                    {% if job.job_loc_w3w %}<a href="https://w3w.co/{{job.job_loc_w3w}}" target="_w3w" >Map...</a>
-                    {% elif job.job_loc_lat and job.job_loc_lng %}<a href="#">Map...</a>{% endif %}
-                </p>
+                <div class="event-contain w3-row w3-secondary-color" style="margin-top:0;padding-bottom:3pt;">
+                    <p><strong>{{ job.job_loc_name }}</strong> <span class="w3-small">{{job.job_loc_street_address}}, {{job.job_loc_city }}</span>
+                    <div class="w3-small" style="margin-left:10pt;">{{ directions_snippet_one_line(job) }}</div>
+                </div>
+                
             {% endif %} {# show loction? #}
            <div id="job-body{{job.job_id}}">
                 {% include 'roster_job.html' %}

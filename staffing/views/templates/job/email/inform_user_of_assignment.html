@@ -10,10 +10,13 @@ If you have any questions about the assignment please contact {{ manager.first_n
 
 Your assignment is to help with {{ job_data.job_title }}.
 
-Your shift starts on {{ job_data.start_date | abbr_date_string }} at: {{ job_data.start_date | local_time_string }}
-and ends at {{ job_data.end_date | local_time_string }}.
+Shift Date: {{ job_data.start_date | abbr_date_string }}    
+Shift Time: {{ job_data.start_date | local_time_string }} to {{ job_data.end_date | local_time_string }}.
 
 {{ description }}
 
+{% from '_staffing_helper_macros.html' import directions_snippet %}
+
+{{ directions_snippet(job_data) }}
 
 {% if ical %}The attached file will add your shift to your calendar. (Usually you can tap or double click to open it.){% endif %}

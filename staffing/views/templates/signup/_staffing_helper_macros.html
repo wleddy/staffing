@@ -1,0 +1,23 @@
+{# job is a single row from the "job_data" list from signup.get_job_rows function #}
+
+{# IMPORTANT - Don't include any leading spaces in html lines because this sometimes gets passed #}
+{#             through the markdown filter and the leading space signifies a <code> block per Markdown syntax. #}
+{#             In such a case, the content will be escaped rather than normal html #}
+
+{% macro directions_snippet(job) %}
+{% if job and job.job_loc_lat and job.job_loc_lng %}
+<p><em>Directions:</em><br>
+&nbsp;&nbsp;<a href="https://www.google.com/maps/dir/?api=1&destination={{ job.job_loc_lat}},{{ job.job_loc_lng }}" target="_blank">Google Maps</a>
+<br>
+&nbsp;&nbsp;<a href="http://maps.apple.com/?daddr={{job.job_loc_lat}},{{job.job_loc_lng }}" target="_blank">Apple Maps</a>
+</p>
+{% endif %}
+{% endmacro %}
+
+{% macro directions_snippet_one_line(job) %}
+{% if job and job.job_loc_lat and job.job_loc_lng %}
+<p><em>Directions:</em> <a href="https://www.google.com/maps/dir/?api=1&destination={{ job.job_loc_lat}},{{ job.job_loc_lng }}" target="_blank">Google Maps</a>
+&nbsp;&nbsp;<a href="http://maps.apple.com/?daddr={{job.job_loc_lat}},{{job.job_loc_lng }}" target="_blank">Apple Maps</a>
+</p>
+{% endif %}
+{% endmacro %}
