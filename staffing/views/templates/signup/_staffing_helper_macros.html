@@ -14,6 +14,7 @@
 {% endif %}
 {% endmacro %}
 
+{# same thing in a one line format #}
 {% macro directions_snippet_one_line(job) %}
 {% if job and job.job_loc_lat and job.job_loc_lng %}
 <p><em>Directions:</em> <a href="https://www.google.com/maps/dir/?api=1&destination={{ job.job_loc_lat}},{{ job.job_loc_lng }}" target="_blank">Google Maps</a>
