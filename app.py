@@ -1,4 +1,4 @@
-from flask import Flask, g, session, request, redirect, flash, abort, url_for
+from flask import Flask, g, session, request, redirect, flash, abort, url_for, session
 from flask_mail import Mail
 from shotglass2 import shotglass
 from shotglass2.takeabeltof.database import Database
@@ -82,6 +82,7 @@ def _before():
         return abort(404)
         
     #import pdb;pdb.set_trace()
+    session.permanent = True
     
     get_db()
         

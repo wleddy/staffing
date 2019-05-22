@@ -63,8 +63,10 @@ if REQUIRE_SSL:
 else:
     HOST_PROTOCOL = "http"
 
-# set session expiration in seconds
-PERMANENT_SESSION_LIFETIME = 60*20
+# set session expiration
+### Requires that session.permanent == True in request
+from datetime import timedelta
+PERMANENT_SESSION_LIFETIME = timedelta(days=31)
 
 # Uploads ...
 MAX_CONTENT_LENGTH = 300000
