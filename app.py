@@ -151,6 +151,11 @@ app.register_blueprint(calendar.mod,subdomain=subdomain)
 # seting the subdomain this way works in this case, but may not be the best solution
 app.add_url_rule('/static/<path:filename>','static',shotglass.static,subdomain=subdomain)
 
+# A second approach to setting the static route on a subdomain basis
+# in the layout template "{% set static_domain = "static_" + site_config.HOST_NAME.split('.')[0]%}"
+# will create a route as 'static_signup' or 'static_admin'
+app.add_url_rule('/static/<path:filename>','static_signup',shotglass.static,subdomain='signup')
+app.add_url_rule('/static/<path:filename>','static_admin',shotglass.static,subdomain='admin')
 
 # Create the routes for the admin Subdomain
 subdomain = app.config.get('ADMIN_SUBDOMAIN','admin')
