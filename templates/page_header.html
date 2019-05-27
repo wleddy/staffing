@@ -1,6 +1,6 @@
 <div class="w3-panel w3-card-2 w3-secondary-color">
     <h2>
-        <img src="{{url_for('static',filename='images/bicycle.png')}}" />
+        <img src="{{url_for(site_config.STATIC_DOMAIN,filename='images/bicycle.png')}}" />
         {{ g.title | default("Title Goes Here",True)}}
     </h2>
 </div>

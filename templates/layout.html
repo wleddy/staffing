@@ -2,27 +2,24 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    {# used to set the static route with the correct subdomain #}
-    {% set static_domain = "static_" + site_config.HOST_NAME.split('.')[0]%}
-
 	<title>{% block document_title %}{% block title%}{{g.title}}{% endblock %} - {{ site_config.SITE_NAME | default("",True) }}{% endblock document_title%}</title> 
-	<link rel="icon" type="image/png" href="{{ url_for(static_domain, filename='favicon.png') }}" >
-    <link rel="SHORTCUT ICON" type="image/vnd.microsoft.icon" href="{{ url_for(static_domain, filename='favicon.ico') }}" >
-    <link rel="apple-touch-icon" type="image/png" sizes="57x57" href="{{ url_for(static_domain, filename='apple-touch-icon-57.png') }}"><!-- iPhone -->
-    <link rel="apple-touch-icon" type="image/png" sizes="72x72" href="{{ url_for(static_domain, filename='apple-touch-icon-72.png') }}"><!-- iPad -->
-    <link rel="apple-touch-icon" type="image/png" sizes="114x114" href="{{ url_for(static_domain, filename='apple-touch-icon-114.png') }}"><!-- iPhone4 -->
-    <link rel="apple-touch-icon" type="image/png" sizes="120x120" href="{{ url_for(static_domain, filename='apple-touch-icon-120.png') }}"><!-- iPhone7? -->
-    <link rel="icon" type="image/png" href="{{ url_for(static_domain, filename='apple-touch-icon-114.png') }}"><!-- Opera Speed Dial, at least 144×114 px -->
+	<link rel="icon" type="image/png" href="{{ url_for(site_config.STATIC_DOMAIN, filename='favicon.png') }}" >
+    <link rel="SHORTCUT ICON" type="image/vnd.microsoft.icon" href="{{ url_for(site_config.STATIC_DOMAIN, filename='favicon.ico') }}" >
+    <link rel="apple-touch-icon" type="image/png" sizes="57x57" href="{{ url_for(site_config.STATIC_DOMAIN, filename='apple-touch-icon-57.png') }}"><!-- iPhone -->
+    <link rel="apple-touch-icon" type="image/png" sizes="72x72" href="{{ url_for(site_config.STATIC_DOMAIN, filename='apple-touch-icon-72.png') }}"><!-- iPad -->
+    <link rel="apple-touch-icon" type="image/png" sizes="114x114" href="{{ url_for(site_config.STATIC_DOMAIN, filename='apple-touch-icon-114.png') }}"><!-- iPhone4 -->
+    <link rel="apple-touch-icon" type="image/png" sizes="120x120" href="{{ url_for(site_config.STATIC_DOMAIN, filename='apple-touch-icon-120.png') }}"><!-- iPhone7? -->
+    <link rel="icon" type="image/png" href="{{ url_for(site_config.STATIC_DOMAIN, filename='apple-touch-icon-114.png') }}"><!-- Opera Speed Dial, at least 144×114 px -->
     
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <!--  <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">   -->
-    <link rel="stylesheet" href="{{ url_for(static_domain, filename='w3.css' )}}">
-    <link rel="stylesheet" href="{{ url_for(static_domain, filename='default_style.css' )}}">
-    <link rel="stylesheet" href="{{ url_for(static_domain, filename='style.css' )}}">
+    <link rel="stylesheet" href="{{ url_for(site_config.STATIC_DOMAIN, filename='w3.css' )}}">
+    <link rel="stylesheet" href="{{ url_for(site_config.STATIC_DOMAIN, filename='default_style.css' )}}">
+    <link rel="stylesheet" href="{{ url_for(site_config.STATIC_DOMAIN, filename='style.css' )}}">
 	
-	<script src="{{ url_for(static_domain, filename='jquery.1.10.1.js') }}"></script>
-	<script src="{{ url_for(static_domain, filename='common.js') }}"></script>
-	<script src="{{ url_for(static_domain, filename='staffing.js') }}"></script>
+	<script src="{{ url_for(site_config.STATIC_DOMAIN, filename='jquery.1.10.1.js') }}"></script>
+	<script src="{{ url_for(site_config.STATIC_DOMAIN, filename='common.js') }}"></script>
+	<script src="{{ url_for(site_config.STATIC_DOMAIN, filename='staffing.js') }}"></script>
 
     <script>
         $(window).resize(function(){set_menu_style();});

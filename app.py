@@ -68,7 +68,17 @@ def get_db(filespec=None):
 @app.context_processor
 def inject_site_config():
     # Add 'site_config' dict to template context
-    return {'site_config':shotglass.get_site_config()}
+    c = shotglass.get_site_config()
+    
+    # inject either 'static_signup' or 'static_admin' into the 'site_config' template context
+    static_route="static"
+    try:
+        static_route = 'static_' + c["HOST_NAME"].split(".")[0]
+    except:
+        pass
+        
+    c.update({"STATIC_DOMAIN":static_route})
+    return {'site_config':c}
     
     
 @app.before_request
@@ -152,8 +162,8 @@ app.register_blueprint(calendar.mod,subdomain=subdomain)
 app.add_url_rule('/static/<path:filename>','static',shotglass.static,subdomain=subdomain)
 
 # A second approach to setting the static route on a subdomain basis
-# in the layout template "{% set static_domain = "static_" + site_config.HOST_NAME.split('.')[0]%}"
-# will create a route as 'static_signup' or 'static_admin'
+# inject either 'static_signup' or 'static_admin' into the 'site_config' template context
+# will create a route for url_for of 'static_signup' or 'static_admin'
 app.add_url_rule('/static/<path:filename>','static_signup',shotglass.static,subdomain='signup')
 app.add_url_rule('/static/<path:filename>','static_admin',shotglass.static,subdomain='admin')
 
