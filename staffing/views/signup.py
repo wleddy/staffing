@@ -571,7 +571,6 @@ def get_job_rows(start_date=None,end_date=None,where='',user_skills=[],is_admin=
     event_location.zip as event_loc_zip,
     event_location.lat as event_loc_lat,
     event_location.lng as event_loc_lng,
-    event_location.w3w as event_loc_w3w,
     null as event_date_list, -- a list of dates for this event
     (select min(job.start_date) from job where job.event_id = event.id and {where}) as active_first_date, 
     (select coalesce(sum(user_job.positions),0) from user_job
@@ -598,7 +597,6 @@ def get_job_rows(start_date=None,end_date=None,where='',user_skills=[],is_admin=
     job_location.zip as job_loc_zip,
     job_location.lat as job_loc_lat,
     job_location.lng as job_loc_lng,
-    job_location.w3w as job_loc_w3w,
 
     null as participants, -- just a place holder
     0 as user_event_positions,
@@ -647,7 +645,6 @@ def get_job_rows(start_date=None,end_date=None,where='',user_skills=[],is_admin=
             job_default_loc_city = event_default_loc_city = ''
             job_default_loc_state = event_default_loc_state = ''
             job_default_loc_zip = event_default_loc_zip = ''
-            job_default_loc_w3w = event_default_loc_w3w = ''
             
             if job.event_loc_name:
                 # Set the job default loc to event loc
@@ -656,7 +653,6 @@ def get_job_rows(start_date=None,end_date=None,where='',user_skills=[],is_admin=
                 job_default_loc_city =  event_default_loc_city = job.event_loc_city
                 job_default_loc_state = event_default_loc_state = job.event_loc_state
                 job_default_loc_zip = event_default_loc_zip = job.event_loc_zip
-                job_default_loc_w3w = event_default_loc_w3w = job.event_loc_w3w
             
             if not job.event_loc_name and job.unique_job_locations == 1:
                 # location only in one job, set all to that loc
@@ -669,7 +665,6 @@ def get_job_rows(start_date=None,end_date=None,where='',user_skills=[],is_admin=
                         event_default_loc_city = loc_rec.city
                         event_default_loc_state = loc_rec.state
                         event_default_loc_zip = loc_rec.zip
-                        event_default_loc_w3w = loc_rec.w3w
                     
             if not job.event_loc_name and job.unique_job_locations > 1:
                 # More than one location specifed
@@ -682,7 +677,6 @@ def get_job_rows(start_date=None,end_date=None,where='',user_skills=[],is_admin=
                 job.event_loc_city = job_default_loc_city
                 job.event_loc_state = job_default_loc_state
                 job.event_loc_zip = job_default_loc_zip
-                job.event_loc_w3w = job_default_loc_w3w
                 
             if job.job_loc_name == None:
                 job.job_loc_name, job.job_loc_lat, job.job_loc_lng = job_default_loc
@@ -690,7 +684,6 @@ def get_job_rows(start_date=None,end_date=None,where='',user_skills=[],is_admin=
                 job.job_loc_city = job_default_loc_city
                 job.job_loc_state = job_default_loc_state
                 job.job_loc_zip = job_default_loc_zip
-                job.job_loc_w3w = job_default_loc_w3w
                     
             if g.user:
                 #if not logged in, can't see any of this anyway...
