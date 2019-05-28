@@ -573,15 +573,15 @@ def get_job_rows(start_date=None,end_date=None,where='',user_skills=[],is_admin=
     event_location.lng as event_loc_lng,
     event_location.w3w as event_loc_w3w,
     null as event_date_list, -- a list of dates for this event
-    (select min(job.start_date) from job where job.event_id = event.id {where_date_range} {where_skills}) as active_first_date, 
+    (select min(job.start_date) from job where job.event_id = event.id and {where}) as active_first_date, 
     (select coalesce(sum(user_job.positions),0) from user_job
-        where user_job.job_id in (select id from job where job.event_id = event.id {where_date_range} {where_skills} )) as event_filled_positions,
+        where user_job.job_id in (select id from job where job.event_id = event.id and {where} )) as event_filled_positions,
     
     (select coalesce(sum(job.max_positions),1) from job 
-        where job.event_id = event.id {where_date_range} {where_skills}) as event_max_positions,
+        where job.event_id = event.id and {where}) as event_max_positions,
     (select distinct coalesce(count(job.id),1) from job 
         where job.event_id = event.id and job.location_id not null and 
-        job.location_id <> event.location_id {where_date_range} {where_skills}) as unique_job_locations,
+        job.location_id <> event.location_id and {where}) as unique_job_locations,
     job.id as job_id,
     job.title as job_title,
     job.status as job_status,
@@ -604,7 +604,7 @@ def get_job_rows(start_date=None,end_date=None,where='',user_skills=[],is_admin=
     0 as user_event_positions,
     0 as user_job_positions,
     (select coalesce(sum(user_job.positions),0) from user_job 
-        where job.id = user_job.job_id and job.event_id = event.id {where_date_range} {where_skills}) 
+        where job.id = user_job.job_id and job.event_id = event.id and {where}) 
         as job_filled_positions
         
     from job
@@ -617,7 +617,7 @@ def get_job_rows(start_date=None,end_date=None,where='',user_skills=[],is_admin=
     """
     
     #import pdb;pdb.set_trace()
-    jobs = Job(g.db).query(sql.format(where=where, where_date_range=where_date_range,where_skills=where_skills,order_by=order_by))
+    jobs = Job(g.db).query(sql.format(where=where, order_by=order_by))
 
     last_event_id = 0
     dates_list = []
