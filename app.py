@@ -69,15 +69,6 @@ def get_db(filespec=None):
 def inject_site_config():
     # Add 'site_config' dict to template context
     c = shotglass.get_site_config()
-    
-    # inject either 'static_signup' or 'static_admin' into the 'site_config' template context
-    static_route="static"
-    try:
-        static_route = 'static_' + c["HOST_NAME"].split(".")[0]
-    except:
-        pass
-        
-    c.update({"STATIC_DOMAIN":static_route})
     return {'site_config':c}
     
     
@@ -147,6 +138,9 @@ def page_not_found(error):
 def server_error(error):
     return shotglass.server_error(error)
 
+#Register the static route
+# Direct to a specific server for static content
+app.add_url_rule('/static/<path:filename>','static',shotglass.static,subdomain="staffingassets")
 
 
 #import pdb;pdb.set_trace()
@@ -156,16 +150,6 @@ subdomain = app.config.get('SIGNUP_SUBDOMAIN','signup')
 from staffing.views import signup, calendar
 app.register_blueprint(signup.mod,subdomain=subdomain)
 app.register_blueprint(calendar.mod,subdomain=subdomain)
-
-#Register the static route
-# seting the subdomain this way works in this case, but may not be the best solution
-app.add_url_rule('/static/<path:filename>','static',shotglass.static,subdomain=subdomain)
-
-# A second approach to setting the static route on a subdomain basis
-# inject either 'static_signup' or 'static_admin' into the 'site_config' template context
-# will create a route for url_for of 'static_signup' or 'static_admin'
-app.add_url_rule('/static/<path:filename>','static_signup',shotglass.static,subdomain='signup')
-app.add_url_rule('/static/<path:filename>','static_admin',shotglass.static,subdomain='admin')
 
 # Create the routes for the admin Subdomain
 subdomain = app.config.get('ADMIN_SUBDOMAIN','admin')
