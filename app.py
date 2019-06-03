@@ -16,6 +16,10 @@ app = Flask(__name__, instance_relative_config=True,
         )
 app.config.from_pyfile('site_settings.py', silent=True)
 
+@app.before_first_request
+def start_logging():
+    shotglass.start_logging(app)
+
 
 # work around some web servers that mess up root path
 from werkzeug.contrib.fixers import CGIRootFix
@@ -88,8 +92,7 @@ def _before():
     get_db()
         
     shotglass.set_template_dirs(app)
-    
-    
+        
     # Is the user signed in?
     g.user = None
     if 'user_id' in session and 'user' in session:
@@ -184,6 +187,7 @@ shotglass.register_users(app)
 shotglass.register_www(app)
 shotglass.register_maps(app)
 
+
 @app.route('/')
 def default_home():
     # if no subdomain
@@ -195,7 +199,7 @@ if __name__ == '__main__':
     with app.app_context():
         # create the default database if needed
         initalize_all_tables()
-
+        
     #app.run(host='localhost', port=8000)
     #app.run()
     app.run(host='admin.willie.local')
