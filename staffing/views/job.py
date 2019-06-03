@@ -514,27 +514,32 @@ def coerce_datetime(date_str,time_str,ampm=None):
     """Convert a string date and a string time into a datetime object
     if ampm is None, assume 24 hour time else 12 hour"""
     #import pdb;pdb.set_trace()
-    
-    tempDatetime = None
-    time_parts = time_str.split(":")
-    if len(time_parts) == 0 or time_parts[0] == '':
-        valid_data = False
-        flash("That is not a valid time")
-    else:
-        for key in range(len(time_parts)):
-            if len(time_parts[key]) == 1:
-                time_parts[key] = "0" + time_parts[key]
+    try:
+        tempDatetime = None
+        time_parts = time_str.split(":")
+        if len(time_parts) == 0 or time_parts[0] == '':
+            valid_data = False
+            flash("That is not a valid time")
+        else:
+            for key in range(len(time_parts)):
+                if len(time_parts[key]) == 1:
+                    time_parts[key] = "0" + time_parts[key]
                     
-        time_parts.extend(["00","00"])
-        if ampm != None:
-            if ampm.upper() == 'PM' and int(time_parts[0])<12:
-                time_parts[0] = str(int(time_parts[0]) + 12)            
-            if ampm.upper() == 'AM' and int(time_parts[0])> 12:
-                time_parts[0] = str(int(time_parts[0]) - 12)            
-        time_str = ":".join(time_parts[:3])
-        tempDatetime = getDatetimeFromString("{} {}".format(date_str,time_str))
+            time_parts.extend(["00","00"])
+            if ampm != None:
+                if ampm.upper() == 'PM' and int(time_parts[0])<12:
+                    time_parts[0] = str(int(time_parts[0]) + 12)            
+                if ampm.upper() == 'AM' and int(time_parts[0])> 12:
+                    time_parts[0] = str(int(time_parts[0]) - 12)            
+            time_str = ":".join(time_parts[:3])
+            tempDatetime = getDatetimeFromString("{} {}".format(date_str,time_str))
         
-    return tempDatetime
+        return tempDatetime
+    except Exception as e:
+        mes = "Error in job.coerce_datetime"
+        flash(printException(mes,level='error',err=e))
+        return None
+        
     
 def skills_to_list():
     """Create a list of skill (role) ids from form"""
