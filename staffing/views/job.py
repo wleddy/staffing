@@ -482,19 +482,20 @@ def valid_input(rec):
     tempDatetime =coerce_datetime(request.form.get("job_date",""),request.form.get('start_time',''),request.form['start_time_AMPM'])
     if not tempDatetime:
         valid_data = False
-        flash("That Date and Start Time are not valid")
+        flash("Start Date and Start Time are not valid")
     else:
         rec.start_date = tempDatetime
             
     tempDatetime =coerce_datetime(request.form.get("job_date",""),request.form.get('end_time',''),request.form['end_time_AMPM'])
     if not tempDatetime:
         valid_data = False
-        flash("That Date and End Time are not valid")
+        flash("End Date and End Time are not valid")
     else:
         rec.end_date = tempDatetime
         
 
-    if rec.start_date and rec.end_date and rec.start_date > rec.end_date:
+    # ensure that both fields are the same type before comparing
+    if type(rec.start_date) == type(rec.end_date) and rec.start_date > rec.end_date:
         valid_data = False
         flash("The End Time can't be before the Start Time")
         
