@@ -359,7 +359,7 @@ def assignment_manager(job_id=0):
             job_data = get_job_rows(None,None,"job.id = {}".format(job_id),[],is_admin=True,job_status_where='')
             if job_data:
                 job_data = job_data[0]
-                subject = "[SABA] {} {} has given you an assignment".format(manager_rec.first_name,manager_rec.last_name)
+                subject = "{} {} has given you an assignment".format(manager_rec.first_name,manager_rec.last_name)
                 send_signup_email(job_data,user_rec,'email/inform_user_of_assignment.html',mod,manager=manager_rec,subject=subject,job_data=job_data,escape=False)
             else:
                 # failed to get the job data... this should never happen
@@ -440,7 +440,7 @@ def assignment_manager_delete(job_id=0,user_id=0):
                     # send a special email to the user to inform them of the assignment.
                     manager_rec = User(g.db).get(session.get('user_id',0))
                     user_rec = User(g.db).get(user_id)
-                    subject = "[SABA] {} {} has cancelled your assignment".format(manager_rec.first_name,manager_rec.last_name)
+                    subject = "{} {} has cancelled your assignment".format(manager_rec.first_name,manager_rec.last_name)
                     send_signup_email(job_data,user_rec,'email/inform_user_of_cancellation.html',mod,manager=manager_rec,subject=subject,job_data=job_data,no_calendar=True)
                 else:
                     # failed to get the job data... this should never happen
