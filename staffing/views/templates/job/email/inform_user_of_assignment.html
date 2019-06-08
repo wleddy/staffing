@@ -1,11 +1,11 @@
 {# Send to user when manager has given them an assignment #}
 
 {% if manager %}
-### {{ manager.first_name }} {{ manager.last_name }} at SABA has assigned you a job for {{ job_data.event_title }}.
+### {{ manager.first_name }} {{ manager.last_name }} at {{ site_config.SITE_NAME }} has assigned you a job for {{ job_data.event_title }}.
 
 If you have any questions about the assignment please contact {{ manager.first_name }} at {{ manager.email }}
 {% else %}
-### A SABA staff member has assign you a job for {{ job_data.event_title }}.
+### A {{ site_config.SITE_NAME }} staff member has assign you a job for {{ job_data.event_title }}.
 {% endif %}
 
 Your assignment is to help with {{ job_data.job_title }}.
