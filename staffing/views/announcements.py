@@ -27,6 +27,8 @@ def send_signup_email(job_data_list,user,template_path,bp,**kwargs):
         job_data_list = [job_data_list]
             
             
+    site_config = get_site_config()
+            
     ical = None
     ical_events = []
     for job_data in job_data_list:
@@ -69,6 +71,7 @@ def send_signup_email(job_data_list,user,template_path,bp,**kwargs):
                     body_is_html=True,
                     body=email_html,
                     attachment=attachment,
+                    bcc=site_config.get('ADMIN_EMAILS',None),
                     )
     if not send_result[0]:
         #Error occured
