@@ -246,6 +246,8 @@ def roster(display_end_days=0):
     is_admin = is_user_admin()
     end_date = start_date = local_datetime_now()
     display_end_days = cleanRecordID(request.form.get('display_end_days',request.args.get('display_end_days',0)))
+    as_spreadsheet=request.form.get("as_spreadsheet",False)
+    
     if display_end_days > 0:
         end_date = end_date + timedelta(days=display_end_days)
     
@@ -263,7 +265,7 @@ def roster(display_end_days=0):
                 
     jobs = get_job_rows(start_date,end_date,"",user_skills,is_admin)
                 
-    return render_template('roster.html',jobs=jobs,is_admin=is_admin,display_end_days=display_end_days)
+    return render_template('roster.html',jobs=jobs,is_admin=is_admin,display_end_days=display_end_days,as_spreadsheet=as_spreadsheet,)
     
     
 @mod.route('/login',methods=['GET','POST',])

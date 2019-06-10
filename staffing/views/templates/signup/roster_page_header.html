@@ -1,4 +1,4 @@
-{% from "_form_helpers.html" import select_field  %}
+{% from "_form_helpers.html" import select_field, checkbox_field  %}
 
 <div class="w3-panel w3-card-2 w3-secondary-color">
     <div class="w3-row">
@@ -8,14 +8,22 @@
         <p><img style="width:90%" src="{{url_for('static',filename='apple-touch-icon-114.png')}}" /></p>
         </div>
         <form action="" method="post" >
-            <p class="w3-col l2 m2" style="margin-right:10pt">
-                {{ select_field("display_end_days","Show from today thru",extras="") }}
-                    <option value="0">Today Only</option>
-                    <option value="7" {% if display_end_days == 7 %}selected{% endif %} >Next Week</option>
-                    <option value="30" {% if display_end_days == 30 %}selected{% endif %}>Next Month</option>
-                </select>
-            </p>
-            <p class="w3-col l2 m2">
+            <div class="w3-col l3 m3" >
+                <p>
+                    {{ select_field("display_end_days","Show from today thru",extras="") }}
+                        <option value="0">Today Only</option>
+                        <option value="7" {% if display_end_days == 7 %}selected{% endif %} >Next Week</option>
+                        <option value="30" {% if display_end_days == 30 %}selected{% endif %}>Next Month</option>
+                    </select>
+                </p>
+                {% if as_spreadsheet %}
+                    {% set checked = 'checked="checked"' %}
+                {% else %}
+                    {% set checked = '' %}
+                {% endif %}
+                <p>{{ checkbox_field("True","as_spreadsheet",label="Spreadsheet Format",extras=checked) }}</p>
+            </div>
+            <p class="w3-col l2 m2" style="margin-left:10pt">
                 <input class=" w3-button w3-primary-color w3-round-large" type="submit" value="Search">
             </p>
         </form>
