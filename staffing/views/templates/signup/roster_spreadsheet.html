@@ -6,7 +6,6 @@
         {% set job_location_name = [''] %}
         <table id="roster_table" class="w3-table">
         {% for job in jobs %}
-            <tr>
             {% if job.event_id != event_id[0] or job.start_date[:10] != job_start_date[0] %}
             
             {# don't show event head again till event changes #}
@@ -16,6 +15,7 @@
             {% set _ = job_start_date.append(job.start_date[:10]) %}
             {% set _ = job_location_name.pop() %}
             {% set _ = job_location_name.append('') %}
+            <tr style="border-top:2pt black solid;">
                 <td>{{ job.start_date[:10] | abbr_date_string }}</td>
                 <td>
                     <p>
@@ -30,6 +30,7 @@
                 <td>{{ job.job_loc_name }}</td>
                 {% include "roster_spreadsheet_job.html"%}
             {% else %}
+            <tr>
             <td colspan="4" style="background-color:#ddd;">&nbsp;</td>
             {% include "roster_spreadsheet_job.html"%}
             {% endif %}{# if event change #}
