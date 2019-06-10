@@ -5,6 +5,13 @@
         {% set job_start_date = [''] %}
         {% set job_location_name = [''] %}
         <table id="roster_table" class="w3-table">
+            <tr style="border-top:2pt black solid;">
+                <th>Date</th>
+                <th>Title</th>
+                <th>Client</th>
+                <th>Location</th>
+                <th>Jobs</th>
+            </tr>
         {% for job in jobs %}
             {% if job.event_id != event_id[0] or job.start_date[:10] != job_start_date[0] %}
             
