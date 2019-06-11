@@ -263,7 +263,9 @@ def roster(display_end_days=0):
         if rec and rec.id not in user_skills:
             user_skills.append(rec.id)
                 
-    jobs = get_job_rows(start_date,end_date,"",user_skills,is_admin)
+    order_by = "job.start_date" if as_spreadsheet else ""
+    
+    jobs = get_job_rows(start_date,end_date,"",user_skills,is_admin,order_by=order_by)
                 
     return render_template('roster.html',jobs=jobs,is_admin=is_admin,display_end_days=display_end_days,as_spreadsheet=as_spreadsheet,)
     
@@ -527,7 +529,6 @@ def get_job_rows(start_date=None,end_date=None,where='',user_skills=[],is_admin=
     where_date_range = " and date(job.start_date, 'localtime') >= date('{}') and date(job.start_date, 'localtime') <= date('{}') ".format(start_date,end_date)
         
     job_status_where = " " + kwargs.get('job_status_where'," and lower(job.status) = 'active' ") + " "
-    order_by = " " + kwargs.get('order_by'," active_first_date, event_title, job.start_date ") + " "
     
     where_skills = ''
     if not is_admin:
@@ -555,6 +556,10 @@ def get_job_rows(start_date=None,end_date=None,where='',user_skills=[],is_admin=
         where = "1 "
     
     where = where + job_status_where + where_date_range + where_skills
+
+    order_by = kwargs.get('order_by',None)
+    if not order_by:
+        order_by = " active_first_date, event_title, job.start_date "
     
     sql = """
     select event.id as event_id, event.title as event_title, event.description as event_description,
