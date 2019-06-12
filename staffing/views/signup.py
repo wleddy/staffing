@@ -263,7 +263,7 @@ def roster(display_end_days=0):
         if rec and rec.id not in user_skills:
             user_skills.append(rec.id)
                 
-    order_by = "job.start_date" if as_spreadsheet else ""
+    order_by = "sort_by_date_and_event" if as_spreadsheet else ""
     
     jobs = get_job_rows(start_date,end_date,"",user_skills,is_admin,order_by=order_by)
                 
@@ -594,6 +594,7 @@ def get_job_rows(start_date=None,end_date=None,where='',user_skills=[],is_admin=
     job.description as job_description,
     job.start_date,
     job.end_date,
+    substr(job.start_date,1,10) || event.title as sort_by_date_and_event,
     job.max_positions,
     job.skill_list,
     job_location.id as job_loc_id,
