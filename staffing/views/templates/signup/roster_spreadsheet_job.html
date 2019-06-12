@@ -31,7 +31,7 @@
         {% endif %}
         {% for x in range(job.max_positions+1)%}
             {% if row_count[0] <= job.max_positions %}
-            <tr><td>{{ row_count[0] }}. <em>&mdash; Open &mdash;</em></td></tr>
+            <tr class="open_shift"><td>{{ row_count[0] }}. <em>&mdash; Open &mdash;</em></td></tr>
             {%endif%}{% set _ = row_count.append(row_count.pop() + 1)%}
         {% endfor %}
         </table>

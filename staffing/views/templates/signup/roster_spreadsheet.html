@@ -1,4 +1,10 @@
 {# Spreadsheet page layout for roster #}
+{% block head %}
+<style>
+    .open_shift {background-color:yellow;}
+</style>
+{% endblock head %}
+
 {% block body %}
         {% set job_date_header_list = []%}
         {% set event_id = [0] %}
