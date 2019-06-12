@@ -26,8 +26,7 @@
                 <td>{{ job.start_date[:10] | abbr_date_string }}</td>
                 <td>
                     <p>
-                        {{ job.event_title }}<br>
-                        <span class="w3-small">Filled: {{ job.event_filled_positions | default("0", True) }} of {{ job.event_max_positions | default("0", True) }}</span>
+                        {{ job.event_title }}
                     </p>
                     {{ job.event_staff_info | render_markdown }}
                 </td>
