@@ -1,0 +1,2 @@
+## command to run notifications script - may run as cron job
+/usr/bin/curl -L --data "username=username&password=password" "http://signup.willie.local:5000/process_notifications/" >/dev/null 2>&1
