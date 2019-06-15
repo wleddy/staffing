@@ -530,24 +530,43 @@ def get_job_rows(start_date=None,end_date=None,where='',user_skills=[],is_admin=
         
     job_status_where = " " + kwargs.get('job_status_where'," and lower(job.status) = 'active' ") + " "
     
-    where_skills = ''
-    if not is_admin:
-        if not user_skills:
-            #visitors get basic skills even if not logged in
-            user_skills = [] #just be sure it's a list
-            default_skill_list = site_config.get('DEFAULT_USER_ROLES',['volunteer','user'])
-            for skill in default_skill_list:
-                rec = Role(g.db).get(skill)
-                if rec and rec.id not in user_skills:
-                    user_skills.append(rec.id)
-            
-        # limit job selection to only jobs the user can do
-        job_ids = []
-        for skill in user_skills:
+    def get_job_ids_for_skills(skill_ids):
+        """Return a list of job.id where the jobs have one or more of skills required"""
+        the_job_ids = []
+        for skill in skill_ids:
             skill = ":" + str(skill) + ":"
             jobs = Job(g.db).select(where='skill_list like "%{}%"'.format(skill))
             if jobs:
-                job_ids.extend([str(job.id) for job in jobs if str(job.id) not in job_ids])
+                the_job_ids.extend([str(job.id) for job in jobs if str(job.id) not in the_job_ids])
+                
+        return the_job_ids
+            
+    # get a list of basic user skills
+    default_skills = site_config.get('DEFAULT_USER_ROLES',['volunteer','user'])
+    default_skill_list = []
+    for skill in default_skills:
+        rec = Role(g.db).get(skill)
+        if rec and rec.id not in default_skill_list:
+            default_skill_list.append(rec.id)
+            
+    volunteer_job_ids = get_job_ids_for_skills(default_skill_list)
+        
+    where_skills = ''
+    if is_admin:
+        # admins see everything
+        pass
+    else:
+        #limit selection by user skills
+                
+        #get a list of job ids for all jobs that can be done by volunteers
+        volunteer_jobs_list = []
+        
+        if not user_skills:
+            #visitors get basic skills even if not logged in
+            user_skills = default_skill_list
+            
+        # limit job selection to only jobs the user can do
+        job_ids = get_job_ids_for_skills(user_skills)
         
         if job_ids:
             where_skills = ' and job.id in ({})'.format(','.join(job_ids))
@@ -611,8 +630,9 @@ def get_job_rows(start_date=None,end_date=None,where='',user_skills=[],is_admin=
     0 as user_job_positions,
     (select coalesce(sum(user_job.positions),0) from user_job 
         where job.id = user_job.job_id and job.event_id = event.id and {where}) 
-        as job_filled_positions
-        
+        as job_filled_positions,
+    0 as is_volunteer_job -- placeholder
+    
     from job
     join event on event.id = job.event_id
     left join location as event_location on event_location.id = event.location_id
@@ -623,7 +643,7 @@ def get_job_rows(start_date=None,end_date=None,where='',user_skills=[],is_admin=
     """
     
     #import pdb;pdb.set_trace()
-    jobs = Job(g.db).query(sql.format(where=where, order_by=order_by))
+    jobs = Job(g.db).query(sql.format(where=where, order_by=order_by,))
 
     last_event_id = 0
     dates_list = []
@@ -645,6 +665,10 @@ def get_job_rows(start_date=None,end_date=None,where='',user_skills=[],is_admin=
                     
             job.event_date_list = dates_list
         
+            # is this a job for a volunteer
+            if str(job.job_id) in volunteer_job_ids:
+                job.is_volunteer_job = 1
+                
             # Location resolution...
             # job.event_loc_* and job.job_loc_* fields will all be populated for display
             # defaults

@@ -104,3 +104,8 @@ pre {
 .w3-delete-button-color,.w3-delete-button-hover-color:hover{color:#fff!important;background-color:#ff5722!important}
 .w3-cancel-button-color,.w3-delete-button-hover-color:hover{color:#fff!important;background-color:#3f51b5!important}
 */
+
+
+/* set the open shift colors for the spreadheet view of roster */
+.open_shift {background-color:yellow;}
+.open_volunteer {background-color:lightblue;}
