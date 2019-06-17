@@ -107,5 +107,6 @@ pre {
 
 
 /* set the open shift colors for the spreadheet view of roster */
-.open_shift {background-color:yellow;}
-.open_volunteer {background-color:lightblue;}
+.filled-shift, .filled-volunteer-shift {background-color:lightgreen;}
+.open-shift {background-color:yellow;}
+.open-volunteer-shift {background-color:lightblue;}
