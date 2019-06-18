@@ -19,7 +19,7 @@
             {% if g.admin and g.admin.has_access(g.user)%}
                 <div style="display:none"><div style="display:none"><!-- just a place holder -->
                 {% for item in g.admin.permissions %}
-                    {% if g.admin.has_access(g.user,item['table'])%}
+                    {% if g.admin.has_access(g.user,item['table']) and item['add_to_menu'] %}
                         {% if item['header_row'] == True %}
                         </div></div>
                         <div class="w3-dropdown-hover w3-bar-block">
