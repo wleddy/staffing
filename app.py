@@ -12,7 +12,6 @@ from staffing.models import Event, Job, Location, EventType, UserJob
 # setting static_folder to None allows me to handle loading myself
 app = Flask(__name__, instance_relative_config=True,
         static_folder=None,
-        subdomain_matching=True,
         )
 app.config.from_pyfile('site_settings.py', silent=True)
 
@@ -102,26 +101,18 @@ def _before():
         
     g.admin = Admin(g.db) # This is where user access rules are stored
     
-    if "//" + app.config.get("SIGNUP_SUBDOMAIN",'signup') in request.url_root:
-        # this is the signup subdomaine
-        g.admin.register(Job,url_for('signup.roster'),display_name='View Roster',minimum_rank_required=80)
-        pass
-    else:
-        # Admin subdomain
-        #Events
-        # a header row must have the some permissions or higher than the items it heads
-        g.admin.register(Event,url_for('event.display'),display_name='Staffing Admin',header_row=True,minimum_rank_required=500,roles=['admin','event manager'])
-        g.admin.register(Event,url_for('event.display'),display_name='Events',minimum_rank_required=500,roles=['admin','event manager'])
-        g.admin.register(Job,url_for('job.roster'),display_name='View Roster',minimum_rank_required=80)
-        #Jobs
-    #g.admin.register(Job,url_for('job.display'),display_name='Jobs',minimum_rank_required=500,roles=['admin','event manager'])
-        #location
-        g.admin.register(Location,url_for('location.display'),display_name='Locations',minimum_rank_required=500,roles=['admin','event manager'])
-        g.admin.register(EventType,url_for('event_type.display'),display_name='Event Types',minimum_rank_required=500,roles=['admin','event manager'])
+    #Events
+    # a header row must have the some permissions or higher than the items it heads
+    g.admin.register(Event,url_for('event.display'),display_name='Staffing Admin',header_row=True,minimum_rank_required=500,roles=['admin','event manager'])
+    g.admin.register(Event,url_for('event.display'),display_name='Events',minimum_rank_required=500,roles=['admin','event manager'])
+    g.admin.register(Job,url_for('signup.roster'),display_name='',minimum_rank_required=80)
+    #location
+    g.admin.register(Location,url_for('location.display'),display_name='Locations',minimum_rank_required=500,roles=['admin','event manager'])
+    g.admin.register(EventType,url_for('event_type.display'),display_name='Event Types',minimum_rank_required=500,roles=['admin','event manager'])
 
-        g.admin.register(UserJob,url_for('attendance.display'),display_name='Attendance',minimum_rank_required=500,roles=['admin','event manager'])
-    
-        shotglass.user_setup() # g.admin now holds access rules Users, Prefs and Roles
+    g.admin.register(UserJob,url_for('attendance.display'),display_name='Attendance',minimum_rank_required=500,roles=['admin','event manager'])
+
+    shotglass.user_setup() # g.admin now holds access rules Users, Prefs and Roles
 
 
 @app.teardown_request
@@ -143,36 +134,37 @@ def server_error(error):
 
 #Register the static route
 # Direct to a specific server for static content
-app.add_url_rule('/static/<path:filename>','static',shotglass.static,subdomain="staffingassets")
+app.add_url_rule('/static/<path:filename>','static',shotglass.static)
 
 
 #import pdb;pdb.set_trace()
 # Creates the routes for signup subdomain
 subdomain = app.config.get('SIGNUP_SUBDOMAIN','signup')
+#subdomain = None
 
 from staffing.views import signup, calendar
-app.register_blueprint(signup.mod,subdomain=subdomain)
-app.register_blueprint(calendar.mod,subdomain=subdomain)
+app.register_blueprint(signup.mod)
+app.register_blueprint(calendar.mod)
 
 # Create the routes for the admin Subdomain
-subdomain = app.config.get('ADMIN_SUBDOMAIN','admin')
+#subdomain = app.config.get('ADMIN_SUBDOMAIN','admin')
 
 from staffing.views import event
-app.register_blueprint(event.mod,subdomain=subdomain)
+app.register_blueprint(event.mod)
 from staffing.views import location
-app.register_blueprint(location.mod,subdomain=subdomain)
+app.register_blueprint(location.mod)
 from staffing.views import job
-app.register_blueprint(job.mod,subdomain=subdomain)
+app.register_blueprint(job.mod)
 from staffing.views import event_type
-app.register_blueprint(event_type.mod,subdomain=subdomain)
+app.register_blueprint(event_type.mod)
 from staffing.views import attendance
-app.register_blueprint(attendance.mod,subdomain=subdomain)
+app.register_blueprint(attendance.mod)
 
 ## Setup the routes for users
-shotglass.register_users(app,subdomain=subdomain)
+shotglass.register_users(app)
 
 # setup www.routes...
-shotglass.register_www(app,subdomain=subdomain)
+shotglass.register_www(app)
 
 if app.config['TESTING']:
     ## Setup routes that pytest will us.
@@ -182,10 +174,10 @@ if app.config['TESTING']:
     ## Setup the routes for users
     pass
     
-shotglass.register_users(app)
-# setup www.routes...
-shotglass.register_www(app)
-shotglass.register_maps(app)
+# shotglass.register_users(app)
+# # setup www.routes...
+# shotglass.register_www(app)
+# shotglass.register_maps(app)
 
 
 @app.route('/')

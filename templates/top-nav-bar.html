@@ -8,22 +8,14 @@
             <div class="w3-dropdown-hover w3-bar-block">
                 <a href="javascript:void(0)" class="w3-button w3-border w3-primary-color w3-drop-menu-section-hover-color">Home</a>
                 <div class="w3-dropdown-content">
-                    <a  class="w3-bar-item w3-button w3-border w3-drop-menu-color w3-drop-menu-hover-color" href="/">Admin Home</a>
-                    <a  class="w3-bar-item w3-button w3-border w3-drop-menu-color w3-drop-menu-hover-color" href="http://signup.sacbike.org">Signup Home</a>
+                    <a  class="w3-bar-item w3-button w3-border w3-drop-menu-color w3-drop-menu-hover-color" href="/">Signup Home</a>
                     <a  class="w3-bar-item w3-button w3-border w3-drop-menu-color w3-drop-menu-hover-color" href="http://sacbike.org">SABA Home</a>
                 </div>
             </div>
-              <a class="w3-bar-item w3-button w3-border w3-primary-color w3-secondary-hover-color" href="{{ url_for('www.about')}}">About</a>
-              <!-- <a class="w3-bar-item w3-button w3-border w3-primary-color w3-secondary-hover-color" href="{{ url_for('www.contact')}}">Contact Us</a> -->
-              <a class="w3-bar-item w3-button w3-border w3-primary-color w3-secondary-hover-color" href="http://sacbike.org/contact/">Contact Us</a>
-              <a class="w3-bar-item w3-button w3-border w3-primary-color w3-secondary-hover-color" href="{{ url_for('www.docs')}}">Docs</a>
-        {% if not g.user %}
-              <a class="w3-bar-item w3-button w3-border w3-primary-color w3-secondary-hover-color" href="{{ url_for('login.login')}}">Login</a>
-        {% else %}
-            {% if g.admin and not g.admin.has_user_table_access(g.user) %}
-              <a class="w3-bar-item w3-button w3-border w3-primary-color w3-secondary-hover-color" href="{{ url_for('user.edit')}}" >Manage Your Profile</a>
-            {% endif %}
-              <a class="w3-bar-item w3-button w3-border w3-primary-color w3-secondary-hover-color" href="{{ url_for('login.logout')}}">Logout</a>
+              <a class="w3-bar-item w3-button w3-border w3-primary-color w3-secondary-hover-color" href="{{ url_for('calendar.display') }}">Calendar</a>
+              {% if g.admin and g.admin.has_access(g.user,Job)%}
+              <a class="w3-bar-item w3-button w3-border w3-primary-color w3-secondary-hover-color" href="{{ url_for('signup.roster') }}">View Roster</a>
+              {% endif %}
             {% if g.admin and g.admin.has_access(g.user)%}
                 <div style="display:none"><div style="display:none"><!-- just a place holder -->
                 {% for item in g.admin.permissions %}
@@ -40,6 +32,22 @@
                 {% endfor %}
                     </div></div>
             {% endif %} <!-- g.admin -->
+        <div class="w3-dropdown-hover w3-bar-block">
+            <a href="javascript:void(0)" class="w3-button w3-border w3-primary-color w3-drop-menu-section-hover-color">Help</a>
+            <div class="w3-dropdown-content">
+                <a  class="w3-bar-item w3-button w3-border w3-drop-menu-color w3-drop-menu-hover-color" href="{{ url_for('www.about')}}">About</a>
+                <a  class="w3-bar-item w3-button w3-border w3-drop-menu-color w3-drop-menu-hover-color" href="{{ url_for('www.docs')}}">Docs</a>
+                <a  class="w3-bar-item w3-button w3-border w3-drop-menu-color w3-drop-menu-hover-color" href="http://sacbike.org/contact/">Contact Us</a>
+            </div>
+        </div>
+        {% if not g.user %}
+              <a class="w3-bar-item w3-button w3-border w3-primary-color w3-secondary-hover-color" href="{{ url_for('login.login')}}">Login</a>
+        {% else %}
+            {% if g.admin and not g.admin.has_user_table_access(g.user) %}
+              <a class="w3-bar-item w3-button w3-border w3-primary-color w3-secondary-hover-color" href="{{ url_for('user.edit')}}" >Manage Your Profile</a>
+            {% endif %}
+              <a class="w3-bar-item w3-button w3-border w3-primary-color w3-secondary-hover-color" href="{{ url_for('login.logout')}}">Logout</a>
+        
         {% endif %} <!-- g.user -->
     </div>
 </div>

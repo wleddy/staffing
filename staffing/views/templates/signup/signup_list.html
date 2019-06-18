@@ -74,7 +74,7 @@
                         <p style="margin-top:10pt;" >
                         {% if not g.user %}
                             To see details or signup you must login...<br>
-                            <a class="w3-button w3-primary-color w3-round-medium w3-medium" href="#" onclick="editFromList('{{ url_for('signup.login')}}1')">Login / Register</a>
+                            <a class="w3-button w3-primary-color w3-round-medium w3-medium" href="#" onclick="editFromList('{{ url_for('login.login')}}1')">Login / Register</a>
                         {% else %}
                             <a class="w3-button w3-primary-color w3-round-medium w3-medium" href="{{ url_for('signup.more_info')}}{{job.event_id}}/" >More Info...</a></p>
                         {% endif %}

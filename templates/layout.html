@@ -38,12 +38,7 @@
     
     {% block header %}
         {% include "header.html"%}
-        {% if site_config.SIGNUP_SUBDOMAIN in site_config.HOST_NAME %}
-            {# signup has a special menu #}
-            {% include "signup-nav-bar.html" %}
-        {% else %}
-            {% include "top-nav-bar.html"%}
-        {% endif %}
+        {% include "top-nav-bar.html"%}
             <div class="w3-main menu_space">
     {% endblock header %}
 

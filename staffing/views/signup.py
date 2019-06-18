@@ -6,7 +6,7 @@ from shotglass2.takeabeltof.utils import render_markdown_for, render_markdown_te
 from shotglass2.takeabeltof.date_utils import date_to_string, getDatetimeFromString, local_datetime_now
 from shotglass2.users.admin import login_required, table_access_required, silent_login
 from shotglass2.users.models import Role, User
-from shotglass2.users.views.login import authenticate_user, setUserStatus, logout as log_user_out
+from shotglass2.users.views.login import authenticate_user, setUserStatus, logout as log_user_out, login as log_user_in
 from shotglass2.www.views.home import contact as home_contact
 from staffing.models import Event, Location, Job, UserJob
 from staffing.utils import pack_list_to_string, un_pack_string
@@ -270,10 +270,47 @@ def roster(display_end_days=0):
     return render_template('roster.html',jobs=jobs,is_admin=is_admin,display_end_days=display_end_days,as_spreadsheet=as_spreadsheet,)
     
     
-@mod.route('/login',methods=['GET','POST',])
-@mod.route('/login/<int:from_main>',methods=['GET','POST',])
-@mod.route('/login/',methods=['GET','POST',])
-def login(from_main=0):
+# @mod.route('/login',methods=['GET','POST',])
+# @mod.route('/login/',methods=['GET','POST',])
+# def login():
+#     """Log user into signup system
+#     Will not require a password if user did not set one
+#     """
+#     setExits()
+#     g.title = "Login"
+#
+#     import pdb; pdb.set_trace()
+#
+#     if g.user:
+#         log_user_out()
+#
+#     return log_user_in()
+
+    # form_email=request.form.get('email','').strip()
+    # form_password = request.form.get('password','').strip()
+    # user = User(g.db).get(form_email)
+    # if user:
+    #     if not user.password:
+    #         # log the user in without a password
+    #         setUserStatus(user.email,user.id)
+    #     elif form_password and authenticate_user(user.email,form_password) > 0:
+    #         setUserStatus(user.email,user.id)
+    #     else:
+    #         flash("Incorrect password")
+    # else:
+    #     #user not found
+    #     flash("Could not find a user with that email address")
+    #
+    # if g.user:
+    #     #user is logged in
+    #     if next:
+    #         return redirect(next)
+    #     else:
+    #         return redirect(url_for('.home'))
+    #
+    # return render_template('login.html',rec=user,form_email=form_email,next=next)
+    
+def login_old(from_main=0):
     # no password is required for volunteer login
     setExits()
     ready_to_login = False

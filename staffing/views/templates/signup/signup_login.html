@@ -22,7 +22,7 @@
     		<p>
         		<input class="w3-button w3-mobile  w3-primary-color w3-round-medium " type="button" 
                     onclick="{{ submit_script }}('signupModalForm',
-                    '{{url_for('signup.login')}}{{ from_main }}',
+                    '{{url_for('login.login')}}{{ from_main }}',
                     {% if from_main %}''{% else %}'modal-form'{% endif %},
                     '{{next}}'
                     )" 
