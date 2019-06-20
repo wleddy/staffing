@@ -1,45 +1,44 @@
 <div id="nav" style="overflow:hidden;">
-<div id="nav-placeholder" class="w3-mobile w3-bar w3-collapse w3-primary-color w3-hide-medium w3-hide-small" style="position:absolute;z-index:-1;height:30pt">&nbsp;</div>
-<div id="nav-placeholder_small" class="w3-mobile w3-bar w3-primary-color w3-hide-large" style="position:absolute;z-index:-1;">&nbsp;</div>
-<div id="nav-placeholder_small_headspace" class="w3-mobile w3-bar w3-hide-large" >&nbsp;</div>
-  <div class="w3-mobile w3-bar w3-collapse w3-hide-small w3-hide-medium"  id="primary-nav" style="min-width:50%">
-              <a href="javascript:void(0)" onclick="primary_nav_toggle();show_hamburger();" 
-                class="w3-button w3-bar-item w3-hide-large w3-primary-color ">Close &times;</a>
-            <div class="w3-dropdown-hover w3-bar-block">
-                <a href="javascript:void(0)" class="w3-button w3-border w3-primary-color w3-drop-menu-section-hover-color">Home</a>
-                <div class="w3-dropdown-content">
-                    <a  class="w3-bar-item w3-button w3-border w3-drop-menu-color w3-drop-menu-hover-color" href="/">Signup Home</a>
-                    <a  class="w3-bar-item w3-button w3-border w3-drop-menu-color w3-drop-menu-hover-color" href="http://sacbike.org">SABA Home</a>
-                </div>
-            </div>
-              <a class="w3-bar-item w3-button w3-border w3-primary-color w3-secondary-hover-color" href="{{ url_for('calendar.display') }}">Calendar</a>
-              {% if g.admin and g.admin.has_access(g.user,Job)%}
-              <a class="w3-bar-item w3-button w3-border w3-primary-color w3-secondary-hover-color" href="{{ url_for('signup.roster') }}">View Roster</a>
-              {% endif %}
-            {% if g.admin and g.admin.has_access(g.user)%}
-                <div style="display:none"><div style="display:none"><!-- just a place holder -->
-                {% for item in g.admin.permissions %}
-                    {% if g.admin.has_access(g.user,item['table']) and item['add_to_menu'] %}
-                        {% if item['header_row'] == True %}
-                        </div></div>
-                        <div class="w3-dropdown-hover w3-bar-block">
-                            <button class="w3-button w3-border w3-primary-color w3-drop-menu-section-hover-color"><strong>{{item['display_name']}}</strong></button>
-                            <div class="w3-dropdown-content w3-card-4">
-                        {% else %}
-                            <a  class="w3-bar-item w3-button w3-border w3-drop-menu-color w3-drop-menu-hover-color" href="{{item['url']}}">{{item['display_name']}}</a>
-                        {% endif %}
-                    {% endif %}
-                {% endfor %}
-                    </div></div>
-            {% endif %} <!-- g.admin -->
+    <div id="nav-placeholder" class="w3-mobile w3-bar w3-collapse w3-primary-color w3-hide-medium w3-hide-small" style="position:absolute;z-index:-1;height:30pt">&nbsp;</div>
+    <div id="nav-placeholder_small" class="w3-mobile w3-bar w3-primary-color w3-hide-large" style="position:absolute;z-index:-1;">&nbsp;</div>
+    <div id="nav-placeholder_small_headspace" class="w3-mobile w3-bar w3-hide-large" >&nbsp;</div>
+    <div class="w3-mobile w3-bar w3-collapse w3-hide-small w3-hide-medium"  id="primary-nav" style="min-width:50%">
+        <a href="javascript:void(0)" onclick="primary_nav_toggle();show_hamburger();" class="w3-button w3-bar-item w3-hide-large w3-primary-color ">Close &times;</a>
         <div class="w3-dropdown-hover w3-bar-block">
-            <a href="javascript:void(0)" class="w3-button w3-border w3-primary-color w3-drop-menu-section-hover-color">Help</a>
+            <a href="javascript:void(0)" class="w3-button w3-border w3-primary-color w3-drop-menu-section-hover-color">Home</a>
+            <div class="w3-dropdown-content">
+                <a  class="w3-bar-item w3-button w3-border w3-drop-menu-color w3-drop-menu-hover-color" href="/">Signup Home</a>
+                <a  class="w3-bar-item w3-button w3-border w3-drop-menu-color w3-drop-menu-hover-color" href="http://sacbike.org">SABA Home</a>
+            </div>
+        </div>
+          <a class="w3-bar-item w3-button w3-border w3-primary-color w3-secondary-hover-color" href="{{ url_for('calendar.display') }}">Calendar</a>
+          {% if g.admin and g.admin.has_access(g.user,Job)%}
+          <a class="w3-bar-item w3-button w3-border w3-primary-color w3-secondary-hover-color" href="{{ url_for('signup.roster') }}">View Roster</a>
+          {% endif %}
+        <div class="w3-dropdown-hover w3-bar-block">
+            <a href="javascript:void(0)" class="w3-button w3-border w3-primary-color w3-drop-menu-section-hover-color"><strong>Help</strong></a>
             <div class="w3-dropdown-content">
                 <a  class="w3-bar-item w3-button w3-border w3-drop-menu-color w3-drop-menu-hover-color" href="{{ url_for('www.about')}}">About</a>
                 <a  class="w3-bar-item w3-button w3-border w3-drop-menu-color w3-drop-menu-hover-color" href="{{ url_for('www.docs')}}">Docs</a>
                 <a  class="w3-bar-item w3-button w3-border w3-drop-menu-color w3-drop-menu-hover-color" href="http://sacbike.org/contact/">Contact Us</a>
             </div>
         </div>
+        {% if g.admin and g.admin.has_access(g.user)%}
+            <div style="display:none"><div style="display:none"><!-- just a place holder -->
+            {% for item in g.admin.permissions %}
+                {% if g.admin.has_access(g.user,item['table']) and item['add_to_menu'] %}
+                    {% if item['header_row'] == True %}
+                    </div></div>
+                    <div class="w3-dropdown-hover w3-bar-block">
+                        <button class="w3-button w3-border w3-primary-color w3-drop-menu-section-hover-color"><strong>{{item['display_name']}}</strong></button>
+                        <div class="w3-dropdown-content w3-card-4">
+                    {% else %}
+                        <a  class="w3-bar-item w3-button w3-border w3-drop-menu-color w3-drop-menu-hover-color" href="{{item['url']}}">{{item['display_name']}}</a>
+                    {% endif %}
+                {% endif %}
+            {% endfor %}
+                </div></div>
+        {% endif %} <!-- g.admin -->
         {% if not g.user %}
               <a class="w3-bar-item w3-button w3-border w3-primary-color w3-secondary-hover-color" href="{{ url_for('login.login')}}">Login</a>
         {% else %}
@@ -47,7 +46,7 @@
               <a class="w3-bar-item w3-button w3-border w3-primary-color w3-secondary-hover-color" href="{{ url_for('user.edit')}}" >Manage Your Profile</a>
             {% endif %}
               <a class="w3-bar-item w3-button w3-border w3-primary-color w3-secondary-hover-color" href="{{ url_for('login.logout')}}">Logout</a>
-        
+    
         {% endif %} <!-- g.user -->
     </div>
 </div>
