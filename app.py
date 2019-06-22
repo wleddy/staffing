@@ -165,19 +165,7 @@ shotglass.register_users(app)
 
 # setup www.routes...
 shotglass.register_www(app)
-
-if app.config['TESTING']:
-    ## Setup routes that pytest will us.
-    ##### 
-    # The test server must be restarted before attempting to test
-    #####
-    ## Setup the routes for users
-    pass
-    
-# shotglass.register_users(app)
-# # setup www.routes...
-# shotglass.register_www(app)
-# shotglass.register_maps(app)
+shotglass.register_maps(app)
 
 
 @app.route('/')
