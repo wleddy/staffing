@@ -340,10 +340,11 @@ def is_user_admin():
             site_config = get_site_config()
             #may be job admin
             recs = User(g.db).get_roles(session['user_id'])
-            for rec in recs:
-                if rec.rank >= site_config.get('MINIMUM_MANAGER_RANK',70): #event manager
-                    is_admin = True
-                    break
+            if recs:
+                for rec in recs:
+                    if rec.rank >= site_config.get('MINIMUM_MANAGER_RANK',70): #event manager
+                        is_admin = True
+                        break
     
     return is_admin
 
