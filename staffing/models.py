@@ -76,7 +76,8 @@ class Job(SqliteTable):
             event_id INTEGER,
             location_id INTEGER,
             status TEXT,
-            FOREIGN KEY (event_id) REFERENCES event(id) ON DELETE CASCADE """
+            FOREIGN KEY (event_id) REFERENCES event(id) ON DELETE CASCADE
+            """
                 
         super().create_table(sql)
         
@@ -84,6 +85,10 @@ class Job(SqliteTable):
         """Create the table and initialize data"""
         self.create_table()
         
+    def init_index(self):
+        self.db.execute("CREATE INDEX IF NOT EXISTS job_event_start ON job(event_id, start_date)")
+        self.db.execute("CREATE INDEX IF NOT EXISTS job_event_location ON job(event_id, location_id)")
+                
     def filled(self,job_id):
         """Return the number positions filled for this job"""
         out = 0
@@ -122,7 +127,10 @@ class UserJob(SqliteTable):
     def init_table(self):
         """Create the table and initialize data"""
         self.create_table()
-        
+
+    def init_index(self):
+        self.db.execute("CREATE INDEX IF NOT EXISTS user_job_job_id ON user_job(job_id)")
+
     def new(self):
         """Setup a new record"""
         rec = super().new()
