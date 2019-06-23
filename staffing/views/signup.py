@@ -47,6 +47,7 @@ def help():
 @mod.route('/more_info')
 @mod.route('/more_info/')
 @mod.route('/more_info/<int:event_id>/')
+@login_required
 def more_info(event_id=0):
     event_id = cleanRecordID(event_id)
     
@@ -101,6 +102,7 @@ def display():
 @mod.route('/signup/<int:job_id>',methods=['GET','POST',])
 @mod.route('/signup/',methods=['GET','POST',])
 @mod.route('/signup',methods=['GET','POST',])
+@login_required
 def signup(job_id=None):
     """Add or remove a signup
     May come from a modal dialog"""
@@ -111,13 +113,6 @@ def signup(job_id=None):
     event = None
     user = None
     filled_positions = 0
-    
-    # if user not logged in, get that first
-    #import pdb;pdb.set_trace()
-    if not g.user:
-        next = request.url
-        rec = User(g.db).new()
-        return render_template('signup_login.html',rec=rec,next=next,submit_script = 'submitModalToModalForm',from_main=0)
     
     # get user_id
     user_id = None
@@ -269,187 +264,6 @@ def roster(display_end_days=0):
                 
     return render_template('roster.html',jobs=jobs,is_admin=is_admin,display_end_days=display_end_days,as_spreadsheet=as_spreadsheet,)
     
-    
-# @mod.route('/login',methods=['GET','POST',])
-# @mod.route('/login/',methods=['GET','POST',])
-# def login():
-#     """Log user into signup system
-#     Will not require a password if user did not set one
-#     """
-#     setExits()
-#     g.title = "Login"
-#
-#     import pdb; pdb.set_trace()
-#
-#     if g.user:
-#         log_user_out()
-#
-#     return log_user_in()
-
-    # form_email=request.form.get('email','').strip()
-    # form_password = request.form.get('password','').strip()
-    # user = User(g.db).get(form_email)
-    # if user:
-    #     if not user.password:
-    #         # log the user in without a password
-    #         setUserStatus(user.email,user.id)
-    #     elif form_password and authenticate_user(user.email,form_password) > 0:
-    #         setUserStatus(user.email,user.id)
-    #     else:
-    #         flash("Incorrect password")
-    # else:
-    #     #user not found
-    #     flash("Could not find a user with that email address")
-    #
-    # if g.user:
-    #     #user is logged in
-    #     if next:
-    #         return redirect(next)
-    #     else:
-    #         return redirect(url_for('.home'))
-    #
-    # return render_template('login.html',rec=user,form_email=form_email,next=next)
-    
-def login_old(from_main=0):
-    # no password is required for volunteer login
-    setExits()
-    ready_to_login = False
-    password_required = False
-    #import pdb;pdb.set_trace()
-    if g.user:
-        log_user_out()
-        
-    if not 'first_pass' in session:
-        session['first_pass'] = True
-    else:
-        session['first_pass'] = False
-        
-    first_pass = session['first_pass']
-    
-    user_rec = User(g.db).get(request.form.get('email','').strip())
-    if user_rec:
-        ready_to_login = True
-        # Check for a password
-        user_password = request.form.get('login_password')
-        if user_rec.password:
-            if not user_password:
-                # redisplay the form with a password box
-                ready_to_login = False
-                password_required = True
-                flash("You must enter your password.")
-            else:
-                #validate the user login
-                if authenticate_user(user_rec.email,user_password) > 0:
-                    #User is logged in
-                    ready_to_login = True
-                else:
-                    ready_to_login = False
-                    flash("Password did not match your record")
-                    password_required = True
-    else:
-        if not from_main or not first_pass:
-            flash("Could not find your account")
-
-    if ready_to_login:
-        # login user without a password if they don't have one
-        log_user_out()
-        setUserStatus(user_rec.email,user_rec.id)
-        return 'success'
-        
-    # Redisplay form
-    rec = User(g.db).new()
-    submit_script = 'submitModalToModalForm'
-    next = "/page-not-found/"
-    if from_main:
-        submit_script = 'submitModalForm'
-        next = g.listURL
-        
-    if request.form:
-        User(g.db).update(rec,request.form)
-        next=request.form.get('next',next)
-        
-    return render_template('signup_login.html',rec=rec,next=next,password_required=password_required,submit_script=submit_script,from_main=from_main)
-    
-
-@mod.route('/logout',methods=['GET',])
-@mod.route('/logout/',methods=['GET',])
-def logout():
-    setExits()
-    log_user_out()
-    return redirect(g.listURL)
-
-
-@mod.route('/register',methods=['GET','POST',])
-@mod.route('/register/<int:from_main>',methods=['GET','POST',])
-@mod.route('/register/',methods=['GET','POST',])
-def register(from_main=0):
-    """Allow volunteers to create an account"""
-    setExits()
-    site_config = get_site_config()
-    ready_to_login = True
-    next=request.form.get('next','/page-not-found/')
-    rec = User(g.db).new()
-    
-    # all fields are required
-    required_fields = ['first_name','last_name','email','phone']
-    for key, value in request.form.items():
-        if key in required_fields and not value:
-            flash("All fields are required")
-            ready_to_login = False
-            break
-    
-    User(g.db).update(rec,request.form)
-    #import pdb;pdb.set_trace()
-    
-    # email address must look like one...
-    if ready_to_login:
-        if not looksLikeEmailAddress(rec.email):
-            flash("{} doesn't look like an email address".format(rec.email))
-            ready_to_login = False
-    # Check the phone number
-    if ready_to_login:
-        formatted_phone = formatted_phone_number(rec.phone)
-        if not formatted_phone:
-            flash("{} doesn't look like an phone number. Be sure to include the area code".format(rec.phone))
-            ready_to_login = False
-        else:
-            rec.phone = formatted_phone
-    # test that email address is not in use
-    if ready_to_login:
-        test_user = User(g.db).get(rec.email)
-        if test_user:
-            flash("Someone with that email address (probably you) is already registered. Try login in instead")
-            ready_to_login = False
-    # create account and log user in
-    if ready_to_login:
-        User(g.db).save(rec)
-        # Try to give the user a couple roles
-        role = Role(g.db).get('volunteer')
-        if role:
-            User(g.db).add_role(rec.id,role.id)
-        role = Role(g.db).get('user')
-        if role:
-            User(g.db).add_role(rec.id,role.id)
-        g.db.commit()
-        # Treat this as a confirmed account. Inform Admin
-        #inform the admin
-        to=None # send to admin
-        subject = 'New account created from - {}'.format(site_config['SITE_NAME'])
-        html_template = 'email/new_account_alert.html'
-        send_message(to,subject=subject,html_template=html_template,rec=rec)
-        
-        log_user_out() # just to clear session...
-        setUserStatus(rec.email,rec.id) #log new user in
-        return "success"
-        
-        
-    submit_script = 'submitModalToModalForm'
-    if from_main:
-        submit_script = 'submitModalForm'
-        next = g.listURL
-
-    return render_template('signup_login.html',rec=rec,next=next,register=True,submit_script=submit_script,from_main=from_main)
-
 
 @mod.route('/process_notifications',methods=['GET','POST',])
 @mod.route('/process_notifications/',methods=['GET','POST',])
