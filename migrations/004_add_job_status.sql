@@ -1,7 +1,6 @@
-BEGIN;
-
+.bail on
 ALTER TABLE job ADD COLUMN status TEXT;
-
-UPDATE OR ROLLBACK job SET status = 'Active';
-
+BEGIN;
+-- don't overwrite non null values
+UPDATE OR ROLLBACK job SET status = 'Active' where status = null;
 COMMIT;
