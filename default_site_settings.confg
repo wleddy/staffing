@@ -73,7 +73,10 @@ MAX_CONTENT_LENGTH = 300000
 
 ## some administrative settings
 ALLOW_USERNAME_CHANGE = True
-ALLOW_USER_SIGNUP = True
+ALLOW_USER_SIGNUP = True #User may create their own accounts
+#By default, user accounts are inactive untill approved by Admin.
+ACTIVATE_USER_ON_CONFIRMATION=False #Activate when user responds to the confimation email
+AUTOMATICALLY_ACTIVATE_NEW_USERS=True #no confirmation email sent.
 
 ## Places to look for documentation:
 DOC_DIRECTORY_LIST = ['/','docs','shotglass2/','shotglass2/docs/',]
