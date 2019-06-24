@@ -136,19 +136,9 @@ def server_error(error):
 # Direct to a specific server for static content
 app.add_url_rule('/static/<path:filename>','static',shotglass.static)
 
-
-#import pdb;pdb.set_trace()
-# Creates the routes for signup subdomain
-subdomain = app.config.get('SIGNUP_SUBDOMAIN','signup')
-#subdomain = None
-
 from staffing.views import signup, calendar
 app.register_blueprint(signup.mod)
 app.register_blueprint(calendar.mod)
-
-# Create the routes for the admin Subdomain
-#subdomain = app.config.get('ADMIN_SUBDOMAIN','admin')
-
 from staffing.views import event
 app.register_blueprint(event.mod)
 from staffing.views import location
