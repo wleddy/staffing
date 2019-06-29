@@ -3,35 +3,68 @@ from shotglass2.takeabeltof.utils import cleanRecordID
 from shotglass2.takeabeltof.date_utils import local_datetime_now
 from shotglass2.users.models import User
         
-class Event(SqliteTable):
-    """Staffing Event Table"""
+class Activity(SqliteTable):
+    """Events are grouped under Activiies
+    """
     def __init__(self,db_connection):
         super().__init__(db_connection)
-        self.table_name = 'event'
-        self.order_by_col = 'lower(title)'
+        self.table_name = 'activity'
+        self.order_by_col = 'id'
         self.defaults = {}
         
     def create_table(self):
         """Define and create the table"""
         
         sql = """
-            title TEXT NULL,
+        title TEXT,
+        description TEXT,
+        """
+                
+        super().create_table(sql)
+
+
+class Event(SqliteTable):
+    """Staffing Event Table"""
+    def __init__(self,db_connection):
+        super().__init__(db_connection)
+        self.table_name = 'event'
+        self.order_by_col = 'lower(title)'
+        self.defaults = {'status':'Active','exclude_from_calendar':0,}
+        
+    def create_table(self):
+        """Define and create the table"""
+        
+        sql = """
+            activity_id INTEGER,
             description TEXT,
             staff_info TEXT,
             manager_user_id INTEGER,
+            client_id INTEGER,
             client_contact TEXT,
             client_email TEXT,
             client_phone TEXT,
             client_website TEXT,
             event_type_id INTEGER,
-            location_id INTEGER """
+            location_id INTEGER,
+            event_start_date DATETIME,
+            event_end_date DATETIME,
+            event_start_date_label_id INTEGER,
+            event_end_date_label_id INTEGER,
+            service_start_date DATETIME,
+            service_end_date DATETIME,
+            service_start_date_label_id INTEGER,
+            service_end_date_label_id INTEGER,
+            calendar_title TEXT,
+            exclude_from_calendar INTEGER DEFAULT 0,
+            status TEXT DEFAULT 'Active',
+            FOREIGN KEY (activity_id) REFERENCES activity(id) ON DELETE CASCADE
+            """
                 
         super().create_table(sql)
         
-    def init_table(self):
-        """Create the table and initialize data"""
-        self.create_table()
-        
+    def init_index(self):
+        #self.db.execute("CREATE INDEX IF NOT EXISTS event_activity_id ON event(activity_id)")
+        pass
         
 class EventType(SqliteTable):
     """Categorize events"""
@@ -49,10 +82,6 @@ class EventType(SqliteTable):
         description TEXT"""
         
         super().create_table(sql)
-
-    def init_table(self):
-        """Create the table and initialize data"""
-        self.create_table()
 
 
 class Job(SqliteTable):
@@ -75,16 +104,11 @@ class Job(SqliteTable):
             max_positions INTEGER,
             event_id INTEGER,
             location_id INTEGER,
-            status TEXT,
             FOREIGN KEY (event_id) REFERENCES event(id) ON DELETE CASCADE
             """
                 
         super().create_table(sql)
-        
-    def init_table(self):
-        """Create the table and initialize data"""
-        self.create_table()
-        
+                
     def init_index(self):
         self.db.execute("CREATE INDEX IF NOT EXISTS job_event_start ON job(event_id, start_date)")
         self.db.execute("CREATE INDEX IF NOT EXISTS job_event_location ON job(event_id, location_id)")
@@ -124,10 +148,6 @@ class UserJob(SqliteTable):
                 
         super().create_table(sql)
         
-    def init_table(self):
-        """Create the table and initialize data"""
-        self.create_table()
-
     def init_index(self):
         self.db.execute("CREATE INDEX IF NOT EXISTS user_job_job_id ON user_job(job_id)")
 
@@ -178,10 +198,6 @@ class Location(SqliteTable):
                 
         super().create_table(sql)
         
-    def init_table(self):
-        """Create the table and initialize data"""
-        self.create_table()
-
 class StaffNotification(SqliteTable):
     """Staffing Notification Table
     Record that a particular notification has been sent so we don't send it twice.
@@ -206,15 +222,68 @@ class StaffNotification(SqliteTable):
                 
         super().create_table(sql)
         
-    def init_table(self):
-        """Create the table and initialize data"""
-        self.create_table()
-
+        
+class Client(SqliteTable):
+    """Client for events"""
+    def __init__(self,db_connection):
+        super().__init__(db_connection)
+        self.table_name = 'client'
+        self.order_by_col = 'id'
+        self.defaults = {}
+        
+    def create_table(self):
+        """Define and create the table"""
+        
+        sql = """
+        name TEXT,
+        address TEXT,
+        city TEXT,
+        state TEXT,
+        zip TEXT,
+        web_site TEXT,
+        email TEXT,
+        phone TEXT
+        contact_first_name TEXT,
+        contact_lase_name TEXT,
+        """
+                
+        super().create_table(sql)
+    
+    
+class EventDateLabel(SqliteTable):
+    """A place to put the labels used to make event.<event|service>_start_date and end dates user friendly
+    """
+    def __init__(self,db_connection):
+        super().__init__(db_connection)
+        self.table_name = 'event_date_label'
+        self.order_by_col = 'id'
+        self.defaults = {}
+        
+    def create_table(self):
+        """Define and create the table"""
+        
+        sql = """
+        label TEXT NOT NULL UNIQUE
+        """
+                
+        super().create_table(sql)
+    
+    def get(self,label_or_id):
+        """select the label record by label or id"""
+        if type(label_or_id) is str:
+            rec = self.select_one(where='lower(label) = "{}"'.format(label_or_id.lower()))
+        else:
+            rec = super().get(cleanRecordID(label_or_id))
+            
+        return rec
+    
 def init_event_db(db):
     """Create a intial user record."""
-    Event(db).init_table()
-    EventType(db).init_table()
-    Job(db).init_table()
-    UserJob(db).init_table()
-    Location(db).init_table()
-    StaffNotification(db).init_table()
+    Event(db).create_table()
+    EventType(db).create_table()
+    Job(db).create_table()
+    UserJob(db).create_table()
+    Location(db).create_table()
+    StaffNotification(db).create_table()
+    Client(db).create_table()
+    EventDateLabel(db).create_table()
