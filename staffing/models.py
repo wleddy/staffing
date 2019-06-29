@@ -244,7 +244,7 @@ class Client(SqliteTable):
         email TEXT,
         phone TEXT
         contact_first_name TEXT,
-        contact_lase_name TEXT,
+        contact_last_name TEXT,
         """
                 
         super().create_table(sql)
