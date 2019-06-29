@@ -240,7 +240,7 @@ class Client(SqliteTable):
         city TEXT,
         state TEXT,
         zip TEXT,
-        web_site TEXT,
+        website TEXT,
         email TEXT,
         phone TEXT,
         contact_first_name TEXT,
