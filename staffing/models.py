@@ -28,7 +28,7 @@ class Event(SqliteTable):
     def __init__(self,db_connection):
         super().__init__(db_connection)
         self.table_name = 'event'
-        self.order_by_col = 'lower(title)'
+        self.order_by_col = 'id'
         self.defaults = {'status':'Active','exclude_from_calendar':0,}
         
     def create_table(self):
