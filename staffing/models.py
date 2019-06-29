@@ -242,7 +242,7 @@ class Client(SqliteTable):
         zip TEXT,
         web_site TEXT,
         email TEXT,
-        phone TEXT
+        phone TEXT,
         contact_first_name TEXT,
         contact_last_name TEXT,
         """
