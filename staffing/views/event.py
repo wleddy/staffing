@@ -4,7 +4,7 @@ from shotglass2.shotglass import get_site_config
 from shotglass2.users.admin import login_required, table_access_required
 from shotglass2.takeabeltof.utils import render_markdown_for, printException, cleanRecordID
 from shotglass2.takeabeltof.date_utils import datetime_as_string
-from staffing.models import Event, Location, EventType
+from staffing.models import Event, Location, EventType, Client
 from shotglass2.users.models import User
 from staffing.views.job import get_job_list_for_event
 
@@ -39,6 +39,7 @@ def edit(id=0):
         id = cleanRecordID(request.form.get("id"))
         
     event = Event(g.db)
+    clients = Client(g.db).select()
     #import pdb;pdb.set_trace()
     
     if id < 0:
@@ -53,7 +54,6 @@ def edit(id=0):
         rec = event.new()
         user = User(g.db).get(g.user)
         rec.manager_user_id = user.id
-        rec.title = "New Event"
         event.save(rec)
         g.cancelURL = url_for('.delete') + str(rec.id)
         g.db.commit()
@@ -80,7 +80,7 @@ def edit(id=0):
             return redirect(g.listURL)
         
         
-    return render_template('event_edit.html',rec=rec,locations=locations,event_types=event_types,event_managers=event_managers,job_embed_list=job_embed_list)
+    return render_template('event_edit.html',rec=rec,locations=locations,event_types=event_types,event_managers=event_managers,clients=clients,job_embed_list=job_embed_list)
     
     
 @mod.route('/delete/',methods=['GET','POST',])
@@ -99,7 +99,7 @@ def delete(id=0):
     if rec:
         event.delete(rec.id)
         g.db.commit()
-        flash("{} Event Deleted".format(rec.title))
+        flash("Event Deleted")
     
     return redirect(g.listURL)
     
@@ -107,9 +107,9 @@ def delete(id=0):
 def valid_input(rec):
     valid_data = True
     
-    title = request.form.get('title').strip()
-    if not title:
-        valid_data = False
-        flash("You must give the event a title")
+    # title = request.form.get('title','').strip()
+    # if not title:
+    #     valid_data = False
+    #     flash("You must give the event a title")
 
     return valid_data
