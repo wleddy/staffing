@@ -1,5 +1,5 @@
 -- stage 2, join the data to get meaningful result
-select event.id as event_id, event.title as event_title, event.description as event_description,
+select event.id as event_id, event.title as activity_title, event.description as event_description,
 location.location_name,
 location.lat,
 location.lng,
@@ -27,7 +27,7 @@ order by active_first_date, job.start_date
 
 
 -- Try to get location for event and job
-select event.id as event_id, event.title as event_title, event.description as event_description,
+select event.id as event_id, event.title as activity_title, event.description as event_description,
 event_location.id as event_loc_id,
 event_location.location_name as event_loc_name,
 event_location.lat as event_loc_lat,

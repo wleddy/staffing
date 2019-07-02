@@ -153,7 +153,7 @@ def event(job_id=None):
     if job.job_loc_lat and job.job_loc_lng:
         # make a list of dict for the location
         map_data = {'lat':job.job_loc_lat,'lng':job.job_loc_lng,
-        'title':job.event_title,
+        'title':job.activity_title,
         'description':job.event_description,
         'UID':job.event_id,
         'location_name':job.job_loc_name,

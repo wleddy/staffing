@@ -39,7 +39,7 @@
             <div id="event-{{ job.event_id }}" class="event-contain w3-row-padding w3-secondary-color w3-topbar" style="padding-bottom:6pt;">        
                 <div class="w3-col w3-half w3-small" >
                        <p class="w3-medium">
-                           <strong>{{ job.event_title }}</strong>
+                           <strong>{{ job.activity_title }}</strong>
                            {% if job.user_event_positions %}Your Signup ({{ job.user_event_positions }}){% endif %}
                            {% if is_admin %}<a class="w3-small" href="{{ url_for('event.edit')}}{{job.event_id}}/" ><em>(edit)</em></a>{% endif %}
 
@@ -51,7 +51,9 @@
                            {% endfor %}
                        </p>
                        {% endif %}
-                       <p>{{ job.event_description }}{% if job.client_website %}<br>Event website: {{job.client_website | weblink }}{%endif%}</p>
+                       <p>{{job.activity_description }}
+                           {% if job.event_description %}<br>{{ job.event_description }}{% endif %}
+                           {% if job.client_website %}<br>Event website: {{job.client_website | weblink }}{%endif%}</p>
                 </div>
                 <div class="w3-half w3-small" style="padding-left:4pt;">
                     <p class="w3-medium">
@@ -104,7 +106,7 @@
                     </div>
                 {% endif %} {# show date? #}
             
-                    <p id="event-title-{{ job.job_id }}" title="{{ job.event_title }}" style="font-size:1pt;padding:0;margin:0;">&nbsp;<!-- A marker to hold the title --></p>
+                    <p id="event-title-{{ job.job_id }}" title="{{ job.activity_title }}" style="font-size:1pt;padding:0;margin:0;">&nbsp;<!-- A marker to hold the title --></p>
                 <div class="job-date-container-{{ job.event_id }}-{{job.start_date[:10]}}">
                     
                     <div id="job-body{{job.job_id}}" >

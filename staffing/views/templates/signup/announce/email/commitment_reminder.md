@@ -9,7 +9,7 @@ as soon as possible so we can arrange for someone to take your place.
 {% if job_data_list %}
 {% for job_data in job_data_list %}
 ---
-### {{ job_data.event_title }}
+### {{ job_data.activity_title }}
 #### _{{ job_data.job_title }}_
 
 Your assignment date: {{ job_data.start_date | abbr_date_string }}

@@ -1,7 +1,7 @@
 {# job_data_list should only contain one item #}
 {% if job_data_list %}{% set job_data = job_data_list[0] %}
                 {% from '_staffing_helper_macros.html' import directions_snippet %}
-## Thank you for helping us with {{ job_data.event_title }}!
+## Thank you for helping us with {{ job_data.activity_title }}!
 
 Your assignment is to help with {{ job_data.job_title }}.
 

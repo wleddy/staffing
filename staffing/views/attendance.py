@@ -30,7 +30,7 @@ def display():
     user_job.user_id,
 
     event.id as event_id,
-    event.title as event_title, 
+    activity.title as activity_title, 
 
     job.title as job_title, 
     job.start_date as start_date,
@@ -42,8 +42,9 @@ def display():
     join job on user_job.job_id = job.id
     join user on user_job.user_id = user.id
     join event on job.event_id = event.id
+    join activity on activity.id = event.activity_id
     where 1
-    order by date(start_date,'localtime'), event_title, job_title, first_name, last_name
+    order by date(start_date,'localtime'), activity_title, job_title, first_name, last_name
     """
     recs = UserJob(g.db).query(sql)
     
@@ -68,7 +69,7 @@ def edit(userjob_id=None):
         user_job.*,
         
         event.id as event_id,
-        event.title as event_title, 
+        activity.title as activity_title, 
 
         job.title as job_title, 
         job.start_date as job_start_date,
@@ -80,6 +81,7 @@ def edit(userjob_id=None):
         join job on user_job.job_id = job.id
         join user on user_job.user_id = user.id
         join event on job.event_id = event.id
+        join activity on activity.id = event.activity_id
         where user_job.id = {}
         order by user_job.id
         """.format(userjob_id)

@@ -1,11 +1,11 @@
 {# Send to user when manager has cancelled an assignment #}
 
 {% if manager %}
-### {{ manager.first_name }} {{ manager.last_name }} at SABA has *cancelled* your assignment for {{ job_data.event_title }}.
+### {{ manager.first_name }} {{ manager.last_name }} at SABA has *cancelled* your assignment for {{ job_data.activity_title }}.
 
 If you have any questions about the assignment please contact {{ manager.first_name }} at {{ manager.email }}
 {% else %}
-### A SABA staff member has *cancelled* your assignment for {{ job_data.event_title }}.
+### A SABA staff member has *cancelled* your assignment for {{ job_data.activity_title }}.
 {% endif %}
 
 Your assignment was {{ job_data.job_title }}.

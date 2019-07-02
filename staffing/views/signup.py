@@ -261,7 +261,6 @@ def roster(display_end_days=0):
     order_by = "sort_by_date_and_event" if as_spreadsheet else ""
     
     jobs = get_job_rows(start_date,end_date,"",user_skills,is_admin,order_by=order_by)
-                
     return render_template('roster.html',jobs=jobs,is_admin=is_admin,display_end_days=display_end_days,as_spreadsheet=as_spreadsheet,)
     
 
@@ -380,7 +379,7 @@ def get_job_rows(start_date=None,end_date=None,where='',user_skills=[],is_admin=
     ## Don't use 'localtime' modifier with date strings without timezone info
     where_date_range = " and date(job.start_date, 'localtime') >= date('{}') and date(job.start_date, 'localtime') <= date('{}') ".format(start_date,end_date)
         
-    job_status_where = " " + kwargs.get('job_status_where'," and lower(job.status) = 'active' ") + " "
+    job_status_where = " " + kwargs.get('job_status_where'," and lower(event.status) = 'active' ") + " "
     
     def get_job_ids_for_skills(skill_ids):
         """Return a list of job.id where the jobs have one or more of skills required"""
@@ -430,11 +429,19 @@ def get_job_rows(start_date=None,end_date=None,where='',user_skills=[],is_admin=
 
     order_by = kwargs.get('order_by',None)
     if not order_by:
-        order_by = " active_first_date, event_title, job.start_date "
+        order_by = " active_first_date, activity_title, job.start_date "
     
     sql = """
-    select event.id as event_id, event.title as event_title, event.description as event_description,
-    event.client_contact,event.client_email,event.client_phone,event.client_website,
+    select event.id as event_id, activity.title as activity_title, activity.description as activity_description, event.description as event_description,
+    --event.client_contact,event.client_email,event.client_phone,event.client_website,
+    coalesce(nullif(event.client_contact,''),event.client_contact) as event_client_contact,
+    coalesce(nullif(event.client_email,''),event.client_email) as event_client_email,
+    coalesce(nullif(event.client_phone,''),event.client_phone) as event_client_phone,
+    coalesce(nullif(event.client_website,''),event.client_website) as event_client_website,
+    (select coalesce(nullif(event.client_contact,''),client.contact_first_name | " " | client.contact_last_name)) as client_contact,
+    (select coalesce(nullif(event.client_email,''),client.email)) as client_email,
+    (select coalesce(nullif(event.client_phone,''),client.phone)) as client_phone,
+    (select coalesce(nullif(event.client_website,''),client.website)) as client_website,
     event.staff_info as event_staff_info,
     event_manager.id as event_manager_user_id,
     event_manager.first_name as event_manager_first_name,
@@ -461,11 +468,11 @@ def get_job_rows(start_date=None,end_date=None,where='',user_skills=[],is_admin=
         job.location_id <> event.location_id and {where}) as unique_job_locations,
     job.id as job_id,
     job.title as job_title,
-    job.status as job_status,
+    event.status as job_status,
     job.description as job_description,
     job.start_date,
     job.end_date,
-    substr(job.start_date,1,10) || event.title as sort_by_date_and_event,
+    substr(job.start_date,1,10) || activity.title as sort_by_date_and_event,
     job.max_positions,
     job.skill_list,
     job_location.id as job_loc_id,
@@ -490,10 +497,12 @@ def get_job_rows(start_date=None,end_date=None,where='',user_skills=[],is_admin=
     left join location as event_location on event_location.id = event.location_id
     left join location as job_location on job_location.id = job.location_id
     left join user as event_manager on event_manager.id = event.manager_user_id
+    join activity on activity.id = event.activity_id
+    left join client on client.id = event.client_id
     where {where}
     order by {order_by}
     """
-    
+    #print(sql.format(where=where, order_by=order_by,))
     #import pdb;pdb.set_trace()
     jobs = Job(g.db).query(sql.format(where=where, order_by=order_by,))
 

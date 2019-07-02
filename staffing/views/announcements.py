@@ -60,7 +60,7 @@ def send_signup_email(job_data_list,user,template_path,bp,**kwargs):
 
     subject = kwargs.pop('subject','')
     if not subject:
-        subject = 'Your assignment for {}'.format(job_data.event_title)
+        subject = 'Your assignment for {}'.format(job_data.activity_title)
     attachment = None
     if ical:
         attachment = ("{}.ics".format(job_data.job_title.replace(' ','_')), "text/calendar", ical)
