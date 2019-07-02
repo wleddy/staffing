@@ -66,6 +66,13 @@ class Event(SqliteTable):
         #self.db.execute("CREATE INDEX IF NOT EXISTS event_activity_id ON event(activity_id)")
         pass
         
+    def select(self,**kwargs):
+        """Include Activity fields"""
+        sql="""select event.*, activity.title as activity_title, activity.description as activity_description from event join activity on activity.id = event.activity_id
+        where {} order by {}""".format(kwargs.get('where',1),kwargs.get('order_by',self.order_by_col))
+        
+        return self.query(sql)
+        
 class EventType(SqliteTable):
     """Categorize events"""
     def __init__(self,db_connection):
@@ -228,7 +235,7 @@ class Client(SqliteTable):
     def __init__(self,db_connection):
         super().__init__(db_connection)
         self.table_name = 'client'
-        self.order_by_col = 'id'
+        self.order_by_col = 'name, id'
         self.defaults = {}
         
     def create_table(self):
@@ -279,6 +286,7 @@ class EventDateLabel(SqliteTable):
     
 def init_event_db(db):
     """Create a intial user record."""
+    Activity(db).create_table()
     Event(db).create_table()
     EventType(db).create_table()
     Job(db).create_table()
