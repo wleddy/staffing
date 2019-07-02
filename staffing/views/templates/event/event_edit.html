@@ -4,10 +4,12 @@
 
 {% block fieldset %}
     <fieldset class="w3-col w3-half w3-left">        
-        <p>{{ input_field(rec.id,"id",type="hidden",default=0)}}</p>
-        <p>{{ input_field(rec.title,'title',req=True)}}</p>
+        {{ input_field(rec.id,"id",type="hidden",default=0)}}
+        {{ input_field(rec.activity_id,"activity_id",type="hidden",default=0)}}
+        <p>{{ input_field(rec.activity_title,'activity title',extras='readonly')}}</p>
+        <p>{{ input_field(rec.calendar_title,'calendar_title',label="Calendar Title (if different)")}}</p>
         <p>{{ label_only(label="Description (Appears in Public Calendar)")}}</p>
-        <p><textarea rows="7" name="description" style="width:100%;">{{rec.description |default('',True)}}</textarea></p>
+        <p><textarea rows="7" name="description" style="width:100%;" placeholder="{{rec.activity_description | default('',True) }}" >{{rec.description |default('',True)}}</textarea></p>
         <p>{{ label_only(label="Staff Only information (not visible to public)")}}</p>
         <p><textarea rows="5" name="staff_info" style="width:100%;" >{{rec.staff_info |default('',True)}}</textarea></p>
         <p>{{ select_field("location_id","Location", class="w3-border") }}
@@ -37,8 +39,23 @@
                 {% endif %}
             </select>
         </p>
+        <p>{{ select_field("client_id","Client", class="w3-border") }}
+                <option value="0">Select a Client</option>
+                {% if clients %}
+                {% for client in clients %}
+                    <option value="{{client.id}}" {% if client.id == rec.client_id %}selected="selected" {% endif %}>{{client.name}}</option>
+                {% endfor %}
+                {% endif %}
+            </select>
+        </p>
 
-        <p>{{ input_field(rec.client_contact,"client_contact")}}</p>
+        <p>{{ label_only("(Change below for this event only)")}}</p>
+        {% set placeholder = "Huh?"%}
+        {% if client %}
+            {% set placeholder = client.contact_first_name + " " + client.contact_last_name %}
+        {% endif %}
+        <p>{{ placeholder }}</p>
+        <p>{{ input_field(rec.client_contact,"client_contact", placeholder="{{  placeholder }}")}}</p>
         <p>{{ input_field(rec.client_email,"client_email")}}</p>
         <p>{{ input_field(rec.client_phone,"client_phone")}}</p>
         <p>{{ input_field(rec.client_website,"client_website", placeholder='http://example.com')}}</p>
