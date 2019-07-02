@@ -4,11 +4,11 @@ sys.path.append('') ##get import to look in the working dir.
 
 from shotglass2.takeabeltof.database import Database, SqliteTable
 from shotglass2.takeabeltof.date_utils import local_datetime_now, date_to_string
-from staffing.models import Event, Client, EventDateLabel, Job, EventType, Activity
+from staffing.models import Event, Client, EventDateLabel, Job, EventType, Activity, UserJob
 from instance.site_settings import DATABASE_PATH
 
 def drop_tables():
-    table_list = ['activity','temp_event','activity','client','temp_job','event_date_label']
+    table_list = ['activity','temp_event','activity','client','temp_job','event_date_label','temp_user_job']
     for table in table_list:
         try:
             db.execute("drop table {}".format(table))
@@ -48,6 +48,11 @@ new_job_table = Job(db)
 new_job_table.table_name = "temp_job"
 new_job_table.create_table()
 
+assignment_table = UserJob(db)
+new_assignment_table = UserJob(db)
+new_assignment_table.table_name = "temp_user_job"
+new_assignment_table.create_table()
+
 #import pdb; pdb.set_trace()
 old_event_table = Event(db)
 old_events = old_event_table.select()
@@ -86,6 +91,18 @@ if old_events:
                         new_job_table.update(new_job_rec,job._asdict())
                         new_job_rec.event_id = new_event_rec.id
                         new_job_table.save(new_job_rec)
+                        
+                        # Create new assignments for this job
+                        #import pdb; pdb.set_trace()
+                        
+                        old_assignments = assignment_table.select(where="job_id = {}".format(job.id))
+                        if old_assignments:
+                            for assmnt in old_assignments:
+                                new_assmt = new_assignment_table.new()
+                                new_assignment_table.update(new_assmt,assmnt._asdict())
+                                new_assmt.job_id = new_job_rec.id
+                                new_assignment_table.save(new_assmt)
+                                
             
             
             
@@ -107,9 +124,18 @@ if old_events:
                     if not client_rec:
                         client_rec = client.new()
                         client_rec.name = old_event_rec.client_contact
-                        client_rec.web_site = old_event_rec.client_website
+                        client_rec.website = old_event_rec.client_website
                         client_rec.email = old_event_rec.client_email
                         client_rec.phone = old_event_rec.client_phone
+                        # Most of the old contact names are people, so split it into first and last
+                        contact_name = old_event_rec.client_contact.split(' ')
+                        for pos in range(2):
+                            if len(contact_name) > pos:
+                                if pos == 0:
+                                    client_rec.contact_first_name = contact_name[pos]
+                                else:
+                                    client_rec.contact_last_name = contact_name[pos]
+                                    
                         client.save(client_rec)
                         # clear these fields in new event record
                         new_event_rec.client_contact = None
