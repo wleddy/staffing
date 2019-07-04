@@ -217,7 +217,7 @@ def get_job_list_for_event(id=0):
     #import pdb;pdb.set_trace()
     id = cleanRecordID(id)
     #jobs = Job(g.db).select(where='event_id = {}'.format(id))
-    job_data = get_job_rows(None,None,"job.event_id = {}".format(id),[],is_admin=True,job_status_where='')
+    job_data = get_job_rows(None,None,"job.event_id = {}".format(id),[],is_admin=True,event_status_where='')
     
     return render_template('job_embed_list.html',jobs=job_data,event_id=id)
     
@@ -356,7 +356,7 @@ def assignment_manager(job_id=0):
             manager_rec = User(g.db).get(session.get('user_id',0))
             user_rec = User(g.db).get(assignment_user_id)
             # need a fresh copy of this
-            job_data = get_job_rows(None,None,"job.id = {}".format(job_id),[],is_admin=True,job_status_where='')
+            job_data = get_job_rows(None,None,"job.id = {}".format(job_id),[],is_admin=True,event_status_where='')
             if job_data:
                 job_data = job_data[0]
                 subject = "{} {} has given you an assignment".format(manager_rec.first_name,manager_rec.last_name)
@@ -375,7 +375,7 @@ def assignment_manager(job_id=0):
         signup.positions=0
         
     #Get the job to display
-    job_data = get_job_rows(None,None,"job.id = {}".format(job_id),[],is_admin=True,job_status_where='')
+    job_data = get_job_rows(None,None,"job.id = {}".format(job_id),[],is_admin=True,event_status_where='')
     role_list=[0] #will return none
     if job_data:
         job_data = job_data[0]
@@ -434,7 +434,7 @@ def assignment_manager_delete(job_id=0,user_id=0):
             # Only send a notification if the job is in the future
             #assigned_job = Job(g.db).get(job_id)
             if assigned_job and getDatetimeFromString(assigned_job.start_date) > local_datetime_now():
-                job_data = get_job_rows(None,None,"job.id = {}".format(job_id),[],is_admin=True,job_status_where='')
+                job_data = get_job_rows(None,None,"job.id = {}".format(job_id),[],is_admin=True,event_status_where='')
                 if job_data:
                     job_data = job_data[0]
                     # send a special email to the user to inform them of the assignment.

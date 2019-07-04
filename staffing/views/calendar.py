@@ -66,7 +66,7 @@ def display(month=None,year=None):
     end_date = start_date.replace(day=eom)    
     
     job_data = get_job_rows(start_date,end_date,is_admin=True,
-            job_status_where=get_job_status_where(),
+            event_status_where=get_event_status_where(),
             order_by="date(job.start_date,'localtime')")
             
     job_list_dict = {}
@@ -141,7 +141,7 @@ def event(job_id=None):
         return redirect(url_for('.display'))
         
     job = get_job_rows(None,None,is_admin=True,where="job.id = {}".format(job_id),
-                        job_status_where=get_job_status_where(),
+                        event_status_where=get_event_status_where(),
                         )
     if not job:
         return redirect(url_for('.display'))
@@ -163,5 +163,5 @@ def event(job_id=None):
     return render_template('calendar_event.html',job=job,map_html=map_html,)
     
     
-def get_job_status_where():
-    return " and lower(job.status) = 'public calendar' "
+def get_event_status_where():
+    return " and lower(event.status) = 'scheduled' "

@@ -379,7 +379,7 @@ def get_job_rows(start_date=None,end_date=None,where='',user_skills=[],is_admin=
     ## Don't use 'localtime' modifier with date strings without timezone info
     where_date_range = " and date(job.start_date, 'localtime') >= date('{}') and date(job.start_date, 'localtime') <= date('{}') ".format(start_date,end_date)
         
-    job_status_where = " " + kwargs.get('job_status_where'," and lower(event.status) = 'active' ") + " "
+    event_status_where = " " + kwargs.get('event_status_where'," and lower(event.status) = 'scheduled' ") + " "
     
     def get_job_ids_for_skills(skill_ids):
         """Return a list of job.id where the jobs have one or more of skills required"""
@@ -425,7 +425,7 @@ def get_job_rows(start_date=None,end_date=None,where='',user_skills=[],is_admin=
     if not where:
         where = "1 "
     
-    where = where + job_status_where + where_date_range + where_skills
+    where = where + event_status_where + where_date_range + where_skills
 
     order_by = kwargs.get('order_by',None)
     if not order_by:
@@ -516,7 +516,7 @@ def get_job_rows(start_date=None,end_date=None,where='',user_skills=[],is_admin=
                 
                 # generate a list of all dates fo this event in this selection of jobs
                 # get a selection of jobs for this event
-                job_dates = Job(g.db).select(where='event_id = {} {} {} {}'.format(job.event_id,where_date_range,where_skills,job_status_where),order_by="job.start_date")
+                job_dates = Job(g.db).query('select job.*, event.status from job join event on event.id = job.event_id where event_id = {} {} {} {} order by job.start_date'.format(job.event_id,where_date_range,where_skills,event_status_where))
                 #put into list
                 dates_list = []
                 if job_dates:
