@@ -468,7 +468,7 @@ def get_job_rows(start_date=None,end_date=None,where='',user_skills=[],is_admin=
         job.location_id <> event.location_id and {where}) as unique_job_locations,
     job.id as job_id,
     job.title as job_title,
-    event.status as job_status,
+    event.status as event_status,
     job.description as job_description,
     job.start_date,
     job.end_date,
