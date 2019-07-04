@@ -117,7 +117,23 @@ TEMPLATE_DIRS = [
 # 'shotglass2/templates' then...
 # each blueprint in the order defined
 
-    
+##### Staffing Settings #############
+#####################################
+
+# Role list for users who can signup for events without special skills
+DEFAULT_USER_ROLES = ['volunteer','user']
+
+# Minimum Role Rank for Event managers
+MINIMUM_MANAGER_RANK = 70
+
+# The number of days into the future to display
+#.  in the roster and signup displays
+ROSTER_END_DAYS = 60
+
+# Values for even.status drop down
+EVENT_STATUS_VALUES = ["Scheduled","Pending","Cancelled",]
+
+
 #Mapbox Settings...
 MAPBOX_PROJECT_ID = "baw.p0hdja4j"
 MAPBOX_ACCESS_TOKEN = "pk.eyJ1IjoiYmF3IiwiYSI6ImNpanh4bHQ3MzFleXh2d2tpMTNzYXQ0bGcifQ.WNpDcwH6Y9pGVZhUtZOdwg"
