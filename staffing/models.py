@@ -29,7 +29,7 @@ class Event(SqliteTable):
         super().__init__(db_connection)
         self.table_name = 'event'
         self.order_by_col = 'id'
-        self.defaults = {'status':'Active','exclude_from_calendar':0,}
+        self.defaults = {'status':'Scheduled','exclude_from_calendar':0,}
         
     def create_table(self):
         """Define and create the table"""

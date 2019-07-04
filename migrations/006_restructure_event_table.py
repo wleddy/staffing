@@ -55,7 +55,7 @@ new_assignment_table.create_table()
 
 #import pdb; pdb.set_trace()
 old_event_table = Event(db)
-old_events = old_event_table.select()
+old_events = old_event_table.query("select * from event")
 if old_events:
     for old_event_rec in old_events:
         #import pdb; pdb.set_trace()
@@ -104,8 +104,6 @@ if old_events:
                                 new_assignment_table.save(new_assmt)
                                 
             
-            
-            
                 # set the start and end dates for the event
                 new_event_rec.event_start_date = event_start_date if event_start_date else service_start_date
                 new_event_rec.event_end_date = event_end_date if event_end_date else service_end_date
@@ -113,10 +111,12 @@ if old_events:
                 new_event_rec.service_end_date = service_end_date if service_end_date else event_end_date
                 # Set the time labels based on the event type
                 # these ids are hard wired per the new table definition
-                new_event_rec.event_end_date_label_id = 3 
-                new_event_rec.event_start_date_label_id = 4
-                new_event_rec.service_end_date_label_id = 1 if new_event_rec.event_type_id <=2 else 3
-                new_event_rec.service_start_date_label_id = 2  if new_event_rec.event_type_id <=2 else 4
+                new_event_rec.event_end_date_label_id = 4 
+                new_event_rec.event_start_date_label_id = 3
+                new_event_rec.service_end_date_label_id = 2 if new_event_rec.event_type_id <=2 else 4
+                new_event_rec.service_start_date_label_id = 1  if new_event_rec.event_type_id <=2 else 3
+                
+                new_event_rec.status = "Scheduled"
             
                 # Create or find client record
                 if old_event_rec.client_contact:

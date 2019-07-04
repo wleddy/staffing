@@ -2,16 +2,93 @@
 
 {% from "_form_helpers.html" import input_field, select_field, radio_field, checkbox_field, label_only %}
 
+{% block head %}
+    {{ super() }}
+    
+    {% include "anytime_head.html"%}
+{% endblock head %}
+
 {% block fieldset %}
     <fieldset class="w3-col w3-half w3-left">        
+        {% set placeholders = {}%} {# add dict items to set placeholders if needed. #}
         {{ input_field(rec.id,"id",type="hidden",default=0)}}
         {{ input_field(rec.activity_id,"activity_id",type="hidden",default=0)}}
         <p>{{ input_field(rec.activity_title,'activity title',extras='readonly')}}</p>
+        <p>{{ select_field("status","Event Status", class="w3-border") }}
+                {% for status in site_config.get("EVENT_STATUS_VALUES",["Scheduled","Pending","Cancelled"]) %}
+                    <option value="{{status}}" {% if status == rec.status %}selected="selected" {% endif %}>{{status}}</option>
+                {% endfor %}
+            </select>
+        </p>
         <p>{{ input_field(rec.calendar_title,'calendar_title',label="Calendar Title (if different)")}}</p>
+        {% set selected =  'checked="checked"' if rec.exclude_from_calendar else '' %}
+        <p>{{ checkbox_field(1,'exclude_from_calendar', extras=selected)}}</p>
         <p>{{ label_only(label="Description (Appears in Public Calendar)")}}</p>
         <p><textarea rows="7" name="description" style="width:100%;" placeholder="{{rec.activity_description | default('',True) }}" >{{rec.description |default('',True)}}</textarea></p>
         <p>{{ label_only(label="Staff Only information (not visible to public)")}}</p>
         <p><textarea rows="5" name="staff_info" style="width:100%;" >{{rec.staff_info |default('',True)}}</textarea></p>
+        <p>{{ label_only(label="Event Times")}}</p>
+        <div class="w3-row">
+            <p class="w3-col w3-third">
+                {{ select_field("event_start_date_label_id","Calendar Label",class="w3-border") }}
+                    {% if event_date_labels %}
+                    {% for label in event_date_labels %}
+                        <option value="{{label.id}}" {% if label.id == rec.event_start_date_label_id %}selected="selected" {% endif %}>{{label.label}}</option>
+                    {% endfor %}
+                    {% endif %}
+                </select>
+            </p>
+            <p class="w3-col w3-twothird">
+                {% set event_start_date = rec.event_start_date | local_date_and_time_string %}
+                {{ input_field(event_start_date,'event_start_date',id="event_start_date", label="Event Starts", placeholder="Event Start Date and Time") }}
+            </p>
+        </div>
+        <div class="w3-row">
+            <p class="w3-col w3-third">
+                {{ select_field("event_end_date_label_id","Calendar Label",class="w3-border") }}
+                    {% if event_date_labels %}
+                    {% for label in event_date_labels %}
+                        <option value="{{label.id}}" {% if label.id == rec.event_end_date_label_id %}selected="selected" {% endif %}>{{label.label}}</option>
+                    {% endfor %}
+                    {% endif %}
+                </select>
+            </p>
+            <p class="w3-col w3-twothird">
+                {% set event_end_date = rec.event_end_date | local_date_and_time_string %}
+                {{ input_field(event_end_date,'event_end_date',id="event_end_date", label="Event Ends", placeholder="Event End Date and Time") }}
+            </p>
+        </div>
+        <p>{{ label_only(label="Service Times")}}</p>
+        <div class="w3-row">
+            <p class="w3-col w3-third">
+                {{ select_field("service_start_date_label_id","Calendar Label",class="w3-border") }}
+                    {% if event_date_labels %}
+                    {% for label in event_date_labels %}
+                        <option value="{{label.id}}" {% if label.id == rec.service_start_date_label_id %}selected="selected" {% endif %}>{{label.label}}</option>
+                    {% endfor %}
+                    {% endif %}
+                </select>
+            </p>
+            <p class="w3-col w3-twothird">
+                {% set service_start_date = rec.service_start_date | local_date_and_time_string %}
+                {{ input_field(service_start_date,'service_start_date',id="service_start_date", label="Service Starts", placeholder="Service Start Date and Time") }}
+            </p>
+        </div>
+        <div class="w3-row">
+            <p class="w3-col w3-third">
+                {{ select_field("service_end_date_label_id","Calendar Label",class="w3-border") }}
+                    {% if event_date_labels %}
+                    {% for label in event_date_labels %}
+                        <option value="{{label.id}}" {% if label.id == rec.service_end_date_label_id %}selected="selected" {% endif %}>{{label.label}}</option>
+                    {% endfor %}
+                    {% endif %}
+                </select>
+            </p>
+            <p class="w3-col w3-twothird">
+                {% set service_end_date = rec.service_end_date | local_date_and_time_string %}
+                {{ input_field(service_end_date,'service_end_date',id="service_end_date", label="Service Ends", placeholder="Service End Date and Time") }}
+            </p>
+        </div>
         <p>{{ select_field("location_id","Location", class="w3-border") }}
                 <option value="0">Select a location</option>
                 {% if locations %}
@@ -39,6 +116,7 @@
                 {% endif %}
             </select>
         </p>
+        {# TODO - update placeholders on contact input fields below when this changes #}
         <p>{{ select_field("client_id","Client", class="w3-border") }}
                 <option value="0">Select a Client</option>
                 {% if clients %}
@@ -50,16 +128,34 @@
         </p>
 
         <p>{{ label_only("(Change below for this event only)")}}</p>
-        {% set placeholder = "Huh?"%}
         {% if client %}
-            {% set placeholder = client.contact_first_name + " " + client.contact_last_name %}
+            {%if client.contact_first_name and client.contact_last_name %}{% set _ = placeholders.update({'client_contact':client.contact_first_name + " " + client.contact_last_name,}) %}{% endif %}
+            {% if client.email %}{% set _ = placeholders.update({'client_email':client.email,}) %}{% endif %}
+            {% if client.phone %}{% set _ = placeholders.update({'client_phone':client.phone,}) %}{% endif %}
+            {% if client.website %}{% set _ = placeholders.update({'client_website':client.website,}) %}{% endif %}
         {% endif %}
-        <p>{{ placeholder }}</p>
-        <p>{{ input_field(rec.client_contact,"client_contact", placeholder="{{  placeholder }}")}}</p>
-        <p>{{ input_field(rec.client_email,"client_email")}}</p>
-        <p>{{ input_field(rec.client_phone,"client_phone")}}</p>
-        <p>{{ input_field(rec.client_website,"client_website", placeholder='http://example.com')}}</p>
-    
+        <p>{{ input_field(rec.client_contact,"client_contact",label="Client Contact", id="client_contact")}}</p>
+        <p>{{ input_field(rec.client_email,"client_email",label="Client Contact Email", id="client_email")}}</p>
+        <p>{{ input_field(rec.client_phone,"client_phone",label="Client Contact Phone",id="client_phone")}}</p>
+        <p>{{ input_field(rec.client_website,"client_website",label="Event Website", placeholder='http://example.com')}}</p>
+        
+        <script>
+            // set the placeholder text
+            {% for key, value in placeholders.items() %}
+            $("#{{key}}").attr('placeholder',"{{value}}");
+            {% endfor %}
+            
+            var date_format = "%c/%e/%y %l:%i%p";
+            $("#event_start_date").AnyTime_picker(
+                { format: date_format } );
+            $("#event_end_date").AnyTime_picker(
+                { format: date_format } );
+            $("#service_start_date").AnyTime_picker(
+                { format: date_format } );
+            $("#service_end_date").AnyTime_picker(
+                { format: date_format } );
+        </script>
+            
     </fieldset>
 <div class="w3-col w3-hide-small" style="width:20pt;">&nbsp;</div>
 <div class="w3-col l5 m5 s12" >

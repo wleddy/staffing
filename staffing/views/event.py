@@ -3,8 +3,8 @@ from flask import request, session, g, redirect, url_for, abort, \
 from shotglass2.shotglass import get_site_config
 from shotglass2.users.admin import login_required, table_access_required
 from shotglass2.takeabeltof.utils import render_markdown_for, printException, cleanRecordID
-from shotglass2.takeabeltof.date_utils import datetime_as_string
-from staffing.models import Event, Location, EventType, Client
+from shotglass2.takeabeltof.date_utils import date_to_string, getDatetimeFromString
+from staffing.models import Event, Location, EventType, Client, EventDateLabel
 from shotglass2.users.models import User
 from staffing.views.job import get_job_list_for_event
 
@@ -40,6 +40,7 @@ def edit(id=0):
         
     event = Event(g.db)
     clients = Client(g.db).select()
+    event_date_labels=EventDateLabel(g.db).select()
     #import pdb;pdb.set_trace()
     
     if id < 0:
@@ -50,6 +51,7 @@ def edit(id=0):
         if not rec:
             flash("Record Not Found")
             return redirect(g.listURL)
+        client = Client(g.db).get(rec.client_id)
     else:
         rec = event.new()
         user = User(g.db).get(g.user)
@@ -66,7 +68,10 @@ def edit(id=0):
     job_embed_list = get_job_list_for_event(rec.id)
     
     if request.form:
+        #import pdb;pdb.set_trace()
+        
         event.update(rec,request.form)
+        rec.exclude_from_calendar = request.form.get('exclude_from_calendar',0) #checkbox value
         rec.location_id = cleanRecordID(request.form.get('location_id',-1))
         # ensure that web address is absolute
         if rec.client_website:
@@ -80,7 +85,16 @@ def edit(id=0):
             return redirect(g.listURL)
         
         
-    return render_template('event_edit.html',rec=rec,locations=locations,event_types=event_types,event_managers=event_managers,clients=clients,job_embed_list=job_embed_list)
+        
+    return render_template('event_edit.html',
+        rec=rec,
+        locations=locations,
+        event_types=event_types,
+        event_managers=event_managers,
+        clients=clients,client=client,
+        job_embed_list=job_embed_list,
+        event_date_labels=event_date_labels,
+        )
     
     
 @mod.route('/delete/',methods=['GET','POST',])
@@ -107,9 +121,56 @@ def delete(id=0):
 def valid_input(rec):
     valid_data = True
     
-    # title = request.form.get('title','').strip()
-    # if not title:
-    #     valid_data = False
-    #     flash("You must give the event a title")
+    # validate and convert start and end dates to timezone aware date strings
+    form_datetime = request.form.get("event_start_date",'')
+    if not form_datetime:
+        valid_data = False
+        flash("Enter a Start time for the event")
+    else:
+        temp_datetime = getDatetimeFromString(form_datetime)
+        if temp_datetime == None:
+            #Failed conversion
+            valid_data = False
+            flash("That is not a valid Start date")
+        else:
+            rec.event_start_date = temp_datetime #store as date time
+            
+    form_datetime = request.form.get("event_end_date",'')
+    if not form_datetime:
+        valid_data = False
+        flash("Enter an end time for the event")
+    else:
+        temp_datetime = getDatetimeFromString(form_datetime)
+        if temp_datetime == None:
+            #Failed conversion
+            valid_data = False
+            flash("That is not a valid End date")
+        else:
+            rec.event_end_date = temp_datetime #store as date time
 
+    form_datetime = request.form.get("service_start_date",'')
+    if not form_datetime:
+        valid_data = False
+        flash("Enter a Start time for the service")
+    else:
+        temp_datetime = getDatetimeFromString(form_datetime)
+        if temp_datetime == None:
+            #Failed conversion
+            valid_data = False
+            flash("That is not a valid Start date")
+        else:
+            rec.service_start_date = temp_datetime #store as date time
+            
+    form_datetime = request.form.get("service_end_date",'')
+    if not form_datetime:
+        valid_data = False
+        flash("Enter an end time for the service")
+    else:
+        temp_datetime = getDatetimeFromString(form_datetime)
+        if temp_datetime == None:
+            #Failed conversion
+            valid_data = False
+            flash("That is not a valid End date")
+        else:
+            rec.service_end_date = temp_datetime #store as date time
     return valid_data
