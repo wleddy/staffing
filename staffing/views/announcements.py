@@ -100,12 +100,14 @@ def process_commitment_reminder():
                     job_list_as_string = ','.join([str(x) for x in job_list])
                     job_data = get_job_rows(None,None,"job.id in ({})".format(job_list_as_string),[],is_admin=True)
                     
-                    send_result = send_signup_email(job_data,user_rec,template_path,signup_blueprint,subject=subject,escape=False)
-                    if send_result[0]:
-                        #send Ok, create some notification records
-                        log_notifications(job_list,prev_user_id,trigger_function_name)
-                    else:
-                        email_admin('Unable to send commitment reminder to {}. Result: {}'.format((user_rec.first_name + ' ' + user_rec.last_name),send_result[1]))
+                    # the most likely reason for not job_data is case where status of all jobs in list is not "active"
+                    if job_data:
+                        send_result = send_signup_email(job_data,user_rec,template_path,signup_blueprint,subject=subject,escape=False)
+                        if send_result[0]:
+                            #send Ok, create some notification records
+                            log_notifications(job_list,prev_user_id,trigger_function_name)
+                        else:
+                            email_admin('Unable to send commitment reminder to {}. Result: {}'.format((user_rec.first_name + ' ' + user_rec.last_name),send_result[1]))
             
             
         now = local_datetime_now()
@@ -168,7 +170,7 @@ def process_commitment_reminder():
                 send_reminder(reminder.user_id,job_list)
 
     except Exception as e:
-        mes = "An error occured while processing 2 Day renimders. Err: {}".format(str(e))
+        mes = "An error occured while processing commitment renimders. Err: {}".format(str(e))
         printException(mes)
         email_admin(mes)
         

@@ -516,7 +516,7 @@ def get_job_rows(start_date=None,end_date=None,where='',user_skills=[],is_admin=
                 
                 # generate a list of all dates fo this event in this selection of jobs
                 # get a selection of jobs for this event
-                job_dates = Job(g.db).select(where='event_id = {} {} {}'.format(job.event_id,where_date_range,where_skills),order_by="job.start_date")
+                job_dates = Job(g.db).select(where='event_id = {} {} {} {}'.format(job.event_id,where_date_range,where_skills,job_status_where),order_by="job.start_date")
                 #put into list
                 dates_list = []
                 if job_dates:
