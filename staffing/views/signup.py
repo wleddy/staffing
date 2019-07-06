@@ -46,13 +46,13 @@ def help():
     
 @mod.route('/more_info')
 @mod.route('/more_info/')
-@mod.route('/more_info/<int:event_id>/')
+@mod.route('/more_info/<int:activity_id>/')
 @login_required
-def more_info(event_id=0):
-    event_id = cleanRecordID(event_id)
+def more_info(activity_id=0):
+    activity_id = cleanRecordID(activity_id)
     
-    if event_id > 0:
-        g._more_info_event_id = event_id
+    if activity_id > 0:
+        g._more_info_activity_id = activity_id
         return display()
         
     return redirect(url_for('signup.display'))
@@ -81,9 +81,9 @@ def display():
                 
     start_date, end_date = get_display_date_range()
     where = ''
-    event_id = g.get('_more_info_event_id',0)
-    if event_id:
-        where = 'event.id = {}'.format(event_id)
+    activity_id = g.get('_more_info_activity_id',0)
+    if activity_id:
+        where = 'activity.id = {}'.format(activity_id)
     
     jobs = get_job_rows(start_date,end_date,where,user_skills,is_admin)
             
@@ -258,7 +258,7 @@ def roster(display_end_days=0):
         if rec and rec.id not in user_skills:
             user_skills.append(rec.id)
                 
-    order_by = "sort_by_date_and_event" if as_spreadsheet else ""
+    order_by = "sort_by_date_and_title" if as_spreadsheet else ""
     
     jobs = get_job_rows(start_date,end_date,"",user_skills,is_admin,order_by=order_by)
     return render_template('roster.html',jobs=jobs,is_admin=is_admin,display_end_days=display_end_days,as_spreadsheet=as_spreadsheet,)
@@ -427,17 +427,18 @@ def get_job_rows(start_date=None,end_date=None,where='',user_skills=[],is_admin=
     
     where = where + event_status_where + where_date_range + where_skills
 
-    order_by = kwargs.get('order_by',None)
-    if not order_by:
-        order_by = " active_first_date, activity_title, job.start_date "
+    order_by = kwargs.get('order_by'," activity_first_date, activity_title, job.start_date ")
     
+        
     sql = """
-    select event.id as event_id, activity.title as activity_title, activity.description as activity_description, event.description as event_description,
-    --event.client_contact,event.client_email,event.client_phone,event.client_website,
+    select activity.id as activity_id, activity.title as activity_title, activity.description as activity_description, 
+    event.id as event_id, event.description as event_description,
+    -- get contact info client table if available else event table
     coalesce(nullif(event.client_contact,''),event.client_contact) as event_client_contact,
     coalesce(nullif(event.client_email,''),event.client_email) as event_client_email,
     coalesce(nullif(event.client_phone,''),event.client_phone) as event_client_phone,
     coalesce(nullif(event.client_website,''),event.client_website) as event_client_website,
+    -- get contact from event table if available, else client table
     (select coalesce(nullif(event.client_contact,''),client.contact_first_name | " " | client.contact_last_name)) as client_contact,
     (select coalesce(nullif(event.client_email,''),client.email)) as client_email,
     (select coalesce(nullif(event.client_phone,''),client.phone)) as client_phone,
@@ -457,12 +458,25 @@ def get_job_rows(start_date=None,end_date=None,where='',user_skills=[],is_admin=
     event_location.lat as event_loc_lat,
     event_location.lng as event_loc_lng,
     null as event_date_list, -- a list of dates for this event
-    (select min(job.start_date) from job where job.event_id = event.id and {where}) as active_first_date, 
+    -- used to sort spreadsheet view
+    substr(job.start_date,1,10) || activity.title as sort_by_date_and_title,
+    -- the first date of any job for this event
+    (select min(job.start_date) from job where job.event_id = event.id and {where}) as event_first_date, 
+    -- the first date of any job for this activity
+    (select min(job.start_date) from job join event on event.id = job.event_id where event.activity_id = activity.id and {where}) as activity_first_date, 
+    -- the number of positions filled in this event
     (select coalesce(sum(user_job.positions),0) from user_job
         where user_job.job_id in (select id from job where job.event_id = event.id and {where} )) as event_filled_positions,
-    
+    -- the total positions for this event
     (select coalesce(sum(job.max_positions),1) from job 
         where job.event_id = event.id and {where}) as event_max_positions,
+    -- the number of positions filled in this activity
+    (select coalesce(sum(user_job.positions),0) from user_job
+        where user_job.job_id in (select id from job where job.event_id in (select event.id from event where event.activity_id = activity.id) and {where} )) as activity_filled_positions,
+    -- the total positions for this activity
+    (select coalesce(sum(job.max_positions),1) from job 
+        where job.event_id in (select event.id from event where event.activity_id = activity.id ) and {where}) as activity_max_positions,
+    -- how many locations are speicifed for this event
     (select distinct coalesce(count(job.id),1) from job 
         where job.event_id = event.id and job.location_id not null and 
         job.location_id <> event.location_id and {where}) as unique_job_locations,
@@ -472,7 +486,6 @@ def get_job_rows(start_date=None,end_date=None,where='',user_skills=[],is_admin=
     job.description as job_description,
     job.start_date,
     job.end_date,
-    substr(job.start_date,1,10) || activity.title as sort_by_date_and_event,
     job.max_positions,
     job.skill_list,
     job_location.id as job_loc_id,
@@ -502,21 +515,27 @@ def get_job_rows(start_date=None,end_date=None,where='',user_skills=[],is_admin=
     where {where}
     order by {order_by}
     """
-    #print(sql.format(where=where, order_by=order_by,))
-    #import pdb;pdb.set_trace()
-    jobs = Job(g.db).query(sql.format(where=where, order_by=order_by,))
+    print(sql.format(where=where, order_by=order_by,))
+    #import pdb;pdb.set_trace()            
+    jobs = Job(g.db).query(sql.format(where=where,order_by=order_by,))
 
-    last_event_id = 0
+    last_activity_id = 0
     dates_list = []
     if jobs:
         for job in jobs:
-            # this only needs to run once for each event id
-            if job.event_id != last_event_id:
-                last_event_id = job.event_id
+            # this only needs to run once for each activity id
+            if job.activity_id != last_activity_id:
+                last_activity_id = job.activity_id
                 
-                # generate a list of all dates fo this event in this selection of jobs
-                # get a selection of jobs for this event
-                job_dates = Job(g.db).query('select job.*, event.status from job join event on event.id = job.event_id where event_id = {} {} {} {} order by job.start_date'.format(job.event_id,where_date_range,where_skills,event_status_where))
+                # generate a list of all dates of events for this activity in this selection of jobs
+                # get a selection of jobs for this actvity's events
+                sql = """
+                select job.*, event.status from job 
+                join event on event.id = job.event_id 
+                where job.event_id in (select event.id from event where event.activity_id = {}) {} {} {} 
+                order by job.start_date
+                """.format(job.activity_id,where_date_range,where_skills,event_status_where)
+                job_dates = Job(g.db).query(sql)
                 #put into list
                 dates_list = []
                 if job_dates:
