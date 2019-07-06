@@ -89,10 +89,7 @@ def edit(id=0,event_id=0,edit_from_list=False):
         rec.event_id = event_id
     
     current_event = Event(g.db).get(event_id)
-    events = None
-    if not current_event:
-        events =  Event(g.db).select() # This should only return current or future events
-    
+
     #import pdb;pdb.set_trace()
     
     roles = Role(g.db).select(where='name <> "admin" and name <> "super"')
@@ -144,7 +141,6 @@ def edit(id=0,event_id=0,edit_from_list=False):
             start_time_AMPM= start_time_AMPM,
             end_time=end_time,
             end_time_AMPM=end_time_AMPM,
-            events=events,
             current_event=current_event,
             locations=locations,
             slots_filled=slots_filled,
