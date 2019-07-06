@@ -113,7 +113,7 @@ def signup(job_id=None):
     event = None
     user = None
     filled_positions = 0
-    
+        
     # get user_id
     user_id = None
     if 'user_id' in session:
@@ -434,7 +434,8 @@ def get_job_rows(start_date=None,end_date=None,where='',user_skills=[],is_admin=
         
     sql = """
     select activity.id as activity_id, activity.title as activity_title, activity.description as activity_description, 
-    event.id as event_id, event.description as event_description,
+    event.id as event_id, 
+    coalesce(nullif(event.description,''),activity.description) as event_description,
     -- get contact info client table if available else event table
     coalesce(nullif(event.client_contact,''),event.client_contact) as event_client_contact,
     coalesce(nullif(event.client_email,''),event.client_email) as event_client_email,
@@ -485,7 +486,7 @@ def get_job_rows(start_date=None,end_date=None,where='',user_skills=[],is_admin=
     job.id as job_id,
     job.title as job_title,
     event.status as event_status,
-    job.description as job_description,
+    coalesce(job.description,'') as job_description,
     job.start_date,
     job.end_date,
     job.max_positions,

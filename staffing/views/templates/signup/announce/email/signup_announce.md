@@ -22,7 +22,7 @@ If you have questions about your shift or you're unable to make it for some reas
 
 Humm... Something is wrong. There are no jobs to list...
 
-Please [contact us](http://{{config.HOST_NAME}}{{ url_for('signup.contact')}}) so we can look into it.
+Please [contact us](http://{{site_config.HOST_NAME}}{{ url_for('signup.contact')}}) so we can look into it.
 
 _Thanks_
 
