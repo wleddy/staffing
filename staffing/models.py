@@ -30,6 +30,7 @@ class Event(SqliteTable):
         self.table_name = 'event'
         self.order_by_col = 'id'
         self.defaults = {'status':'Scheduled','exclude_from_calendar':0,}
+        self.indexes = {"event_activity_id":"activity_id"}
         
     def create_table(self):
         """Define and create the table"""
@@ -62,9 +63,6 @@ class Event(SqliteTable):
                 
         super().create_table(sql)
         
-    def init_index(self):
-        #self.db.execute("CREATE INDEX IF NOT EXISTS event_activity_id ON event(activity_id)")
-        pass
         
     def select(self,**kwargs):
         """Include Activity fields"""
@@ -72,6 +70,7 @@ class Event(SqliteTable):
         where {} order by {}""".format(kwargs.get('where',1),kwargs.get('order_by',self.order_by_col))
         
         return self.query(sql)
+        
         
 class EventType(SqliteTable):
     """Categorize events"""
@@ -98,6 +97,7 @@ class Job(SqliteTable):
         self.table_name = 'job'
         self.order_by_col = 'start_date, lower(title)'
         self.defaults = {'max_positions':1,'skill_list':''}
+        self.indexes = {"job_event_start":"event_id, start_date","job_event_location":"event_id, location_id",}
         
     def create_table(self):
         """Define and create the table"""
@@ -116,9 +116,6 @@ class Job(SqliteTable):
                 
         super().create_table(sql)
                 
-    def init_index(self):
-        self.db.execute("CREATE INDEX IF NOT EXISTS job_event_start ON job(event_id, start_date)")
-        self.db.execute("CREATE INDEX IF NOT EXISTS job_event_location ON job(event_id, location_id)")
                 
     def filled(self,job_id):
         """Return the number positions filled for this job"""
@@ -136,6 +133,7 @@ class UserJob(SqliteTable):
         self.table_name = 'user_job'
         self.order_by_col = 'id'
         self.defaults = {'positions': 0,}
+        self.indexes = {"user_job_job_id":"job_id","user_job_user_id":"user_id",}
         
     def create_table(self):
         """Define and create the table"""
@@ -155,9 +153,6 @@ class UserJob(SqliteTable):
                 
         super().create_table(sql)
         
-    def init_index(self):
-        self.db.execute("CREATE INDEX IF NOT EXISTS user_job_job_id ON user_job(job_id)")
-
     def new(self):
         """Setup a new record"""
         rec = super().new()
