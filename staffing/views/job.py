@@ -6,8 +6,7 @@ from shotglass2.takeabeltof.utils import render_markdown_for, printException, cl
 from shotglass2.takeabeltof.date_utils import date_to_string, getDatetimeFromString, local_datetime_now
 from shotglass2.takeabeltof.mailer import email_admin
 from shotglass2.shotglass import get_site_config
-from staffing.models import Event, Location, Job, UserJob
-from staffing.utils import pack_list_to_string, un_pack_string
+from staffing.models import Event, Location, Job, UserJob, JobRole
 from staffing.views.announcements import send_signup_email
 from staffing.views.signup import get_job_rows
 
@@ -93,10 +92,6 @@ def edit(id=0,event_id=0,edit_from_list=False):
     #import pdb;pdb.set_trace()
     
     roles = Role(g.db).select(where='name <> "admin" and name <> "super"')
-    selected_roles = [] # this needs to be populated from JobRoles
-    # get a list of users who can fill this job
-    #users = Users(g.db).
-        
     
     if request.form:
         job.update(rec,request.form)
@@ -106,6 +101,16 @@ def edit(id=0,event_id=0,edit_from_list=False):
                 rec.location_id = None
             
             job.save(rec)
+            
+            # create job_role records
+            job_role_table = JobRole(g.db)
+            job_role_table.query("delete from job_role where job_id = {}".format(rec.id))
+            for role in skills_to_list():
+                job_role_rec = job_role_table.new()
+                job_role_rec.job_id = rec.id
+                job_role_rec.role_id = int(role)
+                job_role_table.save()
+                
             g.db.commit()
             session['last_job'] = rec._asdict()
             if edit_from_list:
@@ -130,6 +135,11 @@ def edit(id=0,event_id=0,edit_from_list=False):
             end_time=date_to_string(rec.end_date,'time')
             end_time_AMPM=date_to_string(rec.end_date,'ampm').upper()
             
+    skills_list = skills_to_list() #Try to get them from the request form
+    if not skills_list and id > 0:
+        # get the skills from the job_role table
+        job_role_recs = JobRole(g.db).select(where="job_id = {}".format(id))
+                        
     template = 'job_edit.html'
     if edit_from_list:
         template = 'job_embed_edit.html'
@@ -145,6 +155,7 @@ def edit(id=0,event_id=0,edit_from_list=False):
             locations=locations,
             slots_filled=slots_filled,
             users=users,
+            skills_list=skills_list,
             )
     
     
@@ -372,16 +383,17 @@ def assignment_manager(job_id=0):
         
     #Get the job to display
     job_data = get_job_rows(None,None,"job.id = {}".format(job_id),[],is_admin=True,event_status_where='')
-    role_list=[0] #will return none
-    if job_data:
-        job_data = job_data[0]
-        filled_positions = job_data.job_filled_positions
-        # get skills for this job
-        role_list = un_pack_string(job_data.skill_list) # convert to comma separated string
-        role_list = role_list.split(',') #convert it to a list
-    
-    # Get all the users who can do this job
-    #skilled_users = User(g.db).get_with_roles(role_list)
+    # role_list=[0] #will return none
+    # if job_data:
+    #     job_data = job_data[0]
+    #     filled_positions = job_data.job_filled_positions
+    #     # get skills for this job
+    #     job_roles = JobRole(g.db).select(where='job_id = {}'.format(job_data.job))
+    #     if job_roles:
+    #         role_list = [x.id for x in job_roles]
+    #
+    # # Get all the users who can do this job
+    # #skilled_users = User(g.db).get_with_roles(role_list)
     # 4/15/19 - let manager assign anyone they like. Show all users
     skilled_users = User(g.db).select()
  
@@ -495,12 +507,7 @@ def valid_input(rec):
         valid_data = False
         flash("The End Time can't be before the Start Time")
         
-        
-    # skill_list will be a string formatted like ":1:4:16:" so that a statement like
-    #    'if ":16:" in skill_list' will return True.
-    rec.skill_list = pack_list_to_string(skills_to_list()) #every element is wrapped in colons
-    
-    if not rec.skill_list:
+    if not skills_to_list():
         valid_data = False
         flash("You must select at least one Skill for the job.")
 
@@ -542,14 +549,14 @@ def skills_to_list():
     """Create a list of skill (role) ids from form"""
     skills = []
     for role_id in request.form.getlist('skills'):
-        skills.append(str(role_id))
+        skills.append(role_id)
     if not skills:
         # This is a hack that has to do with the way I submit the form via js
         # The 'skills' elements in request.form have the name 'skills[]' only when submitted
         #   via common.js.submitModalForm. Don't want to change it because it works elsewhere.
         # This may be an artifact of the way php handles multiple select elements
         for role_id in request.form.getlist('skills[]'):
-            skills.append(str(role_id))
+            skills.append(role_id)
         
     
     return skills

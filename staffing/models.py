@@ -96,7 +96,7 @@ class Job(SqliteTable):
         super().__init__(db_connection)
         self.table_name = 'job'
         self.order_by_col = 'start_date, lower(title)'
-        self.defaults = {'max_positions':1,'skill_list':''}
+        self.defaults = {'max_positions':1,}
         self.indexes = {"job_event_start":"event_id, start_date","job_event_location":"event_id, location_id",}
         
     def create_table(self):
@@ -105,7 +105,6 @@ class Job(SqliteTable):
         sql = """
             title TEXT NULL,
             description TEXT,
-            skill_list TEXT,
             start_date DATETIME,
             end_date DATETIME,
             max_positions INTEGER,
@@ -175,6 +174,27 @@ class UserJob(SqliteTable):
             return users
         else:
             return None
+
+class JobRole(SqliteTable):
+    """User roles that are required to signup for a job"""
+    def __init__(self,db_connection):
+        super().__init__(db_connection)
+        self.table_name = 'job_role'
+        self.order_by_col = 'id'
+        self.defaults = {}
+        self.indexes = {"job_role_job_id":"job_id"}
+
+    def create_table(self):
+        """Define and create the table"""
+
+        sql = """
+        job_id INTEGER NOT NULL,
+        role_id INTEGER NOT NULL,
+        FOREIGN KEY (job_id) REFERENCES job(id) ON DELETE CASCADE,
+        FOREIGN KEY (role_id) REFERENCES role(id) ON DELETE CASCADE """
+    
+        super().create_table(sql)
+        
 
 class Location(SqliteTable):
     """Staffing Location Table"""
@@ -286,6 +306,7 @@ def init_event_db(db):
     EventType(db).create_table()
     Job(db).create_table()
     UserJob(db).create_table()
+    JobRole(db).create_table()
     Location(db).create_table()
     StaffNotification(db).create_table()
     Client(db).create_table()

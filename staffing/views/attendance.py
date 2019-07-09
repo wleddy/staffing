@@ -6,7 +6,6 @@ from shotglass2.takeabeltof.utils import render_markdown_for, printException, cl
 from shotglass2.takeabeltof.date_utils import date_to_string, getDatetimeFromString, local_datetime_now
 from shotglass2.shotglass import get_site_config
 from staffing.models import Event, Location, Job, UserJob
-from staffing.utils import pack_list_to_string, un_pack_string
 from staffing.views.signup import get_job_rows
 
 mod = Blueprint('attendance',__name__, template_folder='templates/attendance', url_prefix='/attendance')

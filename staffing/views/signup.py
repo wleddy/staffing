@@ -8,8 +8,7 @@ from shotglass2.users.admin import login_required, table_access_required, silent
 from shotglass2.users.models import Role, User
 from shotglass2.users.views.login import authenticate_user, setUserStatus, logout as log_user_out, login as log_user_in
 from shotglass2.www.views.home import contact as home_contact
-from staffing.models import Event, Location, Job, UserJob
-from staffing.utils import pack_list_to_string, un_pack_string
+from staffing.models import Event, Location, Job, UserJob, JobRole
 from staffing.views.announcements import send_signup_email, process_commitment_reminder
 from datetime import timedelta, datetime
 
@@ -317,7 +316,6 @@ def populate_participant_list(job):
                 user_data_list.append({'user_name':part.user_name,'phone':part.phone,'email':part.email,'positions':part.positions,})
             
         job.participants[job.job_id] = {'initials':initials, 'users':participant_list, 'user_data': user_data_list}
-        job.skill_list = un_pack_string(job.skill_list) # convert to simple list
     
 def get_display_date_range(days=None):
     """Return a tuple of the start and end dates for job display"""
@@ -382,13 +380,12 @@ def get_job_rows(start_date=None,end_date=None,where='',user_skills=[],is_admin=
     event_status_where = " " + kwargs.get('event_status_where'," and lower(event.status) = 'scheduled' ") + " "
     
     def get_job_ids_for_skills(skill_ids):
-        """Return a list of job.id where the jobs have one or more of skills required"""
+        """Return a list of job.id (as strings) where the jobs have one or more of skills required"""
         the_job_ids = []
-        for skill in skill_ids:
-            skill = ":" + str(skill) + ":"
-            jobs = Job(g.db).select(where='skill_list like "%{}%"'.format(skill))
-            if jobs:
-                the_job_ids.extend([str(job.id) for job in jobs if str(job.id) not in the_job_ids])
+        if skill_ids:
+            job_roles = JobRole(g.db).select(where="role_id in ({})".format(','.join([str(x) for x in skill_ids])))
+            if job_roles:
+                the_job_ids = [str(x.job_id) for x in job_roles]
                 
         return the_job_ids
             
@@ -490,7 +487,6 @@ def get_job_rows(start_date=None,end_date=None,where='',user_skills=[],is_admin=
     job.start_date,
     job.end_date,
     job.max_positions,
-    job.skill_list,
     job_location.id as job_loc_id,
     job_location.location_name as job_loc_name,
     job_location.street_address as job_loc_street_address,

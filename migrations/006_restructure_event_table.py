@@ -4,11 +4,11 @@ sys.path.append('') ##get import to look in the working dir.
 
 from shotglass2.takeabeltof.database import Database, SqliteTable
 from shotglass2.takeabeltof.date_utils import local_datetime_now, date_to_string
-from staffing.models import Event, Client, EventDateLabel, Job, EventType, Activity, UserJob
+from staffing.models import Event, Client, EventDateLabel, Job, EventType, Activity, UserJob, JobRole
 from instance.site_settings import DATABASE_PATH
 
 def drop_tables():
-    table_list = ['activity','temp_event','activity','client','temp_job','event_date_label','temp_user_job']
+    table_list = ['activity','temp_event','activity','client','temp_job','event_date_label','temp_user_job','job_role',]
     for table in table_list:
         try:
             db.execute("drop table {}".format(table))
@@ -16,11 +16,20 @@ def drop_tables():
         except:
             print("Table {} not found".format(table))
             
+            
+def un_pack_string(string,inSep=":",outSep=","):
+    """
+    The way I was recording the skills list prior to job_role
+    Convert a previously "Packed" list to int list"""
+    if not string:
+        return [] #guard against None
+    return [int(x) for x in string.strip(inSep).replace(inSep,outSep).split(outSep)]
+                
+                
 db = Database(DATABASE_PATH).connect()
 db.execute('PRAGMA foreign_keys = OFF') #Turn off foreign key constraints
 
 drop_tables()
-
 
 EventDateLabel(db).create_table()
 event_labels = ['Bike Valet Open','Bike Valet Close','Event Start','Event Close',]
@@ -33,6 +42,8 @@ for label in event_labels:
         eventlabel.save(rec)
         
 db.commit()
+
+#import pdb;pdb.set_trace()
 
 client = Client(db)
 client.create_table()
@@ -52,6 +63,9 @@ assignment_table = UserJob(db)
 new_assignment_table = UserJob(db)
 new_assignment_table.table_name = "temp_user_job"
 new_assignment_table.create_table()
+
+job_role_table = JobRole(db)
+job_role_table.create_table()
 
 #import pdb; pdb.set_trace()
 old_event_table = Event(db)
@@ -102,6 +116,16 @@ if old_events:
                                 new_assignment_table.update(new_assmt,assmnt._asdict())
                                 new_assmt.job_id = new_job_rec.id
                                 new_assignment_table.save(new_assmt)
+                                
+                                
+                        # create job_role records for this job
+                        roles_for_job = un_pack_string(job.skill_list)
+                        for role in roles_for_job:
+                            job_role_rec = job_role_table.new()
+                            job_role_rec.role_id = role
+                            job_role_rec.job_id = new_job_rec.id
+                            job_role_table.save(job_role_rec)
+                        
                                 
             
                 # set the start and end dates for the event
