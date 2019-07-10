@@ -109,7 +109,7 @@ def edit(id=0,event_id=0,edit_from_list=False):
                 job_role_rec = job_role_table.new()
                 job_role_rec.job_id = rec.id
                 job_role_rec.role_id = int(role)
-                job_role_table.save()
+                job_role_table.save(job_role_rec)
                 
             g.db.commit()
             session['last_job'] = rec._asdict()
@@ -139,6 +139,8 @@ def edit(id=0,event_id=0,edit_from_list=False):
     if not skills_list and id > 0:
         # get the skills from the job_role table
         job_role_recs = JobRole(g.db).select(where="job_id = {}".format(id))
+        if job_role_recs:
+            skills_list = [x.role_id for x in job_role_recs]
                         
     template = 'job_edit.html'
     if edit_from_list:
@@ -383,19 +385,10 @@ def assignment_manager(job_id=0):
         
     #Get the job to display
     job_data = get_job_rows(None,None,"job.id = {}".format(job_id),[],is_admin=True,event_status_where='')
-    # role_list=[0] #will return none
-    # if job_data:
-    #     job_data = job_data[0]
-    #     filled_positions = job_data.job_filled_positions
-    #     # get skills for this job
-    #     job_roles = JobRole(g.db).select(where='job_id = {}'.format(job_data.job))
-    #     if job_roles:
-    #         role_list = [x.id for x in job_roles]
-    #
-    # # Get all the users who can do this job
-    # #skilled_users = User(g.db).get_with_roles(role_list)
+    job_data = job_data[0] if job_data else None
+    
     # 4/15/19 - let manager assign anyone they like. Show all users
-    skilled_users = User(g.db).select()
+    all_users = User(g.db).select()
  
     #get all users currently assigned
     assigned_users = UserJob(g.db).get_assigned_users(job_id)
@@ -403,18 +396,16 @@ def assignment_manager(job_id=0):
     #remove users already assigned from skilled users
     if assigned_users:
         for au in assigned_users:
-            if skilled_users:
-                for i in range(len(skilled_users)):
-                    if skilled_users[i].id == au.id:
-                        del skilled_users[i]
+            if all_users:
+                for i in range(len(all_users)):
+                    if all_users[i].id == au.id:
+                        del all_users[i]
                         break
-        
     return render_template('assignment_manager.html',
             job=job_data,
             signup=signup,
             assigned_users=assigned_users,
-            skilled_users=skilled_users,
-            filled_positions=filled_positions,
+            all_users=all_users,
             )
 
     

@@ -59,15 +59,15 @@
                     <p>Find User:</p>
                     <p>
                         <input id="search_input" type="text" name="user_name" value="" class="w3-input w3-border" placeholder="Type name" 
-                        onkeyup="if (this.value.length > 0) {$('#search_results').show();table_search('search_input','skilled_users',1)} else {$('#search_results').hide();reset_table_search('skilled_users');}"
+                        onkeyup="if (this.value.length > 0) {$('#search_results').show();table_search('search_input','all_users',1)} else {$('#search_results').hide();reset_table_search('all_users');}"
                         onfocus="toggle_table_search('search_results');" 
                         />
                     </p>
                     <div id="search_results" class="w3-border" 
                         style="z-index:10000;position:static;overflow-y: scroll;background-color:white;display:none">
-                        	<table id="skilled_users" class="datatable w3-table w3-striped w3-hoverable" >
-                        	{%if skilled_users %}
-                        		{% for user in skilled_users %}
+                        	<table id="all_users" class="datatable w3-table w3-striped w3-hoverable" >
+                        	{%if all_users %}
+                        		{% for user in all_users %}
                         	    <tr onclick="$('#assignment_user_id').val({{user.id}});$('#search_input').val('{{ user.first_name }} {{ user.last_name }}');toggle_table_search('search_results');">
                                     <td style="width:1pt;"><span style="display:none;">{{ user.id }}</span></td>
                         			<td>{{ user.first_name }} {{ user.last_name }}</td>
@@ -89,7 +89,7 @@
                     </p>
                 </div>
                 <p class="w3-col w3-half w3-center">
-                    {% set open_positions = job.max_positions - filled_positions + signup.positions %}
+                    {% set open_positions = job.max_positions - job.event_filled_positions + signup.positions %}
                     {% if open_positions >= 0 %}
                         {{ open_positions }} positions open<br>
                     {% else %}
