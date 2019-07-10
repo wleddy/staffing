@@ -9,7 +9,7 @@ class Activity(SqliteTable):
     def __init__(self,db_connection):
         super().__init__(db_connection)
         self.table_name = 'activity'
-        self.order_by_col = 'id'
+        self.order_by_col = 'title, id'
         self.defaults = {}
         
     def create_table(self):
