@@ -4,7 +4,7 @@ sys.path.append('') ##get import to look in the working dir.
 
 from shotglass2.takeabeltof.database import Database, SqliteTable
 from shotglass2.takeabeltof.date_utils import local_datetime_now, date_to_string
-from staffing.models import Event, Client, EventDateLabel, Job, EventType, Activity, UserJob, JobRole
+from staffing.models import Event, Client, EventDateLabel, Job, EventType, Activity, UserJob, JobRole, Location
 from instance.site_settings import DATABASE_PATH
 
 def drop_tables():
@@ -89,7 +89,21 @@ if old_events:
                 temp_event.save(new_event_rec)
                 
                 #process all the jobs for this event/date
-                jobs = job_table.select(where="event_id= {} and substr(start_date,1,10) == '{}'".format(old_event_rec.id,job_date.job_date))
+                event_and_date_sql = "event_id= {} and substr(start_date,1,10) == '{}'".format(old_event_rec.id,job_date.job_date)
+                jobs = job_table.select(where=event_and_date_sql)
+                
+                # Set the event location if not already and if all jobs for this event are at the same location
+                if not new_event_rec.location_id:
+                    #import pdb; pdb.set_trace()
+                    loc_sql = """
+                    select location_id from job where {} and location_id <> 0
+                    group by location_id
+                    """.format(event_and_date_sql)
+                    locs = Location(db).query(loc_sql)
+                    if locs and len(locs) == 1:
+                        new_event_rec.location_id = locs[0].location_id
+                    
+
                 # Get the Start and end dates for this event based on related Jobs
                 event_start_date = None
                 event_end_date = None
@@ -141,7 +155,7 @@ if old_events:
                 new_event_rec.service_start_date_label_id = 1  if new_event_rec.event_type_id <=2 else 3
                 
                 new_event_rec.status = "Scheduled"
-            
+                
                 # Create or find client record
                 if old_event_rec.client_contact:
                     client_rec = client.select_one(where="name = '{}'".format(old_event_rec.client_contact))
