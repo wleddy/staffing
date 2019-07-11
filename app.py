@@ -6,7 +6,7 @@ from shotglass2.takeabeltof.jinja_filters import register_jinja_filters
 from shotglass2.takeabeltof.utils import cleanRecordID
 from shotglass2.users.views.login import setUserStatus
 from shotglass2.users.admin import Admin
-from staffing.models import Event, Job, Location, EventType, UserJob
+from staffing.models import Activity, Event, Job, Location, EventType, UserJob, EventDateLabel
 
 # Create app
 # setting static_folder to None allows me to handle loading myself
@@ -104,11 +104,13 @@ def _before():
     #Events
     # a header row must have the some permissions or higher than the items it heads
     g.admin.register(Event,url_for('event.display'),display_name='Staffing Admin',header_row=True,minimum_rank_required=500,roles=['admin','event manager'])
-    g.admin.register(Event,url_for('event.display'),display_name='Events',minimum_rank_required=500,roles=['admin','event manager'])
+    g.admin.register(Event,url_for('event.display'),display_name='Events',add_to_menu=False,minimum_rank_required=500,roles=['admin','event manager'])
+    g.admin.register(Activity,url_for('activity.display'),display_name='Activities',minimum_rank_required=500,roles=['admin','event manager'])
     g.admin.register(Job,url_for('signup.roster'),display_name='',minimum_rank_required=80,add_to_menu=False)
     #location
     g.admin.register(Location,url_for('location.display'),display_name='Locations',minimum_rank_required=500,roles=['admin','event manager'])
     g.admin.register(EventType,url_for('event_type.display'),display_name='Event Types',minimum_rank_required=500,roles=['admin','event manager'])
+    g.admin.register(EventDateLabel,url_for('event_date_label.display'),display_name='Date Labels',minimum_rank_required=500,roles=['admin','event manager'])
 
     g.admin.register(UserJob,url_for('attendance.display'),display_name='Attendance',minimum_rank_required=500,roles=['admin','event manager'])
 
@@ -136,19 +138,16 @@ def server_error(error):
 # Direct to a specific server for static content
 app.add_url_rule('/static/<path:filename>','static',shotglass.static)
 
-from staffing.views import signup, calendar
+from staffing.views import signup, calendar, event, activity,location, job, event_type, attendance, event_date_label
 app.register_blueprint(signup.mod)
-app.register_blueprint(calendar.mod)
-from staffing.views import event
+app.register_blueprint(activity.mod)
 app.register_blueprint(event.mod)
-from staffing.views import location
-app.register_blueprint(location.mod)
-from staffing.views import job
 app.register_blueprint(job.mod)
-from staffing.views import event_type
+app.register_blueprint(calendar.mod)
+app.register_blueprint(location.mod)
 app.register_blueprint(event_type.mod)
-from staffing.views import attendance
 app.register_blueprint(attendance.mod)
+app.register_blueprint(event_date_label.mod)
 
 ## Setup the routes for users
 shotglass.register_users(app)
