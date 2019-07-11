@@ -18,6 +18,7 @@ class Activity(SqliteTable):
         sql = """
         title TEXT,
         description TEXT,
+        activity_type_id INTEGER
         """
                 
         super().create_table(sql)
@@ -45,7 +46,6 @@ class Event(SqliteTable):
             client_email TEXT,
             client_phone TEXT,
             client_website TEXT,
-            event_type_id INTEGER,
             location_id INTEGER,
             event_start_date DATETIME,
             event_end_date DATETIME,
@@ -72,11 +72,11 @@ class Event(SqliteTable):
         return self.query(sql)
         
         
-class EventType(SqliteTable):
+class ActivityType(SqliteTable):
     """Categorize events"""
     def __init__(self,db_connection):
         super().__init__(db_connection)
-        self.table_name = 'event_type'
+        self.table_name = 'activity_type'
         self.order_by_col = 'type, id'
         self.defaults = {}
 
@@ -303,7 +303,7 @@ def init_event_db(db):
     """Create a intial user record."""
     Activity(db).create_table()
     Event(db).create_table()
-    EventType(db).create_table()
+    ActivityType(db).create_table()
     Job(db).create_table()
     UserJob(db).create_table()
     JobRole(db).create_table()

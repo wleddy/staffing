@@ -33,15 +33,6 @@
             {% endif %}
         </select>
     </p>
-    <p>{{ select_field("event_type_id","Event Type (optional)", class="w3-border") }}
-            <option value="0">Select an Event Type</option>
-            {% if event_types %}
-            {% for act_type in event_types %}
-                <option value="{{act_type.id}}" {% if act_type.id == rec.event_type_id %}selected="selected" {% endif %}>{{act_type.type}}</option>
-            {% endfor %}
-            {% endif %}
-        </select>
-    </p>
     <p>{{ select_field("manager_user_id","Event Manager", class="w3-border") }}
             <option value="0">Select an Event Manager</option>
             {% if event_managers %}

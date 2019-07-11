@@ -4,7 +4,7 @@ from shotglass2.shotglass import get_site_config
 from shotglass2.users.admin import login_required, table_access_required
 from shotglass2.takeabeltof.utils import render_markdown_for, printException, cleanRecordID
 from shotglass2.takeabeltof.date_utils import date_to_string, getDatetimeFromString
-from staffing.models import Event, Location, EventType, Client, EventDateLabel
+from staffing.models import Event, Location, ActivityType, Client, EventDateLabel
 from shotglass2.users.models import User
 from staffing.views.job import get_job_list_for_event
 
@@ -121,7 +121,6 @@ def render_edit_form(id,activity_id):
     # get lists for form
     client = Client(g.db).get(rec.client_id)
     locations = Location(g.db).select()
-    event_types = EventType(g.db).select()
     # only users of sufficient rank can manage an event
     where = "user.id in (select user_id from user_role where role_id in (select role.id from role where rank >= {}))".format(get_site_config().get('MINIMUM_MANAGER_RANK',70))
     event_managers = User(g.db).select(where=where)
@@ -131,7 +130,6 @@ def render_edit_form(id,activity_id):
     return render_template('event_edit.html',
         rec=rec,
         locations=locations,
-        event_types=event_types,
         event_managers=event_managers,
         clients=clients,client=client,
         job_embed_list=job_embed_list,

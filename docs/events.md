@@ -19,7 +19,7 @@ An Event may specify a Location though it is not required.
 1. Update general event description
 1. Specify Event manager contact info
 1. Specify Client contact info if needed
-1. Specify an Event Type. This may be used to categorize events for reporting purposes.
+1. Specify an Activity Type. This may be used to categorize events for reporting purposes.
 1. Upload an Image if desired
 
 [Return to Index](/docs/use_case.md)

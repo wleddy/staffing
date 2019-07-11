@@ -4,7 +4,7 @@ sys.path.append('') ##get import to look in the working dir.
 
 from shotglass2.takeabeltof.database import Database, SqliteTable
 from shotglass2.takeabeltof.date_utils import local_datetime_now, date_to_string
-from staffing.models import Event, Client, EventDateLabel, Job, EventType, Activity, UserJob, JobRole, Location
+from staffing.models import Event, Client, EventDateLabel, Job, ActivityType, Activity, UserJob, JobRole, Location
 from instance.site_settings import DATABASE_PATH
 
 def drop_tables():
@@ -76,6 +76,7 @@ if old_events:
         activity_rec = activity_table.new()
         activity_rec.title = old_event_rec.title
         activity_rec.description = old_event_rec.description
+        activity_rec.activity_type_id = old_event_rec.event_type_id
         activity_table.save(activity_rec)
         old_event_rec.description = None
         
@@ -147,12 +148,12 @@ if old_events:
                 new_event_rec.event_end_date = event_end_date if event_end_date else service_end_date
                 new_event_rec.service_start_date = service_start_date if service_start_date else event_start_date
                 new_event_rec.service_end_date = service_end_date if service_end_date else event_end_date
-                # Set the time labels based on the event type
+                # Set the time labels based on the activity type
                 # these ids are hard wired per the new table definition
                 new_event_rec.event_end_date_label_id = 4 
                 new_event_rec.event_start_date_label_id = 3
-                new_event_rec.service_end_date_label_id = 2 if new_event_rec.event_type_id <=2 else 4
-                new_event_rec.service_start_date_label_id = 1  if new_event_rec.event_type_id <=2 else 3
+                new_event_rec.service_end_date_label_id = 2 if old_event_rec.event_type_id <=2 else 4
+                new_event_rec.service_start_date_label_id = 1  if old_event_rec.event_type_id <=2 else 3
                 
                 new_event_rec.status = "Scheduled"
                 

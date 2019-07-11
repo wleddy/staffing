@@ -5,7 +5,7 @@ from shotglass2.shotglass import get_site_config
 from shotglass2.users.admin import login_required, table_access_required
 from shotglass2.takeabeltof.utils import render_markdown_for, printException, cleanRecordID
 from shotglass2.takeabeltof.date_utils import datetime_as_string, local_datetime_now, getDatetimeFromString
-from staffing.models import Event, Location, EventType
+from staffing.models import Event, Location, ActivityType
 from staffing.views.signup import get_job_rows
 
 import calendar

@@ -3,7 +3,7 @@ from flask import request, session, g, redirect, url_for, abort, \
 from shotglass2.users.admin import login_required, table_access_required
 from shotglass2.takeabeltof.utils import render_markdown_for, printException, cleanRecordID
 from shotglass2.takeabeltof.date_utils import datetime_as_string
-from staffing.models import Activity, Event
+from staffing.models import Activity, Event, ActivityType
 from staffing.views.event import edit as edit_event, edit_from_activity as edit_event_from_activity
 
 mod = Blueprint('activity',__name__, template_folder='templates/activity', url_prefix='/activity')
@@ -82,8 +82,13 @@ def edit(id=0):
     if request.form and save_activity():
         return redirect(g.listURL)
         
+    activity_types = ActivityType(g.db).select()
         
-    return render_template('activity_edit.html',rec=rec,event_recs=event_recs,)
+    return render_template('activity_edit.html',
+        rec=rec,
+        event_recs=event_recs,
+        activity_types=activity_types,
+        )
     
     
 def save_activity():
@@ -98,22 +103,6 @@ def save_activity():
         
     return False
     
-    
-@mod.route('/add_event/',methods=['POST',])
-@table_access_required(Activity)
-def add_event():
-    """Save the current record before switching to the event form
-    Return the url of the page to be displayed
-    """
-    if not request.form:
-        return abort(404)
-        
-    if save_activity():
-        return url_for('event.edit_from_activity')+"0/"+request.form.get('id','-1')+"/"
-        #return edit_event_from_activity(0,request.form.get('id',-1))
-    
-    flash("Unable to save Activity changes")
-    return url_for('activity.edit') + request.form.get('id','-1')+"/"
     
 @mod.route('/edit_event/',methods=['POST',])
 @mod.route('/edit_event/<int:event_id>/',methods=['POST',])
