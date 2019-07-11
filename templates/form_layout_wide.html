@@ -11,7 +11,7 @@
 {% endif %}
 
 <div class="w3-container">
-    <form action="{{ g.editURL }}" method=post class="entry ">
+    <form id="main-form" action="{{ g.editURL }}" method=post class="entry ">
 		{% include "editFormButtons.html" %}
         {% block fieldset %}{% endblock %}
     </form>

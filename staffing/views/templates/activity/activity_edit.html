@@ -1,0 +1,59 @@
+{% extends "form_layout_wide.html" %}
+
+{% from "_form_helpers.html" import input_field, select_field, radio_field, checkbox_field, label_only %}
+
+{% block fieldset %}
+<div class="w3-col w3-half w3-left">
+    {{ input_field(rec.id,"id",type="hidden",default=0)}}
+    <p>{{ input_field(rec.title,'title',label="Activity Title",req=True)}}</p>
+    <p>{{ label_only(label="Description (Appears in Public Calendar)")}}</p>
+    <p><textarea rows="7" name="description" style="width:100%;"  >{{rec.description |default('',True)}}</textarea></p>
+</div>
+                
+<div class="w3-col w3-hide-small" style="width:20pt;">&nbsp;</div>
+<div class="w3-col l5 m5 s12" >
+    <div id="event-list" class="w3-card-4" style="padding:6pt;">
+        <div class="w3-row">
+            <p>
+                {# save current activity record and then go to event input form #}
+                <a class="w3-button w3-primary-color w3-round-large" 
+                onclick="$.post('{{ url_for('activity.edit_event')}}',$('#main-form').serialize(),function(data){window.location = data;});"
+                >
+                    Add Event...
+                </a>
+            </p>
+        </div>
+        <div class="w3-row " style="margin-bottom:6pt;">
+            <p class="w3-primary-color w3-large" style="padding:6pt;"><strong>Events:</strong> <span class="w3-medium">(oldest last)</span></p>
+        </div>
+        {% if event_recs %}
+            {% for event in event_recs %}
+            <div class="w3-row">
+                <div class="w3-col w3-threequarter">
+                    <p>
+                        <strong>{{event.event_title}}</strong> <br>
+                        {% if event.event_start_date %}{{event.event_start_date | default('Not Set',True) | short_day_and_date_and_time_string }}
+                        {% else %}{{event.job_start_date | default('Not Set',True) | short_day_and_date_and_time_string }}
+                        {% endif %}<br>
+                        {{ event.event_filled_positions | default("0",True)}} of  {{ event.event_max_positions | default("0",True)}} positions filled
+                        <br>
+                        @ {{ event.location_name }}
+                    </p>
+                </div>
+                <div class="w3-col w3-quarter" style="text-align:center;">
+                    <p>
+                    <a class="w3-button w3-primary-color w3-round-large" 
+                        onclick="$.post('{{ url_for('activity.edit_event')}}{{ event.event_id}}/',$('#main-form').serialize(),function(data){window.location = data;});"
+                        >Edit</a>
+                    </p>
+                </div>
+            </div>
+            <hr>
+            {% endfor %}
+        {% else %}
+            <h4>No Events Created Yet</h4>
+            <hr>
+        {% endif %}
+    </div>
+</div>
+{% endblock fieldset %}

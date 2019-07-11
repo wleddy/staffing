@@ -28,22 +28,62 @@ def display():
     return render_template('event_list.html',recs=recs)
     
     
-@mod.route('/edit/',methods=['GET','POST',])
-@mod.route('/edit/<int:id>/',methods=['GET','POST',])
+@mod.route('/edit/',methods=['POST',])
+@mod.route('/edit/<int:id>/<int:activity_id>',methods=['GET','POST',])
+@mod.route('/edit/<int:id>/<int:activity_id>/',methods=['GET','POST',])
 @table_access_required(Event)
-def edit(id=0):
+def edit(id=0,activity_id=None):
     setExits()
     g.title = 'Edit Event Record'
-    id = cleanRecordID(id)
+    if cleanRecordID(id) == 0:
+        g.cancelURL = g.deleteURL
+        
+    return render_edit_form(id,activity_id)
+    
+    
+@mod.route('/edit_from_activity/',methods=['POST',])
+@mod.route('/edit_from_activity/<int:id>/<int:activity_id>',methods=['GET','POST',])
+@mod.route('/edit_from_activity/<int:id>/<int:activity_id>/',methods=['GET','POST',])
+@table_access_required(Event)
+def edit_from_activity(id=0,activity_id=-1):
+    """Create or edit an Event record from the Activity input form"""
+    #import pdb;pdb.set_trace()
+    setExits()
+    g.title = 'Edit Event Record'
+    
     if request.form:
         id = cleanRecordID(request.form.get("id"))
+        activity_id = cleanRecordID(request.form.get("activity_id"))
+        
+    # Return to Activty record when done with edit
+    g.editURL = url_for('event.edit_from_activity')
+    g.listURL = url_for('activity.edit') + str(cleanRecordID(activity_id))
+    g.deleteURL = url_for('event.delete_from_activity')+ str(cleanRecordID(activity_id)) + "/" 
+    if cleanRecordID(id) == 0:
+        g.cancelURL = g.deleteURL
+        
+
+    return render_edit_form(id,activity_id)
+    
+    
+def render_edit_form(id,activity_id):
+    #import pdb;pdb.set_trace()
+    id = cleanRecordID(id)
+    activity_id = cleanRecordID(activity_id)
+        
+    if request.form:
+        id = cleanRecordID(request.form.get("id"))
+        activity_id = cleanRecordID(request.form.get("activity_id"))
+        
+    if activity_id == None and id == 0:
+        #can't create a new record without an activity link
+        return abort(404)
         
     event = Event(g.db)
     clients = Client(g.db).select()
     event_date_labels=EventDateLabel(g.db).select()
-    #import pdb;pdb.set_trace()
     
-    if id < 0:
+    if id < 0 or activity_id < 0:
         return abort(404)
         
     if id > 0:
@@ -51,25 +91,19 @@ def edit(id=0):
         if not rec:
             flash("Record Not Found")
             return redirect(g.listURL)
-        client = Client(g.db).get(rec.client_id)
     else:
         rec = event.new()
         user = User(g.db).get(g.user)
         rec.manager_user_id = user.id
+        rec.activity_id = activity_id
         event.save(rec)
-        g.cancelURL = url_for('.delete') + str(rec.id)
         g.db.commit()
+        g.cancelURL = g.cancelURL + str(rec.id)
+        # fetch the record again to load the related activity data
+        rec = event.get(rec.id)
 
-    locations = Location(g.db).select()
-    event_types = EventType(g.db).select()
-    # only users of sufficient rank can manage an event
-    where = "user.id in (select user_id from user_role where role_id in (select role.id from role where rank >= {}))".format(get_site_config().get('MINIMUM_MANAGER_RANK',70))
-    event_managers = User(g.db).select(where=where)
-    job_embed_list = get_job_list_for_event(rec.id)
-    
     if request.form:
         #import pdb;pdb.set_trace()
-        
         event.update(rec,request.form)
         rec.exclude_from_calendar = request.form.get('exclude_from_calendar',0) #checkbox value
         rec.location_id = cleanRecordID(request.form.get('location_id',-1))
@@ -78,13 +112,21 @@ def edit(id=0):
             data_part = rec.client_website.partition("//")
             if data_part[0][:4] != 'http':
                 rec.client_website = 'http://' + rec.client_website
-                
+            
         if valid_input(rec):
             event.save(rec)
             g.db.commit()
             return redirect(g.listURL)
         
-        
+    # get lists for form
+    client = Client(g.db).get(rec.client_id)
+    locations = Location(g.db).select()
+    event_types = EventType(g.db).select()
+    # only users of sufficient rank can manage an event
+    where = "user.id in (select user_id from user_role where role_id in (select role.id from role where rank >= {}))".format(get_site_config().get('MINIMUM_MANAGER_RANK',70))
+    event_managers = User(g.db).select(where=where)
+    job_embed_list = get_job_list_for_event(rec.id)
+       
         
     return render_template('event_edit.html',
         rec=rec,
@@ -102,6 +144,9 @@ def edit(id=0):
 @table_access_required(Event)
 def delete(id=0):
     setExits()
+    return handle_delete(id)
+    
+def handle_delete(id):
     id = cleanRecordID(id)
     event = Event(g.db)
     if id <= 0:
@@ -113,10 +158,17 @@ def delete(id=0):
     if rec:
         event.delete(rec.id)
         g.db.commit()
-        flash("Event Deleted")
     
     return redirect(g.listURL)
     
+@mod.route('/delete_from_activity/',methods=['GET','POST',])
+@mod.route('/delete_from_activity/<int:activity_id>/<int:id>/',methods=['GET','POST',])
+def delete_from_activity(activity_id=-1,id=0):
+    """Delete a record, but then return to the activity record
+    Watch out! the params are swapped from usual
+    """
+    g.listURL = url_for('activity.edit') + str(cleanRecordID(activity_id))
+    return handle_delete(id)
     
 def valid_input(rec):
     valid_data = True
