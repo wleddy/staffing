@@ -24,6 +24,51 @@ class Activity(SqliteTable):
         super().create_table(sql)
 
 
+class ActivityType(SqliteTable):
+    """Categorize events"""
+    def __init__(self,db_connection):
+        super().__init__(db_connection)
+        self.table_name = 'activity_type'
+        self.order_by_col = 'type, id'
+        self.defaults = {}
+
+    def create_table(self):
+        """Define and create the table"""
+
+        sql = """
+        type TEXT NOT NULL,
+        description TEXT"""
+
+        super().create_table(sql)
+
+
+class Client(SqliteTable):
+    """Client for events"""
+    def __init__(self,db_connection):
+        super().__init__(db_connection)
+        self.table_name = 'client'
+        self.order_by_col = 'name, id'
+        self.defaults = {}
+
+    def create_table(self):
+        """Define and create the table"""
+
+        sql = """
+        name TEXT,
+        address TEXT,
+        city TEXT,
+        state TEXT,
+        zip TEXT,
+        website TEXT,
+        email TEXT,
+        phone TEXT,
+        contact_first_name TEXT,
+        contact_last_name TEXT,
+        """
+        
+        super().create_table(sql)
+
+
 class Event(SqliteTable):
     """Staffing Event Table"""
     def __init__(self,db_connection):
@@ -57,7 +102,7 @@ class Event(SqliteTable):
             service_end_date_label_id INTEGER,
             calendar_title TEXT,
             exclude_from_calendar INTEGER DEFAULT 0,
-            status TEXT DEFAULT 'Active',
+            status TEXT DEFAULT 'Scheduled',
             FOREIGN KEY (activity_id) REFERENCES activity(id) ON DELETE CASCADE
             """
                 
@@ -72,22 +117,33 @@ class Event(SqliteTable):
         return self.query(sql)
         
         
-class ActivityType(SqliteTable):
-    """Categorize events"""
+class EventDateLabel(SqliteTable):
+    """A place to put the labels used to make event.<event|service>_start_date and end dates user friendly
+    """
     def __init__(self,db_connection):
         super().__init__(db_connection)
-        self.table_name = 'activity_type'
-        self.order_by_col = 'type, id'
+        self.table_name = 'event_date_label'
+        self.order_by_col = 'id'
         self.defaults = {}
 
     def create_table(self):
         """Define and create the table"""
 
         sql = """
-        type TEXT NOT NULL,
-        description TEXT"""
+        label TEXT NOT NULL UNIQUE
+        """
         
         super().create_table(sql)
+
+    def get(self,label_or_id):
+        """select the label record by label or id"""
+        if type(label_or_id) is str:
+            rec = self.select_one(where='lower(label) = "{}"'.format(label_or_id.lower()))
+        else:
+            rec = super().get(cleanRecordID(label_or_id))
+    
+        return rec
+
 
 
 class Job(SqliteTable):
@@ -125,56 +181,7 @@ class Job(SqliteTable):
             out = cnt
         return out
         
-class UserJob(SqliteTable):
-    """Staffing User_Job Table"""
-    def __init__(self,db_connection):
-        super().__init__(db_connection)
-        self.table_name = 'user_job'
-        self.order_by_col = 'id'
-        self.defaults = {'positions': 0,}
-        self.indexes = {"user_job_job_id":"job_id","user_job_user_id":"user_id",}
         
-    def create_table(self):
-        """Define and create the table"""
-        
-        sql = """
-        user_id INTEGER NOT NULL,
-        job_id INTEGER NOT NULL,
-        created DATETIME,
-        modified DATETIME,
-        positions INTEGER,
-        attendance_start DATETIME,
-        attendance_end DATETIME,
-        attendance_comment TEXT,
-        attendance_mileage FLOAT,
-        FOREIGN KEY (user_id) REFERENCES user(id) ON DELETE CASCADE,
-        FOREIGN KEY (job_id) REFERENCES job(id) ON DELETE CASCADE """
-                
-        super().create_table(sql)
-        
-    def new(self):
-        """Setup a new record"""
-        rec = super().new()
-        rec.created = local_datetime_now()
-        rec.modified = rec.created
-        return rec
-        
-    def save(self,rec,**kwargs):
-        rec.modified = local_datetime_now()
-        return super().save(rec,**kwargs)
-        
-        
-    def get_assigned_users(self,job_id):
-        """Return a namedlist of user records assigned to this job or None"""
-        #import pdb;pdb.set_trace()
-        user_jobs = self.select(where='job_id = {}'.format(job_id))
-        if user_jobs:
-            user_ids = [str(user_job.user_id) for user_job in user_jobs]
-            users = User(self.db).select(where='id in ({})'.format(','.join(user_ids)))
-            return users
-        else:
-            return None
-
 class JobRole(SqliteTable):
     """User roles that are required to signup for a job"""
     def __init__(self,db_connection):
@@ -245,60 +252,57 @@ class StaffNotification(SqliteTable):
         super().create_table(sql)
         
         
-class Client(SqliteTable):
-    """Client for events"""
+class UserJob(SqliteTable):
+    """Staffing User_Job Table"""
     def __init__(self,db_connection):
         super().__init__(db_connection)
-        self.table_name = 'client'
-        self.order_by_col = 'name, id'
-        self.defaults = {}
-        
-    def create_table(self):
-        """Define and create the table"""
-        
-        sql = """
-        name TEXT,
-        address TEXT,
-        city TEXT,
-        state TEXT,
-        zip TEXT,
-        website TEXT,
-        email TEXT,
-        phone TEXT,
-        contact_first_name TEXT,
-        contact_last_name TEXT,
-        """
-                
-        super().create_table(sql)
-    
-    
-class EventDateLabel(SqliteTable):
-    """A place to put the labels used to make event.<event|service>_start_date and end dates user friendly
-    """
-    def __init__(self,db_connection):
-        super().__init__(db_connection)
-        self.table_name = 'event_date_label'
+        self.table_name = 'user_job'
         self.order_by_col = 'id'
-        self.defaults = {}
-        
+        self.defaults = {'positions': 0,}
+        self.indexes = {"user_job_job_id":"job_id","user_job_user_id":"user_id",}
+
     def create_table(self):
         """Define and create the table"""
-        
+
         sql = """
-        label TEXT NOT NULL UNIQUE
-        """
-                
+        user_id INTEGER NOT NULL,
+        job_id INTEGER NOT NULL,
+        created DATETIME,
+        modified DATETIME,
+        positions INTEGER,
+        attendance_start DATETIME,
+        attendance_end DATETIME,
+        attendance_comment TEXT,
+        attendance_mileage FLOAT,
+        FOREIGN KEY (user_id) REFERENCES user(id) ON DELETE CASCADE,
+        FOREIGN KEY (job_id) REFERENCES job(id) ON DELETE CASCADE """
+        
         super().create_table(sql)
-    
-    def get(self,label_or_id):
-        """select the label record by label or id"""
-        if type(label_or_id) is str:
-            rec = self.select_one(where='lower(label) = "{}"'.format(label_or_id.lower()))
-        else:
-            rec = super().get(cleanRecordID(label_or_id))
-            
+
+    def new(self):
+        """Setup a new record"""
+        rec = super().new()
+        rec.created = local_datetime_now()
+        rec.modified = rec.created
         return rec
-    
+
+    def save(self,rec,**kwargs):
+        rec.modified = local_datetime_now()
+        return super().save(rec,**kwargs)
+
+
+    def get_assigned_users(self,job_id):
+        """Return a namedlist of user records assigned to this job or None"""
+        #import pdb;pdb.set_trace()
+        user_jobs = self.select(where='job_id = {}'.format(job_id))
+        if user_jobs:
+            user_ids = [str(user_job.user_id) for user_job in user_jobs]
+            users = User(self.db).select(where='id in ({})'.format(','.join(user_ids)))
+            return users
+        else:
+            return None
+
+
 def init_event_db(db):
     """Create a intial user record."""
     Activity(db).create_table()
