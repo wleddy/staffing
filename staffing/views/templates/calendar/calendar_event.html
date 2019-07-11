@@ -5,7 +5,7 @@
 <div class="w3-panel w3-card-2 w3-secondary-color">
     <h2>
         <img src="{{url_for('static',filename='images/bicycle.png')}}" />
-        {{ job.activity_type }}
+        {{ job.service_type }}
     </h2>
 </div>
 {% endblock page_header %}
@@ -18,24 +18,44 @@
             <p>
                 <em>Date:</em> <strong>{{ job.event_start_date | abbr_date_string }}</strong>
             </p>
-            <p>
-                <em>Location:</em> <strong>{{ job.job_loc_name }}</strong><br>
-                {{ job.job_loc_street_address }}, {{ job.job_loc_city }}<br>
-            </p>
+            <div class="w3-row">
+                <p class="w3-col l1 m2 s2 w3-right-align">
+                    <em>Times:</em>&nbsp;
+                </p>
+                <p class="w3-col l11 m10 s10">
+                    <strong>{{ job.event_start_label }}</strong>: {{ job.event_start_date | local_time_string }}  &ndash; 
+                    <strong>{{ job.event_end_label }}</strong>: {{ job.event_end_date | local_time_string }}
+                </p>
+            </div>
+            {# if the event/service times and labels are identical, don't display the service set #}
+            {% if job.event_start_label ==  job.service_start_label and job.event_start_date == job.service_start_date and job.event_end_label == job.service_end_label and job.event_end_date == job.service_end_date %}
+            {# show nothing #}
+            {% else %}
+            <div class="w3-row">
+                <div class="w3-col l1 m2 s2">&nbsp;</div>
+                <div class="w3-col  l11 m10 s10">
+                    <p>
+                        <strong>{{ job.service_start_label }}</strong>: {{ job.service_start_date | local_time_string }}  &ndash; 
+                        <strong>{{ job.service_end_label }}</strong>: {{ job.service_end_date | local_time_string }}
+                    </p>
+                </div>
+            </div>
+            {% endif %}
+            <div class="w3-row">
+                <p class="w3-col l1 m2 s2 w3-right-align">
+                    <em>Place:</em>&nbsp;
+                </p>
+                <div class="w3-col  l11 m10 s10">
+                    <p>
+                        <strong>{{ job.job_loc_name }}</strong><br>
+                        {{ job.job_loc_street_address }}, {{ job.job_loc_city }}
+                    </p>
+                </div>
+            </div>
             <div style="padding-right:6pt;">
                 {{ job.event_description | render_markdown }}
             </div>
-            <p>
-                <strong>{{ job.event_start_label }}</strong>: {{ job.event_start_date | local_time_string }}  &ndash; 
-                <strong>{{ job.event_end_label }}</strong>: {{ job.event_end_date | local_time_string }}
-                
-            </p>
-            <p>
-                <strong>{{ job.service_start_label }}</strong>: {{ job.service_start_date | local_time_string }}  &ndash; 
-                <strong>{{ job.service_end_label }}</strong>: {{ job.service_end_date | local_time_string }}
-                
-            </p>
-            {% if job.job_loc_lat and job.job_loc_lng %}
+             {% if job.job_loc_lat and job.job_loc_lng %}
             <div style="margin-bottom:16pt;">
                 {{ directions_snippet(job) }}
             </div>

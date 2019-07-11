@@ -82,6 +82,30 @@
                     <span id="event-title-{{ job.job_id }}" title="{{job.activity_title}}">{{ job.activity_title }}</span>
                     <strong id="job-date-{{ job.job_id }}">{{ job.start_date[:10] | abbr_date_string }}</strong>
                 </p>
+                <div class="event-contain w3-secondary-color w3-small"  style="margin-top:0">
+                    <div class="w3-row">
+                        <p class="w3-col l1 m1 s1">&nbsp;</p>
+                        <p class="w3-col l11 m11 s11">
+                            <strong>{{ job.event_start_label }}</strong>: {{ job.event_start_date | local_time_string }}  &ndash; 
+                            <strong>{{ job.event_end_label }}</strong>: {{ job.event_end_date | local_time_string }}
+                        </p>
+                    </div>
+                    {# if the event/service times and labels are identical, don't display the service set #}
+                    {% if job.event_start_label ==  job.service_start_label and job.event_start_date == job.service_start_date and job.event_end_label == job.service_end_label and job.event_end_date == job.service_end_date %}
+                    {# show nothing #}
+                    {% else %}
+                    <div class="w3-row">
+                        <p class="w3-col l1 m1 s1">&nbsp;</p>
+                        <div class="w3-col  l11 m11 s11">
+                            <p>
+                                <strong>{{ job.service_start_label }}</strong>: {{ job.service_start_date | local_time_string }}  &ndash; 
+                                <strong>{{ job.service_end_label }}</strong>: {{ job.service_end_date | local_time_string }}
+                            </p>
+                        </div>
+                    </div>
+                    {% endif %}
+                </div>
+                
             {% endif %} {# show date? #}
             
             {% if job.job_loc_name != job_location_name[0] %}
@@ -94,6 +118,7 @@
                 
             {% endif %} {# show loction? #}
            <div id="job-body{{job.job_id}}">
+               
                 {% include 'roster_job.html' %}
             </div>
     
