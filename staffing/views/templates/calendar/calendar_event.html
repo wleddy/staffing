@@ -1,10 +1,11 @@
 {% extends 'layout.html' %}
+{% from '_staffing_helper_macros.html' import directions_snippet %}
 
 {% block page_header %}
 <div class="w3-panel w3-card-2 w3-secondary-color">
     <h2>
         <img src="{{url_for('static',filename='images/bicycle.png')}}" />
-        {{ job.activity_title | default("Event",True)}}
+        {{ job.activity_type }}
     </h2>
 </div>
 {% endblock page_header %}
@@ -13,10 +14,9 @@
 <div class="w3-panel w3-card-2 w3-secondary-color">
     <div class="w3-row">
         <div class="w3-col w3-half w3-small" style="padding-left:1%;">
-            <h3><strong>{{ job.activity_title}}</strong></h3>
+            <h3><strong>{{ job.calendar_title}}</strong></h3>
             <p>
-                <em>Date:</em> <strong>{{ job.start_date | abbr_date_string }}</strong> &ndash; 
-                {{ job.start_date | local_time_string }} - {{ job.end_date | local_time_string }}
+                <em>Date:</em> <strong>{{ job.event_start_date | abbr_date_string }}</strong>
             </p>
             <p>
                 <em>Location:</em> <strong>{{ job.job_loc_name }}</strong><br>
@@ -25,9 +25,18 @@
             <div style="padding-right:6pt;">
                 {{ job.event_description | render_markdown }}
             </div>
+            <p>
+                <strong>{{ job.event_start_label }}</strong>: {{ job.event_start_date | local_time_string }}  &ndash; 
+                <strong>{{ job.event_end_label }}</strong>: {{ job.event_end_date | local_time_string }}
+                
+            </p>
+            <p>
+                <strong>{{ job.service_start_label }}</strong>: {{ job.service_start_date | local_time_string }}  &ndash; 
+                <strong>{{ job.service_end_label }}</strong>: {{ job.service_end_date | local_time_string }}
+                
+            </p>
             {% if job.job_loc_lat and job.job_loc_lng %}
             <div style="margin-bottom:16pt;">
-                {% from '_staffing_helper_macros.html' import directions_snippet %}
                 {{ directions_snippet(job) }}
             </div>
             {% endif %}

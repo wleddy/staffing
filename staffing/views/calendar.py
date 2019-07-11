@@ -67,7 +67,9 @@ def display(month=None,year=None):
     
     job_data = get_job_rows(start_date,end_date,is_admin=True,
             event_status_where=get_event_status_where(),
-            order_by="date(job.start_date,'localtime')")
+            where=" event.exclude_from_calendar = 0 ",
+            order_by="date(event.event_start_date,'localtime')",
+            group_by=" event.id ",)
             
     job_list_dict = {}
     if job_data:
@@ -86,15 +88,13 @@ def display(month=None,year=None):
     #get a list of lists of tuples
     cal_list=cal.monthdays2calendar(start_date.year,start_date.month)\
     ## some "constants for my sanity... the positions in the cal_list tuples"
-    cal_day = 0
-    cal_weekday_num = 1
-    cal_data_index = 2
+    _cal_day = 0
     
     # add a list to each tuple to hold job_data index for each day
     for week in range(len(cal_list)):
         for day in range(7):
-            if cal_list[week][day][cal_day] != 0 and cal_list[week][day][cal_day] in job_list_dict:
-                cal_list[week][day] = cal_list[week][day] + (job_list_dict[cal_list[week][day][cal_day]],)
+            if cal_list[week][day][_cal_day] != 0 and cal_list[week][day][_cal_day] in job_list_dict:
+                cal_list[week][day] = cal_list[week][day] + (job_list_dict[cal_list[week][day][_cal_day]],)
             else:
                 cal_list[week][day] = cal_list[week][day] + ([],)
         
@@ -126,21 +126,21 @@ def display(month=None,year=None):
                             )
 
 
-@mod.route('calendar/event/<int:job_id>')
-@mod.route('calendar/event/<int:job_id>/')
+@mod.route('calendar/event/<int:event_id>')
+@mod.route('calendar/event/<int:event_id>/')
 @mod.route('calendar/event')
 @mod.route('calendar/event/')
-def event(job_id=None):
-    """Return a page with the event associated with the job"""
+def event(event_id=None):
+    """Return a page with the event details"""
     setExits()
     g.title = "Event Detail"
     #import pdb;pdb.set_trace()
     
-    job_id = cleanRecordID(job_id)
-    if job_id < 1:
+    event_id = cleanRecordID(event_id)
+    if event_id < 1:
         return redirect(url_for('.display'))
         
-    job = get_job_rows(None,None,is_admin=True,where="job.id = {}".format(job_id),
+    job = get_job_rows(None,None,is_admin=True,where="job.event_id = {}".format(event_id),
                         event_status_where=get_event_status_where(),
                         )
     if not job:

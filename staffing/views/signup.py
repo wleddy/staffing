@@ -428,10 +428,31 @@ def get_job_rows(start_date=None,end_date=None,where='',user_skills=[],is_admin=
     if not order_by:
         order_by = " activity_first_date, activity_title, job.start_date "
     
+    group_by = kwargs.get('group_by','')
+    if group_by:
+        group_by = 'group by {}'.format(group_by)
         
     sql = """
-    select activity.id as activity_id, activity.title as activity_title, activity.description as activity_description, 
-    event.id as event_id, 
+    select activity.id as activity_id, 
+    activity.title as activity_title, 
+    activity.description as activity_description,
+    activity.activity_type_id,
+    coalesce((select type from activity_type where activity_type.id = activity.activity_type_id ),"Activity Type") as activity_type,
+    event.id as event_id,
+    event.event_start_date,
+    event.event_end_date,
+    event.event_start_date_label_id,
+    coalesce((select label from event_date_label where id = event.event_start_date_label_id ),'Event Start') as event_start_label,
+    event.event_end_date_label_id,
+    coalesce((select label from event_date_label where id = event.event_end_date_label_id ),'Event End') as event_end_label,
+    event.service_start_date,
+    event.service_end_date,
+    event.service_start_date_label_id,
+    coalesce((select label from event_date_label where id = event.service_start_date_label_id ),'Service Start') as service_start_label,
+    event.service_end_date_label_id,
+    coalesce((select label from event_date_label where id = event.service_end_date_label_id ),'Service End') as service_end_label,
+    coalesce(nullif(event.calendar_title,''),activity.title) as calendar_title,
+    event.exclude_from_calendar,
     coalesce(nullif(event.description,''),activity.description) as event_description,
     -- get contact info client table if available else event table
     coalesce(nullif(event.client_contact,''),event.client_contact) as event_client_contact,
@@ -512,11 +533,12 @@ def get_job_rows(start_date=None,end_date=None,where='',user_skills=[],is_admin=
     join activity on activity.id = event.activity_id
     left join client on client.id = event.client_id
     where {where}
+    {group_by}
     order by {order_by}
     """
     #print(sql.format(where=where, order_by=order_by,))
     #import pdb;pdb.set_trace()            
-    jobs = Job(g.db).query(sql.format(where=where,order_by=order_by,))
+    jobs = Job(g.db).query(sql.format(where=where,order_by=order_by,group_by=group_by,))
 
     last_activity_id = 0
     dates_list = []
