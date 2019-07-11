@@ -437,7 +437,7 @@ def get_job_rows(start_date=None,end_date=None,where='',user_skills=[],is_admin=
     activity.title as activity_title, 
     activity.description as activity_description,
     activity.activity_type_id,
-    coalesce((select type from activity_type where activity_type.id = activity.activity_type_id ),"Activity Type") as activity_type,
+    coalesce(nullif(event.service_type,''),(select type from activity_type where activity_type.id = activity.activity_type_id ),"Activity Type") as service_type,
     event.id as event_id,
     event.event_start_date,
     event.event_end_date,

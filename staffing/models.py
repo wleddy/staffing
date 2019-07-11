@@ -100,6 +100,7 @@ class Event(SqliteTable):
             service_end_date DATETIME,
             service_start_date_label_id INTEGER,
             service_end_date_label_id INTEGER,
+            service_type TEXT,
             calendar_title TEXT,
             exclude_from_calendar INTEGER DEFAULT 0,
             status TEXT DEFAULT 'Scheduled',
@@ -111,7 +112,11 @@ class Event(SqliteTable):
         
     def select(self,**kwargs):
         """Include Activity fields"""
-        sql="""select event.*, activity.title as activity_title, activity.description as activity_description from event join activity on activity.id = event.activity_id
+        sql="""select event.*, activity.title as activity_title, 
+        activity.description as activity_description ,
+        (select type from activity_type where activity_type.id = activity.activity_type_id ) as activity_service_type
+        from event 
+        join activity on activity.id = event.activity_id
         where {} order by {}""".format(kwargs.get('where',1),kwargs.get('order_by',self.order_by_col))
         
         return self.query(sql)
