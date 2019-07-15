@@ -1,7 +1,8 @@
-# About the Staffing Web Application
+# About the SABA Volunteer Signup Web Site
 
-This is an experiment to see if we can create a web site to facilitate staffing for events where SABA is 
-providing services such as Bike Valet and Bike Repair.
+This web site is based on an open source project designed to help non-profit organizations to manage
+their Volunteer and Staff shift signup process.
 
-We hope to be able to expand it to also allow interested members of the public to sign up as volunteers at
-the events.
+The source for the project is available to anyone interested at [github.com/wleddy/staffing/](http://github.com/wleddy/staffing/).
+
+More information about the system is available [in the docs](/docs/)
