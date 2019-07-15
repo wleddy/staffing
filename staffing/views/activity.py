@@ -50,28 +50,6 @@ def edit(id=0):
         if not rec:
             flash("Record Not Found")
             return redirect(g.listURL)
-        else:
-            sql="""select event.id as event_id,
-            coalesce(nullif(event.calendar_title,''),activity.title) as event_title,
-            (select min(job.start_date) from job where job.event_id = event.id) as job_start_date,
-            event.event_start_date,
-            -- the number of positions filled in this event
-            (select coalesce(sum(user_job.positions),0) from user_job
-                where user_job.job_id in (select id from job where job.event_id = event.id)) as event_filled_positions,
-            -- the total positions for this event
-            (select coalesce(sum(job.max_positions),1) from job 
-                where job.event_id = event.id) as event_max_positions,
-            coalesce(job_loc.location_name,event_loc.location_name,"TBD") as location_name
-            from event
-            join activity on activity.id = event.activity_id
-            join job on job.event_id = event.id
-            left join location as event_loc on event_loc.id = event.location_id
-            left join location as job_loc on job_loc.id = job.location_id
-            where event.activity_id = {}
-            group by event.event_start_date, job_start_date
-            order by event.event_start_date DESC
-            """.format(id)
-            event_recs = Event(g.db).query(sql)
     else:
         rec = activity.new()
         rec.title = "New Activity"
@@ -83,11 +61,13 @@ def edit(id=0):
         return redirect(g.listURL)
         
     activity_types = ActivityType(g.db).select()
-        
+    
+    event_list = get_event_list(id)
+            
     return render_template('activity_edit.html',
         rec=rec,
-        event_recs=event_recs,
         activity_types=activity_types,
+        event_list=event_list,
         )
     
     
@@ -121,6 +101,23 @@ def edit_event(event_id=0):
     return url_for('activity.edit') + request.form.get('id','-1')+"/"
 
 
+@mod.route('/get_event_list/',methods=['GET','POST',])
+@mod.route('/get_event_list/<int:id>/',methods=['GET','POST',])
+@table_access_required(Activity)
+def get_event_list(id=0):
+    """Return a fully formatted list of events for the activity specified"""
+    
+    id = cleanRecordID(id)
+    
+    event_list = ''
+    
+    if id > 0:
+        event_recs = get_event_recs(id)
+        if event_recs:
+            event_list = render_template("activity_event_list.html",event_recs=event_recs)
+        
+    return event_list
+    
 @mod.route('/delete/',methods=['GET','POST',])
 @mod.route('/delete/<int:id>/',methods=['GET','POST',])
 @table_access_required(Activity)
@@ -140,6 +137,32 @@ def delete(id=0):
         flash("Activity {} Deleted".format(rec.title))
     
     return redirect(g.listURL)
+    
+    
+def get_event_recs(id):
+    sql="""select event.id as event_id,
+    coalesce(nullif(event.calendar_title,''),activity.title) as event_title,
+    (select min(job.start_date) from job where job.event_id = event.id) as job_start_date,
+    event.event_start_date,
+    -- the number of positions filled in this event
+    (select coalesce(sum(user_job.positions),0) from user_job
+        where user_job.job_id in (select id from job where job.event_id = event.id)) as event_filled_positions,
+    -- the total positions for this event
+    (select coalesce(sum(job.max_positions),1) from job 
+        where job.event_id = event.id) as event_max_positions,
+    coalesce(job_loc.location_name,event_loc.location_name,"TBD") as location_name
+    from event
+    join activity on activity.id = event.activity_id
+    join job on job.event_id = event.id
+    left join location as event_loc on event_loc.id = event.location_id
+    left join location as job_loc on job_loc.id = job.location_id
+    where event.activity_id = {}
+    group by event.event_start_date, job_start_date
+    order by event.event_start_date DESC
+    """.format(id)
+    event_recs = Event(g.db).query(sql)
+    
+    return event_recs
     
     
 def valid_input(rec):

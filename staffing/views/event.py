@@ -3,10 +3,10 @@ from flask import request, session, g, redirect, url_for, abort, \
 from shotglass2.shotglass import get_site_config
 from shotglass2.users.admin import login_required, table_access_required
 from shotglass2.takeabeltof.utils import render_markdown_for, printException, cleanRecordID
-from shotglass2.takeabeltof.date_utils import date_to_string, getDatetimeFromString
-from staffing.models import Event, Location, ActivityType, Client, EventDateLabel
+from shotglass2.takeabeltof.date_utils import date_to_string, getDatetimeFromString, local_datetime_now
+from staffing.models import Event, Location, ActivityType, Client, EventDateLabel, Job, UserJob
 from shotglass2.users.models import User
-from staffing.views.job import get_job_list_for_event
+from staffing.views.job import get_job_list_for_event, coerce_datetime
 
 mod = Blueprint('event',__name__, template_folder='templates/event', url_prefix='/event')
 
@@ -135,6 +135,134 @@ def render_edit_form(id,activity_id):
         job_embed_list=job_embed_list,
         event_date_labels=event_date_labels,
         )
+    
+    
+@mod.route('/manage_event/',methods=['GET','POST',])
+@mod.route('/manage_event/<int:id>/',methods=['GET','POST',])
+@table_access_required(Event)
+def manage_event(id=0):
+    """Delete, move or copy the specifed event and it's jobs.
+    In the case of move or copy, include the option to move/copy the assignments
+    
+    This is an auax request
+    """
+    
+    #import pdb;pdb.set_trace()
+    action = request.args.get('action')
+    new_date=request.form.get('new_date','')
+    move_assignments=request.form.get('move_assignments',"")
+    try:
+        move_assignments = int(move_assignments)
+    except:
+        move_assignments = ''
+        
+    id = cleanRecordID(request.form.get('id',id))
+    
+    if id < 1:
+        return 'failure: That is not a valid event ID'
+        
+    if action not in [None,'copy','move','delete',]:
+        return 'failure: That is not a valid action request'
+    
+    job_table = Job(g.db)
+    user_job_table = UserJob(g.db)
+    event_table=Event(g.db)
+    event_rec = event_table.get(id)
+    
+    if not event_rec:
+        return "failure: Event record not found."
+        
+    dup_date = None
+    if request.form and action != 'delete':
+        # validate the new date for a copy or move
+        try:
+            dup_date = coerce_datetime(request.form.get('new_date',''),'23:00:00')
+            if dup_date:
+                # You can't move a set into the past
+                if dup_date < local_datetime_now():
+                    return "failure: You can't move or copy a set into the past"
+                    
+                #convert it to a string
+                dup_date = date_to_string(dup_date,'iso_date') #'YYYY-MM-DD'
+            else:
+                return "failure: That is not a valid date"
+        except Exception as e:
+            mes = 'Got an error while processing the date'
+            printException(mes,err=e)
+            return "failure: {}".format(mes)
+            
+    if request.form: # and (dup_date or action == 'delete'):
+        try:
+            # stash a copy of the values of the original event record
+            orig_event_dict = event_rec._asdict()
+        
+            user_job_recs = user_job_table.query('select user_job.* from user_job where job_id in (select job.id from job join event on event.id = job.event_id where event.id = {})'.format(event_rec.id))
+            if action == 'delete' and user_job_recs:
+                ## Don't delete if there are any assignmehnts
+                return "failure: There are one or more users assigned to this event. You must remove the assignments first."
+                
+                
+            if action != "delete":
+                # Create or update the event
+                if action == "copy":
+                    #make a new event record
+                    new_event_rec = event_table.new()
+                    event_table.update(new_event_rec,orig_event_dict)
+                else:
+                    new_event_rec=event_rec # to make it easier to refer by either name
+                    
+                new_event_rec.event_start_date = dup_date + new_event_rec.event_start_date[10:]
+                new_event_rec.event_end_date = dup_date + new_event_rec.event_end_date[10:]
+                new_event_rec.service_start_date = dup_date + new_event_rec.service_start_date[10:]
+                new_event_rec.service_end_date = dup_date + new_event_rec.service_end_date[10:]
+                event_table.save(new_event_rec)
+            
+            
+                job_recs = job_table.select(where="event_id = {}".format(event_rec.id))
+                if job_recs:
+                    for job_rec in job_recs:
+                        ## copy or move
+                        orig_job_id = job_rec.id
+                        if action == 'copy':
+                            job_rec.id = None #create a new job record
+                            job_rec.event_id = new_event_rec.id
+                    
+                        job_rec.start_date = dup_date + job_rec.start_date[10:]
+                        job_rec.end_date = dup_date + job_rec.end_date[10:]
+                        job_table.save(job_rec)
+                
+                        if move_assignments:
+                            user_assignments = user_job_table.select(where="job_id = {}".format(orig_job_id))
+                            if user_assignments:
+                                for ua in user_assignments:
+                                    orig_ua_id = ua.id # so we can refer to it later
+                                    if action == "copy":
+                                        ua.id=None
+                                        
+                                    ua.job_id = job_rec.id
+                                    user_job_table.save(ua)
+                                    if ua.id != orig_ua_id:
+                                        ## TODO - We just gave the user a new assignment. Should let them know....
+                                        pass
+                                        
+            elif action == "delete":
+                event_table.delete(event_rec.id) #Jobs and usre_jobs should cascade delete
+    
+            else:
+                # did not get a valid action?
+                return "failure: Not a valid request"
+                    
+            g.db.commit()
+            return 'success'
+            
+        except Exception as e:
+            g.db.rollback()
+            mes="Something went wrong while trying to manage that job."
+            printException(mes,err=e)
+            return "failure: {}".format(mes)
+        
+    return render_template('event_manage.html',rec=event_rec,new_date=new_date)
+    
     
     
 @mod.route('/delete/',methods=['GET','POST',])

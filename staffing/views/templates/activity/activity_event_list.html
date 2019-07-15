@@ -1,0 +1,30 @@
+{% for event in event_recs %}
+<div class="w3-row">
+    <div class="w3-col w3-threequarter">
+        <p>
+            <strong>{{event.event_title}}</strong> <br>
+            {% if event.event_start_date %}{{event.event_start_date | default('Not Set',True) | short_day_and_date_and_time_string }}
+            {% else %}{{event.job_start_date | default('Not Set',True) | short_day_and_date_and_time_string }}
+            {% endif %}<br>
+            {{ event.event_filled_positions | default("0",True)}} of  {{ event.event_max_positions | default("0",True)}} positions filled
+            <br>
+            @ {{ event.location_name }}
+        </p>
+    </div>
+    <div class="w3-col w3-quarter" style="text-align:center;">
+        <p>
+        <a class="w3-button w3-primary-color w3-round-large" 
+            onclick="$.post('{{ url_for('activity.edit_event')}}{{ event.event_id}}/',$('#main-form').serialize(),function(data){window.location = data;});"
+            >Edit</a>
+        </p>
+        <p>
+            <a class="w3-button w3-primary-color w3-round-large" 
+            onclick="editFromList('{{ url_for('event.manage_event')}}{{ event.event_id }}')"
+            >
+            More...
+            </a>
+        </p>  
+    </div>
+</div>
+<hr>
+{% endfor %}
