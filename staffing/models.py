@@ -114,6 +114,7 @@ class Event(SqliteTable):
         """Include Activity fields"""
         sql="""select event.*, activity.title as activity_title, 
         activity.description as activity_description ,
+        coalesce(nullif(event.calendar_title,''),activity.title) as event_title,
         (select type from activity_type where activity_type.id = activity.activity_type_id ) as activity_service_type
         from event 
         join activity on activity.id = event.activity_id
@@ -121,6 +122,12 @@ class Event(SqliteTable):
         
         return self.query(sql)
         
+    def get(self, id):
+        out = self.select(where=self.table_name + ".id={}".format(cleanRecordID(id)))
+        if type(out) == list and len(out) > 0:
+            return out[0]
+            
+        return None
         
 class EventDateLabel(SqliteTable):
     """A place to put the labels used to make event.<event|service>_start_date and end dates user friendly
