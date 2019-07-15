@@ -172,6 +172,10 @@ def manage_event(id=0):
     if not event_rec:
         return "failure: Event record not found."
         
+    # the event start and end dates must be set for this to work
+    if not event_rec.event_start_date or not event_rec.event_end_date:
+        return "failure: You must set the start and end dates for the event first."
+        
     dup_date = None
     if request.form and action != 'delete':
         # validate the new date for a copy or move
