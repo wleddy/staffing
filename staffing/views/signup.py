@@ -257,7 +257,7 @@ def roster(display_end_days=0):
         if rec and rec.id not in user_skills:
             user_skills.append(rec.id)
                 
-    order_by = "sort_by_date_and_title" if as_spreadsheet else None
+    order_by = " sort_by_date_and_title, is_volunteer_job " if as_spreadsheet else None
     
     jobs = get_job_rows(start_date,end_date,"",user_skills,is_admin,order_by=order_by)
     return render_template('roster.html',jobs=jobs,is_admin=is_admin,display_end_days=display_end_days,as_spreadsheet=as_spreadsheet,)
@@ -397,7 +397,9 @@ def get_job_rows(start_date=None,end_date=None,where='',user_skills=[],is_admin=
         if rec and rec.id not in default_skill_list:
             default_skill_list.append(rec.id)
             
-    volunteer_job_ids = get_job_ids_for_skills(default_skill_list)
+    volunteer_skills = "0"
+    if default_skill_list:
+        volunteer_skills = '{}'.format(','.join([str(x) for x in default_skill_list]))
         
     where_skills = ''
     if is_admin:
@@ -426,7 +428,7 @@ def get_job_rows(start_date=None,end_date=None,where='',user_skills=[],is_admin=
 
     order_by = kwargs.get('order_by',None)
     if not order_by:
-        order_by = " activity_first_date, activity_title, job.start_date "
+        order_by = " activity_first_date, activity_title, substr(job.start_date,1,10), is_volunteer_job, job.start_date "
     
     group_by = kwargs.get('group_by','')
     if group_by:
@@ -523,7 +525,8 @@ def get_job_rows(start_date=None,end_date=None,where='',user_skills=[],is_admin=
     (select coalesce(sum(user_job.positions),0) from user_job 
         where job.id = user_job.job_id and job.event_id = event.id and {where}) 
         as job_filled_positions,
-    0 as is_volunteer_job -- placeholder
+    -- 1 if a volunteer job, else 0
+    coalesce((select 1 from job_role where job_role.role_id in (6,3) and job_role.job_id = job.id),0) as is_volunteer_job
     
     from job
     join event on event.id = job.event_id
@@ -536,9 +539,10 @@ def get_job_rows(start_date=None,end_date=None,where='',user_skills=[],is_admin=
     {group_by}
     order by {order_by}
     """
-    #print(sql.format(where=where, order_by=order_by,))
+    sql = sql.format(where=where,order_by=order_by,group_by=group_by,volunteer_skills=volunteer_skills,)
+    print(sql)
     #import pdb;pdb.set_trace()            
-    jobs = Job(g.db).query(sql.format(where=where,order_by=order_by,group_by=group_by,))
+    jobs = Job(g.db).query(sql)
 
     last_activity_id = 0
     dates_list = []
@@ -566,10 +570,6 @@ def get_job_rows(start_date=None,end_date=None,where='',user_skills=[],is_admin=
                     
             job.event_date_list = dates_list
         
-            # is this a job for a volunteer
-            if str(job.job_id) in volunteer_job_ids:
-                job.is_volunteer_job = 1
-                
             # Location resolution...
             # job.event_loc_* and job.job_loc_* fields will all be populated for display
             # defaults
