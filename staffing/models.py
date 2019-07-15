@@ -201,7 +201,7 @@ class JobRole(SqliteTable):
         self.table_name = 'job_role'
         self.order_by_col = 'id'
         self.defaults = {}
-        self.indexes = {"job_role_job_id":"job_id"}
+        self.indexes = {"job_role_job_id":"job_id","job_role_roll_and_job":"role_id,job_id"}
 
     def create_table(self):
         """Define and create the table"""
