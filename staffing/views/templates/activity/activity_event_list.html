@@ -2,6 +2,13 @@
 <div class="w3-row">
     <div class="w3-col w3-threequarter">
         <p>
+            {% if event.status.lower() == "pending" %}
+                <img src="{{ url_for('static',filename='images/question_mark.png')}}" alt="{{ event.status }}"/>
+            {% elif event.status.lower() == 'cancelled' %}
+                 <img src="{{ url_for('static',filename='images/red_x.png')}}" alt="{{ event.status }}"/>
+            {% else %}
+                 <img src="{{ url_for('static',filename='images/check_mark.png')}}" alt="{{ event.status }}"/>
+            {% endif %}
             <strong>{{event.event_title}}</strong> <br>
             {% if event.event_start_date %}{{event.event_start_date | default('Not Set',True) | short_day_and_date_and_time_string }}
             {% else %}{{event.job_start_date | default('Not Set',True) | short_day_and_date_and_time_string }}

@@ -140,7 +140,7 @@ def delete(id=0):
     
     
 def get_event_recs(id):
-    sql="""select event.id as event_id,
+    sql="""select event.id as event_id, event.status,
     coalesce(nullif(event.calendar_title,''),activity.title) as event_title,
     (select min(job.start_date) from job where job.event_id = event.id) as job_start_date,
     event.event_start_date,
