@@ -31,11 +31,11 @@ def home():
 #     g.title = "About"
 #     return render_template('about_signup.html')
 
-# @mod.route('/contact/', methods=['GET','POST',])
-# @mod.route('/contact', methods=['GET','POST',])
-# def contact():
-#     """Delecate the actual contact function to wwww"""
-#     return home_contact()
+@mod.route('/contact/', methods=['GET','POST',])
+@mod.route('/contact', methods=['GET','POST',])
+def contact():
+    """Delecate the actual contact function to wwww"""
+    return home_contact()
 
 @mod.route('/help/')
 @mod.route('/help')
