@@ -12,20 +12,20 @@
             {% if job.job_filled_positions >= job.max_positions %}<em>(Full)</em>{% endif %}
             </span>
         </p>
-        
-        {% if job.job_loc_id and job.job_loc_id != job.event_loc_id %}
         <div class="w3-small">
-            <p><em>Job location:</em> 
-                <strong>{{ job.job_loc_name | default("", True ) }}</strong> 
+                <p><em>Job location:</em><br>
+            {% if job.job_loc_id and job.job_loc_id != job.event_loc_id %}
+                    <strong>{{ job.job_loc_name | default("", True ) }}</strong> 
+                    <a href="{{ url_for('calendar.event')}}{{job.event_id}}">(Map)</a>
+            {% elif not job.job_loc_id and not job.event_loc_id %}
+                <strong>tbd</strong> 
+            {% elif job.event_loc_id %}
+                <strong>{{ job.event_loc_name | default("", True ) }}</strong> 
+                <a href="{{ url_for('calendar.event')}}{{job.event_id}}">(Map)</a></p>
+            {% endif %}
             </p>
-                {% from '_staffing_helper_macros.html' import directions_snippet %}
-                {{ directions_snippet(job) }}
         </div>
-        {% elif not job.job_loc_id and not job.event_loc_id %}
-        <p class="w3-primary-color" style="padding-left:3pt;width:80%">
-            <em>Job location:</em> <strong>tbd</strong> 
-        </p>
-        {% endif %}
+        
     </div>
     <div class="w3-row ">
         <div class="w3-col l2 m2 w3-hide-small">&nbsp;</div>

@@ -77,7 +77,7 @@
                     {% endif %}
                     {% if not g._more_info_activity_id %}
                         <p style="margin-top:10pt;" >
-                        {% if not g.user %}
+                        {% if False and not g.user %}
                             To see details or signup you must login...<br>
                             <a class="w3-button w3-primary-color w3-round-medium w3-medium" href="{{ url_for('login.login')}}?next={{ url_for('signup.more_info')}}{{job.activity_id}}/">Login or Register new account</a>
                         {% else %}

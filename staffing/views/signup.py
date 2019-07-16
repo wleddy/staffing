@@ -46,10 +46,14 @@ def help():
 @mod.route('/more_info')
 @mod.route('/more_info/')
 @mod.route('/more_info/<int:activity_id>/')
-@login_required
 def more_info(activity_id=0):
     activity_id = cleanRecordID(activity_id)
     
+    if not g.user:
+        ## get login first
+        flash("You need to log in or create an account")
+        return redirect(url_for('login.login')+ '?next={}{}'.format(url_for('signup.more_info'),activity_id))
+        
     if activity_id > 0:
         g._more_info_activity_id = activity_id
         return display()

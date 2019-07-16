@@ -69,6 +69,6 @@
     </div>
 </div>
 <div class="w3-panel w3-card-2 w3-secondary-color">
-    <h3 style="text-align:center;cursor:pointer" onclick="location='{{ url_for('calendar.display')}}{{ job.start_date[5:7] |int }}/{{ job.start_date[:4] }}/'">&larr; Back</h3>
+    <h3 style="text-align:center;cursor:pointer" onclick="window.history.back();return false;">&larr; Back</h3>
 </div>
 {% endblock body %}
