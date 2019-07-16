@@ -544,7 +544,7 @@ def get_job_rows(start_date=None,end_date=None,where='',user_skills=[],is_admin=
     order by {order_by}
     """
     sql = sql.format(where=where,order_by=order_by,group_by=group_by,volunteer_skills=volunteer_skills,)
-    print(sql)
+    #print(sql)
     #import pdb;pdb.set_trace()            
     jobs = Job(g.db).query(sql)
 
