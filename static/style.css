@@ -26,6 +26,20 @@
 .participant-badge {padding:7pt;min-width:29pt;}
 .filled-bar {cursor:text;padding:3pt 0pt}
 
+/* special styling for old event listings */
+.past-event, hr.past-event{
+    background-color:#ddd;
+    color:black;
+}
+div.past-event{
+    padding-top:12pt;
+}
+
+hr.past-event{
+    padding:0;
+    margin:0;
+    border-color:black;
+}
 
 /*p {margin-top:0;margin-bottom:.4em;}*/
 

@@ -106,7 +106,7 @@ def edit_event(event_id=0):
 @table_access_required(Activity)
 def get_event_list(id=0):
     """Return a fully formatted list of events for the activity specified"""
-    
+    #import pdb;pdb.set_trace()
     id = cleanRecordID(id)
     
     event_list = ''
@@ -150,7 +150,12 @@ def get_event_recs(id):
     -- the total positions for this event
     (select coalesce(sum(job.max_positions),1) from job 
         where job.event_id = event.id) as event_max_positions,
-    coalesce(job_loc.location_name,event_loc.location_name,"TBD") as location_name
+    coalesce(job_loc.location_name,event_loc.location_name,"TBD") as location_name,
+    coalesce(
+        (select 1 from event where date(event.event_start_date,'localtime') < date('now','localtime') and event.id = job.event_id)
+     ,0) 
+    as is_past_event
+    
     from event
     join activity on activity.id = event.activity_id
     join job on job.event_id = event.id

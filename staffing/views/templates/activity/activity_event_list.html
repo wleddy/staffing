@@ -1,5 +1,5 @@
 {% for event in event_recs %}
-<div class="w3-row">
+<div class="w3-row {% if event.is_past_event == 1 %} past-event {% endif %}">
     <div class="w3-col w3-threequarter">
         <p>
             {% if event.status.lower() == "pending" %}
@@ -33,5 +33,5 @@
         </p>  
     </div>
 </div>
-<hr>
+<hr class="{% if event.is_past_event == 1 %} past-event {% endif %}">
 {% endfor %}
