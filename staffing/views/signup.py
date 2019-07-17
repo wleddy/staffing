@@ -49,10 +49,10 @@ def help():
 def more_info(activity_id=0):
     activity_id = cleanRecordID(activity_id)
     
-    if not g.user:
-        ## get login first
-        flash("You need to log in or create an account")
-        return redirect(url_for('login.login')+ '?next={}{}'.format(url_for('signup.more_info'),activity_id))
+    # if not g.user:
+    #     ## get login first
+    #     flash("You need to log in or create an account")
+    #     return redirect(url_for('login.login')+ '?next={}{}'.format(url_for('signup.more_info'),activity_id))
         
     if activity_id > 0:
         g._more_info_activity_id = activity_id
@@ -105,7 +105,6 @@ def display():
 @mod.route('/signup/<int:job_id>',methods=['GET','POST',])
 @mod.route('/signup/',methods=['GET','POST',])
 @mod.route('/signup',methods=['GET','POST',])
-@login_required
 def signup(job_id=None):
     """Add or remove a signup
     May come from a modal dialog"""
@@ -116,6 +115,21 @@ def signup(job_id=None):
     event = None
     user = None
     filled_positions = 0
+    job_id = cleanRecordID(request.form.get('id',job_id))
+    
+    job = Job(g.db).get(job_id)
+    if not job:
+        return 'failure: That is not a valid job id'
+    
+    event = Event(g.db).get(job.event_id)
+    if not event:
+        return 'failure: That is not a valid event id'
+
+    if not g.user:
+        ## get login first
+        flash("You need to log in or create an account")
+        return redirect(url_for('login.login')+ '?next={}{}'.format(url_for('signup.more_info'),event.activity_id))
+        
         
     # get user_id
     user_id = None
@@ -126,21 +140,7 @@ def signup(job_id=None):
             return 'failure: That is not a valid user id'
     else:
         redirect(abort(404))
-        
-    # setup for input form
-    if job_id == None and request.form:
-        job_id = request.form.get('id',-1)
-        
-    job_id = cleanRecordID(job_id)
-    
-    job = Job(g.db).get(job_id)
-    if not job:
-        return 'failure: That is not a valid job id'
-    
-    event = Event(g.db).get(job.event_id)
-    if not event:
-        return 'failure: That is not a valid event id'
-            
+                    
     job_data = get_job_rows(None,None,"job.id = {}".format(job.id),[],is_admin=True)
     if job_data:
         job_data = job_data[0]
