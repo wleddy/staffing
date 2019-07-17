@@ -530,7 +530,12 @@ def get_job_rows(start_date=None,end_date=None,where='',user_skills=[],is_admin=
         where job.id = user_job.job_id and job.event_id = event.id and {where}) 
         as job_filled_positions,
     -- 1 if a volunteer job, else 0
-    coalesce((select 1 from job_role where job_role.role_id in (6,3) and job_role.job_id = job.id),0) as is_volunteer_job
+    coalesce((select 1 from job_role where job_role.role_id in (6,3) and job_role.job_id = job.id),0) as is_volunteer_job,
+    coalesce(
+        (select 1 from event where date(event.event_start_date,'localtime') < date('now','localtime') and event.id = job.event_id)
+     ,0) 
+    as is_past_event
+    
     
     from job
     join event on event.id = job.event_id
