@@ -60,6 +60,15 @@
             <div style="padding-right:6pt;">
                 {{ job.event_description | render_markdown }}
             </div>
+            <div>
+            <p class="w3-medium">Would you like to help? 
+            {% if job.is_past_event == 0 %}
+               <a href="{{url_for('signup.more_info')}}{{ job.activity_id }}/">Click here to Volunteer...</a></p>
+            {% else %}
+                <a href="{{url_for('signup.display')}}">Click here to Volunteer...</a></p>
+            {% endif %}
+            </div>
+            
         </div>
         {% if map_html %}
         <div id="map" class="w3-col w3-half w3-card-2">
