@@ -51,9 +51,6 @@
                 {% set user_data_list = job.participants[job.job_id]['user_data'] %}
                 {% endif %}
                 <div class="w3-small">
-                {% if job.user_job_positions %}
-                    <p>You have signed up for this job</p>
-                {% endif %}
                 {% if is_admin and  user_data_list %}
                     <p style="margin:10pt"> 
                         <strong>Signed up:</strong>
