@@ -86,35 +86,38 @@ def _before():
         return abort(404)
         
     #import pdb;pdb.set_trace()
-    session.permanent = True
+    if 'static' not in request.url:
+        # this is not needed for static requests
+        
+        session.permanent = True
     
-    get_db()
+        get_db()
         
-    shotglass.set_template_dirs(app)
+        shotglass.set_template_dirs(app)
         
-    # Is the user signed in?
-    g.user = None
-    if 'user_id' in session and 'user' in session:
-        # Refresh the user session
-        setUserStatus(session['user'],cleanRecordID(session['user_id']))
+        # Is the user signed in?
+        g.user = None
+        if 'user_id' in session and 'user' in session:
+            # Refresh the user session
+            setUserStatus(session['user'],cleanRecordID(session['user_id']))
         
         
-    g.admin = Admin(g.db) # This is where user access rules are stored
+        g.admin = Admin(g.db) # This is where user access rules are stored
     
-    #Events
-    # a header row must have the some permissions or higher than the items it heads
-    g.admin.register(Event,url_for('event.display'),display_name='Staffing Admin',header_row=True,minimum_rank_required=500,roles=['admin','event manager'])
-    g.admin.register(Event,url_for('event.display'),display_name='Events',add_to_menu=False,minimum_rank_required=500,roles=['admin','event manager'])
-    g.admin.register(Activity,url_for('activity.display'),display_name='Activities',minimum_rank_required=500,roles=['admin','event manager'])
-    g.admin.register(Job,url_for('signup.roster'),display_name='',minimum_rank_required=80,add_to_menu=False)
-    #location
-    g.admin.register(Location,url_for('location.display'),display_name='Locations',minimum_rank_required=500,roles=['admin','event manager'])
-    g.admin.register(ActivityType,url_for('activity_type.display'),display_name='Activity Types',minimum_rank_required=500,roles=['admin','event manager'])
-    g.admin.register(EventDateLabel,url_for('event_date_label.display'),display_name='Date Labels',minimum_rank_required=500,roles=['admin','event manager'])
+        #Events
+        # a header row must have the some permissions or higher than the items it heads
+        #import pdb;pdb.set_trace()
+        g.admin.register(Activity,url_for('activity.display'),display_name='Staffing Admin',header_row=True,minimum_rank_required=500,roles=['admin','activity manager'])
+        g.admin.register(Activity,url_for('activity.display'),display_name='Activities',minimum_rank_required=500,roles=['admin','activity manager'])
+        g.admin.register(Job,url_for('signup.roster'),display_name='',minimum_rank_required=80,add_to_menu=False)
+        #location
+        g.admin.register(Location,url_for('location.display'),display_name='Locations',minimum_rank_required=500,roles=['admin','activity manager'])
+        g.admin.register(ActivityType,url_for('activity_type.display'),display_name='Activity Types',minimum_rank_required=500,roles=['admin','activity manager'])
+        g.admin.register(EventDateLabel,url_for('event_date_label.display'),display_name='Date Labels',minimum_rank_required=500,roles=['admin','activity manager'])
+        g.admin.register(Event,url_for('event.display'),display_name='Events',add_to_menu=False,minimum_rank_required=500,roles=['admin','activity manager'])
+        #g.admin.register(UserJob,url_for('attendance.display'),display_name='Attendance',minimum_rank_required=500,roles=['admin','activity manager'])
 
-    #g.admin.register(UserJob,url_for('attendance.display'),display_name='Attendance',minimum_rank_required=500,roles=['admin','event manager'])
-
-    shotglass.user_setup() # g.admin now holds access rules Users, Prefs and Roles
+        shotglass.user_setup() # g.admin now holds access rules Users, Prefs and Roles
 
 
 @app.teardown_request
@@ -123,9 +126,6 @@ def _teardown(exception):
         g.db.close()
 
 
-#######################
-# TODO -- the signup subdomain needs it's own error pages or maybe just it's own layout...
-#######################
 @app.errorhandler(404)
 def page_not_found(error):
     return shotglass.page_not_found(error)
