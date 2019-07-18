@@ -30,6 +30,15 @@
                         {{ job.activity_title }}
                     </p>
                     {{ job.event_staff_info | render_markdown }}
+                <div class="w3-small" >
+                    <p>
+                        <strong>{{ job.event_start_label }}</strong>: {{ job.event_start_date | local_time_string }}  &ndash; 
+                        <strong>{{ job.event_end_label }}</strong>: {{ job.event_end_date | local_time_string }}
+                        <br>
+                        <strong>{{ job.service_start_label }}</strong>: {{ job.service_start_date | local_time_string }}  &ndash; 
+                        <strong>{{ job.service_end_label }}</strong>: {{ job.service_end_date | local_time_string }}
+                    </p>
+                </div>
                 </td>
                 <td>
                    <p>Client: {{ job.client_contact }}<br>Phone: {{job.client_phone}}<br>email: {{ job.client_email}}</p>
