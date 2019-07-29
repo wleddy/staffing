@@ -2,15 +2,149 @@
 
 {% from "_form_helpers.html" import input_field, select_field, radio_field, checkbox_field, label_only %}
 
+{% block head %}
+    {{ super() }}
+    <script src="https://api.mqcdn.com/sdk/place-search-js/v1.0.0/place-search.js"></script>
+    <link type="text/css" rel="stylesheet" href="https://api.mqcdn.com/sdk/place-search-js/v1.0.0/place-search.css"/>
+        
+    <script type="text/javascript">
+      window.onload = function() {
+        let ps = placeSearch({
+          key: '{{ site_config["MAPQUEST_ACCESS_KEY"] }}',
+          container: document.querySelector('#search-input'),
+          useDeviceLocation: true,
+          collection: [
+            'address',
+            'adminArea',
+            'poi',
+            'airport',
+          ],
+          limit: 5
+        });
+        
+        let markers = [];
+        
+        ps.on('change', (e) => {
+           ps.close();
+           markers
+             .forEach(function(marker, markerIndex) {
+               if (markerIndex === e.resultIndex) {
+                 markers = [marker];
+                 marker.setOpacity(1);
+                 marker.bindPopup(e.result.name);
+                 map.setView(e.result.latlng, 19);
+                 $('#map').css('z-index',2000);
+                 updateFormLocationFields("latitude", "longitude", e.result.latlng.lat, e.result.latlng.lng);
+                theID = document.getElementById("street_address");
+                if(theID != null){theID.value = e.result.name;}
+                theID = document.getElementById("city");
+                if(theID != null){theID.value = e.result.city;}
+                theID = document.getElementById("state");
+                if(theID != null){theID.value = e.result.stateCode;}
+                theID = document.getElementById("zip");
+                if(theID != null){theID.value = e.result.postalCode;}
+                 
+               } else {
+                 removeMarker(marker);
+               }
+             });
+         });
+
+         ps.on('results', (e) => {
+           markers.forEach(removeMarker);
+           markers = [];
+
+           if (e.results.length === 0) {
+             map.setView(new L.LatLng(0, 0), 2);
+             return;
+           }
+
+           e.results.forEach(addMarker);
+           findBestZoom();
+           $('#map').css('z-index',-30);
+           
+         });
+
+         ps.on('cursorchanged', (e) => {
+           markers
+             .forEach(function(marker, markerIndex) {
+               if (markerIndex === e.resultIndex) {
+                 marker.setOpacity(1);
+                 marker.setZIndexOffset(1000);
+               } else {
+                 marker.setZIndexOffset(0);
+                 marker.setOpacity(0.5);
+               }
+             });
+         });
+
+         ps.on('clear', () => {
+           console.log('cleared');
+           map.setView(new L.LatLng(0, 0), 2);
+           markers.forEach(removeMarker);
+         });
+
+         ps.on('error', (e) => {
+           console.log(e);
+         });
+
+         function addMarker(result) {
+           let marker = L.marker(result.latlng, {opacity: .4,draggable:true});
+           setDragFunction(marker);
+           marker.addTo(map);
+           markers.push(marker);
+         }
+
+         function removeMarker(marker) {
+           map.removeLayer(marker);
+         }
+
+         function findBestZoom() {
+           let featureGroup = L.featureGroup(markers);
+           map.fitBounds(featureGroup.getBounds().pad(0.5), { animate: false });
+         }
+         
+     	function setDragFunction(theMarker){
+     		// 'draggable' is in the 'options' object
+             if (theMarker.options.draggable === true) {
+                 // Add drag event handler
+                 theMarker.on('dragend', function (event) {
+                     var marker = event.target;
+                     var position = marker.getLatLng();
+
+                     updateFormLocationFields("latitude", "longitude", position.lat, position.lng);
+                 });
+     		}
+         }
+         function updateFormLocationFields(latitudeFieldId, longitudeFieldId, latitude, longitude, NSheadingFieldID, EWheadingFieldID, NSheading, EWheading) {
+             if (latitudeFieldId !== undefined && longitudeFieldId !== undefined) {
+     			var theID = document.getElementById(latitudeFieldId);
+     			if(theID != null){theID.value = latitude;}
+     			theID = document.getElementById(longitudeFieldId);
+     			if(theID != null){theID.value = longitude;}
+     			theID = document.getElementById(NSheadingFieldID);
+     			if(theID != null){theID.value = NSheading;}
+     			theID = document.getElementById(EWheadingFieldID);
+     			if(theID != null){theID.value = EWheading;}
+             }
+         }
+      }
+    </script>
+      
+{% endblock head %}
+
 {% block fieldset %}
 <fieldset>
     <p>{{ input_field(rec.id,"id",type="hidden",default=0)}}</p>
-    <p>{{ input_field(rec.location_name,'location_name',req=True)}}</p>
+    <p>{{ input_field(rec.location_name,'location_name',req=True,extras="autofocus")}}</p>
+    {% if not rec.street_address %}
+    <p>{{ input_field('','search-input',type="search",label="Search for an address...",id="search-input",placeholder="Start a Search")}}</p>
+    {% endif %}
     <p>{{ input_field(rec.business_name,'business_name')}}</p>
-    <p>{{ input_field(rec.street_address,'street_address')}}</p>
-    <p class="w3-row w3-half" style="padding-right:3pt;">{{ input_field(rec.city,'city')}}</p>
-    <p class="w3-row w3-quarter" style="padding-right:3pt;padding-left:3pt;">{{ input_field(rec.state,'state')}}</p>
-    <p class="w3-row w3-quarter" style="padding-left:3pt;">{{ input_field(rec.zip,'zip')}}</p>
+    <p>{{ input_field(rec.street_address,'street_address',id="street_address")}}</p>
+    <p class="w3-row w3-half" style="padding-right:3pt;">{{ input_field(rec.city,'city',id="city")}}</p>
+    <p class="w3-row w3-quarter" style="padding-right:3pt;padding-left:3pt;">{{ input_field(rec.state,'state',id="state")}}</p>
+    <p class="w3-row w3-quarter" style="padding-left:3pt;">{{ input_field(rec.zip,'zip',id="zip")}}</p>
     <p class="w3-row w3-half" style="padding-right:3pt;">{{ input_field(rec.lat,'lat',label="Latitude", id="latitude" )}}</p>
     <p class="w3-row w3-half" style="padding-left:3pt;">{{ input_field(rec.lng,'lng',label="Longitude", id="longitude" )}}</p>
     <p class="w3-row">{{ label_only("Drag the marker below to set the Latitude and Longitude for this location")}}</p>

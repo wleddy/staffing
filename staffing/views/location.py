@@ -62,7 +62,7 @@ def edit(id=0):
         
         
     map_html = None
-
+    map_data = None
     #get the map for this
     # make a list of dict for the location
 #     marker["dragable"] = point.get('dragable',False)
@@ -75,14 +75,16 @@ def edit(id=0):
 #     # for getting lat and lng values interactively from map
 #     marker['latitudeFieldId'] = point.get('latitudeFieldId')
 #     marker['longitudeFieldId'] = point.get('longitudeFieldId')
-    
-    map_data = {'lat':rec.lat,'lng':rec.lng,
-    'title':rec.location_name,
-    'UID':rec.id,
-    'draggable':True,
-    'latitudeFieldId':'latitude',
-    'longitudeFieldId':'longitude',
-    }
+    map_data = None
+    if rec.street_address:
+        map_data = {'lat':rec.lat,'lng':rec.lng,
+        'title':rec.location_name,
+        'UID':rec.id,
+        'draggable':True,
+        'latitudeFieldId':'latitude',
+        'longitudeFieldId':'longitude',
+        }
+        
     map_html = simple_map(map_data,target_id='map')
         
     return render_template('location_edit.html',rec=rec,map_html=map_html,locations=locations)
