@@ -51,7 +51,7 @@
                        </p>
                        {% endif %}
                        <p>
-                           {{job.activity_description }}
+                           {{job.activity_description | render_markdown }}
                            {% if job.client_website %}<br>Event website: {{job.client_website | weblink }}{%endif%}
                        </p>
                 </div>
