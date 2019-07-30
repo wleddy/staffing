@@ -136,9 +136,11 @@
 {% block fieldset %}
 <fieldset>
     <p>{{ input_field(rec.id,"id",type="hidden",default=0)}}</p>
-    <p>{{ input_field(rec.location_name,'location_name',req=True,extras="autofocus")}}</p>
     {% if not rec.street_address %}
+    <p>{{ input_field(rec.location_name,'location_name',req=True,extras="autofocus")}}</p>
     <p>{{ input_field('','search-input',type="search",label="Search for an address...",id="search-input",placeholder="Start a Search")}}</p>
+    {% else %}
+    <p>{{ input_field(rec.location_name,'location_name',req=True)}}</p>
     {% endif %}
     <p>{{ input_field(rec.business_name,'business_name')}}</p>
     <p>{{ input_field(rec.street_address,'street_address',id="street_address")}}</p>
