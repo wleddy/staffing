@@ -1,6 +1,11 @@
 {% extends 'layout.html' %}
 {% from '_staffing_helper_macros.html' import directions_snippet %}
 
+{% block head %}
+    {{ super() }}
+    {{ map_html | safe }}
+{% endblock head %}
+
 {% block page_header %}
 <div class="w3-panel w3-card-2 w3-secondary-color">
     <h2>
@@ -71,9 +76,7 @@
             
         </div>
         {% if map_html %}
-        <div id="map" class="w3-col w3-half w3-card-2">
-            {{ map_html | safe }}
-        </div>
+        <div id="map" class="w3-col w3-half w3-card-2"></div>
         {% endif %}
     </div>
 </div>
