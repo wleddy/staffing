@@ -1,76 +1,89 @@
 {% extends 'layout.html' %}
-{% block body %}
-<style>
-    .day-col{
-        width:14.2857142857142857%;
-    }
-    .full_day_display{
-        position:absolute;
-        white-space: nowrap;
-        overflow:hidden;
-        text-overflow:ellipsis;
-        background-color:white;
-        width:14.2857142857142857%;
-        z-index:3000;
-        display:none;
-    }
-    
-    @media (min-width:993px){
-        .day-col, .full_day_display{
-            width:11.9047619047619%;
+
+{% block head %}
+    {{ super() }}
+    <style>
+        @font-face {
+          font-family: condensed-font;
+          src: url("{{ url_for('static', filename='fonts/sans_condensed.ttf')}}") format("truetype");
         }
-    }
-    .day-content{
+
+        .day-col{
+            width:14.2857142857142857%;
+        }
+        .full_day_display{
+            position:absolute;
             white-space: nowrap;
             overflow:hidden;
             text-overflow:ellipsis;
-            cursor:pointer;
-    }
-    .day-name, .month-name{
-        text-align:center;
-        font-weight:bold;
-    }
-    .month-name{
-        padding:6pt 0;
-    }
-    .calendar-contain .w3-row p.w3-col {
-        margin:0;
-    }
-    .day-cell{
-        min-height:80pt
-    }
-    .day-number{
-        text-align:right;
-        font-weight:bold;
-        padding-right:6pt;
-    }
-    .today {
-        color:white;
-        background-color:red;
-    }
-    .month_arrow{
-        text-decoration:none;
-    }
-    #coverup{
-        position:absolute;
-        top:0;
-        left:0;
-        display:none;
-        height:1000pt;
-        width:100%;
-        z-index:2000;
-    }
-</style>
+            background-color:white;
+            width:14.2857142857142857%;
+            z-index:3000;
+            display:none;
+        }
+    
+        @media (min-width:993px){
+            .day-col, .full_day_display{
+                width:11.9047619047619%;
+            }
+        }
+        .day-content{
+                font-family: condensed-font, sans-serif;
+                font-size:1.25em;
+                line-height:1;
+                white-space: nowrap;
+                overflow:hidden;
+                text-overflow:ellipsis;
+                cursor:pointer;
+        }
+        .day-name, .month-name{
+            text-align:center;
+            font-weight:bold;
+        }
+        .month-name{
+            padding:6pt 0;
+        }
+        .calendar-contain .w3-row p.w3-col {
+            margin:0;
+        }
+        .day-cell{
+            min-height:80pt
+        }
+        .day-number{
+            text-align:right;
+            font-weight:bold;
+            padding-right:6pt;
+        }
+        .today {
+            color:white;
+            background-color:red;
+        }
+        .month_arrow{
+            text-decoration:none;
+        }
+        #coverup{
+            position:absolute;
+            top:0;
+            left:0;
+            display:none;
+            height:1000pt;
+            width:100%;
+            z-index:2000;
+        }
+    </style>
 
-<script>
-    function show_full_day(day_number){
-        $('#full_day_display_'+day_number.toString()).show()
-        $('#coverup').show()
-    }
-    function hide_full_day(){
-        $('#coverup, .full_day_display').hide()
-    }
-</script>
+    <script>
+        function show_full_day(day_number){
+            $('#full_day_display_'+day_number.toString()).show()
+            $('#coverup').show()
+        }
+        function hide_full_day(){
+            $('#coverup, .full_day_display').hide()
+        }
+    </script>
+{% endblock head %}
+
+{% block body %}
 <div id="coverup" onclick="hide_full_day()">&nbsp;</div>
 {% if cal_list %}
     {% set _ = calendar.setfirstweekday(calendar.SUNDAY) %}
@@ -120,7 +133,7 @@
                         {% endfor %}
                         {# lump all the extra events into a "more" line #}
                         {% if events_today > 3 %}
-                        <p class="day-content w3-primary-color" onclick="show_full_day({{day_number}})">&amp; {{ cal_list[week][day][2] | length - 2}} more...</p>
+                        <p class=" w3-primary-color" onclick="show_full_day({{day_number}})">&amp; {{ cal_list[week][day][2] | length - 2}} more...</p>
                         {% endif %}
                     </div>
                 </div>
