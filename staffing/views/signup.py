@@ -261,7 +261,7 @@ def roster(display_end_days=0):
         if rec and rec.id not in user_skills:
             user_skills.append(rec.id)
                 
-    order_by = " sort_by_date_and_title, is_volunteer_job " if as_spreadsheet else None
+    order_by = " sort_by_date_and_title, is_volunteer_job " 
     
     jobs = get_job_rows(start_date,end_date,"",user_skills,is_admin,order_by=order_by)
     return render_template('roster.html',jobs=jobs,is_admin=is_admin,display_end_days=display_end_days,as_spreadsheet=as_spreadsheet,)
