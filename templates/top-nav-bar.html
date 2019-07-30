@@ -7,8 +7,8 @@
         <div class="w3-dropdown-hover w3-bar-block">
             <a href="javascript:void(0)" class="w3-button w3-border w3-primary-color w3-drop-menu-section-hover-color">Home</a>
             <div class="w3-dropdown-content">
-                <a  class="w3-bar-item w3-button w3-border w3-drop-menu-color w3-drop-menu-hover-color" href="/">Signup Home</a>
-                <a  class="w3-bar-item w3-button w3-border w3-drop-menu-color w3-drop-menu-hover-color" href="http://sacbike.org">SABA Home</a>
+                <a  class="w3-bar-item w3-button w3-border w3-drop-menu-color w3-drop-menu-hover-color" href="/">&nbsp;&nbsp;Signup Home</a>
+                <a  class="w3-bar-item w3-button w3-border w3-drop-menu-color w3-drop-menu-hover-color" href="http://sacbike.org">&nbsp;&nbsp;SABA Home</a>
             </div>
         </div>
           <a class="w3-bar-item w3-button w3-border w3-primary-color w3-secondary-hover-color" href="{{ url_for('calendar.display') }}">Calendar</a>
@@ -18,9 +18,9 @@
         <div class="w3-dropdown-hover w3-bar-block">
             <a href="javascript:void(0)" class="w3-button w3-border w3-primary-color w3-drop-menu-section-hover-color"><strong>Help</strong></a>
             <div class="w3-dropdown-content">
-                <a  class="w3-bar-item w3-button w3-border w3-drop-menu-color w3-drop-menu-hover-color" href="{{ url_for('www.about')}}">About</a>
-                <a  class="w3-bar-item w3-button w3-border w3-drop-menu-color w3-drop-menu-hover-color" href="{{ url_for('www.docs')}}">Docs</a>
-                <a  class="w3-bar-item w3-button w3-border w3-drop-menu-color w3-drop-menu-hover-color" href="http://sacbike.org/contact/">Contact Us</a>
+                <a  class="w3-bar-item w3-button w3-border w3-drop-menu-color w3-drop-menu-hover-color" href="{{ url_for('www.about')}}">&nbsp;&nbsp;About</a>
+                <a  class="w3-bar-item w3-button w3-border w3-drop-menu-color w3-drop-menu-hover-color" href="{{ url_for('www.docs')}}">&nbsp;&nbsp;Docs</a>
+                <a  class="w3-bar-item w3-button w3-border w3-drop-menu-color w3-drop-menu-hover-color" href="http://sacbike.org/contact/">&nbsp;&nbsp;Contact Us</a>
             </div>
         </div>
         {% if g.admin and g.admin.has_access(g.user)%}
@@ -33,7 +33,7 @@
                         <button class="w3-button w3-border w3-primary-color w3-drop-menu-section-hover-color"><strong>{{item['display_name']}}</strong></button>
                         <div class="w3-dropdown-content w3-card-4">
                     {% else %}
-                        <a  class="w3-bar-item w3-button w3-border w3-drop-menu-color w3-drop-menu-hover-color" href="{{item['url']}}">{{item['display_name']}}</a>
+                        <a  class="w3-bar-item w3-button w3-border w3-drop-menu-color w3-drop-menu-hover-color" href="{{item['url']}}">&nbsp;&nbsp;{{item['display_name']}}</a>
                     {% endif %}
                 {% endif %}
             {% endfor %}
