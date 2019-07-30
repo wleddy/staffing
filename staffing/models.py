@@ -220,7 +220,7 @@ class Location(SqliteTable):
     def __init__(self,db_connection):
         super().__init__(db_connection)
         self.table_name = 'location'
-        self.order_by_col = 'location_name, id'
+        self.order_by_col = 'lower(location_name), id'
         self.defaults = {}
         
     def create_table(self):
