@@ -48,6 +48,7 @@ def initalize_all_tables(db=None):
     
 def get_db(filespec=None):
     """Return a connection to the database.
+    
     If the db path does not exist, create it and initialize the db"""
     
     if not filespec:
@@ -70,7 +71,10 @@ def get_db(filespec=None):
 
 @app.context_processor
 def inject_site_config():
-    # Add 'site_config' dict to template context
+    """ Add 'site_config' dict to template context 
+    
+    site_config will contain the settings specific to the current site
+    """
     c = shotglass.get_site_config()
     return {'site_config':c}
     

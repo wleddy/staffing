@@ -111,7 +111,10 @@ class Event(SqliteTable):
         
         
     def select(self,**kwargs):
-        """Include Activity fields"""
+        """Extend `select` to include Activity fields in the result set
+        """
+        
+        
         sql="""select event.*, activity.title as activity_title, 
         activity.description as activity_description ,
         coalesce(nullif(event.calendar_title,''),activity.title) as event_title,
