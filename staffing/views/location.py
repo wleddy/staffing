@@ -35,7 +35,8 @@ def edit(id=0):
     map_html = None
     map_data = None
     search_field_id = None
-    
+    location = Location(g.db)
+        
     id = cleanRecordID(id)
     if request.form:
         id = cleanRecordID(request.form.get("id"))
