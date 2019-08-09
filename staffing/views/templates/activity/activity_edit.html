@@ -17,6 +17,9 @@
             {% endif %}
         </select>
     </p>
+    <p>{{ label_only(label="Additional Info (Staff View Only)")}}</p>
+    <p><textarea rows="7" name="activity_info" style="width:100%;"  >{{rec.activity_info |default('',True)}}</textarea></p>
+    
 </div>
                 
 <div class="w3-col w3-hide-small" style="width:20pt;">&nbsp;</div>

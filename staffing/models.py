@@ -9,7 +9,7 @@ class Activity(SqliteTable):
     def __init__(self,db_connection):
         super().__init__(db_connection)
         self.table_name = 'activity'
-        self.order_by_col = 'title, id'
+        self.order_by_col = 'lower(title), id'
         self.defaults = {}
         
     def create_table(self):
@@ -19,6 +19,7 @@ class Activity(SqliteTable):
         title TEXT,
         description TEXT,
         activity_type_id INTEGER
+        activity_info TEXT
         """
                 
         super().create_table(sql)
@@ -29,7 +30,7 @@ class ActivityType(SqliteTable):
     def __init__(self,db_connection):
         super().__init__(db_connection)
         self.table_name = 'activity_type'
-        self.order_by_col = 'type, id'
+        self.order_by_col = 'lower(type), id'
         self.defaults = {}
 
     def create_table(self):
