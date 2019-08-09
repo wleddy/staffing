@@ -1,0 +1,23 @@
+{% extends "form_layout.html" %}
+
+{% from "_form_helpers.html" import input_field, select_field, radio_field, checkbox_field, label_only %}
+
+{% block fieldset %}
+{% if next %}{% set next_loc = next %}{% else %}{% set next_loc = '' %}{% endif %}
+<fieldset>
+    <p>{{ input_field(rec.id,"id",type="hidden",default=0) }}</p>
+    <p>{{ input_field(next_loc,"next",type="hidden") }}</p>
+    <p>{{ input_field(rec.name,"name",label="Client Name*",req=True) }}</p>
+    <div class="w3-row">
+        <p class="w3-col w3-half">{{ input_field(rec.contact_first_name,"contact_first_name",label="Contact First Name") }}</p>
+        <p class="w3-col w3-half">{{ input_field(rec.contact_last_name,"contact_last_name",label="Contact Last Name") }}</p>
+    </div>
+    <p>{{ input_field(rec.email,"email",label="Email",req=True, type="email") }}
+    <p>{{ input_field(rec.phone,"phone",label="Phone") }}
+    <p>{{ input_field(rec.address,"address") }}</p>
+    <p>{{ input_field(rec.city,"city") }}</p>
+    <p>{{ input_field(rec.state,"state") }}</p>
+    <p>{{ input_field(rec.zip,"zip") }}</p>
+    
+</fieldset>
+{% endblock %}

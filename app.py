@@ -6,7 +6,7 @@ from shotglass2.takeabeltof.jinja_filters import register_jinja_filters
 from shotglass2.takeabeltof.utils import cleanRecordID
 from shotglass2.users.views.login import setUserStatus
 from shotglass2.users.admin import Admin
-from staffing.models import Activity, Event, Job, Location, ActivityType, UserJob, EventDateLabel
+from staffing.models import Activity, Event, Job, Location, ActivityType, UserJob, EventDateLabel, Client
 
 # Create app
 # setting static_folder to None allows me to handle loading myself
@@ -119,6 +119,7 @@ def _before():
         g.admin.register(ActivityType,url_for('activity_type.display'),display_name='Activity Types',minimum_rank_required=500,roles=['admin','activity manager'])
         g.admin.register(EventDateLabel,url_for('event_date_label.display'),display_name='Date Labels',minimum_rank_required=500,roles=['admin','activity manager'])
         g.admin.register(Event,url_for('event.display'),display_name='Events',add_to_menu=False,minimum_rank_required=500,roles=['admin','activity manager'])
+        g.admin.register(Client,url_for('client.display'),display_name='Clients',minimum_rank_required=500,roles=['admin','activity manager'])
         #g.admin.register(UserJob,url_for('attendance.display'),display_name='Attendance',minimum_rank_required=500,roles=['admin','activity manager'])
 
         shotglass.user_setup() # g.admin now holds access rules Users, Prefs and Roles
@@ -142,7 +143,7 @@ def server_error(error):
 # Direct to a specific server for static content
 app.add_url_rule('/static/<path:filename>','static',shotglass.static)
 
-from staffing.views import signup, calendar, event, activity,location, job, activity_type, attendance, event_date_label
+from staffing.views import signup, calendar, event, activity,location, job, activity_type, attendance, event_date_label, client
 app.register_blueprint(signup.mod)
 app.register_blueprint(activity.mod)
 app.register_blueprint(event.mod)
@@ -152,6 +153,7 @@ app.register_blueprint(location.mod)
 app.register_blueprint(activity_type.mod)
 app.register_blueprint(attendance.mod)
 app.register_blueprint(event_date_label.mod)
+app.register_blueprint(client.mod)
 
 ## Setup the routes for users
 shotglass.register_users(app)

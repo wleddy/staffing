@@ -47,7 +47,7 @@ class Client(SqliteTable):
     def __init__(self,db_connection):
         super().__init__(db_connection)
         self.table_name = 'client'
-        self.order_by_col = 'name, id'
+        self.order_by_col = 'lower(name), id'
         self.defaults = {}
 
     def create_table(self):

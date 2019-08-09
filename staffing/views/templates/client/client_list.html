@@ -1,0 +1,39 @@
+{% extends "layout.html" %}
+{% block title %}{{ g.title }}{% endblock %}
+{% block body %}
+  	<p id="addRecord"><a href="{{ g.editURL }}0">Add a new record</a>
+    &nbsp;&nbsp;Find in:
+    <select id="col_select">
+        <option value="0">Id</option>
+        <option value="1" selected >Name</option>
+        <option value="2">Contact</option>
+        <option value="3">Phone</option>
+        <option value="4">Email</option>
+    </select>
+        &nbsp;&nbsp;<input id="search_input" type="text" name="user_name" value="" class="w3-border" placeholder="Type anything" 
+        onkeyup="if (this.value.length > 0){ table_search('search_input','table_list',$('#col_select').val());}else{reset_table_search('table_list')}"
+        />
+    </p>
+	{%if recs %}
+		<table id="table_list" class="datatable w3-table w3-striped w3-hoverable">
+		<tr  class="w3-primary-color">
+			<th>Id</th>
+			<th>Name</th>
+			<th>Contact</th>
+			<th class="w3-hide-small">Phone</th>
+			<th class="w3-hide-small">Email</th>
+		</tr>
+		{% for rec in recs %}
+	    <tr>
+			<td onclick="window.location='{{ g.editURL }}{{rec.id}}/'">{{ rec.id }}</td>
+			<td onclick="window.location='{{ g.editURL }}{{rec.id}}/'">{{ rec.name }}</td>
+			<td onclick="window.location='{{ g.editURL }}{{rec.id}}/'">{{ rec.contact_first_name }} {{ rec.contact_last_name}}</td>
+			<td onclick="window.location='{{ g.editURL }}{{rec.id}}/'" class="w3-hide-small">{{ rec.phone|default("",true) }}</td>
+			<td onclick="window.location='{{ g.editURL }}{{rec.id}}/'" class="w3-hide-small">{{ rec.email|default("",true) }}</td>
+		</tr>
+		{% endfor %}
+	  </table>
+  	{% else %}
+    	<p><em>No records here so far</em></p>
+	{% endif %}
+{% endblock %}
