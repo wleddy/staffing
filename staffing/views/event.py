@@ -4,7 +4,7 @@ from shotglass2.shotglass import get_site_config
 from shotglass2.users.admin import login_required, table_access_required
 from shotglass2.takeabeltof.utils import render_markdown_for, printException, cleanRecordID
 from shotglass2.takeabeltof.date_utils import date_to_string, getDatetimeFromString, local_datetime_now
-from staffing.models import Event, Location, ActivityType, Client, EventDateLabel, Job, UserJob
+from staffing.models import Event, Location, ActivityType, Client, EventDateLabel, Job, JobRole, UserJob
 from shotglass2.users.models import User
 from staffing.views.job import get_job_list_for_event, coerce_datetime
 
@@ -212,6 +212,7 @@ def manage_event(id=0):
                     #make a new event record
                     new_event_rec = event_table.new()
                     event_table.update(new_event_rec,orig_event_dict)
+                    event_table.save(new_event_rec)
                 else:
                     new_event_rec=event_rec # to make it easier to refer by either name
                     
@@ -223,6 +224,8 @@ def manage_event(id=0):
             
             
                 job_recs = job_table.select(where="event_id = {}".format(event_rec.id))
+                #import pdb;pdb.set_trace()
+                
                 if job_recs:
                     for job_rec in job_recs:
                         ## copy or move
@@ -230,7 +233,18 @@ def manage_event(id=0):
                         if action == 'copy':
                             job_rec.id = None #create a new job record
                             job_rec.event_id = new_event_rec.id
-                    
+                            job_table.save(job_rec)
+                            
+                            #copy the skills required
+                            job_role_table = JobRole(g.db)
+                            job_roles =job_role_table .select(where='job_id = {}'.format(orig_job_id))
+                            if job_roles:
+                                for job_role in job_roles:
+                                    new_job_role = job_role_table.new()
+                                    new_job_role.role_id = job_role.role_id
+                                    new_job_role.job_id = job_rec.id
+                                    job_role_table.save(new_job_role)
+                                    
                         job_rec.start_date = dup_date + job_rec.start_date[10:]
                         job_rec.end_date = dup_date + job_rec.end_date[10:]
                         job_table.save(job_rec)
