@@ -9,7 +9,7 @@
             {% else %}
                  <img src="{{ url_for('static',filename='images/check_mark.png')}}" alt="{{ event.status }}"/>
             {% endif %}
-            <strong>{{event.event_title}}</strong> <br>
+            <strong>{{event.calendar_title}}</strong> <br>
             {% if event.event_start_date %}{{event.event_start_date | default('Not Set',True) | short_day_and_date_and_time_string }}
             {% else %}{{event.job_start_date | default('Not Set',True) | short_day_and_date_and_time_string }}
             {% endif %}<br>

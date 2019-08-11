@@ -5,20 +5,40 @@
 {#             In such a case, the content will be escaped rather than normal html #}
 
 {% macro directions_snippet(job) %}
+{% set lat = None %}
+{% set lng = None %}
 {% if job and job.job_loc_lat and job.job_loc_lng %}
+    {% set lat = job.job_loc_lat %}
+    {% set lng = job.job_loc_lng %}
+{% endif %}
+{% if job and job.lat and job.lng %}
+    {% set lat = job.lat %}
+    {% set lng = job.lng %}
+{% endif%}
+{% if lat and lng %}
 <p><em>Directions:</em><br>
-&nbsp;&nbsp;<a href="https://www.google.com/maps/dir/?api=1&destination={{ job.job_loc_lat}},{{ job.job_loc_lng }}" target="_blank">Google Maps</a>
+&nbsp;&nbsp;<a href="https://www.google.com/maps/dir/?api=1&destination={{ lat}},{{ lng }}" target="_blank">Google Maps</a>
 <br>
-&nbsp;&nbsp;<a href="http://maps.apple.com/?daddr={{job.job_loc_lat}},{{job.job_loc_lng }}" target="_blank">Apple Maps</a>
+&nbsp;&nbsp;<a href="http://maps.apple.com/?daddr={{lat}},{{lng }}" target="_blank">Apple Maps</a>
 </p>
 {% endif %}
 {% endmacro %}
 
 {# same thing in a one line format #}
 {% macro directions_snippet_one_line(job) %}
+{% set lat = None %}
+{% set lng = None %}
 {% if job and job.job_loc_lat and job.job_loc_lng %}
-<p><em>Directions:</em> <a href="https://www.google.com/maps/dir/?api=1&destination={{ job.job_loc_lat}},{{ job.job_loc_lng }}" target="_blank">Google Maps</a>
-&nbsp;&nbsp;<a href="http://maps.apple.com/?daddr={{job.job_loc_lat}},{{job.job_loc_lng }}" target="_blank">Apple Maps</a>
+    {% set lat = job.job_loc_lat %}
+    {% set lng = job.job_loc_lng %}
+{% endif%}
+{% if job and job.lat and job.lng %}
+    {% set lat = job.lat %}
+    {% set lng = job.lng %}
+{% endif%}
+{% if lat and lng %}
+<p><em>Directions:</em> <a href="https://www.google.com/maps/dir/?api=1&destination={{ lat}},{{ lng }}" target="_blank">Google Maps</a>
+&nbsp;&nbsp;<a href="http://maps.apple.com/?daddr={{lat}},{{lng }}" target="_blank">Apple Maps</a>
 </p>
 {% endif %}
 {% endmacro %}

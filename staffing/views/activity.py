@@ -139,18 +139,55 @@ def delete(id=0):
     return redirect(g.listURL)
     
     
-def get_event_recs(id):
-    sql="""select event.id as event_id, event.status,
-    coalesce(nullif(event.calendar_title,''),activity.title) as event_title,
+def get_event_recs(activity_id=None,**kwargs):
+    """Return a list of event records or None
+     if 'event_id' is in kwargs, search for a single event, else 
+     search for all events associated with activity_id.
+     
+    
+    """
+    
+    activity_id = activity_id if activity_id else 0
+    where = "event.activity_id = {}".format(activity_id)
+    
+    event_id = kwargs.get('event_id')
+    if event_id:
+        where = "event.id = {}".format(event_id)
+        
+    sql="""select event.id as event_id, 
+    event.status,
+    event.activity_id,
+    coalesce(nullif(event.calendar_title,''),activity.title) as calendar_title,
     (select min(job.start_date) from job where job.event_id = event.id) as job_start_date,
+
     event.event_start_date,
+    event.event_end_date,
+    event.event_start_date_label_id,
+    coalesce((select label from event_date_label where id = event.event_start_date_label_id ),'Event Start') as event_start_label,
+    event.event_end_date_label_id,
+    coalesce((select label from event_date_label where id = event.event_end_date_label_id ),'Event End') as event_end_label,
+    event.service_start_date,
+    event.service_end_date,
+    event.service_start_date_label_id,
+    coalesce((select label from event_date_label where id = event.service_start_date_label_id ),'Service Start') as service_start_label,
+    event.service_end_date_label_id,
+    coalesce((select label from event_date_label where id = event.service_end_date_label_id ),'Service End') as service_end_label,
+
     -- the number of positions filled in this event
     (select coalesce(sum(user_job.positions),0) from user_job
         where user_job.job_id in (select id from job where job.event_id = event.id)) as event_filled_positions,
     -- the total positions for this event
-    (select coalesce(sum(job.max_positions),1) from job 
-        where job.event_id = event.id) as event_max_positions,
-    coalesce(job_loc.location_name,event_loc.location_name,"TBD") as location_name,
+    (select coalesce(sum(job.max_positions),0) from job where job.event_id = event.id) as event_max_positions,
+    coalesce(job.location_id,event.location_id) as event_location_id,
+    location.location_name,
+    location.lat,
+    location.lng,
+    location.street_address,
+    location.city,
+    location.state,
+    location.zip,
+    coalesce(nullif(event.service_type,''),(select type from activity_type where activity_type.id = activity.activity_type_id ),"Activity Type") as service_type,
+    coalesce(nullif(event.description,''),activity.description) as event_description,
     coalesce(
         (select 1 from event where date(event.event_start_date,'localtime') < date('now','localtime') and event.id = job.event_id)
      ,0) 
@@ -159,12 +196,11 @@ def get_event_recs(id):
     from event
     join activity on activity.id = event.activity_id
     left join job on event.id = job.event_id
-    left join location as event_loc on event_loc.id = event.location_id
-    left join location as job_loc on job_loc.id = job.location_id
-    where event.activity_id = {}
+    join location on event_location_id = location.id
+    where {where}
     group by event.event_start_date, job_start_date
     order by event.event_start_date DESC
-    """.format(id)
+    """.format(where=where)
     event_recs = Event(g.db).query(sql)
     
     return event_recs

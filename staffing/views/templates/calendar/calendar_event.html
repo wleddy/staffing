@@ -10,7 +10,7 @@
 <div class="w3-panel w3-card-2 w3-secondary-color">
     <h2>
         <img src="{{url_for('static',filename='images/bicycle.png')}}" />
-        {{ job.service_type }}
+        {{ event.service_type }}
     </h2>
 </div>
 {% endblock page_header %}
@@ -19,29 +19,29 @@
 <div class="w3-panel w3-card-2 w3-secondary-color">
     <div class="w3-row" style="padding-top:16pt;padding-bottom:16pt;">
         <div class="w3-col w3-half w3-small" style="padding-left:1%;">
-            <h3><strong>{{ job.calendar_title}}</strong></h3>
+            <h3><strong>{{ event.calendar_title}}</strong></h3>
             <p>
-                <em>Date:</em> <strong>{{ job.event_start_date | default('tbd',True)| abbr_date_string }}</strong>
+                <em>Date:</em> <strong>{{ event.event_start_date | default('tbd',True)| abbr_date_string }}</strong>
             </p>
             <div class="w3-row">
                 <p class="w3-col l1 m2 s2 w3-right-align">
                     <em>Times:</em>&nbsp;
                 </p>
                 <p class="w3-col l11 m10 s10">
-                    <strong>{{ job.event_start_label | default("Event Starts", True) }}</strong>: {{ job.event_start_date | default('tbd',True) | local_time_string }}  &ndash; 
-                    <strong>{{ job.event_end_label | default("Event Ends", True)}}</strong>: {{ job.event_end_date  | default('tbd',True) | local_time_string }}
+                    <strong>{{ event.event_start_label | default("Event Starts", True) }}</strong>: {{ event.event_start_date | default('tbd',True) | local_time_string }}  &ndash; 
+                    <strong>{{ event.event_end_label | default("Event Ends", True)}}</strong>: {{ event.event_end_date  | default('tbd',True) | local_time_string }}
                 </p>
             </div>
             {# if the event/service times and labels are identical, don't display the service set #}
-            {% if job.event_start_label ==  job.service_start_label and job.event_start_date == job.service_start_date and job.event_end_label == job.service_end_label and job.event_end_date == job.service_end_date %}
+            {% if event.event_start_label ==  event.service_start_label and event.event_start_date == event.service_start_date and event.event_end_label == event.service_end_label and event.event_end_date == event.service_end_date %}
             {# show nothing #}
             {% else %}
             <div class="w3-row">
                 <div class="w3-col l1 m2 s2">&nbsp;</div>
                 <div class="w3-col  l11 m10 s10">
                     <p>
-                        <strong>{{ job.service_start_label | default("Service Starts", True) }}</strong>: {{ job.service_start_date | default('tbd',True)| local_time_string }}  &ndash; 
-                        <strong>{{ job.service_end_label | default("Service Ends", True)}}</strong>: {{ job.service_end_date | default('tbd',True) | local_time_string }}
+                        <strong>{{ event.service_start_label | default("Service Starts", True) }}</strong>: {{ event.service_start_date | default('tbd',True)| local_time_string }}  &ndash; 
+                        <strong>{{ event.service_end_label | default("Service Ends", True)}}</strong>: {{ event.service_end_date | default('tbd',True) | local_time_string }}
                     </p>
                 </div>
             </div>
@@ -52,26 +52,27 @@
                 </p>
                 <div class="w3-col  l11 m10 s10">
                     <p>
-                        <strong>{{ job.job_loc_name }}</strong><br>
-                        {{ job.job_loc_street_address }}, {{ job.job_loc_city }}
+                        <strong>{{ event.location_name }}</strong><br>
+                        {{ event.street_address }}, {{ event.city }}
                     </p>
-                     {% if job.job_loc_lat and job.job_loc_lng %}
+                     {% if event.lat and event.lng %}
                     <div style="margin-bottom:10pt;">
-                        {{ directions_snippet(job) }}
+                        {{ directions_snippet(event) }}
                     </div>
                     {% endif %}
                 </div>
             </div>
             <div style="padding-right:6pt;">
-                {{ job.event_description | render_markdown }}
+                {{ event.event_description | render_markdown }}
             </div>
             <div>
-            <p class="w3-medium">Would you like to help? 
-            {% if job.is_past_event == 0 %}
-               <a href="{{url_for('signup.more_info')}}{{ job.activity_id }}/">Click here to Volunteer...</a></p>
-            {% else %}
-                <a href="{{url_for('signup.display')}}">Click here to Volunteer...</a></p>
+            {% set vol_url = url_for('signup.display') %}
+            {% if event.is_past_event == 0 and event.activity_id and event.event_max_positions > 0 %}
+               {% set vol_url = url_for('signup.more_info') + event.activity_id | string  + "/" %}
             {% endif %}
+            <p class="w3-medium">Would you like to help? 
+                <a href="{{ vol_url }}">Click here to Volunteer...</a>
+            </p>
             </div>
             
         </div>
