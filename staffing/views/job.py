@@ -148,6 +148,15 @@ def edit(id=0,event_id=0,edit_from_list=False):
     
     return render_template(template,rec=rec,
             roles=roles,
+            current_event=current_event,
+            locations=locations,
+            slots_filled=slots_filled,
+            users=users,
+            skills_list=skills_list,
+            )
+    
+    return render_template(template,rec=rec,
+            roles=roles,
             job_date=job_date,
             start_time=start_time,
             start_time_AMPM= start_time_AMPM,
@@ -159,8 +168,8 @@ def edit(id=0,event_id=0,edit_from_list=False):
             users=users,
             skills_list=skills_list,
             )
-    
-    
+            
+                
 @mod.route('/delete/',methods=['GET','POST',])
 @mod.route('/delete/<int:id>/',methods=['GET','POST',])
 @table_access_required(Job)
@@ -472,25 +481,32 @@ def valid_input(rec):
             valid_data = False
             flash("That does not seem to be a valid Event ID")
             
-    job_date = getDatetimeFromString(request.form.get("job_date",""))
+    job_date = getDatetimeFromString(request.form.get("start_date",""))
     if not job_date:
         valid_data = False
-        flash("That is not a valid date")
+        flash("That is not a valid starting time")
+    else:
+        rec.start_date = job_date
+    job_date = getDatetimeFromString(request.form.get("end_date",""))
+    if not job_date:
+        valid_data = False
+        flash("That is not a valid ending time")
+    else:
+        rec.end_date = job_date
     #coerce the start and end datetimes
     #Get the start time into 24 hour format
-    tempDatetime =coerce_datetime(request.form.get("job_date",""),request.form.get('start_time',''),request.form['start_time_AMPM'])
-    if not tempDatetime:
-        valid_data = False
-        flash("Start Date and Start Time are not valid")
-    else:
-        rec.start_date = tempDatetime
+    # tempDatetime =coerce_datetime(request.form.get("job_date",""),request.form.get('start_time',''),request.form['start_time_AMPM'])
+#     if not tempDatetime:
+#         valid_data = False
+#         flash("Start Date and Start Time are not valid")
+#     else:
             
-    tempDatetime =coerce_datetime(request.form.get("job_date",""),request.form.get('end_time',''),request.form['end_time_AMPM'])
-    if not tempDatetime:
-        valid_data = False
-        flash("End Date and End Time are not valid")
-    else:
-        rec.end_date = tempDatetime
+    # tempDatetime =coerce_datetime(request.form.get("job_date",""),request.form.get('end_time',''),request.form['end_time_AMPM'])
+    # if not tempDatetime:
+    #     valid_data = False
+    #     flash("End Date and End Time are not valid")
+    # else:
+    #     rec.end_date = tempDatetime
         
 
     # ensure that both fields are the same type before comparing

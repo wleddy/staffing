@@ -155,6 +155,9 @@
         $(pickers[i]).AnyTime_picker({ format: date_format } );                
     }
     
+    // so the date picker will show above modal job form
+    $("#modal-form-contain").css({'z-index':'auto'})
+    //$('.AnyTime-pkr *').css({'z-index':'auto'})
 </script>
             
 {% endblock fieldset %}
