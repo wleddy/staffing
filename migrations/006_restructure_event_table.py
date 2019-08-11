@@ -93,24 +93,30 @@ if old_events:
                 event_and_date_sql = "event_id= {} and substr(start_date,1,10) == '{}'".format(old_event_rec.id,job_date.job_date)
                 jobs = job_table.select(where=event_and_date_sql)
                 
-                # Set the event location if not already and if all jobs for this event are at the same location
-                if not new_event_rec.location_id:
-                    #import pdb; pdb.set_trace()
-                    loc_sql = """
-                    select location_id from job where {} and location_id <> 0
-                    group by location_id
-                    """.format(event_and_date_sql)
-                    locs = Location(db).query(loc_sql)
-                    if locs and len(locs) == 1:
-                        new_event_rec.location_id = locs[0].location_id
+                # # Set the event location if not already and if all jobs for this event are at the same location
+                # if not new_event_rec.location_id:
+                #     #import pdb; pdb.set_trace()
+                #     loc_sql = """
+                #     select location_id from job where {} and location_id <> 0
+                #     group by location_id
+                #     """.format(event_and_date_sql)
+                #     locs = Location(db).query(loc_sql)
+                #     if locs and len(locs) == 1:
+                #         new_event_rec.location_id = locs[0].location_id
                     
-
                 # Get the Start and end dates for this event based on related Jobs
                 event_start_date = None
                 event_end_date = None
                 service_start_date = None #date_to_string(local_datetime_now(),'iso_date_tz')
                 service_end_date = None
                 for job in jobs:
+                    #Set the location for the new event from first job with event
+                    if job.location_id and not new_event_rec.location_id:
+                        new_event_rec.location_id = job.location_id
+                    # The job doesn't need a location if same as event
+                    if job.location_id and new_event_rec.location_id:
+                        job.location_id = None
+                        
                     if job.status == "Public Calendar":
                         service_start_date = event_start_date = job.start_date 
                         service_end_date = event_end_date = job.end_date 
