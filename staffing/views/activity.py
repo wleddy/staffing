@@ -158,7 +158,7 @@ def get_event_recs(id):
     
     from event
     join activity on activity.id = event.activity_id
-    join job on job.event_id = event.id
+    left join job on event.id = job.event_id
     left join location as event_loc on event_loc.id = event.location_id
     left join location as job_loc on job_loc.id = job.location_id
     where event.activity_id = {}
