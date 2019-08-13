@@ -1,0 +1,315 @@
+
+
+<!doctype html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta charset="utf-8" />
+    <title>Staffing Module &#8212; Staffing 0.1.0 documentation</title>
+    <link rel="stylesheet" href="../_static/bizstyle.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <script type="text/javascript" src="../_static/language_data.js"></script>
+    <script type="text/javascript" src="../_static/bizstyle.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Shotglass2 Docs" href="shotglass2.html" />
+    <link rel="prev" title="Technical Documentation" href="index.html" />
+    <meta name="viewport" content="width=device-width,initial-scale=1.0">
+    <!--[if lt IE 9]>
+    <script type="text/javascript" src="_static/css3-mediaqueries.js"></script>
+    <![endif]-->
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="shotglass2.html" title="Shotglass2 Docs"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="index.html" title="Technical Documentation"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">Staffing 0.1.0 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="index.html" accesskey="U">Technical Documentation</a> &#187;</li> 
+      </ul>
+    </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../index.html">Table of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Staffing Module</a><ul>
+<li><a class="reference internal" href="#module-app">Root Application</a></li>
+<li><a class="reference internal" href="#module-staffing.models">Tables</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="index.html"
+                        title="previous chapter">Technical Documentation</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="shotglass2.html"
+                        title="next chapter">Shotglass2 Docs</a></p>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../_sources/system/staffing.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="staffing-module">
+<h1>Staffing Module<a class="headerlink" href="#staffing-module" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="module-app">
+<span id="root-application"></span><h2>Root Application<a class="headerlink" href="#module-app" title="Permalink to this headline">¶</a></h2>
+<dl class="function">
+<dt id="app.get_db">
+<code class="sig-prename descclassname">app.</code><code class="sig-name descname">get_db</code><span class="sig-paren">(</span><em class="sig-param">filespec=None</em><span class="sig-paren">)</span><a class="headerlink" href="#app.get_db" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return a connection to the database.</p>
+<p>If the db path does not exist, create it and initialize the db</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="app.initalize_all_tables">
+<code class="sig-prename descclassname">app.</code><code class="sig-name descname">initalize_all_tables</code><span class="sig-paren">(</span><em class="sig-param">db=None</em><span class="sig-paren">)</span><a class="headerlink" href="#app.initalize_all_tables" title="Permalink to this definition">¶</a></dt>
+<dd><p>Place code here as needed to initialze all the tables for this site</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="app.inject_site_config">
+<code class="sig-prename descclassname">app.</code><code class="sig-name descname">inject_site_config</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#app.inject_site_config" title="Permalink to this definition">¶</a></dt>
+<dd><p>Add ‘site_config’ dict to template context</p>
+<p>site_config will contain the settings specific to the current site</p>
+</dd></dl>
+
+</div>
+<div class="section" id="module-staffing.models">
+<span id="tables"></span><h2>Tables<a class="headerlink" href="#module-staffing.models" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="staffing.models.Activity">
+<em class="property">class </em><code class="sig-prename descclassname">staffing.models.</code><code class="sig-name descname">Activity</code><span class="sig-paren">(</span><em class="sig-param">db_connection</em><span class="sig-paren">)</span><a class="headerlink" href="#staffing.models.Activity" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="shotglass2.html#shotglass2.takeabeltof.database.SqliteTable" title="shotglass2.takeabeltof.database.SqliteTable"><code class="xref py py-class docutils literal notranslate"><span class="pre">shotglass2.takeabeltof.database.SqliteTable</span></code></a></p>
+<p>Events are grouped under Activiies</p>
+<dl class="method">
+<dt id="staffing.models.Activity.create_table">
+<code class="sig-name descname">create_table</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#staffing.models.Activity.create_table" title="Permalink to this definition">¶</a></dt>
+<dd><p>Define and create the table</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="staffing.models.ActivityType">
+<em class="property">class </em><code class="sig-prename descclassname">staffing.models.</code><code class="sig-name descname">ActivityType</code><span class="sig-paren">(</span><em class="sig-param">db_connection</em><span class="sig-paren">)</span><a class="headerlink" href="#staffing.models.ActivityType" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="shotglass2.html#shotglass2.takeabeltof.database.SqliteTable" title="shotglass2.takeabeltof.database.SqliteTable"><code class="xref py py-class docutils literal notranslate"><span class="pre">shotglass2.takeabeltof.database.SqliteTable</span></code></a></p>
+<p>Categorize events</p>
+<dl class="method">
+<dt id="staffing.models.ActivityType.create_table">
+<code class="sig-name descname">create_table</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#staffing.models.ActivityType.create_table" title="Permalink to this definition">¶</a></dt>
+<dd><p>Define and create the table</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="staffing.models.Client">
+<em class="property">class </em><code class="sig-prename descclassname">staffing.models.</code><code class="sig-name descname">Client</code><span class="sig-paren">(</span><em class="sig-param">db_connection</em><span class="sig-paren">)</span><a class="headerlink" href="#staffing.models.Client" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="shotglass2.html#shotglass2.takeabeltof.database.SqliteTable" title="shotglass2.takeabeltof.database.SqliteTable"><code class="xref py py-class docutils literal notranslate"><span class="pre">shotglass2.takeabeltof.database.SqliteTable</span></code></a></p>
+<p>Client for events</p>
+<dl class="method">
+<dt id="staffing.models.Client.create_table">
+<code class="sig-name descname">create_table</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#staffing.models.Client.create_table" title="Permalink to this definition">¶</a></dt>
+<dd><p>Define and create the table</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="staffing.models.Event">
+<em class="property">class </em><code class="sig-prename descclassname">staffing.models.</code><code class="sig-name descname">Event</code><span class="sig-paren">(</span><em class="sig-param">db_connection</em><span class="sig-paren">)</span><a class="headerlink" href="#staffing.models.Event" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="shotglass2.html#shotglass2.takeabeltof.database.SqliteTable" title="shotglass2.takeabeltof.database.SqliteTable"><code class="xref py py-class docutils literal notranslate"><span class="pre">shotglass2.takeabeltof.database.SqliteTable</span></code></a></p>
+<p>Staffing Event Table</p>
+<dl class="method">
+<dt id="staffing.models.Event.create_table">
+<code class="sig-name descname">create_table</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#staffing.models.Event.create_table" title="Permalink to this definition">¶</a></dt>
+<dd><p>Define and create the table</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="staffing.models.Event.select">
+<code class="sig-name descname">select</code><span class="sig-paren">(</span><em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#staffing.models.Event.select" title="Permalink to this definition">¶</a></dt>
+<dd><p>Extend <cite>select</cite> to include Activity fields in the result set</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="staffing.models.EventDateLabel">
+<em class="property">class </em><code class="sig-prename descclassname">staffing.models.</code><code class="sig-name descname">EventDateLabel</code><span class="sig-paren">(</span><em class="sig-param">db_connection</em><span class="sig-paren">)</span><a class="headerlink" href="#staffing.models.EventDateLabel" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="shotglass2.html#shotglass2.takeabeltof.database.SqliteTable" title="shotglass2.takeabeltof.database.SqliteTable"><code class="xref py py-class docutils literal notranslate"><span class="pre">shotglass2.takeabeltof.database.SqliteTable</span></code></a></p>
+<p>A place to put the labels used to make event.&lt;event|service&gt;_start_date and end dates user friendly</p>
+<dl class="method">
+<dt id="staffing.models.EventDateLabel.create_table">
+<code class="sig-name descname">create_table</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#staffing.models.EventDateLabel.create_table" title="Permalink to this definition">¶</a></dt>
+<dd><p>Define and create the table</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="staffing.models.EventDateLabel.get">
+<code class="sig-name descname">get</code><span class="sig-paren">(</span><em class="sig-param">label_or_id</em><span class="sig-paren">)</span><a class="headerlink" href="#staffing.models.EventDateLabel.get" title="Permalink to this definition">¶</a></dt>
+<dd><p>select the label record by label or id</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="staffing.models.Job">
+<em class="property">class </em><code class="sig-prename descclassname">staffing.models.</code><code class="sig-name descname">Job</code><span class="sig-paren">(</span><em class="sig-param">db_connection</em><span class="sig-paren">)</span><a class="headerlink" href="#staffing.models.Job" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="shotglass2.html#shotglass2.takeabeltof.database.SqliteTable" title="shotglass2.takeabeltof.database.SqliteTable"><code class="xref py py-class docutils literal notranslate"><span class="pre">shotglass2.takeabeltof.database.SqliteTable</span></code></a></p>
+<p>Staffing Job Table</p>
+<dl class="method">
+<dt id="staffing.models.Job.create_table">
+<code class="sig-name descname">create_table</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#staffing.models.Job.create_table" title="Permalink to this definition">¶</a></dt>
+<dd><p>Define and create the table</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="staffing.models.Job.filled">
+<code class="sig-name descname">filled</code><span class="sig-paren">(</span><em class="sig-param">job_id</em><span class="sig-paren">)</span><a class="headerlink" href="#staffing.models.Job.filled" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the number positions filled for this job</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="staffing.models.JobRole">
+<em class="property">class </em><code class="sig-prename descclassname">staffing.models.</code><code class="sig-name descname">JobRole</code><span class="sig-paren">(</span><em class="sig-param">db_connection</em><span class="sig-paren">)</span><a class="headerlink" href="#staffing.models.JobRole" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="shotglass2.html#shotglass2.takeabeltof.database.SqliteTable" title="shotglass2.takeabeltof.database.SqliteTable"><code class="xref py py-class docutils literal notranslate"><span class="pre">shotglass2.takeabeltof.database.SqliteTable</span></code></a></p>
+<p>User roles that are required to signup for a job</p>
+<dl class="method">
+<dt id="staffing.models.JobRole.create_table">
+<code class="sig-name descname">create_table</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#staffing.models.JobRole.create_table" title="Permalink to this definition">¶</a></dt>
+<dd><p>Define and create the table</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="staffing.models.Location">
+<em class="property">class </em><code class="sig-prename descclassname">staffing.models.</code><code class="sig-name descname">Location</code><span class="sig-paren">(</span><em class="sig-param">db_connection</em><span class="sig-paren">)</span><a class="headerlink" href="#staffing.models.Location" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="shotglass2.html#shotglass2.takeabeltof.database.SqliteTable" title="shotglass2.takeabeltof.database.SqliteTable"><code class="xref py py-class docutils literal notranslate"><span class="pre">shotglass2.takeabeltof.database.SqliteTable</span></code></a></p>
+<p>Staffing Location Table</p>
+<dl class="method">
+<dt id="staffing.models.Location.create_table">
+<code class="sig-name descname">create_table</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#staffing.models.Location.create_table" title="Permalink to this definition">¶</a></dt>
+<dd><p>Define and create the table</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="staffing.models.StaffNotification">
+<em class="property">class </em><code class="sig-prename descclassname">staffing.models.</code><code class="sig-name descname">StaffNotification</code><span class="sig-paren">(</span><em class="sig-param">db_connection</em><span class="sig-paren">)</span><a class="headerlink" href="#staffing.models.StaffNotification" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="shotglass2.html#shotglass2.takeabeltof.database.SqliteTable" title="shotglass2.takeabeltof.database.SqliteTable"><code class="xref py py-class docutils literal notranslate"><span class="pre">shotglass2.takeabeltof.database.SqliteTable</span></code></a></p>
+<p>Staffing Notification Table
+Record that a particular notification has been sent so we don’t send it twice.</p>
+<dl class="method">
+<dt id="staffing.models.StaffNotification.create_table">
+<code class="sig-name descname">create_table</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#staffing.models.StaffNotification.create_table" title="Permalink to this definition">¶</a></dt>
+<dd><p>Define and create the table</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="staffing.models.UserJob">
+<em class="property">class </em><code class="sig-prename descclassname">staffing.models.</code><code class="sig-name descname">UserJob</code><span class="sig-paren">(</span><em class="sig-param">db_connection</em><span class="sig-paren">)</span><a class="headerlink" href="#staffing.models.UserJob" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="shotglass2.html#shotglass2.takeabeltof.database.SqliteTable" title="shotglass2.takeabeltof.database.SqliteTable"><code class="xref py py-class docutils literal notranslate"><span class="pre">shotglass2.takeabeltof.database.SqliteTable</span></code></a></p>
+<p>Staffing User_Job Table</p>
+<dl class="method">
+<dt id="staffing.models.UserJob.create_table">
+<code class="sig-name descname">create_table</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#staffing.models.UserJob.create_table" title="Permalink to this definition">¶</a></dt>
+<dd><p>Define and create the table</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="staffing.models.UserJob.get_assigned_users">
+<code class="sig-name descname">get_assigned_users</code><span class="sig-paren">(</span><em class="sig-param">job_id</em><span class="sig-paren">)</span><a class="headerlink" href="#staffing.models.UserJob.get_assigned_users" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return a namedlist of user records assigned to this job or None</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="staffing.models.UserJob.new">
+<code class="sig-name descname">new</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#staffing.models.UserJob.new" title="Permalink to this definition">¶</a></dt>
+<dd><p>Setup a new record</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="function">
+<dt id="staffing.models.init_event_db">
+<code class="sig-prename descclassname">staffing.models.</code><code class="sig-name descname">init_event_db</code><span class="sig-paren">(</span><em class="sig-param">db</em><span class="sig-paren">)</span><a class="headerlink" href="#staffing.models.init_event_db" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create a intial user record.</p>
+</dd></dl>
+
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="shotglass2.html" title="Shotglass2 Docs"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="index.html" title="Technical Documentation"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">Staffing 0.1.0 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="index.html" >Technical Documentation</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2019, Bill Leddy.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 2.1.2.
+    </div>
+  </body>
+</html>
