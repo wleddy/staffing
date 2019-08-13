@@ -117,11 +117,18 @@ def signup(job_id=None):
     filled_positions = 0
     job_id = cleanRecordID(request.form.get('id',job_id))
     
-    job = Job(g.db).get(job_id)
-    if not job:
-        return 'failure: That is not a valid job id'
+    # job = Job(g.db).get(job_id)
+#     if not job:
+#         return'failure: That is not a valid job id'
     
-    event = Event(g.db).get(job.event_id)
+    job_data = get_job_rows(None,None,"job.id = {}".format(job_id),[],is_admin=True)
+    if job_data:
+        job_data = job_data[0]
+        filled_positions = job_data.job_filled_positions
+    else:
+        return'failure: That is not a valid job id'
+        
+    event = Event(g.db).get(job_data.event_id)
     if not event:
         return 'failure: That is not a valid event id'
 
@@ -141,10 +148,10 @@ def signup(job_id=None):
     else:
         redirect(abort(404))
                     
-    job_data = get_job_rows(None,None,"job.id = {}".format(job.id),[],is_admin=True)
-    if job_data:
-        job_data = job_data[0]
-        filled_positions = job_data.job_filled_positions
+    # job_data = get_job_rows(None,None,"job.id = {}".format(job.id),[],is_admin=True)
+    # if job_data:
+    #     job_data = job_data[0]
+    #     filled_positions = job_data.job_filled_positions
         
     # get the user's signup
     signup = UserJob(g.db).select_one(where='user_id = {} and job_id = {}'.format(user_id,job_id))
@@ -203,7 +210,7 @@ def signup(job_id=None):
             pass
     
     
-    return render_template('signup_form.html',job=job,signup=signup,filled_positions=filled_positions)
+    return render_template('signup_form.html',job=job_data,signup=signup,filled_positions=filled_positions)
     
     
 @mod.route('/signup_success/<int:id>/',methods=['GET','POST',])

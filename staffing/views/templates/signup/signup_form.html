@@ -1,57 +1,33 @@
 <form id="signupModalForm"  action="" method="POST">
-    <input type="hidden" name="id" value="{{job.id}}">
-	<div class="transaction-buttons data-element">
-        <div class="event-contain w3-row-padding w3-secondary-color ">  
-        <!-- a simple tool to help in debugging layout issues -->
-        <!-- <div class="w3-hide-small"><div class="w3-col m1 w3-center w3-grey">1</div><div class="w3-col m1 w3-center">2</div><div class="w3-col m1 w3-center w3-grey">3</div><div class="w3-col m1 w3-center">4</div><div class="w3-col m1 w3-center w3-grey">5</div><div class="w3-col m1 w3-center">6</div><div class="w3-col m1 w3-center w3-grey">7</div><div class="w3-col m1 w3-center">8</div><div class="w3-col m1 w3-center w3-grey">9</div><div class="w3-col m1 w3-center">10</div><div class="w3-col m1 w3-center w3-grey">11</div><div class="w3-col m1 w3-center">12</div></div> -->
-        <div class="w3-col w3-half">
-            <p class="w3-medium"><strong>{{job.title}}</strong></p>
-            <p class="w3-small">{{ job.description }}</p>
-        </div>
-        <div class="w3-col w3-half " >
-            <div style="padding-left:4pt;">
-                <p>
-                    <em>When:</em> <strong>{{ job.start_date | abbr_date_string}}</strong>
-                </p>
-                <p>
-                    <em>Shift:</em> <strong>{{ job.start_date | local_time_string | lower }} - {{ job.end_date | local_time_string | lower }}</strong>
-                </p>
-            </div>
-            <div style="text-align:center;">
-                <p class="w3-small">
-                    {% set pos = signup.positions | default(0,True) | int %}
-                    {% if pos > 0 %}
-                        You have currently signed up {{signup.positions | default(0,True)}} {% if pos == 1%}person{% else %}people{% endif %}
-                        for this shift
-                    {% else %}
-                        Use the &quot;+&quot; button to add one or more people for this shift:
-                    {% endif %}
-                <p>
-                    <a class="w3-button w3-primary-color w3-round-medium w3-xlarge" onclick="signup_count('#signup-count',-1,{{ job.max_positions}})" style="padding:6pt;width:30pt;" title="Decrease Shifts">&ndash;</a>
-                    <input class="w3-xlarge" id="signup-count" type="num" name='positions' value="{{signup.positions | default(1,True)}}" readonly style="padding:6pt;width:30pt;display:block-inline;text-align:center"/>
-                    <a class="w3-button w3-primary-color w3-round-medium w3-xlarge"  onclick="signup_count('#signup-count',1,{{job.max_positions - filled_positions + signup.positions}})" style="padding:6pt;width:30pt;" title="Increase Shifts">+</a>
-                </p>
-            <p style="text-align:left">
-                Comment:<br>
-                <textarea class="w3-small" rows="4" style="width:100%" name="attendance_comment" 
-                placeholder="If signing up for more than one person, you can tell us who it is here... or anything else."
-                >{{ signup.attendance_comment | default("", True) }}</textarea>
-            </p>
-                <div>
-            		<p>
-                		<input class="w3-button w3-primary-color w3-round-medium " type="button" 
-                            onclick="submitModalForm('signupModalForm',
-                            '{{url_for('signup.signup')}}',
-                            'job-body{{ job.id }}',
-                            '{{url_for('signup.signup_success')}}{{job.id}}'
-                            )" 
-                            name="Save" value="Save" />
-                        &nbsp;&nbsp;
-                		<a class="w3-button w3-primary-color w3-round-medium " onclick="cancelModalForm()">Cancel</a>
-            		</p>
-                </div>
-        </div>
-	</div>
+    <input type="hidden" name="id" value="{{job.job_id}}">
+    <div class="event-contain w3-row-padding w3-secondary-color w3-center" style="padding:20pt;"> 
+        {% set shift_count = 1 %}
+        {% set button_text = 'Sign Me Up' %}
+        {% if signup.positions | int > 0 %}
+            {# user is already signed up. Give the option to cancel #}
+            {% set shift_count = 0 %}
+            {% set button_text = "I can't be there" %}
+        {% endif %}
+        <input type="hidden" name="positions" value="{{shift_count}}">
+        <p>
+            You are {%if not shift_count %}currently signed{% else %}signing{% endif %} up<br>
+            to help as <strong>{{job.job_title}}</strong> at<br>
+            <span class="w3-large"><strong>{{ job.calendar_title }}</strong></span><br>
+            on <strong>{{ job.start_date | abbr_date_string }}</strong><br>
+            from <strong>{{ job.start_date | local_time_string | lower }}</strong> to 
+           <strong> {{ job.end_date | local_time_string | lower }}</strong>
+        </p>
+        <p>
+        	<input class="w3-button w3-primary-color w3-round-medium " type="button" 
+                onclick="submitModalForm('signupModalForm',
+                '{{url_for('signup.signup')}}',
+                'job-body{{ job.job_id }}',
+                '{{url_for('signup.signup_success')}}{{job.job_id}}'
+                )" 
+                name="save" value="{{ button_text }}" />
+            &nbsp;&nbsp;
+        	<a class="w3-button w3-primary-color w3-round-medium " onclick="cancelModalForm()">Close</a>
+        </p>
     </div>
 </form>
 
