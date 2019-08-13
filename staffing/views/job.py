@@ -462,6 +462,14 @@ def assignment_manager_delete(job_id=0,user_id=0):
             
     return "failure: Invalid User or Job id"
 
+@mod.route('/assignment_manager_done/<int:event_id>',methods=['GET',])
+@mod.route('/assignment_manager_done/<int:event_id>/',methods=['GET',])
+@mod.route('/assignment_manager_done',methods=['POST',])
+@mod.route('/assignment_manager_done/',methods=['POST',])
+@table_access_required(Job)
+def assignment_manager_done(event_id=0):
+    """Simply return 'success' to allow modal assignment dialog to close"""
+    return 'success'
 
 def valid_input(rec):
     valid_data = True
