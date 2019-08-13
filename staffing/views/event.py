@@ -75,15 +75,13 @@ def render_edit_form(id,activity_id):
         id = cleanRecordID(request.form.get("id"))
         activity_id = cleanRecordID(request.form.get("activity_id"))
         
-    if activity_id == None and id == 0:
-        #can't create a new record without an activity link
-        return abort(404)
-        
     event = Event(g.db)
     clients = Client(g.db).select()
     event_date_labels=EventDateLabel(g.db).select()
     
-    if id < 0 or activity_id < 0:
+    if id <= 0 and activity_id <= 0:
+        #can't create a new record without an activity link
+        flash("Unknown Activity ID")
         return abort(404)
         
     if id > 0:
