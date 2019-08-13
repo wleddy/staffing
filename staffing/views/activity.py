@@ -196,9 +196,9 @@ def get_event_recs(activity_id=None,**kwargs):
     from event
     join activity on activity.id = event.activity_id
     left join job on event.id = job.event_id
-    join location on event_location_id = location.id
+    left join location on event_location_id = location.id
     where {where}
-    group by event.event_start_date, job_start_date
+    group by event.event_start_date, event.location_id, job_start_date
     order by event.event_start_date DESC
     """.format(where=where)
     event_recs = Event(g.db).query(sql)
