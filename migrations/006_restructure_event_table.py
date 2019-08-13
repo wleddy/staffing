@@ -194,9 +194,26 @@ if old_events:
                 print(activity_rec.title)
         try:
             db.commit()
+            
         except Exception as e:
             db.rollback()
             print("Changes rolled back. Error = {}".format(str(e)))
             break
+            
+    # rename some tables
+    db.execute("alter table event rename to old_event")
+    db.execute("alter table temp_event rename to event")
+    db.execute("drop table old_event")
+    
+    db.execute("alter table job rename to old_job")
+    db.execute("alter table temp_job rename to job")
+    db.execute("drop table old_job")
+
+    db.execute("alter table user_job rename to old_user_job")
+    db.execute("alter table temp_user_job rename to user_job")
+    db.execute("drop table old_user_job")
+        
+    db.execute("alter table event_type rename to activity_type")
+            
         
 db.close()
