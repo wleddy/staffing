@@ -55,14 +55,25 @@
             <input id="assignment_user_id" type="hidden" name="assignment_user_id" value="0">
             <div class="w3-row">
                 <div class="w3-col w3-half">
-                <div id="assignment_user_search">
+                <div class="w3-row" id="assignment_user_search">
                     <p>Find User:</p>
-                    <p>
-                        <input id="search_input" type="text" name="user_name" value="" class="w3-input w3-border" placeholder="Type name" 
-                        onkeyup="if (this.value.length > 0) {$('#search_results').show();table_search('search_input','all_users',1)} else {$('#search_results').hide();reset_table_search('all_users');}"
-                        onfocus="toggle_table_search('search_results');" 
-                        />
-                    </p>
+                    <div class="w3-col l10">
+                        <p class="w3-row">
+                            <input id="search_input" type="text" name="user_name" value="" class="w3-input w3-border" placeholder="Type name" 
+                            onkeyup="if (this.value.length > 0) {$('#search_results').show();table_search('search_input','all_users',1)} else {$('#search_results').hide();reset_table_search('all_users');}"
+                            onfocus="toggle_table_search('search_results');" 
+                            />
+                        </p>
+                    </div>
+                	<p class="w3-right">
+                		<input class="w3-button w3-primary-color w3-round-medium" type="button" 
+                            onclick="submitModalForm('assignmentModalForm',
+                            '{{url_for('job.assignment_manager')}}',
+                            'assignment_manager_layout',
+                            '{{url_for('job.assignment_manager')}}{{job.job_id}}'
+                            )" 
+                            name="Add" value="Add" id="add_button"/>
+                	</p>
                     <div id="search_results" class="w3-border" 
                         style="z-index:10000;position:static;overflow-y: scroll;background-color:white;display:none">
                         	<table id="all_users" class="datatable w3-table w3-striped w3-hoverable" >
@@ -99,16 +110,7 @@
                     <input class="w3-xlarge" id="signup-count" type="num" id="positions" name='positions' value="1" style="padding:6pt;width:40pt;display:block-inline;text-align:center"/>
                 </p>
             </div>
-        	<p class="w3-right">
-        		<input class="w3-button w3-primary-color w3-round-medium" type="button" 
-                    onclick="submitModalForm('assignmentModalForm',
-                    '{{url_for('job.assignment_manager')}}',
-                    'assignment_manager_layout',
-                    '{{url_for('job.assignment_manager')}}{{job.job_id}}'
-                    )" 
-                    name="Add" value="Add" id="add_button"/>
-        	</p>
-            <p class="w3-left">
+            <p class="w3-right">
                 <a class="w3-button w3-primary-color w3-round-medium " onclick="cancelModalForm()">Done</a>
             </p>
         </form>
