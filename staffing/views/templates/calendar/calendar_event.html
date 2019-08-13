@@ -52,8 +52,8 @@
                 </p>
                 <div class="w3-col  l11 m10 s10">
                     <p>
-                        <strong>{{ event.location_name }}</strong><br>
-                        {{ event.street_address }}, {{ event.city }}
+                        <strong>{{ event.location_name | default('tbd',True) }}</strong>
+                        {%if event.location_name %}<br>{{ event.street_address }}, {{ event.city }}{% endif %}
                     </p>
                      {% if event.lat and event.lng %}
                     <div style="margin-bottom:10pt;">

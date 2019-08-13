@@ -15,7 +15,7 @@
             {% endif %}<br>
             {{ event.event_filled_positions | default("0",True)}} of  {{ event.event_max_positions | default("0",True)}} positions filled
             <br>
-            @ {{ event.location_name }}
+            @ {{ event.location_name | default('tbd',True) }}
         </p>
     </div>
     <div class="w3-col w3-quarter" style="text-align:center;">
