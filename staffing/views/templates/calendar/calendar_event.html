@@ -3,7 +3,7 @@
 
 {% block head %}
     {{ super() }}
-    {{ map_html | safe }}
+    {{ map_html | default('',True) | safe }}
 {% endblock head %}
 
 {% block page_header %}
@@ -70,8 +70,8 @@
             {% if event.is_past_event == 0 and event.activity_id and event.event_max_positions > 0 %}
                {% set vol_url = url_for('signup.more_info') + event.activity_id | string  + "/" %}
             {% endif %}
-            <p class="w3-medium">Would you like to help? 
-                <a href="{{ vol_url }}">Click here to Volunteer...</a>
+            <p class="w3-medium">
+                Would you like to help? <a href="{{ vol_url }}">Click here to Volunteer...</a>
             </p>
             </div>
             
