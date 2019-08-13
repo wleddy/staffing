@@ -111,14 +111,13 @@
                 </p>
             </div>
             <p class="w3-right">
-                <a class="w3-button w3-primary-color w3-round-medium " onclick="cancelModalForm()">Done</a>
         		<input class="w3-button w3-primary-color w3-round-medium" type="button" 
                     onclick="submitModalForm('assignmentModalForm',
                     '{{url_for('job.assignment_manager_done')}}',
                     'job-list',
                     '{{url_for('job.get_job_list_for_event')}}{{job.event_id}}/'
                     );" 
-                    name="done" value="finished" id="done_button"/>
+                    name="done" value="Done" id="done_button"/>
             </p>
         </form>
     </div>
