@@ -96,6 +96,24 @@ def delete(rec_id=None):
     return redirect(g.listURL)
 
 
+@mod.route('/get_rec_as_json', methods=['GET'])
+@mod.route('/get_rec_as_json/', methods=['GET'])
+@mod.route('/get_rec_as_json/<int:rec_id>/', methods=['GET'])
+def get_rec_as_json(rec_id=None):
+    """Return a json object with the requested client data or the empty string"""
+    import json
+    
+    out = ''
+    rec_id = cleanRecordID(rec_id)
+    rec = Client(g.db).get(rec_id)
+    if rec:
+        
+        out = json.dumps(rec._asdict())
+        # replace 'null' with double-quotes around a space
+        # without the space jquery retrieves the value rather than set it.
+        out = out.replace('null','" "') 
+    return out
+
 def valid_input(rec):
     # Validate the form
     goodForm = True

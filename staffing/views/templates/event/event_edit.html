@@ -43,7 +43,7 @@
         </select>
     </p>
     {# TODO - update placeholders on contact input fields below when this changes #}
-    <p>{{ select_field("client_id","Client", class="w3-border") }}
+    <p>{{ select_field("client_id","Client", class="w3-border", extras=' onchange="updateClientFields(this);"') }}
             <option value="0">Select a Client</option>
             {% if clients %}
             {% for client in clients %}
@@ -63,7 +63,7 @@
     <p>{{ input_field(rec.client_contact,"client_contact",label="Client Contact", id="client_contact")}}</p>
     <p>{{ input_field(rec.client_email,"client_email",label="Client Contact Email", id="client_email")}}</p>
     <p>{{ input_field(rec.client_phone,"client_phone",label="Client Contact Phone",id="client_phone")}}</p>
-    <p>{{ input_field(rec.client_website,"client_website",label="Event Website", placeholder='http://example.com')}}</p>
+    <p>{{ input_field(rec.client_website,"client_website",label="Event Website", id="client_website", placeholder='http://example.com')}}</p>
 </div>
 <div class="w3-col w3-hide-small" style="width:20pt;">&nbsp;</div>
 <div class="w3-col l5 m5 s12" >
@@ -158,6 +158,22 @@
     // so the date picker will show above modal job form
     $("#modal-form-contain").css({'z-index':'auto'})
     //$('.AnyTime-pkr *').css({'z-index':'auto'})
+    
+    
+    function updateClientFields(x) {
+      var client_id = x.value.toString();
+      // query the database for this client id
+      $.get('{{ url_for('client.get_rec_as_json')}}'+client_id+'/',
+      function(data){
+          var y
+          // stuff the result (json) into the fields
+          data = JSON.parse(data)
+          $('#client_contact').attr({'value':data.contact_first_name + " " + data.contact_last_name})
+          $('#client_phone').attr({'value':data.phone})
+          $('#client_email').attr({'value':data.email})
+          $('#client_website').attr({'value':data.website})
+      });
+    }
 </script>
             
 {% endblock fieldset %}
