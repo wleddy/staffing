@@ -3,10 +3,12 @@
     <div class="event-contain w3-row-padding w3-secondary-color w3-center" style="padding:20pt;"> 
         {% set shift_count = 1 %}
         {% set button_text = 'Sign Me Up' %}
+        {% set notification_text = "<br><em>(You'll receive an email with all the details for your calendar.)</em>"%}
         {% if signup.positions | int > 0 %}
             {# user is already signed up. Give the option to cancel #}
             {% set shift_count = 0 %}
             {% set button_text = "I can't be there" %}
+            {% set notification_text = ""%}
         {% endif %}
         <input type="hidden" name="positions" value="{{shift_count}}">
         <p>
@@ -27,6 +29,7 @@
                 name="save" value="{{ button_text }}" />
             &nbsp;&nbsp;
         	<a class="w3-button w3-primary-color w3-round-medium " onclick="cancelModalForm()">Close</a>
+           {{ notification_text | safe }}
         </p>
     </div>
 </form>

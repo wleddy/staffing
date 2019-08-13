@@ -116,11 +116,7 @@ def signup(job_id=None):
     user = None
     filled_positions = 0
     job_id = cleanRecordID(request.form.get('id',job_id))
-    
-    # job = Job(g.db).get(job_id)
-#     if not job:
-#         return'failure: That is not a valid job id'
-    
+        
     job_data = get_job_rows(None,None,"job.id = {}".format(job_id),[],is_admin=True)
     if job_data:
         job_data = job_data[0]
@@ -137,7 +133,6 @@ def signup(job_id=None):
         flash("You need to log in or create an account")
         return redirect(url_for('login.login')+ '?next={}{}'.format(url_for('signup.more_info'),event.activity_id))
         
-        
     # get user_id
     user_id = None
     if 'user_id' in session:
@@ -147,11 +142,6 @@ def signup(job_id=None):
             return 'failure: That is not a valid user id'
     else:
         redirect(abort(404))
-                    
-    # job_data = get_job_rows(None,None,"job.id = {}".format(job.id),[],is_admin=True)
-    # if job_data:
-    #     job_data = job_data[0]
-    #     filled_positions = job_data.job_filled_positions
         
     # get the user's signup
     signup = UserJob(g.db).select_one(where='user_id = {} and job_id = {}'.format(user_id,job_id))
