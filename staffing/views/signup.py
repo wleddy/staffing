@@ -222,6 +222,18 @@ def signup_success(id=0):
     return render_template('signup_job.html',job=job,is_admin=is_user_admin())
     
     
+@mod.route('/acknowledge_signup/<int:id>/',methods=['GET','POST',])
+@mod.route('/acknowledge_signup/<int:id>',methods=['GET','POST',])
+@mod.route('/acknowledge_signup/',methods=['GET','POST',])
+def acknowledge_signup(id=0):
+    """Send a dialog to confirm the users signup choice"""
+    
+    uj = UserJob(g.db).select(where="user_id = {} and job_id = {}".format(session.get('user_id',-1),cleanRecordID(id)))
+    user_signed_up = uj != None
+    
+    return render_template('signup_acknowledgment.html',user_signed_up=user_signed_up)
+        
+    
 @mod.route('/roster/<int:display_end_days>',methods=['GET','POST',])
 @mod.route('/roster/<int:display_end_days>/',methods=['GET','POST',])
 @mod.route('/roster',methods=['GET',])
