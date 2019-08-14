@@ -1,5 +1,6 @@
 from flask import request, session, g, redirect, url_for, abort, \
      render_template, flash, Blueprint
+from datetime import datetime
 from shotglass2.users.admin import login_required, table_access_required
 from shotglass2.users.models import Role, User
 from shotglass2.takeabeltof.utils import render_markdown_for, printException, cleanRecordID
@@ -73,6 +74,16 @@ def edit(id=0,event_id=0,edit_from_list=False):
         
     else:
         rec = job.new()
+        #set default dates
+        event_rec = Event(g.db).get(event_id)
+        temp_date = datetime.now().replace(minute=0,second=0)
+        rec.start_date = temp_date
+        rec.end_date = temp_date
+        if event_rec.service_start_date:
+            rec.start_date = getDatetimeFromString(event_rec.service_start_date)
+        if event_rec.service_end_date:
+            rec.end_date = getDatetimeFromString(event_rec.service_end_date)
+            
         if 'last_job' in session:
             # apply previous record
             ses_rec = session['last_job']
