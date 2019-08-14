@@ -48,11 +48,6 @@ def edit(id=0,event_id=0,edit_from_list=False):
     g.title = 'Edit Job Record'
     #import pdb;pdb.set_trace()
     
-    job_date=None
-    start_time=None
-    start_time_AMPM=None
-    end_time=None
-    end_time_AMPM=None
     locations = Location(g.db).select()
     slots_filled = 0
     users = None
@@ -116,24 +111,6 @@ def edit(id=0,event_id=0,edit_from_list=False):
             if edit_from_list:
                 return 'success'
             return redirect(g.listURL)
-        else:
-            job_date=request.form.get('job_date',"")
-            start_time=request.form.get('start_time',"")
-            start_time_AMPM=request.form.get('start_time_AMPM',"AM")
-            end_time=request.form.get('end_time',"")
-            end_time_AMPM=request.form.get('end_time_AMPM',"AM")
-    else:
-        if rec.start_date and isinstance(rec.start_date,str):
-            rec.start_date = getDatetimeFromString(rec.start_date)
-        if rec.start_date:
-            job_date=date_to_string(rec.start_date,'date')
-            start_time=date_to_string(rec.start_date,'time')
-            start_time_AMPM=date_to_string(rec.start_date,'ampm').upper()
-        if rec.end_date and isinstance(rec.end_date,str):
-            rec.start_date = getDatetimeFromString(rec.end_date)
-        if rec.end_date:
-            end_time=date_to_string(rec.end_date,'time')
-            end_time_AMPM=date_to_string(rec.end_date,'ampm').upper()
             
     skills_list = skills_to_list() #Try to get them from the request form
     if not skills_list and id > 0:
@@ -157,11 +134,6 @@ def edit(id=0,event_id=0,edit_from_list=False):
     
     return render_template(template,rec=rec,
             roles=roles,
-            job_date=job_date,
-            start_time=start_time,
-            start_time_AMPM= start_time_AMPM,
-            end_time=end_time,
-            end_time_AMPM=end_time_AMPM,
             current_event=current_event,
             locations=locations,
             slots_filled=slots_filled,
