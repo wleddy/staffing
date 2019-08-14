@@ -4,17 +4,17 @@
 <form id="jobFromListForm"  action="" method="POST">
     <p class="form_button_row w3-contain w3-panel" >
     	<input type="button" class="w3-btn w3-ripple w3-save-button-color w3-mobile w3-round-large"
-            onclick="removePickers();submitModalForm('jobFromListForm', 
+            onclick="submitModalForm('jobFromListForm', 
             '{{ url_for('job.edit_job_from_list')}}{{rec.id | default(0,True)}}/', 
             'job-list', 
             '{{ url_for('job.get_job_list_for_event')}}{{ rec.event_id}}')" 
             name="Save" value="Save" />
         &nbsp;&nbsp;
     	{% if rec.id and rec.id > 0 and (not no_delete or is_admin) and not g.cancelURL %}
-    	<a id="form_delete_link"  class="w3-btn w3-ripple w3-delete-button-color w3-mobile w3-round-large" onclick="deleteFromList('{{ url_for('job.delete_from_list')}}{{rec.id}}', 'list-row-{{rec.id}}');removePickers();cancelModalForm()">Delete...</a>
+    	<a id="form_delete_link"  class="w3-btn w3-ripple w3-delete-button-color w3-mobile w3-round-large" onclick="deleteFromList('{{ url_for('job.delete_from_list')}}{{rec.id}}', 'list-row-{{rec.id}}');cancelModalForm()">Delete...</a>
         &nbsp;&nbsp;
     	{% endif %}
-        <a  class="w3-btn w3-ripple w3-cancel-button-color w3-mobile w3-round-large" onclick="removePickers();cancelModalForm()">Cancel</a>
+        <a  class="w3-btn w3-ripple w3-cancel-button-color w3-mobile w3-round-large" onclick="cancelModalForm()">Cancel</a>
     </p> 
     {% include "job_edit_form.html"%}
 </form>

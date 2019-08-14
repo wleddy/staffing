@@ -47,19 +47,11 @@
     var date_format = "%c/%e/%y %l:%i%p"; // "3/4/19 06:00AM"
     var job_pickers = ["#job_start_date","#job_end_date"]
     for( i = 0;i<job_pickers.length;i++){
-        $(job_pickers[i]).AnyTime_picker({ format: date_format } );                
-    }
-    
-    /* 
-        you must remove the pickers before dismissing the dialog
-        else they will not be reattached the next time the dialog opens
-    */
-    function removePickers(){
-        // remove any "Anytime" pickers
-        for( i = 0;i<job_pickers.length;i++){
-            $(job_pickers[i]).AnyTime_noPicker();                
-        }
-       
+        /* 
+            you must remove the pickers before dismissing the dialog
+            else they will not be reattached the next time the dialog opens
+        */
+        $(job_pickers[i]).AnyTime_noPicker().AnyTime_picker({ format: date_format } );                
     }
     
 </script>
