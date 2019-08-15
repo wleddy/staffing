@@ -10,6 +10,7 @@
                  <img src="{{ url_for('static',filename='images/check_mark.png')}}" alt="{{ event.status }}"/>
             {% endif %}
             <strong>{{event.calendar_title}}</strong> <br>
+            <span class="w3-small">
             {% if event.job_start_date %}{{event.job_start_date | default('Not Set',True) | short_day_and_date_and_time_string }}
             {% else %}{{event.service_start_date | default('Not Set',True) | short_day_and_date_and_time_string }}
             {% endif %} to
@@ -19,6 +20,7 @@
             {{ event.event_filled_positions | default("0",True)}} of  {{ event.event_max_positions | default("0",True)}} positions filled
             <br>
             @ {{ event.location_name | default('tbd',True) }}
+            </span>
         </p>
     </div>
     <div class="w3-col w3-quarter" style="text-align:center;">
