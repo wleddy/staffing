@@ -4,8 +4,10 @@
         <p>
             {% if event.status.lower() == "pending" %}
                 <img src="{{ url_for('static',filename='images/question_mark.png')}}" alt="{{ event.status }}"/>
+                <span class="w3-small"><em>&mdash; Pending &mdash;</em></span><br>
             {% elif event.status.lower() == 'cancelled' %}
                  <img src="{{ url_for('static',filename='images/red_x.png')}}" alt="{{ event.status }}"/>
+                <span class="w3-small w3-text-red"><em>&mdash; Cancelled &mdash;</em></span><br>
             {% else %}
                  <img src="{{ url_for('static',filename='images/check_mark.png')}}" alt="{{ event.status }}"/>
             {% endif %}
