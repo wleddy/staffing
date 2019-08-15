@@ -159,6 +159,7 @@ def get_event_recs(activity_id=None,**kwargs):
     event.activity_id,
     coalesce(nullif(event.calendar_title,''),activity.title) as calendar_title,
     (select min(job.start_date) from job where job.event_id = event.id) as job_start_date,
+    (select max(job.end_date) from job where job.event_id = event.id) as job_end_date,
 
     event.event_start_date,
     event.event_end_date,

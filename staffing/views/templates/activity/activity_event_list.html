@@ -10,8 +10,11 @@
                  <img src="{{ url_for('static',filename='images/check_mark.png')}}" alt="{{ event.status }}"/>
             {% endif %}
             <strong>{{event.calendar_title}}</strong> <br>
-            {% if event.event_start_date %}{{event.event_start_date | default('Not Set',True) | short_day_and_date_and_time_string }}
-            {% else %}{{event.job_start_date | default('Not Set',True) | short_day_and_date_and_time_string }}
+            {% if event.job_start_date %}{{event.job_start_date | default('Not Set',True) | short_day_and_date_and_time_string }}
+            {% else %}{{event.service_start_date | default('Not Set',True) | short_day_and_date_and_time_string }}
+            {% endif %} to
+            {% if event.job_end_date %}{{event.job_end_date | default('Not Set',True) | local_time_string }}
+            {% else %}{{event.service_end_date | default('Not Set',True) | local_time_string }}
             {% endif %}<br>
             {{ event.event_filled_positions | default("0",True)}} of  {{ event.event_max_positions | default("0",True)}} positions filled
             <br>
