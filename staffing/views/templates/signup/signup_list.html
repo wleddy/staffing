@@ -96,7 +96,7 @@
                     {% set _ = job_start_date.pop() %}
                     {% set _ = job_start_date.append(job.start_date[:10]) %}
                     {% set _ = job_date_header_list.append(job.job_id)  %}
-                    <div class="w3-row w3-secondary-color job-contain job-date-contain" style="margin-top:3pt;">
+                    <div id="event-header-{{ job.event_id }}" class="w3-row w3-secondary-color job-contain job-date-contain" style="margin-top:3pt;">
                         <div class="w3-col l1 m1 w3-hide-small">&nbsp;</div>
                         <div class="w3-col l11 m11 w3-primary-color">
                             <p onclick="$('.job-date-container-{{ job.event_id }}-{{job.start_date[:10]}},#job-date-more-{{ job.event_id }}-{{job.start_date[:10]}},#job-date-less-{{ job.event_id }}-{{job.start_date[:10]}}').toggle();"

@@ -68,7 +68,7 @@
             <div>
             {% set vol_url = url_for('signup.display') %}
             {% if event.is_past_event == 0 and event.activity_id and event.event_max_positions > 0 %}
-               {% set vol_url = url_for('signup.more_info') + event.activity_id | string  + "/" %}
+               {% set vol_url = url_for('signup.more_info') + event.activity_id | string  + "/#event-header-" + event.event_id | string  %}
             {% endif %}
             <p class="w3-medium">
                 Would you like to help? <a href="{{ vol_url }}">Click here to Volunteer...</a>
