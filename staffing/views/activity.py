@@ -192,7 +192,11 @@ def get_event_recs(activity_id=None,**kwargs):
     coalesce(
         (select 1 from event where date(event.event_start_date,'localtime') < date('now','localtime') and event.id = job.event_id)
      ,0) 
-    as is_past_event
+    as is_past_event,
+    coalesce(
+        (select 1 from activity join event as future_event on event.activity_id = activity.id where date(future_event.event_start_date,'localtime') > date('now','localtime') and activity.id = future_event.activity_id)
+     ,0) as has_future_events
+    
     
     from event
     join activity on activity.id = event.activity_id
