@@ -126,10 +126,6 @@ DEFAULT_USER_ROLES = ['volunteer','user']
 # Minimum Role Rank for Event managers
 MINIMUM_MANAGER_RANK = 70
 
-# The number of days into the future to display
-#.  in the roster and signup displays
-ROSTER_END_DAYS = 60
-
 # Values for even.status drop down
 EVENT_STATUS_VALUES = ["Scheduled","Pending","Cancelled",]
 

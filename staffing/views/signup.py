@@ -82,7 +82,9 @@ def display():
         if rec and rec.id not in user_skills:
             user_skills.append(rec.id)
                 
-    start_date, end_date = get_display_date_range()
+    start_date = local_datetime_now().isoformat()[:10]
+    end_date = None # forever...
+    
     where = ''
     activity_id = g.get('_more_info_activity_id',0)
     if activity_id:
@@ -330,16 +332,6 @@ def populate_participant_list(job):
             
         job.participants[job.job_id] = {'initials':initials, 'users':participant_list, 'user_data': user_data_list}
     
-def get_display_date_range(days=None):
-    """Return a tuple of the start and end dates for job display"""
-    if not days:
-        site_config = get_site_config()
-        days = site_config.get('ROSTER_END_DAYS',30)
-        
-    start_date = local_datetime_now().isoformat()[:10]
-    end_date = (local_datetime_now() + timedelta(days=days)).isoformat()[:10]
-    return start_date, end_date
-
 
 def is_user_admin():
     is_admin = False
