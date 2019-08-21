@@ -139,7 +139,7 @@ class EventDateLabel(SqliteTable):
     def __init__(self,db_connection):
         super().__init__(db_connection)
         self.table_name = 'event_date_label'
-        self.order_by_col = 'id'
+        self.order_by_col = 'lower(label), id'
         self.defaults = {}
 
     def create_table(self):
