@@ -88,5 +88,13 @@ def valid_input(rec):
     if not title:
         valid_data = False
         flash("You must give the label a name")
+        
+    test_recs = EventDateLabel(g.db).select(where='lower(label) = lower("{}")'.format(request.form.get('label','Event Opens').strip()))
+    if test_recs:
+        for test in test_recs:
+            if test.id != rec.id:
+                valid_data = False
+                flash("That label name is already in use.")
+                break
 
     return valid_data
