@@ -57,7 +57,7 @@
                 </div>
                 <div class="w3-half w3-small" style="padding-left:4pt;">
                     <p class="w3-medium">
-                        <em>Where:</em> <strong>{{ job.event_loc_name | default("", True ) }}</strong> 
+                        <em>Where:</em> <strong>{{ job.activity_loc_name | default("tbd", True ) }}</strong> 
                     </p>
                     {% set filled_positions = job.activity_filled_positions %}
                     {% set max_positions = job.activity_max_positions%}
@@ -102,8 +102,11 @@
                             <p onclick="$('.job-date-container-{{ job.event_id }}-{{job.start_date[:10]}},#job-date-more-{{ job.event_id }}-{{job.start_date[:10]}},#job-date-less-{{ job.event_id }}-{{job.start_date[:10]}}').toggle();"
                             style="cursor:pointer;">
                                   <strong id="job-date-{{ job.job_id }}">{{ job.start_date[:10] | abbr_date_string }}</strong>
-                                  <span class="w3-small" id="job-date-more-{{ job.event_id }}-{{job.start_date[:10]}}" style="display:none;">&nbsp;<em>More...</em></span>
-                                  <span class="w3-small" id="job-date-less-{{ job.event_id }}-{{job.start_date[:10]}}" >&nbsp;<em>Less</em></span>
+                                  {% if job.event_loc_name == "Multiple Locations" %}
+                                  <br><strong class="w3-small">@ {{ job.event_loc_name | default("tbd", True ) }}</strong>
+                                  {% endif %}
+                                  <span class="w3-small" id="job-date-more-{{ job.event_id }}-{{job.start_date[:10]}}" style="display:none;">&nbsp;<em>Show this event</em></span>
+                                  <span class="w3-small" id="job-date-less-{{ job.event_id }}-{{job.start_date[:10]}}" >&nbsp;<em>Hide this event</em></span>
                             </p>
                         </div>
                     </div>

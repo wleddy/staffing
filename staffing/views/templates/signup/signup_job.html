@@ -14,14 +14,9 @@
         </p>
         <div class="w3-small">
                 <p><em>Job location:</em><br>
-            {% if job.job_loc_id and job.job_loc_id != job.event_loc_id %}
-                    <strong>{{ job.job_loc_name | default("", True ) }}</strong> 
+                    <strong>{{ job.job_loc_name | default("tbd", True ) }}</strong> 
+            {% if job.job_loc_id %}
                     <a href="{{ url_for('calendar.event')}}{{job.event_id}}">(Map)</a>
-            {% elif not job.job_loc_id and not job.event_loc_id %}
-                <strong>tbd</strong> 
-            {% elif job.event_loc_id %}
-                <strong>{{ job.event_loc_name | default("", True ) }}</strong> 
-                <a href="{{ url_for('calendar.event')}}{{job.event_id}}">(Map)</a></p>
             {% endif %}
             </p>
         </div>
