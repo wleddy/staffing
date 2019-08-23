@@ -343,30 +343,38 @@ def valid_input(rec):
             else:
                 rec.event_end_date = temp_datetime #store as date time
 
-        form_datetime = request.form.get("service_start_date",'')
-        if not form_datetime:
-            valid_data = False
-            flash("Enter a Start time for the service")
-        else:
-            temp_datetime = getDatetimeFromString(form_datetime)
-            if temp_datetime == None:
-                #Failed conversion
-                valid_data = False
-                flash("That is not a valid Start date")
+        if valid_data:
+            # if no service dates, use event dates instead
+            # This needs to be the last test
+            if request.form.get("service_start_date",'') + request.form.get("service_end_date",'') =='':
+                rec.service_start_date = rec.event_start_date
+                rec.service_start_date_label_id = rec.event_start_date_label_id
+                rec.service_end_date = rec.event_end_date
+                rec.service_end_date_label_id = rec.event_end_date_label_id
             else:
-                rec.service_start_date = temp_datetime #store as date time
-            
-        form_datetime = request.form.get("service_end_date",'')
-        if not form_datetime:
-            valid_data = False
-            flash("Enter an end time for the service")
-        else:
-            temp_datetime = getDatetimeFromString(form_datetime)
-            if temp_datetime == None:
-                #Failed conversion
-                valid_data = False
-                flash("That is not a valid End date")
-            else:
-                rec.service_end_date = temp_datetime #store as date time
+                form_datetime = request.form.get("service_start_date",'')
+                if not form_datetime:
+                    valid_data = False
+                    flash("Enter an start time for the service")
+                else:
+                    temp_datetime = getDatetimeFromString(form_datetime)
+                    if temp_datetime == None:
+                        #Failed conversion
+                        valid_data = False
+                        flash("That is not a valid Start date")
+                    else:
+                        rec.service_start_date = temp_datetime #store as date time
+                form_datetime = request.form.get("service_end_date",'')
+                if not form_datetime:
+                    valid_data = False
+                    flash("Enter an end time for the service")
+                else:
+                    temp_datetime = getDatetimeFromString(form_datetime)
+                    if temp_datetime == None:
+                        #Failed conversion
+                        valid_data = False
+                        flash("That is not a valid End date")
+                    else:
+                        rec.service_end_date = temp_datetime #store as date time
             
     return valid_data
