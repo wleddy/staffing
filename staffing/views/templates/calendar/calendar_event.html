@@ -47,20 +47,26 @@
             </div>
             {% endif %}
             <div class="w3-row">
+                {% if event_locations %}
                 <p class="w3-col l1 m2 s2 w3-right-align">
-                    <em>Place:</em>&nbsp;
+                    <em>Place{% if event_locations | length > 1 %}s{% endif %}:</em>&nbsp;
                 </p>
-                <div class="w3-col  l11 m10 s10">
-                    <p>
-                        <strong>{{ event.location_name | default('tbd',True) }}</strong>
-                        {%if event.location_name %}<br>{{ event.street_address }}, {{ event.city }}{% endif %}
-                    </p>
-                     {% if event.lat and event.lng %}
-                    <div style="margin-bottom:10pt;">
-                        {{ directions_snippet(event) }}
-                    </div>
-                    {% endif %}
+                <div class="w3-col  l11 m10 s10">                    
+                        {% for loc in event_locations %}
+                            <p>
+                                <strong>{{ loc.location_name | default('tbd',True) }}</strong>
+                                <br>{{ loc.street_address }}, {{ loc.city }}
+                            </p>
+                            {% if loc.lat and loc.lng %}
+                                <div style="margin-bottom:10pt;">
+                                    {{ directions_snippet(loc) }}
+                                </div>
+                            {% endif %}
+                        {% endfor %}
                 </div>
+                {% else %}
+                <p><em>Location to be determined</em></p>
+                {% endif %}
             </div>
             <div style="padding-right:6pt;">
                 {{ event.event_description | render_markdown }}

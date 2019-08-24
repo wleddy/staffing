@@ -7,7 +7,7 @@ from shotglass2.takeabeltof.utils import render_markdown_for, printException, cl
 from shotglass2.takeabeltof.date_utils import datetime_as_string, local_datetime_now, getDatetimeFromString
 from staffing.models import Event, Location, ActivityType
 from staffing.views.activity import get_event_recs
-from staffing.views.signup import get_job_rows
+from staffing.views.signup import get_job_rows, get_activity_location_list
 
 import calendar
 from datetime import date, timedelta
@@ -161,19 +161,28 @@ def event(event_id=None):
         
     event = event[0]
     map_html = None
+    event_locations = None
+
+    # assemble a list of locations where this event will be held
+    activity_location_list = get_activity_location_list(event.activity_id,"event.id = {}".format(event_id))
     
     # get the map for this
-    if event.lat and event.lng:
-        # make a list of dict for the location
-        map_data = {'lat':event.lat,'lng':event.lng,
-        'title':event.calendar_title,
-        'description':event.event_description,
-        'UID':event.event_id,
-        'location_name':event.location_name,
-        }
-        map_html = simple_map(map_data,target_id='map')
+    if activity_location_list:
+        # Get the location record
+        map_data = []
+        event_locations = Location(g.db).select(where="id in ({})".format(','.join([str(x) for x in activity_location_list])))
+        if event_locations:
+            for loc in event_locations:
+                # make a list of dict for the location
+                map_data.append({'lat':loc.lat,'lng':loc.lng,
+                'title':event.calendar_title,
+                'description':event.event_description,
+                'UID':str(event.event_id) + "-" + str(loc.id),
+                'location_name':loc.location_name,
+                },)
+            map_html = simple_map(map_data,target_id='map')
         
-    return render_template('calendar_event.html',event=event,map_html=map_html,)
+    return render_template('calendar_event.html',event=event,map_html=map_html,event_locations=event_locations)
     
     
 def get_event_status_where():

@@ -564,25 +564,7 @@ def get_job_rows(start_date=None,end_date=None,where='',user_skills=[],is_admin=
                 activity_location_name = None
 
                 # Get a list location ids of all events and jobs for this activity
-                sql = """
-                select distinct event.location_id as event_loc_id, job.location_id as job_loc_id from event
-                left join job on job.event_id = event.id
-                join activity on activity.id = event.activity_id
-                where event.activity_id = {} and {}
-                """.format(job.activity_id,where)
-                
-                loc_recs = Job(g.db).query(sql)
-                
-                activity_location_list = []
-                if not loc_recs:
-                    # no location set at all (this should never really happen...)
-                    activity_location_name = "tbd"
-                else:
-                    for x in loc_recs:
-                        if x.event_loc_id and x.event_loc_id not in activity_location_list:
-                            activity_location_list.append(x.event_loc_id)
-                        if x.job_loc_id and x.job_loc_id not in activity_location_list:
-                            activity_location_list.append(x.job_loc_id)
+                activity_location_list = get_activity_location_list(job.activity_id,where)
                                 
                 unique_activity_locations = len(activity_location_list)
                 if unique_activity_locations > 1:
@@ -706,4 +688,33 @@ def get_job_rows(start_date=None,end_date=None,where='',user_skills=[],is_admin=
                 job.user_event_positions = UJPos[0].temp
             
     return jobs
+    
+    
+def get_activity_location_list(activity_id,where_clause=''):
+    """Get a list location ids of all events and jobs for this activity"""
+    
+    if where_clause:
+        where_clause = " and " + where_clause
+        
+    sql = """
+    select distinct event.location_id as event_loc_id, job.location_id as job_loc_id from event
+    left join job on job.event_id = event.id
+    join activity on activity.id = event.activity_id
+    where event.activity_id = {activity_id} {where_clause}
+    """.format(activity_id=cleanRecordID(activity_id),where_clause=where_clause)
+    
+    loc_recs = Job(g.db).query(sql)
+    
+    activity_location_list = []
+    if not loc_recs:
+        # no location set at all (this should never really happen...)
+        activity_location_name = "tbd"
+    else:
+        for x in loc_recs:
+            if x.event_loc_id and x.event_loc_id not in activity_location_list:
+                activity_location_list.append(x.event_loc_id)
+            if x.job_loc_id and x.job_loc_id not in activity_location_list:
+                activity_location_list.append(x.job_loc_id)
+    
+    return activity_location_list
     
