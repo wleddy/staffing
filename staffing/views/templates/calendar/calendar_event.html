@@ -4,6 +4,9 @@
 {% block head %}
     {{ super() }}
     {{ map_html | default('',True) | safe }}
+    <style>
+        #map {height: 60vh;}
+    </style>
 {% endblock head %}
 
 {% block page_header %}
