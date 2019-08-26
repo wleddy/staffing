@@ -21,13 +21,8 @@
             z-index:3000;
             display:none;
         }
-    
-        @media (min-width:993px){
-            .day-col, .full_day_display{
-                width:11.9047619047619%;
-            }
-        }
-        .day-content{
+
+      .day-content{
                 font-family: condensed-font, sans-serif;
                 font-size:1.25em;
                 line-height:1;
@@ -42,8 +37,20 @@
         }
         .month-name{
             padding:6pt 0;
+            margin:0;
         }
-        .calendar-contain .w3-row p.w3-col {
+        #calendar-contain{
+            margin:0 auto;
+            width:90%;
+            max-width:1000px;
+        }
+        @media (max-width:993px){
+            #calendar-contain{
+                width:99%;
+            }
+        }
+        
+        #calendar-contain .w3-row p.w3-col {
             margin:0;
         }
         .day-cell{
@@ -88,25 +95,26 @@
 {% if cal_list %}
     {% set _ = calendar.setfirstweekday(calendar.SUNDAY) %}
     {% set event_list_position = 2 %} {# for my sanity #}
-    <div class="calendar-contain">
+    <div id="calendar-contain">
         <div class="w3-row">
-            <p class="w3-col l1 m1 w3-hide-small">&nbsp;</p>
-            <p class="w3-col l10 m10 s12 w3-large w3-primary-color month-name">
+            <!-- <p class="w3-col cal-left-spacer w3-hide-small">&nbsp;</p> -->
+            <!-- <p class="w3-col l10 m10 s12 w3-large w3-primary-color month-name"> -->
+            <p class="w3-large w3-primary-color month-name">
                 <a class="month_arrow" href="{{ url_for('calendar.display')}}{{ last_month.month }}/{{ last_month.year }}">&#x3c;</a>&nbsp;&nbsp;
                 {{ calendar.month_name[start_date.month]}} {{ start_date.year }}
                 &nbsp;&nbsp;<a class="month_arrow" href="{{ url_for('calendar.display')}}{{ next_month.month }}/{{ next_month.year }}">&#x3e;</a>
             </p>
-            <p class="w3-col l1 m1 w3-hide-small">&nbsp;</p>
+            <!-- <p class="w3-col cal-left-spacer">&nbsp;</p> -->
         <div class="w3-row">
-            <p class="w3-col l1 m1 w3-hide-small">&nbsp;</p>
+            <!-- <p class="w3-col l1 m1 w3-hide-small">&nbsp;</p> -->
             {%for day in calendar.weekheader(3).split(' ') %}
             <p class="w3-col w3-border w3-secondary-color day-name day-col">{{ day }}</p>
             {% endfor %}
-            <p class="w3-col l1 m1 w3-hide-small">&nbsp;</p>
+            <!-- <p class="w3-col l1 m1 w3-hide-small">&nbsp;</p> -->
         </div>
         {%for week in range(cal_list | length ) %}
         <div class="w3-row">
-            <p class="w3-col l1 m1 w3-hide-small">&nbsp;</p>
+            <!-- <p class="w3-col l1 m1 w3-hide-small">&nbsp;</p> -->
                 {% for day in range(cal_list[week] | length ) %}
                 {% set events_today = cal_list[week][day][event_list_position] | length %}
                 {% set day_number = cal_list[week][day][0]%}
@@ -138,7 +146,6 @@
                     </div>
                 </div>
                 {% endfor %}
-            <p class="w3-col l1 m1 w3-hide-small">&nbsp;</p>
         </div>
         {% endfor %}
     </div>
