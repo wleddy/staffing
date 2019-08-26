@@ -102,7 +102,7 @@
                             <p onclick="$('.job-date-container-{{ job.event_id }}-{{job.start_date[:10]}},#job-date-more-{{ job.event_id }}-{{job.start_date[:10]}},#job-date-less-{{ job.event_id }}-{{job.start_date[:10]}}').toggle();"
                             style="cursor:pointer;">
                                   <strong id="job-date-{{ job.job_id }}">{{ job.start_date[:10] | abbr_date_string }}</strong>
-                                  {% if job.event_loc_name == "Multiple Locations" %}
+                                  {% if job.event_loc_name == "Multiple Locations" or job.event_loc_name != job.activity_loc_name %}
                                   <br><strong class="w3-small">@ {{ job.event_loc_name | default("tbd", True ) }}</strong>
                                   {% endif %}
                                   <span class="w3-small" id="job-date-more-{{ job.event_id }}-{{job.start_date[:10]}}" style="display:none;">&nbsp;<em>Show this event</em></span>
