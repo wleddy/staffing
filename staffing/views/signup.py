@@ -565,13 +565,18 @@ def get_job_rows(start_date=None,end_date=None,where='',user_skills=[],is_admin=
 
                 # Get a list location ids of all events and jobs for this activity
                 activity_location_list = get_activity_location_list(job.activity_id,where)
-                                
+                
+                #import pdb;pdb.set_trace()
+                               
                 unique_activity_locations = len(activity_location_list)
                 if unique_activity_locations > 1:
                     activity_location_name = "Multiple Locations"
                 elif unique_activity_locations == 1:
                     activity_location_name = job.event_loc_name
-                    
+                    if not activity_location_name:
+                        act_loc = Location(g.db).get(activity_location_list[0])
+                        if act_loc:
+                            activity_location_name = act_loc.location_name
                         
                 # generate a list of all dates of events for this activity in this selection of jobs
                 # get a selection of jobs for this actvity's events
@@ -589,6 +594,7 @@ def get_job_rows(start_date=None,end_date=None,where='',user_skills=[],is_admin=
                         if job_date.start_date[:10] not in dates_list:
                             dates_list.append(job_date.start_date[:10])
                     
+            #import pdb;pdb.set_trace()
             job.event_date_list = dates_list
             
             job.activity_loc_name = activity_location_name
@@ -611,6 +617,15 @@ def get_job_rows(start_date=None,end_date=None,where='',user_skills=[],is_admin=
                 event_default_loc_state = job.event_loc_state
                 event_default_loc_zip = job.event_loc_zip
                 event_default_loc_id = job.event_loc_id
+                
+            elif job.job_loc_name:
+                #set default to the job location
+                event_default_loc = (job.job_loc_name, job.job_loc_lat, job.job_loc_lng)
+                event_default_loc_street_address = job.job_loc_street_address
+                event_default_loc_city = job.job_loc_city
+                event_default_loc_state = job.job_loc_state
+                event_default_loc_zip = job.job_loc_zip
+                event_default_loc_id = job.job_loc_id
                 
             
             # use defaults if needed
