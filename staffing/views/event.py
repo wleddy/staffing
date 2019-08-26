@@ -315,6 +315,11 @@ def delete_from_activity(activity_id=-1,id=0):
 def valid_input(rec):
     valid_data = True
     
+    # Require a default location
+    if cleanRecordID(rec.location_id) < 1:
+        valid_data = False
+        flash("You must select a default location.")
+        
     if not rec.exclude_from_calendar:
         # validate and convert start and end dates to timezone aware date strings
         form_datetime = request.form.get("event_start_date",'')

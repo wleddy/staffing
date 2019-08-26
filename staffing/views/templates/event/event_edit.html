@@ -24,7 +24,7 @@
     <p><textarea rows="7" name="description" style="width:100%;" placeholder="{{rec.activity_description | default('',True) }}" >{{rec.description |default('',True)}}</textarea></p>
     <p>{{ label_only(label="Staff Only information (not visible to public)")}}</p>
     <p><textarea rows="5" name="staff_info" style="width:100%;" >{{rec.staff_info |default('',True)}}</textarea></p>
-    <p>{{ select_field("location_id","Location", class="w3-border") }}
+    <p>{{ select_field("location_id","Default Location (May override in Jobs)", class="w3-border", req=True ) }}
             <option value="0">Select a location</option>
             {% if locations %}
             {% for loc in locations %}
