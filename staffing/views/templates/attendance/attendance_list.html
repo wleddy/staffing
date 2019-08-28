@@ -1,36 +1,36 @@
 {% extends "layout.html" %}
-{% block title %}{{ g.title }}{% endblock %}
-{% block body %}
 
-      	<p id="addRecord">
-        &nbsp;&nbsp;Find in:
-        <select id="col_select">
-            <option value="0">Id</option>
-            <option value="1" selected >Event</option>
-            <option value="2">Job</option>
-            <option value="3">Job Date</option>
-            <option value="4">Name</option>
-        </select>
-            &nbsp;&nbsp;<input id="search_input" type="text" name="user_name" value="" class="w3-border" placeholder="Type anything" 
-            onkeyup="if (this.value.length > 0){ table_search('search_input','table_list',$('#col_select').prop('selectedIndex'));}else{reset_table_search('table_list')}"
-            />
-        </p>
+{% from "_layout_helpers.html" import list_search_widget %}
+{# list_search_widget('user_job',{'Event':0,'Job':1,'Name':2,'Job Date':3,'Attendance':5,},'Name') #}
+
+{% block title %}{{ g.title }}{% endblock %}
+
+{% block body %}
+      	<p id="addRecord"><a href="{{ g.editURL }}0/">Add new record</a>&nbsp;&nbsp;
+        {{ list_search_widget('user_job',{'Event':0,'Job':1,'Name':2,'Job Date':3,'Attendance':5,})}}
+    </p>
 	{%if recs %}
 		<table id="table_list" class="datatable w3-table w3-striped w3-hoverable">
 		<tr class="w3-primary-color">
-			<th class="w3-hide-small">Id</th>
 			<th>Event</th>
             <th>Job</th>
-			<th class="w3-hide-small">Job Date</th>
             <th>Name</th>
+ 			<th>Job Date</th>
+            <th>Scheduled</th>
+            <th>Attendance</th>
 		</tr>
 		{% for rec in recs %}
-	    <tr>
-			<td onclick="window.location='{{ g.editURL }}{{rec.id}}/'"  class="w3-hide-small">{{ rec.id }}</td>
-			<td onclick="window.location='{{ g.editURL }}{{rec.id}}/'">{{ rec.activity_title | truncate(25, True) }}</td>
-			<td onclick="window.location='{{ g.editURL }}{{rec.id}}/'">{{ rec.job_title | truncate(25, True) }}</td>
-			<td onclick="window.location='{{ g.editURL }}{{rec.id}}/'"  class="w3-hide-small">{{ rec.start_date | short_date_string }}</td>
-			<td onclick="window.location='{{ g.editURL }}{{rec.id}}/'">{{ rec.first_name }} {{ rec.last_name }}</td>
+	    <tr class=" 
+            {% if not rec.attendance_start or not rec.attendance_end %} w3-pale-blue
+            {% elif rec.attendance_start != rec.job_start_date or rec.attendance_end != rec.job_end_date %} w3-pale-red
+            {% endif %}
+        ">
+			<td onclick="window.location='{{ g.editURL }}{{rec.id}}/'" >{{ rec.calendar_title | truncate(25, True) }}</td>
+			<td onclick="window.location='{{ g.editURL }}{{rec.id}}/'" >{{ rec.job_title | truncate(25, True) }}</td>
+			<td onclick="window.location='{{ g.editURL }}{{rec.id}}/'" >{{ rec.first_name }} {{ rec.last_name }}</td>
+			<td onclick="window.location='{{ g.editURL }}{{rec.id}}/'" >{{ rec.start_date | short_date_string }}</td>
+			<td onclick="window.location='{{ g.editURL }}{{rec.id}}/'" >{{ rec.job_start_date | default('No start',True) | local_time_string }} &ndash; {{ rec.job_end_date | local_time_string }}</td>
+			<td onclick="window.location='{{ g.editURL }}{{rec.id}}/'" >{{ rec.attendance_start | default('Not Recorded',True) | local_time_string }}{% if rec.attendance_end %} &ndash; {{ rec.attendance_end | local_time_string }}{% endif %}</td>
 		</tr>
 		{% endfor %}
 	  </table>

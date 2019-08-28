@@ -1,18 +1,10 @@
 {% extends "layout.html" %}
+{% from "_layout_helpers.html" import list_search_widget %}
 {% block title %}{{ g.title }}{% endblock %}
 {% block body %}
 
       	<p id="addRecord"><a href="{{ g.editURL }}0/">Add a new record</a>
-        &nbsp;&nbsp;Find in:
-        <select id="col_select">
-            <option value="0">Id</option>
-            <option value="1" selected >Name</option>
-            <option value="2">Address</option>
-            <option value="3">City</option>
-        </select>
-            &nbsp;&nbsp;<input id="search_input" type="text" name="user_name" value="" class="w3-border" placeholder="Type anything" 
-            onkeyup="if (this.value.length > 0){ table_search('search_input','table_list',$('#col_select').val());}else{reset_table_search('table_list')}"
-            />
+        &nbsp;&nbsp;{{ list_search_widget('location',{'Id':0,'Nane':1,'Address':2,'City':3,},1) }}
         </p>
 	{%if recs %}
 		<table id="table_list" class="datatable w3-table w3-striped w3-hoverable">

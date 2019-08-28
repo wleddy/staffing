@@ -24,13 +24,14 @@ def display():
     g.title = 'Attendance List'
     sql = """
     select
-    user_job.id,
-    user_job.job_id,
-    user_job.user_id,
+    user_job.*,
+    
+    job.start_date as job_start_date,
+    job.end_date as job_end_date,
 
     event.id as event_id,
     activity.title as activity_title, 
-
+    coalesce(nullif(event.calendar_title,''),activity.title) as calendar_title,
     job.title as job_title, 
     job.start_date as start_date,
 
@@ -42,15 +43,15 @@ def display():
     join user on user_job.user_id = user.id
     join event on job.event_id = event.id
     join activity on activity.id = event.activity_id
-    where 1
-    order by date(start_date,'localtime'), activity_title, job_title, first_name, last_name
+    where date(start_date, 'localtime') < date('now','localtime')
+    order by date(start_date,'localtime') DESC , activity_title, job_title, first_name, last_name
     """
     recs = UserJob(g.db).query(sql)
     
     return render_template('attendance_list.html',recs=recs)
 
-@mod.route('/edit/<int:userjob_id>',methods=['GET',])
-@mod.route('/edit/<int:userjob_id>/',methods=['GET',])
+@mod.route('/edit/<int:userjob_id>',methods=['GET','POST'])
+@mod.route('/edit/<int:userjob_id>/',methods=['GET','POST'])
 @mod.route('/edit',methods=['GET','POST'])
 @mod.route('/edit/',methods=['GET','POST'])
 @login_required
@@ -62,14 +63,19 @@ def edit(userjob_id=None):
     #import pdb;pdb.set_trace()
     userjob_id = cleanRecordID(request.form.get('id',userjob_id))
     rec = None
-    if userjob_id > 0:
+    if userjob_id < 0:
+        flash("That is not a valid record id")
+        return abort(404)
+    if userjob_id == 0:
+        rec = UserJob(g.db).new()
+    else:
         sql = """
         select 
         user_job.*,
         
         event.id as event_id,
         activity.title as activity_title, 
-
+        coalesce(nullif(event.calendar_title,''),activity.title) as calendar_title,
         job.title as job_title, 
         job.start_date as job_start_date,
         job.end_date as job_end_date,
@@ -86,9 +92,11 @@ def edit(userjob_id=None):
         """.format(userjob_id)
         rec = UserJob(g.db).query_one(sql)
     
-    if not rec:
-        flash('Could not access Attendance Record')
-        return abort(404)
+        if not rec:
+            flash('Could not access Attendance Record')
+            return abort(404)
+        
+    #import pdb;pdb.set_trace()
         
     # If the current user is not the user_id requested or current user is not admin
     is_admin = g.admin.has_access(g.user,UserJob)
@@ -101,7 +109,9 @@ def edit(userjob_id=None):
         # get a single table version of the record
         fresh_rec = UserJob(g.db).get(userjob_id)
         UserJob(g.db).update(fresh_rec,request.form)
+        
         #import pdb;pdb.set_trace()
+            
         if valid_form(fresh_rec):
             # Save the updated record
             UserJob(g.db).save(fresh_rec)
@@ -115,7 +125,7 @@ def edit(userjob_id=None):
             
         
     # display the form
-    return render_template('attendance_edit.html',rec=rec,no_delete=True)
+    return render_template('attendance_edit.html',rec=rec,no_delete=True,is_admin=is_admin)
     
     
 def valid_form(rec):

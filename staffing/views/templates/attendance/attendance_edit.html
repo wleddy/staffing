@@ -13,11 +13,12 @@
     {{ input_field(rec.id,"id",type="hidden",default=-1)}}
     <div class="w3-container" >
         <h3 class="w3-panel w3-primary-color">{{rec.activity_title}}</h3>
-        <h4>
+        <p class="w3-medium">
             Name: {{ rec.first_name}} {{rec.last_name}}<br>
+            Event: {{ rec.calendar_title }}<br>
             Job: {{ rec.job_title }}<br>
             Date: {{ rec.job_start_date | abbr_date_string }}, Sched.: {{ rec.job_start_date | local_time_string }} to {{ rec.job_end_date | local_time_string }}
-        </h4>
+        </p>
         
     {% if rec.attendance_start %}
         {% set start_date = rec.attendance_start | short_date_string %}
@@ -101,5 +102,9 @@
             { format: "%l:%i%p" } );
         $("#end_time").AnyTime_picker(
             { format: "%l:%i%p" } );
+            
+        {% if not is_admin %}
+            $('#main-form').submit(function(){return confirm("When submitting this form you are stating that you worked the hours your've recorded.");});
+        {% endif %}
     </script>
 {% endblock fieldset %}
