@@ -5,8 +5,8 @@ from shotglass2.users.models import Role, User
 from shotglass2.takeabeltof.utils import render_markdown_for, printException, cleanRecordID
 from shotglass2.takeabeltof.date_utils import date_to_string, getDatetimeFromString, local_datetime_now
 from shotglass2.shotglass import get_site_config
-from staffing.models import Event, Location, Job, UserJob
-from staffing.views.signup import get_job_rows
+from staffing.models import Event, Location, Job, UserJob, Attendance, Task
+from staffing.views.signup import get_job_rows, get_volunteer_role_ids
 
 mod = Blueprint('attendance',__name__, template_folder='templates/attendance', url_prefix='/attendance')
 
@@ -17,14 +17,18 @@ def setExits():
 #     g.deleteURL = url_for('.delete')
     g.title = 'Attendance'
 
-@table_access_required(UserJob)
+@table_access_required(Attendance)
 @mod.route('/',methods=['GET','POST'])
 def display():
     setExits()
     g.title = 'Attendance List'
+    
+    #get the ids for vounteer roles
+    vol_role_ids = get_volunteer_role_ids()
+        
     sql = """
     select
-    user_job.*,
+    attendance.*,
     
     job.start_date as job_start_date,
     job.end_date as job_end_date,
@@ -33,45 +37,48 @@ def display():
     activity.title as activity_title, 
     coalesce(nullif(event.calendar_title,''),activity.title) as calendar_title,
     job.title as job_title, 
-    job.start_date as start_date,
-
+    
+    -- 1 if a volunteer job, else 0
+    coalesce((select 1 from job_role where job_role.role_id in ({vol_role_ids}) and job_role.job_id = job.id),0) as is_volunteer_job,
+    
     user.first_name,
     user.last_name
 
-    from user_job
+    from attendance
+    join user_job on user_job.id = attendance.user_job_id
     join job on user_job.job_id = job.id
     join user on user_job.user_id = user.id
     join event on job.event_id = event.id
     join activity on activity.id = event.activity_id
-    where date(start_date, 'localtime') < date('now','localtime')
-    order by date(start_date,'localtime') DESC , activity_title, job_title, first_name, last_name
-    """
-    recs = UserJob(g.db).query(sql)
+    where date(job.start_date, 'localtime') < date('now','localtime') and is_volunteer_job = 0
+    order by date(job.start_date,'localtime') DESC , activity_title, job_title, first_name, last_name
+    """.format(vol_role_ids=vol_role_ids)
+    recs = Attendance(g.db).query(sql)
     
     return render_template('attendance_list.html',recs=recs)
 
-@mod.route('/edit/<int:userjob_id>',methods=['GET','POST'])
-@mod.route('/edit/<int:userjob_id>/',methods=['GET','POST'])
+@mod.route('/edit/<int:att_id>',methods=['GET','POST'])
+@mod.route('/edit/<int:att_id>/',methods=['GET','POST'])
 @mod.route('/edit',methods=['GET','POST'])
 @mod.route('/edit/',methods=['GET','POST'])
 @login_required
-def edit(userjob_id=None):
+def edit(att_id=None):
     """this is where users (staff) will record their work hours and other info"""
     setExits()
-    g.title = 'Edit Attendance'
+    g.title = 'Record Attendance'
         
     #import pdb;pdb.set_trace()
-    userjob_id = cleanRecordID(request.form.get('id',userjob_id))
+    att_id = cleanRecordID(request.form.get('id',att_id))
     rec = None
-    if userjob_id < 0:
+    if att_id < 0:
         flash("That is not a valid record id")
         return abort(404)
-    if userjob_id == 0:
-        rec = UserJob(g.db).new()
+    if att_id == 0:
+        rec = Attendance(g.db).new()
     else:
         sql = """
         select 
-        user_job.*,
+        attendance.*,
         
         event.id as event_id,
         activity.title as activity_title, 
@@ -82,15 +89,16 @@ def edit(userjob_id=None):
         user.first_name,
         user.last_name
 
-        from user_job
+        from attendance
+        join user_job on user_job.id = attendance.user_job_id
         join job on user_job.job_id = job.id
         join user on user_job.user_id = user.id
         join event on job.event_id = event.id
         join activity on activity.id = event.activity_id
-        where user_job.id = {}
-        order by user_job.id
-        """.format(userjob_id)
-        rec = UserJob(g.db).query_one(sql)
+        where attendance.id = {}
+        order by attendance.id
+        """.format(att_id)
+        rec = Attendance(g.db).query_one(sql)
     
         if not rec:
             flash('Could not access Attendance Record')
@@ -99,7 +107,7 @@ def edit(userjob_id=None):
     #import pdb;pdb.set_trace()
         
     # If the current user is not the user_id requested or current user is not admin
-    is_admin = g.admin.has_access(g.user,UserJob)
+    is_admin = g.admin.has_access(g.user,Attendance)
     if not is_admin and session.get('user_id') != rec.user_id:
         flash('You do not have access to this action')
         abort(404)
@@ -107,21 +115,21 @@ def edit(userjob_id=None):
     if request.form:
         # Validate the Form
         # get a single table version of the record
-        fresh_rec = UserJob(g.db).get(userjob_id)
-        UserJob(g.db).update(fresh_rec,request.form)
+        fresh_rec = Attendance(g.db).get(att_id)
+        Attendance(g.db).update(fresh_rec,request.form)
         
         #import pdb;pdb.set_trace()
             
         if valid_form(fresh_rec):
             # Save the updated record
-            UserJob(g.db).save(fresh_rec)
+            Attendance(g.db).save(fresh_rec)
             g.db.commit()
             # Go somewhere else
         
             return redirect(g.listURL)
             
         else:
-            UserJob(g.db).update(rec,request.form)
+            Attendance(g.db).update(rec,request.form)
             
         
     # display the form
@@ -132,7 +140,7 @@ def valid_form(rec):
     is_valid = True
     #import pdb;pdb.set_trace()
     
-    job_rec = Job(g.db).get(rec.job_id)
+    job_rec = UserJob(g.db).get(rec.user_job_id)
     if not job_rec:
         flash("Could not locate Job record")
         is_valid = False
@@ -164,8 +172,8 @@ def valid_form(rec):
             flash("The Start time cannot be after the End Time")
             is_valid = False
         else:
-            rec.attendance_start = start_time
-            rec.attendance_end = end_time
+            rec.start_date = start_time
+            rec.end_date = end_time
         
         
     return is_valid

@@ -6,7 +6,7 @@ from shotglass2.takeabeltof.jinja_filters import register_jinja_filters
 from shotglass2.takeabeltof.utils import cleanRecordID
 from shotglass2.users.views.login import setUserStatus
 from shotglass2.users.admin import Admin
-from staffing.models import Activity, Event, Job, Location, ActivityType, UserJob, EventDateLabel, Client
+from staffing.models import Activity, Event, Job, Location, ActivityType, UserJob, EventDateLabel, Client, Attendance
 
 # Create app
 # setting static_folder to None allows me to handle loading myself
@@ -120,7 +120,9 @@ def _before():
         g.admin.register(EventDateLabel,url_for('event_date_label.display'),display_name='Date Labels',minimum_rank_required=500,roles=['admin','activity manager'])
         g.admin.register(Event,url_for('event.display'),display_name='Events',add_to_menu=False,minimum_rank_required=500,roles=['admin','activity manager'])
         g.admin.register(Client,url_for('client.display'),display_name='Clients',minimum_rank_required=500,roles=['admin','activity manager'])
-        #g.admin.register(UserJob,url_for('attendance.display'),display_name='Attendance',minimum_rank_required=500,roles=['admin','activity manager'])
+        g.admin.register(Attendance,url_for('attendance.display'),display_name='Attendance',minimum_rank_required=500,roles=['admin','activity manager'])
+        
+        g.admin.register(UserJob,url_for('attendance.display'),display_name='User Jobs',minimum_rank_required=500,roles=['admin','activity manager'],add_to_menu=False)
 
         shotglass.user_setup() # g.admin now holds access rules Users, Prefs and Roles
 

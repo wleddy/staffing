@@ -20,16 +20,16 @@
             Date: {{ rec.job_start_date | abbr_date_string }}, Sched.: {{ rec.job_start_date | local_time_string }} to {{ rec.job_end_date | local_time_string }}
         </p>
         
-    {% if rec.attendance_start %}
-        {% set start_date = rec.attendance_start | short_date_string %}
-        {% set start_time = rec.attendance_start | local_time_string %}
+    {% if rec.start_date %}
+        {% set start_date = rec.start_date | short_date_string %}
+        {% set start_time = rec.start_date | local_time_string %}
     {% else %}
         {% set start_date = rec.job_start_date | short_date_string %}
         {% set start_time = rec.job_start_date | local_time_string %}
     {% endif %}
-    {% if rec.attendance_end %}
-        {% set end_date = rec.attendance_end | short_date_string %}
-        {% set end_time = rec.attendance_end | local_time_string %}
+    {% if rec.end_date %}
+        {% set end_date = rec.end_date | short_date_string %}
+        {% set end_time = rec.end_date | local_time_string %}
     {% else %}
         {% set end_date = rec.job_end_date | short_date_string %}
         {% set end_time = rec.job_end_date | local_time_string %}
@@ -90,10 +90,10 @@
     </div>
     
     <div class="w3-row">
-        <p class="w3-col w3-third" style="padding-right:3pt">{{ input_field(rec.attendance_mileage,'attendance_mileage',label="Mileage",placeholder="Miles")}}</p>
+        <p class="w3-col w3-third" style="padding-right:3pt">{{ input_field(rec.mileage,'mileage',label="Mileage",placeholder="Miles")}}</p>
         <div   class="w3-col w3-twothird">
             <p>{{ label_only("Comments")}}</p>
-            <p><textarea class="w3-input" name="attendance_comment" rows="5" placeholder="Anything Broken? Any problems?">{{ rec.attendance_comment }}</textarea></p>
+            <p><textarea class="w3-input" name="comment" rows="5" placeholder="Anything Broken? Any problems?">{{ rec.comment | default("",True) }}</textarea></p>
         </div>
     </div>
     

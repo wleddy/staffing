@@ -43,6 +43,33 @@ class ActivityType(SqliteTable):
         super().create_table(sql)
 
 
+class Attendance(SqliteTable):
+    """Staffing User_Job Table"""
+    def __init__(self,db_connection):
+        super().__init__(db_connection)
+        self.table_name = 'attendance'
+        self.order_by_col = 'start_date DESC, id'
+        self.defaults = {}
+        self.indexes = {"attendance_user_job_id":"user_job_id","attendance_start_date":"start_date"}
+
+    def create_table(self):
+        """Define and create the table"""
+
+        sql = """
+        user_job_id INTEGER,
+        start_date DATETIME,
+        end_date DATETIME,
+        comment TEXT,
+        mileage FLOAT,
+        task_user_id INTEGER,
+        task_id INTEGER,
+        FOREIGN KEY (task_user_id) REFERENCES user(id) ON DELETE CASCADE,
+        FOREIGN KEY (task_id) REFERENCES task(id) ON DELETE CASCADE,
+        FOREIGN KEY (user_job_id) REFERENCES user_job(id) ON DELETE CASCADE """
+
+        super().create_table(sql)
+
+
 class Client(SqliteTable):
     """Client for events"""
     def __init__(self,db_connection):
@@ -268,6 +295,26 @@ class StaffNotification(SqliteTable):
         super().create_table(sql)
         
         
+class Task(SqliteTable):
+    """Staffing User_Job Table"""
+    def __init__(self,db_connection):
+        super().__init__(db_connection)
+        self.table_name = 'task'
+        self.order_by_col = 'name, id'
+        self.defaults = {}
+        self.indexes = {}
+
+    def create_table(self):
+        """Tasks are Adhock jobs that need to be accounted for but don't appear on the calendar"""
+
+        sql = """
+        name TEXT,
+        activity_id,
+        FOREIGN KEY (activity_id) REFERENCES activity(id) ON DELETE CASCADE """
+
+        super().create_table(sql)
+
+
 class UserJob(SqliteTable):
     """Staffing User_Job Table"""
     def __init__(self,db_connection):
@@ -286,10 +333,7 @@ class UserJob(SqliteTable):
         created DATETIME,
         modified DATETIME,
         positions INTEGER,
-        attendance_start DATETIME,
-        attendance_end DATETIME,
-        attendance_comment TEXT,
-        attendance_mileage FLOAT,
+        comment TEXT,
         FOREIGN KEY (user_id) REFERENCES user(id) ON DELETE CASCADE,
         FOREIGN KEY (job_id) REFERENCES job(id) ON DELETE CASCADE """
         
@@ -322,12 +366,15 @@ class UserJob(SqliteTable):
 def init_event_db(db):
     """Create a intial user record."""
     Activity(db).create_table()
-    Event(db).create_table()
     ActivityType(db).create_table()
+    Attendance(db).create_table()
+    Client(db).create_table()
+    Event(db).create_table()
+    EventDateLabel(db).create_table()
     Job(db).create_table()
-    UserJob(db).create_table()
     JobRole(db).create_table()
     Location(db).create_table()
     StaffNotification(db).create_table()
-    Client(db).create_table()
-    EventDateLabel(db).create_table()
+    Task(db).create_table()
+    UserJob(db).create_table()
+    
