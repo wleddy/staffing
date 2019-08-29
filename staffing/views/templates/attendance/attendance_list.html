@@ -5,7 +5,7 @@
 {% block title %}{{ g.title }}{% endblock %}
 
 {% block body %}
-      	<p id="addRecord"><a href="{{ g.editURL }}0/">Add new record</a>&nbsp;&nbsp;
+      	<p id="addRecord"><!-- <a href="{{ g.editURL }}0/">Add new record</a>&nbsp;&nbsp; -->
         {{ list_search_widget('user_job',{'Event':0,'Job':1,'Name':2,'Job Date':3,'Attendance':5,'Comment':6,})}}
     </p>
     <p class="w3-small "><em>Volunteer Attendance is not listed</em></p>
