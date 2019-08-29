@@ -439,6 +439,8 @@ def get_job_rows(start_date=None,end_date=None,where='',user_skills=[],is_admin=
     if group_by:
         group_by = 'group by {}'.format(group_by)
         
+    vol_role_ids = get_volunteer_role_ids()
+    
     sql = """
     select activity.id as activity_id, 
     activity.title as activity_title, 
@@ -528,7 +530,7 @@ def get_job_rows(start_date=None,end_date=None,where='',user_skills=[],is_admin=
         where job.id = user_job.job_id and job.event_id = event.id and {where}) 
         as job_filled_positions,
     -- 1 if a volunteer job, else 0
-    coalesce((select 1 from job_role where job_role.role_id in (6,3) and job_role.job_id = job.id),0) as is_volunteer_job,
+    coalesce((select 1 from job_role where job_role.role_id in ({vol_role_ids}) and job_role.job_id = job.id),0) as is_volunteer_job,
     coalesce(
         (select 1 from event where date(event.event_start_date,'localtime') < date('now','localtime') and event.id = job.event_id)
      ,0) 
@@ -546,7 +548,7 @@ def get_job_rows(start_date=None,end_date=None,where='',user_skills=[],is_admin=
     {group_by}
     order by {order_by}
     """
-    sql = sql.format(where=where,order_by=order_by,group_by=group_by,volunteer_skills=volunteer_skills,)
+    sql = sql.format(where=where,order_by=order_by,group_by=group_by,volunteer_skills=volunteer_skills,vol_role_ids=vol_role_ids,)
     #print(sql)
     #import pdb;pdb.set_trace()            
     jobs = Job(g.db).query(sql)
@@ -733,3 +735,13 @@ def get_activity_location_list(activity_id,where_clause=''):
     
     return activity_location_list
     
+    
+def get_volunteer_role_ids():
+    #get the ids for vounteer roles
+    l= ['"' + x + '"' for x in get_site_config().get('DEFAULT_USER_ROLES',['volunteer','user'])]
+    vol_roles = Role(g.db).select(where="name in ({})".format(",".join(l)))
+    vol_role_ids = ''
+    if vol_roles:
+        vol_role_ids = ",".join([str(x.id) for x in vol_roles])
+    
+    return vol_role_ids
