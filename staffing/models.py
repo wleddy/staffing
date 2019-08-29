@@ -348,8 +348,21 @@ class UserJob(SqliteTable):
 
     def save(self,rec,**kwargs):
         rec.modified = local_datetime_now()
-        return super().save(rec,**kwargs)
-
+        #import pdb;pdb.set_trace()
+        make_attendance_rec = False
+        if rec.id == None:
+            #a new Attendance record to go with this new user_job record
+            make_attendance_rec = True
+            
+        row_id = super().save(rec,**kwargs)
+        
+        if make_attendance_rec and row_id != None:
+            att = Attendance(self.db)
+            att_rec = att.new()
+            att_rec.user_job_id = row_id
+            att.save(att_rec)
+            
+        return row_id
 
     def get_assigned_users(self,job_id):
         """Return a namedlist of user records assigned to this job or None"""
