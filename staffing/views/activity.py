@@ -218,5 +218,9 @@ def valid_input(rec):
     if not title:
         valid_data = False
         flash("You must give the activity a name")
+        
+    if not rec.activity_type_id:
+        valid_data = False
+        flash("You must select an Activity Type")
 
     return valid_data
