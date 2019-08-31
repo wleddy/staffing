@@ -26,14 +26,6 @@
                 title="Copy the jobs on this date to the new date"
                 >Copy</a>
                 &nbsp;&nbsp;
-                <a class="w3-btn w3-ripple w3-delete-button-color w3-mobile w3-round-large" 
-                onclick="if(confirmRecordDelete()){submitModalForm(
-                'manage_event_form','{{url_for('event.manage_event')}}?action=delete',
-                'event-list',
-                '{{ url_for('activity.get_event_list')}}{{ rec.activity_id}}');}else{cancelModalForm();}"
-                title="Delete the job set from this event"
-                >Delete</a>
-                &nbsp;&nbsp;
                 <a  class="w3-btn w3-ripple w3-cancel-button-color w3-mobile w3-round-large" 
                 onclick="cancelModalForm()">Cancel</a>
             
