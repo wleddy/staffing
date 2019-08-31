@@ -128,7 +128,7 @@ def edit(att_id=None):
         # get a single table version of the record just so I can use .update()
         fresh_rec = Attendance(g.db).get(att_id)
         Attendance(g.db).update(fresh_rec,request.form)
-        
+        fresh_rec.no_show = request.form.get('no_show','0')
         #import pdb;pdb.set_trace()
             
         if valid_form(fresh_rec):

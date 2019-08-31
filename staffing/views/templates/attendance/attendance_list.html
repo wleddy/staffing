@@ -22,8 +22,8 @@
 		</tr>
 		{% for rec in recs %}
 	    <tr class=" 
-            {% if not rec.start_date or not rec.end_date %} w3-pale-blue
-            {% elif rec.start_date != rec.job_start_date or rec.end_date != rec.job_end_date %} w3-pale-red
+            {% if (not rec.start_date or not rec.end_date) and rec.no_show != 1 %} w3-pale-blue
+            {% elif rec.start_date != rec.job_start_date or rec.end_date != rec.job_end_date or rec.no_show == 1 %} w3-pale-red
             {% endif %}
         ">
 			<td onclick="window.location='{{ g.editURL }}{{rec.id}}/'" >{{ rec.calendar_title | truncate(20, True) }}</td>
