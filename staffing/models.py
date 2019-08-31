@@ -38,7 +38,8 @@ class ActivityType(SqliteTable):
 
         sql = """
         type TEXT NOT NULL,
-        description TEXT"""
+        description TEXT
+        """
 
         super().create_table(sql)
 
@@ -49,7 +50,7 @@ class Attendance(SqliteTable):
         super().__init__(db_connection)
         self.table_name = 'attendance'
         self.order_by_col = 'start_date DESC, id'
-        self.defaults = {}
+        self.defaults = {'no_show':0,}
         self.indexes = {"attendance_user_job_id":"user_job_id","attendance_start_date":"start_date"}
 
     def create_table(self):
@@ -63,6 +64,7 @@ class Attendance(SqliteTable):
         mileage FLOAT,
         task_user_id INTEGER,
         task_id INTEGER,
+        no_show INTEGER DEFAULT 0,
         FOREIGN KEY (task_user_id) REFERENCES user(id) ON DELETE CASCADE,
         FOREIGN KEY (task_id) REFERENCES task(id) ON DELETE CASCADE,
         FOREIGN KEY (user_job_id) REFERENCES user_job(id) ON DELETE CASCADE """
