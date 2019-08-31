@@ -1,6 +1,7 @@
 from flask import Flask, g, session, request, redirect, flash, abort, url_for, session
 from flask_mail import Mail
 from shotglass2 import shotglass
+from shotglass2.users.models import User
 from shotglass2.takeabeltof.database import Database
 from shotglass2.takeabeltof.jinja_filters import register_jinja_filters
 from shotglass2.takeabeltof.utils import cleanRecordID
@@ -125,6 +126,8 @@ def _before():
         g.admin.register(UserJob,url_for('attendance.display'),display_name='User Jobs',minimum_rank_required=500,roles=['admin','activity manager'],add_to_menu=False)
 
         shotglass.user_setup() # g.admin now holds access rules Users, Prefs and Roles
+        #give activity managers access to the user records
+        g.admin.register(User,url_for('user.display'),display_name='Users',roles=['activity manager'],add_to_menu=False)
 
 
 @app.teardown_request
