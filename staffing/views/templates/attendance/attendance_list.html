@@ -31,7 +31,7 @@
 			<td onclick="window.location='{{ g.editURL }}{{rec.id}}/'" >{{ rec.first_name }} {{ rec.last_name }}</td>
 			<td onclick="window.location='{{ g.editURL }}{{rec.id}}/'" >{{ rec.job_start_date | short_date_string }}</td>
 			<td onclick="window.location='{{ g.editURL }}{{rec.id}}/'" >{{ rec.job_start_date | default('No start',True) | local_time_string }} &ndash; {{ rec.job_end_date | local_time_string }}</td>
-			<td onclick="window.location='{{ g.editURL }}{{rec.id}}/'" >{{ rec.start_date | default('Not Recorded',True) | local_time_string }}{% if rec.end_date %} &ndash; {{ rec.end_date | local_time_string }}{% endif %}</td>
+			<td onclick="window.location='{{ g.editURL }}{{rec.id}}/'" >{% if rec.no_show == 1 %}<strong class="w3-text-red">No Show</strong>{% else %}{{ rec.start_date | default('Not Recorded',True) | local_time_string }}{% if rec.end_date %} &ndash; {{ rec.end_date | local_time_string }}{% endif %}{% endif %}</td>
 			<td onclick="window.location='{{ g.editURL }}{{rec.id}}/'" >{{ rec.comment | default('None',True) }}</td>
 		</tr>
 		{% endfor %}

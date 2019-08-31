@@ -1,5 +1,6 @@
 from flask import request, session, g, redirect, url_for, abort, \
      render_template, flash, Blueprint
+from datetime import timedelta
 from shotglass2.users.admin import login_required, table_access_required
 from shotglass2.users.models import Role, User
 from shotglass2.takeabeltof.utils import render_markdown_for, printException, cleanRecordID
@@ -67,9 +68,11 @@ def edit(att_id=None):
     setExits()
     g.title = 'Record Attendance'
         
+    rec = None
+    shift_hours = 0
+    
     #import pdb;pdb.set_trace()
     att_id = cleanRecordID(request.form.get('id',att_id))
-    rec = None
     if att_id < 0:
         flash("That is not a valid record id")
         return abort(404)
@@ -105,6 +108,14 @@ def edit(att_id=None):
             return abort(404)
         
     #import pdb;pdb.set_trace()
+
+    if not rec.start_date and rec.job_start_date:
+        rec.start_date = rec.job_start_date
+    if not rec.end_date and rec.job_end_date:
+        rec.end_date = rec.job_end_date
+        
+    if rec.start_date and rec.end_date:
+        shift_hours = (getDatetimeFromString(rec.end_date) - getDatetimeFromString(rec.start_date)).seconds / 3600
         
     # If the current user is not the user_id requested or current user is not admin
     is_admin = g.admin.has_access(g.user,Attendance)
@@ -114,66 +125,111 @@ def edit(att_id=None):
         
     if request.form:
         # Validate the Form
-        # get a single table version of the record
+        # get a single table version of the record just so I can use .update()
         fresh_rec = Attendance(g.db).get(att_id)
         Attendance(g.db).update(fresh_rec,request.form)
         
         #import pdb;pdb.set_trace()
             
         if valid_form(fresh_rec):
-            # Save the updated record
             Attendance(g.db).save(fresh_rec)
             g.db.commit()
-            # Go somewhere else
         
             return redirect(g.listURL)
             
         else:
-            Attendance(g.db).update(rec,request.form)
-            
+            Attendance(g.db).update(rec,request.form)            
         
     # display the form
-    return render_template('attendance_edit.html',rec=rec,no_delete=True,is_admin=is_admin)
+    return render_template('attendance_edit.html',rec=rec,no_delete=True,is_admin=is_admin,shift_hours=shift_hours)
     
     
 def valid_form(rec):
-    is_valid = True
+    valid_form = True
     #import pdb;pdb.set_trace()
     
     job_rec = UserJob(g.db).get(rec.user_job_id)
     if not job_rec:
         flash("Could not locate Job record")
-        is_valid = False
+        valid_form = False
         
-    # start and end times must be present
-    start_time = request.form.get('att_start_time','')
-    start_date = request.form.get('att_start_date','')
-    # Try to append this time onto the job start date
-    start_time = '{} {}'.format(start_date,start_time)
-    start_time = getDatetimeFromString(start_time) 
+    if int(rec.no_show) == 1:
+        #no reason to record anything else
+        rec.start_date = None
+        rec.end_date = None
+        return True
     
-    if not start_time or type(start_time) == str:
-        flash("That is not a valid Start time")
-        is_valid = False
+    start_time = None
+    end_time = None
+    shift_hours = request.form.get('shift_hours')
+    if shift_hours != None:
+        # shift hours must be a number
+        try:
+            shift_hours = float(shift_hours)
+            if shift_hours > 0:
+                start_date = request.form.get('start_date_for_hours','')
+                start_time = request.form.get('start_time_for_hours','')
+                if start_date and start_time:
+                    start_time = '{} {}'.format(start_date,start_time)
+                    start_time = getDatetimeFromString(start_time) 
+                    if start_time:
+                        end_time = start_time + timedelta(seconds=shift_hours * 3600)
+                    else:
+                        valid_form = False
+                        flash(printException("That is not a valid Start Date or time"))
+                else:
+                    valid_form = False
+                    flash(printException("Start Date or time is missing."))
+            else:
+                valid_form = False
+                flash("Hours Worked must be greater than 0")
+        except:
+            valid_form = False
+            flash("Shift Hours must be a number.")
+            
+    else:
+        # start and end times must be present
+        start_time = request.form.get('att_start_time','')
+        start_date = request.form.get('att_start_date','')
+        # Try to append this time onto the job start date
+        start_time = '{} {}'.format(start_date,start_time)
+        start_time = getDatetimeFromString(start_time) 
+    
+        if not start_time:
+            flash("That is not a valid Start time")
+            valid_form = False
         
-    end_time = request.form.get('att_end_time','')
-    end_date = request.form.get('att_end_date','')
-    # Try to append this time onto the job start date
-    end_time = '{} {}'.format(end_date,end_time)
-    end_time = getDatetimeFromString(end_time) 
+        end_time = request.form.get('att_end_time','')
+        end_date = request.form.get('att_end_date','')
+        # Try to append this time onto the job start date
+        end_time = '{} {}'.format(end_date,end_time)
+        end_time = getDatetimeFromString(end_time) 
     
-    if not end_time or type(end_time) == str:
-        flash("That is not a valid End time")
-        is_valid = False
+        if not end_time:
+            flash("That is not a valid End time")
+            valid_form = False
         
         
     if start_time and end_time:
         if start_time > end_time:
             flash("The Start time cannot be after the End Time")
-            is_valid = False
+            valid_form = False
         else:
             rec.start_date = start_time
             rec.end_date = end_time
         
         
-    return is_valid
+    return valid_form
+    
+    
+@mod.route('/tab_select',methods=['POST'])
+@mod.route('/tab_select/',methods=['POST'])
+@login_required
+def tab_select():
+    """Record the select attenance input form tab in the user session"""
+
+    tab_clicked = request.form.get('tab_clicked')
+    if tab_clicked:
+        session['attendance_tab_select'] = tab_clicked
+        
+    return ''
