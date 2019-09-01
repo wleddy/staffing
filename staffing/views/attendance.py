@@ -15,7 +15,7 @@ mod = Blueprint('attendance',__name__, template_folder='templates/attendance', u
 def setExits():
     g.listURL = url_for('.display')
     g.editURL = url_for('.edit')
-#     g.deleteURL = url_for('.delete')
+    g.deleteURL = url_for('.delete')
     g.title = 'Attendance'
 
 @table_access_required(Attendance)
@@ -144,6 +144,27 @@ def edit(att_id=None):
     return render_template('attendance_edit.html',rec=rec,no_delete=True,is_admin=is_admin,shift_hours=shift_hours)
     
     
+@mod.route('/delete/',methods=['GET','POST',])
+@mod.route('/delete/<int:id>/',methods=['GET',])
+@table_access_required(Attendance)
+def delete(id=0):
+    setExits()
+    id = cleanRecordID(id)
+    attendance = Attendance(g.db)
+    if id <= 0:
+        return abort(404)
+    
+    if id > 0:
+        rec = attendance.get(id)
+    
+    if rec:
+        attendance.delete(rec.id)
+        g.db.commit()
+        flash("Attendance Record Deleted")
+
+    return redirect(g.listURL)
+
+
 def valid_form(rec):
     valid_form = True
     #import pdb;pdb.set_trace()
