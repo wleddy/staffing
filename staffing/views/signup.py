@@ -259,6 +259,9 @@ def roster(display_end_days=0):
     
     if display_end_days > 0:
         end_date = end_date + timedelta(days=display_end_days)
+    elif display_end_days < 0:
+        #display all future events
+        end_date = end_date + timedelta(days=2000) # that ought to do it...
     
     user_skills = []
     recs = User(g.db).get_roles(session.get('user_id',-1))
