@@ -65,13 +65,18 @@ def send_signup_email(job_data_list,user,template_path,bp,**kwargs):
     if ical:
         attachment = ("{}.ics".format(job_data.job_title.replace(' ','_')), "text/calendar", ical)
             
+    #import pdb;pdb.set_trace()
+    bcc = None
+    if site_config.get('BCC_ADMINS_ON_ALL_EMAIL',False):
+        bcc=site_config.get('ADMIN_EMAILS',None)
+        
     # send that puppy!
     send_result = send_message([(user.email,' '.join([user.first_name,user.last_name]))],
                     subject=subject,
                     body_is_html=True,
                     body=email_html,
                     attachment=attachment,
-                    bcc=site_config.get('ADMIN_EMAILS',None),
+                    bcc=bcc,
                     )
     if not send_result[0]:
         #Error occured

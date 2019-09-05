@@ -31,6 +31,12 @@ CONTACT_EMAIL_ADDR = MAIL_DEFAULT_ADDR
 
 CC_ADMIN_ON_CONTACT = True
 
+#Contact info for additional admins to inform
+# A list of tuples: (recipient name,recipient address)
+ADMIN_EMAILS = [(CONTACT_NAME,CONTACT_EMAIL_ADDR),]
+
+BCC_ADMINS_ON_ALL_EMAIL = True
+
 REPORT_404_ERRORS = DEBUG
 
 # Security Settings
