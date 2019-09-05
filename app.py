@@ -149,7 +149,9 @@ def server_error(error):
 app.add_url_rule('/static/<path:filename>','static',shotglass.static)
 
 from staffing.views import signup, calendar, event, activity,location, job, activity_type, attendance, event_date_label, client
-app.add_url_rule('/','display',calendar.display)
+    
+app.add_url_rule('/','display',calendar.display) # Make the calendar our home page...
+    
 app.register_blueprint(signup.mod)
 app.register_blueprint(activity.mod)
 app.register_blueprint(event.mod)

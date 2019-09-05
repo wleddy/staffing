@@ -7,11 +7,12 @@
         <div class="w3-dropdown-hover w3-bar-block">
             <a href="javascript:void(0)" class="w3-button w3-border w3-primary-color w3-drop-menu-section-hover-color">Home</a>
             <div class="w3-dropdown-content">
-                <a  class="w3-bar-item w3-button w3-border w3-drop-menu-color w3-drop-menu-hover-color" href="/">&nbsp;&nbsp;Signup Home</a>
+                <a  class="w3-bar-item w3-button w3-border w3-drop-menu-color w3-drop-menu-hover-color" href="/">&nbsp;&nbsp;Events Home</a>
                 <a  class="w3-bar-item w3-button w3-border w3-drop-menu-color w3-drop-menu-hover-color" href="http://sacbike.org">&nbsp;&nbsp;SABA Home</a>
             </div>
         </div>
-          <a class="w3-bar-item w3-button w3-border w3-primary-color w3-secondary-hover-color" href="{{ url_for('calendar.display') }}">Calendar</a>
+          <a class="w3-bar-item w3-button w3-border w3-primary-color w3-secondary-hover-color" href="/">Calendar</a>
+          <a class="w3-bar-item w3-button w3-border w3-primary-color w3-secondary-hover-color" href="{{ url_for('signup.display') }}">Signups</a>
           {% if g.admin and g.admin.has_access(g.user,Job)%}
           <a class="w3-bar-item w3-button w3-border w3-primary-color w3-secondary-hover-color" href="{{ url_for('signup.roster') }}">View Roster</a>
           {% endif %}

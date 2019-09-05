@@ -22,6 +22,7 @@ def setExits():
 @mod.route('/home/', methods=['GET','POST',])
 def home():
     """So we can use www routes in this blueprint"""
+    return display()
     return redirect(url_for('.display'))
     
 # @mod.route('/about/')
@@ -60,7 +61,7 @@ def more_info(activity_id=0):
         
     return redirect(url_for('signup.display'))
 
-@mod.route('/')
+@mod.route('/activities/')
 def display():
     """List Signup opportuniies"""
     setExits()
