@@ -1,4 +1,4 @@
-Werkzeug==0.14.1    # A2hosting setup needs the CGI fixer that this version provides
+Werkzeug
 Flask
 Flask-Mail
 mistune
