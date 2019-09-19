@@ -77,6 +77,10 @@
             width:100%;
             z-index:2000;
         }
+        
+        .theres-more {
+            cursor:pointer;
+        }
     </style>
 
     <script>
@@ -135,7 +139,7 @@
                         {% endfor %}
                         {# lump all the extra events into a "more" line #}
                         {% if events_today > 3 %}
-                        <p class=" w3-primary-color" onclick="show_full_day({{day_number}})">&amp; {{ cal_list[week][day][2] | length - 2}} more...</p>
+                        <p class=" w3-primary-color theres-more" onclick="show_full_day({{day_number}})">&amp; {{ cal_list[week][day][2] | length - 2}} more...</p>
                         {% endif %}
                     </div>
                 </div>
