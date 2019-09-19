@@ -4,13 +4,42 @@
 
 {% block title %}{{ g.title }}{% endblock %}
 
+{% block head %}
+    {{ super() }}
+    {% include "anytime_head.html"%}
+{% endblock head %}
+
+
 {% block body %}
-      	<p id="addRecord"><!-- <a href="{{ g.editURL }}0/">Add new record</a>&nbsp;&nbsp; -->
-        {{ list_search_widget('user_job',{'Event':0,'Job':1,'Name':2,'Job Date':3,'Attendance':5,'Comment':6,})}}
+
+    {% set search_columns_dict = {"Event":0,"Job":1,"Name":2,"Job Date":3,"Attendance":5,"Comment":6} %}
+      	<p id="addRecord"><a href="{{ g.editURL }}0/">Add new record</a>&nbsp;&nbsp;
+    Find in:
+        <select id="col_select" onchange="doSearch()">
+            {% for key, value in search_columns_dict.items() %}
+            <option value="{{ value }}" >{{ key }}</option>
+            {% endfor %}
+        </select>
+            &nbsp;&nbsp;<input id="search_input" type="text" name="user_name" 
+                class="w3-border" placeholder="Type anything" autofocus onkeyup=" doSearch();" 
+            />
+        &nbsp;
+        <input type="checkbox" name="save_search" id="save_search" onclick="if(!this.checked){$('#search_input').val('');} doSearch();" /> <label for='save_search'>Save Search</label>
     </p>
+    <div class="w3-row">
+        <p class="w3-col l4 m12 s12" >Job Date Range: Start Date
+            <input class="w3-border" type="text" name="job_start_date" id="job_start_date" size="12" placeholder="MM/DD/YY" onchange="doSearch()">
+        </p>
+        <p class="w3-col l2 m12 s12">End Data 
+            <input class="w3-border" type="text" name="job_end_date" id="job_end_date" size="12" placeholder="MM/DD/YY" onchange="doSearch()">
+        </p>
+        <p class="w3-col l2 m12 s12"> 
+            <input class="w3-button w3-primary-color w3-round-medium" type="button" name="clear_dates" id="clear_dates" value="Clear Dates" onclick="$('#job_end_date, #job_start_date').val('');doSearch();"/>
+        </p>
+    </div>
     <p class="w3-small "><em>Volunteer Attendance is not listed</em></p>
 	{%if recs %}
-		<table id="table_list" class="datatable w3-table w3-striped w3-hoverable">
+		<table id="table_list" class="datatable w3-table w3-striped w3-hoverable" data-table_list='{{ session_search_data | default("") }}'>
 		<tr class="w3-primary-color">
 			<th>Event</th>
             <th>Job</th>
@@ -39,4 +68,124 @@
   	{% else %}
     	<p><em>No records here so far</em></p>
 	{% endif %}
+    
+    
+    <script>
+        var date_format = "%c/%e/%y"; // "3/4/19"
+        var job_pickers = ["#job_start_date","#job_end_date"]
+        for( i = 0;i<job_pickers.length;i++){
+            /* 
+                you must remove the pickers before dismissing the dialog
+                else they will not be reattached the next time the dialog opens
+            */
+            $(job_pickers[i]).AnyTime_noPicker().AnyTime_picker({ format: date_format } );                
+        }
+        
+        
+        function doSearch(){
+            var theTable = "attendance";
+            var theText = $('#search_input').val();
+            var theColumn = $('#col_select').val();
+            var saveState = $('#save_search').prop('checked');
+            
+            // Watch out!! these columns must be updated if display changes
+            var jobStartDate = $('#job_start_date').val();
+            var jobStartColumn = 3;
+            var jobEndDate = $('#job_end_date').val();
+            var jobEndColumn = 3;
+           
+            if (theText == ''){
+                reset_table_search('table_list');
+            } else {
+                table_search('search_input','table_list',$('#col_select').val());
+            }
+            // now search rows by date if neeed
+            if (jobStartDate != ''){
+                if (jobEndDate == '') jobEndDate = '2050-12-31'; // search to end
+                table_search_with_date(jobStartDate,jobStartColumn,jobEndDate,jobEndColumn,'table_list')
+            }
+            // save or delete the search text from session
+            $.post('{{url_for('user.save_table_search')}}',{ save_search: saveState, table_search_text: theText, search_table_name:  theTable, table_search_column:theColumn, job_start_date: jobStartDate, job_end_date: jobEndDate })
+            
+         }
+         
+         function table_search_with_date(startDate, startDateCol, endDate, endDateCol, table_id) {
+             var table, tr, td, i, startValue, endValue, hideRow;
+             startDate = new Date(startDate);
+             endDate = new Date(endDate);
+
+             /*
+                 filter out additional rows based on start and end date 
+             */
+             table = document.getElementById(table_id);
+
+             tr = table.getElementsByTagName("tr");
+             for (i = 1; i < tr.length; i++) {
+                 // skip row if already hidden
+                 if (tr[i].style.display != 'none') {
+                     hideRow = false;
+                     start_td = tr[i].getElementsByTagName("td")[startDateCol];
+                     end_td = tr[i].getElementsByTagName("td")[endDateCol];
+                     if (start_td && end_td) {
+                         try {                         
+                             startValue = new Date(start_td.textContent || start_td.innerText);
+                             endValue = new Date(end_td.textContent || end_td.innerText);
+                             if ((startValue < startDate) || (endValue > endDate)) hideRow = true;
+                         } catch(err) { // do nothing...
+                         }
+                     }
+                     if (hideRow) {
+                         tr[i].style.display = "none";
+                     } else {
+                         tr[i].style.display = "";
+                     }
+                 }
+             }
+         }
+
+        
+        
+         $(document).ready(function(){
+    
+           {# ex of session['table_search'] = {'user_job': {'table_search_column': '0', 'table_search_text': 'bill'}} #}
+    
+           {% set table_search_column =  '0' %}
+           {% set table_search_text =  '' %}
+           {% set save_search = ''%}
+           
+           {% set job_start_date = ''%}
+           {% set job_end_date = ''%}
+           
+           {% if 'table_search' in session %}
+               {% set table_search = session['table_search'] %}
+               {% if "attendance"  in table_search %}
+                   {% set search_data = table_search['attendance'] %}
+                   {% if 'table_search_column' in search_data %}
+                       {% set table_search_column =  search_data["table_search_column"] %}
+                   {% endif %}
+                   {% if 'table_search_text' in search_data %}
+                       {% set table_search_text =  search_data["table_search_text"] %}
+                   {% endif %}
+                   {% if 'save_search' in search_data and search_data['save_search'] == 'true' %}
+                       {% set save_search =  'checked' %}
+                   {% endif %}
+                   {% if 'job_start_date' in search_data %}
+                       {% set job_start_date =  search_data["job_start_date"] %}
+                   {% endif %}
+                   {% if 'job_end_date' in search_data %}
+                       {% set job_end_date =  search_data["job_end_date"] %}
+                   {% endif %}
+               {% endif %}
+               {% else %}
+               // stop here
+           {% endif %}
+
+           $('#col_select').val('{{ table_search_column }}'); 
+           $('#search_input').val('{{ table_search_text }}'); 
+           $('#save_search').prop('checked','{{ save_search }}');
+           $('#job_start_date').val('{{ job_start_date }}');
+           $('#job_end_date').val('{{ job_end_date }}');
+           doSearch();
+       })
+    </script>
 {% endblock %}
