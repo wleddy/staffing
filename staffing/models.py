@@ -298,7 +298,7 @@ class StaffNotification(SqliteTable):
         
         
 class Task(SqliteTable):
-    """Staffing User_Job Table"""
+    """Contains records of ad hoc user activities"""
     def __init__(self,db_connection):
         super().__init__(db_connection)
         self.table_name = 'task'
