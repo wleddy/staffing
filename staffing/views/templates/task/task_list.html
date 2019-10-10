@@ -3,8 +3,7 @@
 {% block title %}{{ g.title }}{% endblock %}
 {% block body %}
 
-      	<p id="addRecord">
-        {% if is_admin %}<a href="{{ g.editURL }}0/">Add a new record</a>&nbsp;&nbsp;{% endif %}
+      	<p id="addRecord"><a href="{{ g.editURL }}0/">Add a new record</a>&nbsp;&nbsp;
         {{ list_search_widget('activity_type',{'Id':0,'Task Name':1,},1) }}
 
         </p>
