@@ -25,8 +25,9 @@
         {% set end_time = rec.job_end_date | local_time_string %}
     {% endif %}
     
-    {{ input_field(rec.id,"id",type="hidden",default=-1)}}
+    {{ input_field(rec.id,"id",type="hidden",default=0)}}
     <div class="w3-container" >
+        {% if rec.id and rec.task_id == None %}
         <h3 class="w3-panel w3-primary-color">{{rec.activity_title}}</h3>
         <p class="w3-medium">
             Name: {{ rec.first_name}} {{rec.last_name}}<br>
@@ -34,9 +35,59 @@
             Job: {{ rec.job_title }}<br>
             Date: {{ rec.job_start_date | abbr_date_string }}, Sched.: {{ rec.job_start_date | local_time_string }} to {{ rec.job_end_date | local_time_string }}
         </p>
+        {% else %}{# ad hoc attendance #}
+        
+        {# important that this field only be included when recording "ad hoc" activities #}
+        {{ input_field(rec.task_user_id,"task_user_id",type="hidden",id="task_user_id")}}
+        
+        <h3 class="w3-panel w3-primary-color">New Attendance Record</h3>
+        {% if rec.task_user_id %}
+        <p class="w3-medium">Name: {{ rec.first_name}} {{rec.last_name}}</p>
+        {% else %}
+        <div class="w3-row" id="task_user_search">
+            <div  class="w3-col">
+                <p>{{ label_only("Find User",req=True )}}</p>
+                <p><input id="user_search" type="text" name="user_name" value="" class="w3-input w3-border" placeholder="Type name"
+                onkeyup="if (this.value.length > 0) {$('#user_results').show();table_search('user_search','all_users',1)} else {$('#user_results').hide();reset_table_search('all_users');}"
+                onfocus="$('#user_results').show();" 
+                onchanges="if($('#task_user_id').val()==''){alert('You have click on a user name...');$('#user_search').focus()}"
+                />
+            </p>
+            <div style="position:relative;">
+                <div id="user_results" class="w3-border w3-row" 
+                    style="z-index:10000;position:absolute;overflow-y: scroll;background-color:white;display:none;">
+                    	<table id="all_users" class="datatable w3-table w3-striped w3-hoverable" >
+                    	{%if users %}
+                    		{% for user in users %}
+                    	    <tr onclick="$('#task_user_id').val({{user.id}});$('#user_search').val('{{ user.first_name }} {{ user.last_name }}');$('#user_results').hide();">
+                                <td style="display:none;">{{ user.id }}</td>
+                    			<td style="min-width:220pt;">{{ user.first_name }} {{ user.last_name }}</td>
+                    		</tr>
+                    		{% endfor %}
+                            {% else %}
+                            <tr>
+                    			<td>No Users Found?</td>
+                            </tr>
+                            {% endif %}
+                    	 </table>
+                </div>
+            </div>
+          </div>
+        {% endif %}{# end if user name#}
+        <div class="w3-row" >
+            {{ select_field('task_id',label='Select Task')}}
+            <option value="-1">Select a Task</option>
+            {% if tasks %}
+            {% for task in tasks %}
+                <option value="{{task.id}}" {% if rec.task_id |default(0,True) | int == task.id %}selected="selected" {%endif %}>{{ task.name }}</option>
+            {% endfor %}
+            {% endif %}
+        </select>
+        </div>
+        {% endif %}
     </div>
     
-    <div id="tab-bar" class="w3-bar" style="border-bottom:2pt solid #ccc;">
+    <div id="tab-bar" class="w3-bar" style="border-bottom:2pt solid #ccc;margin-top:10pt">
       <button id="date-button" class="w3-bar-item w3-button w3-primary-color button-class" onclick="return openTabById(this,'button-class','dateAndTime','input-tab');">Enter Date/Time</button>
       <button id="hours-button" class="w3-bar-item w3-button w3-secondary-color button-class" onclick="return openTabById(this,'button-class','hours','input-tab')">Enter Hours</button>
     </div>
@@ -200,7 +251,7 @@
             {% endif %}
             
         }
-        
+        $("#user_search").prop({'autocomplete':'off'})
         $(document).ready(function(){formSetup();});
         
     </script>

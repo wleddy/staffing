@@ -24,36 +24,8 @@ def display():
     setExits()
     g.title = 'Attendance List'
     
-    #get the ids for vounteer roles
-    vol_role_ids = get_volunteer_role_ids()
-        
-    sql = """
-    select
-    attendance.*,
-    
-    job.start_date as job_start_date,
-    job.end_date as job_end_date,
-
-    event.id as event_id,
-    activity.title as activity_title, 
-    coalesce(nullif(event.calendar_title,''),activity.title) as calendar_title,
-    job.title as job_title, 
-    
-    -- 1 if a volunteer job, else 0
-    coalesce((select 1 from job_role where job_role.role_id in ({vol_role_ids}) and job_role.job_id = job.id),0) as is_volunteer_job,
-    
-    user.first_name,
-    user.last_name
-
-    from attendance
-    join user_job on user_job.id = attendance.user_job_id
-    join job on user_job.job_id = job.id
-    join user on user_job.user_id = user.id
-    join event on job.event_id = event.id
-    join activity on activity.id = event.activity_id
-    where date(job.start_date, 'localtime') < date('now','localtime') and is_volunteer_job = 0
-    order by date(job.start_date,'localtime') DESC , activity_title, job_title, first_name, last_name
-    """.format(vol_role_ids=vol_role_ids)
+    sql = attendance_sql()
+    print(sql)
     recs = Attendance(g.db).query(sql)
     
     return render_template('attendance_list.html',recs=recs)
@@ -70,6 +42,8 @@ def edit(att_id=None):
         
     rec = None
     shift_hours = 0
+    users = None
+    tasks = Task(g.db).select()
     
     #import pdb;pdb.set_trace()
     att_id = cleanRecordID(request.form.get('id',att_id))
@@ -78,29 +52,10 @@ def edit(att_id=None):
         return abort(404)
     if att_id == 0:
         rec = Attendance(g.db).new()
-    else:
-        sql = """
-        select 
-        attendance.*,
-        
-        event.id as event_id,
-        activity.title as activity_title, 
-        coalesce(nullif(event.calendar_title,''),activity.title) as calendar_title,
-        job.title as job_title, 
-        job.start_date as job_start_date,
-        job.end_date as job_end_date,
-        user.first_name,
-        user.last_name
-
-        from attendance
-        join user_job on user_job.id = attendance.user_job_id
-        join job on user_job.job_id = job.id
-        join user on user_job.user_id = user.id
-        join event on job.event_id = event.id
-        join activity on activity.id = event.activity_id
-        where attendance.id = {}
-        order by attendance.id
-        """.format(att_id)
+        rec.start_date = rec.end_date = date_to_string(local_datetime_now(),'iso_datetime')
+        users = User(g.db).select()
+    else:       
+        sql = attendance_sql(where = "attendance.id = {}".format(att_id))
         rec = Attendance(g.db).query_one(sql)
     
         if not rec:
@@ -125,13 +80,18 @@ def edit(att_id=None):
         
     if request.form:
         # Validate the Form
-        # get a single table version of the record just so I can use .update()
-        fresh_rec = Attendance(g.db).get(att_id)
+        if cleanRecordID(rec.id) > 0:
+            # get a single table version of the record just so I can use .update()
+            fresh_rec = Attendance(g.db).get(att_id)
+        else:
+            fresh_rec = rec #already a single table record
+            
         Attendance(g.db).update(fresh_rec,request.form)
         fresh_rec.no_show = request.form.get('no_show','0')
         #import pdb;pdb.set_trace()
             
         if valid_form(fresh_rec):
+            #import pdb;pdb.set_trace()
             Attendance(g.db).save(fresh_rec)
             g.db.commit()
         
@@ -141,7 +101,14 @@ def edit(att_id=None):
             Attendance(g.db).update(rec,request.form)            
         
     # display the form
-    return render_template('attendance_edit.html',rec=rec,no_delete=True,is_admin=is_admin,shift_hours=shift_hours)
+    return render_template('attendance_edit.html',
+            rec=rec,
+            no_delete=True,
+            is_admin=is_admin,
+            shift_hours=shift_hours,
+            users=users,
+            tasks=tasks,
+            )
     
     
 @mod.route('/delete/',methods=['GET','POST',])
@@ -169,16 +136,27 @@ def valid_form(rec):
     valid_form = True
     #import pdb;pdb.set_trace()
     
-    job_rec = UserJob(g.db).get(rec.user_job_id)
-    if not job_rec:
-        flash("Could not locate Job record")
-        valid_form = False
+    task_id = request.form.get('task_id')
+    if task_id != None:
+        if Task(g.db).get(cleanRecordID(task_id)) == None:
+            valid_form = False
+            flash("You must select a task")
+            
+        # task user id must also be present
+        if not User(g.db).get(cleanRecordID(request.form.get('task_user_id'))):
+            valid_form = False
+            flash("You must select a user")
+    else:
+        job_rec = UserJob(g.db).get(rec.user_job_id)
+        if not job_rec:
+            flash("Could not locate Job record")
+            valid_form = False
         
-    if int(rec.no_show) == 1:
+    if valid_form and cleanRecordID(rec.no_show) == 1:
         #no reason to record anything else
         rec.start_date = None
         rec.end_date = None
-        return True
+        return True #short cut the function
     
     start_time = None
     end_time = None
@@ -188,6 +166,7 @@ def valid_form(rec):
         try:
             shift_hours = float(shift_hours)
             if shift_hours > 0:
+                shift_hours = round(shift_hours,2)
                 start_date = request.form.get('start_date_for_hours','')
                 start_time = request.form.get('start_time_for_hours','')
                 if start_date and start_time:
@@ -247,10 +226,45 @@ def valid_form(rec):
 @mod.route('/tab_select/',methods=['POST'])
 @login_required
 def tab_select():
-    """Record the select attenance input form tab in the user session"""
+    """Record the selected attenance input form tab in the user session"""
 
     tab_clicked = request.form.get('tab_clicked')
     if tab_clicked:
         session['attendance_tab_select'] = tab_clicked
         
     return ''
+    
+def attendance_sql(**kwargs):
+    """Return the sql statement to use to in input and edit forms"""
+    
+    # defaults are for list selection
+    where = kwargs.get('where',"date(job_start_date, 'localtime') <= date('now','localtime') and is_volunteer_job = 0")
+    order_by = kwargs.get('order_by',"date(job_start_date,'localtime') DESC , activity_title, job_title, first_name, last_name")
+    
+    sql = """select
+    attendance.*,
+    coalesce(job.start_date,attendance.start_date) as job_start_date,
+    coalesce(job.end_date,attendance.end_date) as job_end_date,
+    coalesce(activity.title,task_activity.title) as activity_title, 
+    coalesce(user.first_name,task_user.first_name) as first_name,
+    coalesce(user.last_name,task_user.last_name) as last_name,
+    coalesce(nullif(event.calendar_title,''),activity.title,task_activity.title) as calendar_title,
+    coalesce(job.title,task.name) as job_title, 
+    
+    -- 1 if a volunteer job, else 0
+    coalesce((select 1 from job_role where job_role.role_id in ({vol_role_ids}) and job_role.job_id = job.id),0) as is_volunteer_job
+    from attendance
+    left join user_job on user_job.id = attendance.user_job_id
+    left join job on user_job.job_id = job.id
+    left join user on user.id = user_job.user_id
+    left join user as task_user on task_user.id = attendance.task_user_id
+    left join task on task.id = attendance.task_id
+    left join event on event.id = job.event_id
+    left join activity as task_activity on task_activity.id = task.activity_id
+    left join activity on activity.id = event.activity_id
+    
+    where {where}
+    order by {order_by}
+    """.format(vol_role_ids=get_volunteer_role_ids(),where=where,order_by=order_by)
+    
+    return sql
