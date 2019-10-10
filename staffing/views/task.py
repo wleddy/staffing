@@ -20,7 +20,7 @@ def setExits():
 def display():
     setExits()
     g.title="Task List"
-    recs = Task(g.db).select()
+    recs = Task(g.db).query("select task.*,activity.title as activity_name from task join activity on activity.id = task.activity_id order by task.name,task.id")
     
     return render_template('task_list.html',recs=recs)
     

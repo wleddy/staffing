@@ -4,7 +4,7 @@
 {% block body %}
 
       	<p id="addRecord"><a href="{{ g.editURL }}0/">Add a new record</a>&nbsp;&nbsp;
-        {{ list_search_widget('activity_type',{'Id':0,'Task Name':1,},1) }}
+        {{ list_search_widget('activity_type',{'Id':0,'Task Name':1,'Activity':2},1) }}
 
         </p>
 	{%if recs %}
@@ -12,11 +12,13 @@
 		<tr class="w3-primary-color">
 			<th>Id</th>
 			<th>Task Name</th>
+			<th>Activity</th>
 		</tr>
 		{% for rec in recs %}
 	    <tr>
 			<td onclick="window.location='{{ g.editURL }}{{rec.id}}/'">{{ rec.id }}</a></td>
 			<td onclick="window.location='{{ g.editURL }}{{rec.id}}/'">{{ rec.name }}</a></td>
+			<td onclick="window.location='{{ g.editURL }}{{rec.id}}/'">{{ rec.activity_name }}</a></td>
 		</tr>
 		{% endfor %}
 	  </table>
