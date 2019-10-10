@@ -1,5 +1,5 @@
 from flask import request, session, g, redirect, url_for, abort, \
-     render_template, flash, Blueprint
+     render_template, flash, Blueprint, Response
 from datetime import timedelta
 from shotglass2.users.admin import login_required, table_access_required
 from shotglass2.users.models import Role, User
@@ -25,7 +25,7 @@ def display():
     g.title = 'Attendance List'
     
     sql = attendance_sql()
-    print(sql)
+    #print(sql)
     recs = Attendance(g.db).query(sql)
     
     return render_template('attendance_list.html',recs=recs)
@@ -234,6 +234,29 @@ def tab_select():
         
     return ''
     
+@mod.route('/report',methods=['POST'])
+@mod.route('/report/',methods=['POST'])
+@table_access_required(Attendance)
+def report():
+    """Export the current selection of records as csv text"""
+    
+    setExits()
+    selected_recs = request.form.get('selected_recs','')
+    filename = "attendance_report_{}".format(date_to_string(local_datetime_now(),'iso_datetime'))
+    if selected_recs:
+        # get attendance recs with this id
+        recs = Attendance(g.db).query(attendance_sql(where="attendance.id in ({})".format(selected_recs)))
+        if recs:
+            result = render_template("attendance_report.csv", recs=recs)
+            return Response(result,
+                   mimetype="text/csv",
+                   headers={"Content-Disposition":
+                                "attachment;filename={}".format(filename)})
+            
+            
+    flash("No records to report")
+    return g.listURL
+    
 def attendance_sql(**kwargs):
     """Return the sql statement to use to in input and edit forms"""
     
@@ -268,3 +291,4 @@ def attendance_sql(**kwargs):
     """.format(vol_role_ids=get_volunteer_role_ids(),where=where,order_by=order_by)
     
     return sql
+    

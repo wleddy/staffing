@@ -15,12 +15,12 @@
     {% set search_columns_dict = {"Event":0,"Job":1,"Name":2,"Job Date":3,"Attendance":5,"Comment":6} %}
       	<p id="addRecord"><a href="{{ g.editURL }}0/">Add new record</a>&nbsp;&nbsp;
     Find in:
-        <select id="col_select" onchange="doSearch()">
+        <select id="col_select" name="col_select" onchange="doSearch()">
             {% for key, value in search_columns_dict.items() %}
             <option value="{{ value }}" >{{ key }}</option>
             {% endfor %}
         </select>
-            &nbsp;&nbsp;<input id="search_input" type="text" name="user_name" 
+            &nbsp;&nbsp;<input id="search_input" name="search_input" type="text" name="user_name" 
                 class="w3-border" placeholder="Type anything" autofocus onkeyup=" doSearch();" 
             />
         &nbsp;
@@ -37,6 +37,11 @@
             <input class="w3-button w3-primary-color w3-round-medium" type="button" name="clear_dates" id="clear_dates" value="Clear Dates" onclick="$('#job_end_date, #job_start_date').val('');doSearch();"/>
         </p>
     </div>
+    <form id="attendence_search" action="{{ url_for('attendance.report') }}" method="POST" >
+        <input id="selected_recs" name="selected_recs" type="hidden" value="" />
+        <p><strong>Attendance Report:</strong> 
+            <input type="button" onclick="submit(forms.attendence_search);" class="w3-button w3-primary-color w3-round-medium" value="Export Listed Records" /></p>
+    </form>
     <p class="w3-small "><em>Volunteer Attendance is not listed</em></p>
 	{%if recs %}
 		<table id="table_list" class="datatable w3-table w3-striped w3-hoverable" data-table_list='{{ session_search_data | default("") }}'>
@@ -50,11 +55,11 @@
             <th>Comment</th>
 		</tr>
 		{% for rec in recs %}
-	    <tr class=" 
+	    <tr class="row_id 
             {% if (not rec.start_date or not rec.end_date) and rec.no_show != 1 %} w3-pale-blue
             {% elif rec.start_date != rec.job_start_date or rec.end_date != rec.job_end_date or rec.no_show == 1 %} w3-pale-red
             {% endif %}
-        ">
+        " title="{{ rec.id }}">
 			<td onclick="window.location='{{ g.editURL }}{{rec.id}}/'" >{{ rec.calendar_title | truncate(20, True) }}</td>
 			<td onclick="window.location='{{ g.editURL }}{{rec.id}}/'" >{{ rec.job_title | truncate(20, True) }}</td>
 			<td onclick="window.location='{{ g.editURL }}{{rec.id}}/'" >{{ rec.first_name }} {{ rec.last_name }}</td>
@@ -107,6 +112,15 @@
             // save or delete the search text from session
             $.post('{{url_for('user.save_table_search')}}',{ save_search: saveState, table_search_text: theText, search_table_name:  theTable, table_search_column:theColumn, job_start_date: jobStartDate, job_end_date: jobEndDate })
             
+            // update the list of displayed record id's
+            var selected_recs = "";
+            $(".row_id").each(function(index){
+                if (this.style.display !== 'none'){
+                    selected_recs = (selected_recs + "," + this.title).replace(/^,/, '')
+
+                }
+                $("#selected_recs").val(selected_recs)
+            })
          }
          
          function table_search_with_date(startDate, startDateCol, endDate, endDateCol, table_id) {
