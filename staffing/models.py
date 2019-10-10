@@ -311,7 +311,7 @@ class Task(SqliteTable):
 
         sql = """
         name TEXT,
-        activity_id,
+        activity_id INTEGER,
         FOREIGN KEY (activity_id) REFERENCES activity(id) ON DELETE CASCADE """
 
         super().create_table(sql)
