@@ -47,7 +47,7 @@
         <div class="w3-row" id="task_user_search">
             <div  class="w3-col">
                 <p>{{ label_only("Find User",req=True )}}</p>
-                <p><input id="user_search" type="text" name="user_name" value="{{ rec.first_name}} {{rec.last_name}}" class="w3-input w3-border" placeholder="Type name"
+                <p><input id="user_search" type="text" name="user_name" value="{{ rec.first_name | default('',True)}} {{rec.last_name | default('',True)}}" class="w3-input w3-border" placeholder="Type name"
                 onkeyup="if (this.value.length > 0) {$('#user_results').show();table_search('user_search','all_users',1)} else {$('#user_results').hide();reset_table_search('all_users');}"
                 onfocus="$('#user_results').show();" 
                 onchanges="if($('#task_user_id').val()==''){alert('You have click on a user name...');$('#user_search').focus()}"

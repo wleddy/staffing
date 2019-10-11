@@ -1,5 +1,5 @@
 from flask import request, session, g, redirect, url_for, abort, \
-     render_template, flash, Blueprint, Response, get_flashed_messages
+     render_template, flash, Blueprint, Response
 from datetime import timedelta
 from shotglass2.users.admin import login_required, table_access_required
 from shotglass2.users.models import Role, User
@@ -106,15 +106,14 @@ def edit(att_id=None):
                 for item in range(len(rec)):
                     rec[item] = None
                     
-                #rec.start_date = rec.end_date = local_datetime_now() #default dates
             else:
                 flash("Error while handling validation error. No Attendance records found.")
                 return redirect(g.listURL)
                     
             Attendance(g.db).update(rec,request.form)
             #import pdb;pdb.set_trace()
-            mes = get_flashed_messages()
-            valid_form(rec)
+            rec.start_date = get_start_time_from_form()
+            rec.end_date = get_end_time_from_form()
             if rec.task_user_id:
                 user = User(g.db).get(cleanRecordID(rec.task_user_id))
                 if user:
@@ -211,21 +210,12 @@ def valid_form(rec):
             
     else:
         # start and end times must be present
-        start_time = request.form.get('att_start_time','')
-        start_date = request.form.get('att_start_date','')
-        # Try to append this time onto the job start date
-        start_time = '{} {}'.format(start_date,start_time)
-        start_time = getDatetimeFromString(start_time) 
-    
+        start_time = get_start_time_from_form()
         if not start_time:
             flash("That is not a valid Start time")
             valid_form = False
         
-        end_time = request.form.get('att_end_time','')
-        end_date = request.form.get('att_end_date','')
-        # Try to append this time onto the job start date
-        end_time = '{} {}'.format(end_date,end_time)
-        end_time = getDatetimeFromString(end_time) 
+        end_time = get_end_time_from_form()
     
         if not end_time:
             flash("That is not a valid End time")
@@ -314,3 +304,11 @@ def attendance_sql(**kwargs):
     
     return sql
     
+    
+def get_start_time_from_form():
+    """Return a start time using form data else None"""
+    return getDatetimeFromString('{} {}'.format(request.form.get('att_start_date',''),request.form.get('att_start_time',''))) 
+    
+def get_end_time_from_form():
+    """Return a end time using form data else None"""
+    return getDatetimeFromString('{} {}'.format(request.form.get('att_end_date',''),request.form.get('att_end_time',''))) 
