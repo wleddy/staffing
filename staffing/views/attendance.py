@@ -1,5 +1,5 @@
 from flask import request, session, g, redirect, url_for, abort, \
-     render_template, flash, Blueprint, Response
+     render_template, flash, Blueprint, Response, get_flashed_messages
 from datetime import timedelta
 from shotglass2.users.admin import login_required, table_access_required
 from shotglass2.users.models import Role, User
@@ -98,7 +98,29 @@ def edit(att_id=None):
             return redirect(g.listURL)
             
         else:
-            Attendance(g.db).update(rec,request.form)            
+            # get any attendance record with space for all the related fields
+            rec = Attendance(g.db).query(attendance_sql(where="attendance.id > 0")) # effectively, all records
+            if rec:
+                rec = rec[0] #single record
+                #clear the record
+                for item in range(len(rec)):
+                    rec[item] = None
+                    
+                #rec.start_date = rec.end_date = local_datetime_now() #default dates
+            else:
+                flash("Error while handling validation error. No Attendance records found.")
+                return redirect(g.listURL)
+                    
+            Attendance(g.db).update(rec,request.form)
+            #import pdb;pdb.set_trace()
+            mes = get_flashed_messages()
+            valid_form(rec)
+            if rec.task_user_id:
+                user = User(g.db).get(cleanRecordID(rec.task_user_id))
+                if user:
+                    rec.first_name = user.first_name
+                    rec.last_name = user.last_name
+            
         
     # display the form
     return render_template('attendance_edit.html',
@@ -255,7 +277,7 @@ def report():
             
             
     flash("No records to report")
-    return g.listURL
+    return redirect(g.listURL)
     
 def attendance_sql(**kwargs):
     """Return the sql statement to use to in input and edit forms"""
