@@ -152,32 +152,46 @@
             </div>
         </div>
     </div>
+    
+    <!-- hours input tab -->
     <div id="hours" class="w3-container input-tab" style="display:none">
         <p class="w3-xlarge">{{ label_only("Enter Hours worked")}}</p>
         <div class="w3-row">
-            <div class="w3-col w3-half" style="padding-right:6pt">
+            <div class="w3-col w3-half" style="padding-right:6pt;">
                 <div class="w3-row">
-                    <div class="w3-col w3-half">
+                    <div class="w3-col w3-half" >
                         <p style="padding-right:3pt">{{ label_only("Start Date") }}</p>
                         <div class="w3-row">
-                            <p class="w3-col l8 m8 s8">
-                            {{ input_field(start_date,'start_date_for_hours',type='text', id='start_date_for_hours', label=None, extras="disabled")}}
-                            </p>
-                            <p class="w3-col l2 m2 s2 ">
-                                <a href="javascript:addPicker('start_date_for_hours','%m/%d/%y')"  class="DatePickerButton">
-                                <img src="{{ url_for('static', filename='anytime/calendar.png' ) }}" alt="[calendar icon]"/>
-                                </a>
-                            <input type="hidden" name="start_time_for_hours" id="start_time_for_hours" value="{{ start_time | local_time_string }}" disabled />
-                            </p>
+                                    <p class="w3-col l8 m8 s8">
+                                        {{ input_field(start_date,'start_date_for_hours',type='text', id='start_date_for_hours', label=None)}}
+                                    </p>
+                                    <p class="w3-col l2 m2 s2 ">
+                                        <a href="javascript:addPicker('start_date_for_hours','%m/%d/%y')"  class="DatePickerButton">
+                                        <img src="{{ url_for('static', filename='anytime/calendar.png' ) }}" alt="[calendar icon]"/>
+                                        </a>
+                                    </p>
+                            </div>
+                        </div>
+                        
+                            <div class="w3-col w3-half" >
+                                <p>{{ label_only("Start Time") }}</p>
+                                <div class="w3-row">
+                                    <p class="w3-col" >
+                                        {{ input_field(start_time,'start_time_for_hours',id='start_time_for_hours', label=None)}}
+                                    </p>
+                                </div>
+                            </div>
                         </div>
                     </div>
+                                
+                                
                     <div class="w3-col w3-half" >
-                        <p> {{ input_field(shift_hours,'shift_hours',id='shift_hours', label="Hours Worked", default='0', extras="disabled")}}</p> 
+                        <p>{{ label_only("Hours Worked") }}</p>
+                        <p> {{ input_field(shift_hours,'shift_hours',id='shift_hours', label=None, default='0', extras="disabled")}}</p> 
                     </div>
                 </div>
             </div>
-        </div>
-    </div>
+    
     <p class="w3-row">&nbsp;</p>
     <div class="w3-row w3-container">
         <p class="w3-col w3-third" style="padding-right:3pt">{{ input_field(rec.mileage,'mileage',label="Mileage",placeholder="Miles")}}</p>
@@ -191,6 +205,8 @@
         $("#start_time").AnyTime_picker(
             { format: "%l:%i%p" } );
         $("#end_time").AnyTime_picker(
+            { format: "%l:%i%p" } );
+        $("#start_time_for_hours").AnyTime_picker(
             { format: "%l:%i%p" } );
             
         {% if not is_admin %}
