@@ -1,3 +1,3 @@
-{% if recs %}Event,Job Title,First Name,Last Name,Start Date,End Date,Comments
-{% for rec in recs %}"{{ rec.calendar_title}}","{{ rec.job_title }}","{{ rec.first_name }}","{{ rec.last_name }}",{% if rec.no_show == 1 %}No Show{% else %}{{ rec.start_date | default('Not Recorded',True) | local_time_string }},{{ rec.end_date | local_time_string }}{% endif %},"{{ rec.comment | default('',True) }}"
+{% if recs %}Event,Job Title,First Name,Last Name,Start Date,End Date,Milage,Comments
+{% for rec in recs %}"{{ rec.calendar_title}}","{{ rec.job_title }}","{{ rec.first_name }}","{{ rec.last_name }}",{% if rec.no_show == 1 %}No Show{% else %}{{ rec.start_date | default('Not Recorded',True) | local_time_string }},{{ rec.end_date | local_time_string }}{% endif %},{{ rec.milage | default('0',True) }},"{{ rec.comment | default('',True) }}"
 {% endfor %}{% endif %}
