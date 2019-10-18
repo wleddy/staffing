@@ -15,6 +15,7 @@
                         <option value="7" {% if display_end_days == 7 %}selected{% endif %} >Next Week</option>
                         <option value="30" {% if display_end_days == 30 %}selected{% endif %}>Next Month</option>
                         <option value="-1" {% if display_end_days == -1 %}selected{% endif %}>All Future Events</option>
+                        <option value="-2" {% if display_end_days == -2 %}selected{% endif %}>Show All Events</option>
                     </select>
                 </p>
                 {% if as_spreadsheet %}

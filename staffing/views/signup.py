@@ -255,14 +255,22 @@ def roster(display_end_days=0):
     # get the current users role id's
     is_admin = is_user_admin()
     end_date = start_date = local_datetime_now()
-    display_end_days = cleanRecordID(request.form.get('display_end_days',request.args.get('display_end_days',0)))
+    try:
+        display_end_days = int(request.form.get('display_end_days',request.args.get('display_end_days',0)))
+    except:
+        display_end_days = 0
+        
     as_spreadsheet=request.form.get("as_spreadsheet",False)
     
-    if display_end_days > 0:
-        end_date = end_date + timedelta(days=display_end_days)
-    elif display_end_days < 0:
+    if display_end_days == -2:
+        #display all attendance
+        start_date = start_date - timedelta(days=2000)
+        
+    if display_end_days < 0:
         #display all future events
         end_date = end_date + timedelta(days=2000) # that ought to do it...
+    elif display_end_days > 0:
+        end_date = end_date + timedelta(days=display_end_days)
     
     user_skills = []
     recs = User(g.db).get_roles(session.get('user_id',-1))
