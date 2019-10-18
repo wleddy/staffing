@@ -35,7 +35,7 @@ def display():
 @mod.route('/edit',methods=['GET','POST'])
 @mod.route('/edit/',methods=['GET','POST'])
 @login_required
-def edit(att_id=None):
+def edit(att_id=0):
     """this is where users (staff) will record their work hours and other info"""
     setExits()
     g.title = 'Record Attendance'
@@ -69,9 +69,6 @@ def edit(att_id=None):
     if not rec.end_date and rec.job_end_date:
         rec.end_date = rec.job_end_date
         
-    if rec.start_date and rec.end_date:
-        shift_hours = (getDatetimeFromString(rec.end_date) - getDatetimeFromString(rec.start_date)).seconds / 3600
-        
     # If the current user is not the user_id requested or current user is not admin
     is_admin = g.admin.has_access(g.user,Attendance)
     if not is_admin and session.get('user_id') != rec.user_id:
@@ -98,28 +95,41 @@ def edit(att_id=None):
             return redirect(g.listURL)
             
         else:
+            #import pdb;pdb.set_trace()
             # get any attendance record with space for all the related fields
-            rec = Attendance(g.db).query(attendance_sql(where="attendance.id > 0")) # effectively, all records
+            if att_id > 0:
+                where = "attendance.id = {}".format(att_id)
+            else:
+                where = "attendance.id > 0"  # effectively, all records
+
+            rec = Attendance(g.db).query(attendance_sql(where=where))
             if rec:
                 rec = rec[0] #single record
-                #clear the record
-                for item in range(len(rec)):
-                    rec[item] = None
+                if att_id == 0:
+                    #clear the record
+                    for item in range(len(rec)):
+                        rec[item] = None
                     
             else:
                 flash("Error while handling validation error. No Attendance records found.")
                 return redirect(g.listURL)
                     
             Attendance(g.db).update(rec,request.form)
-            #import pdb;pdb.set_trace()
-            rec.start_date = get_start_time_from_form()
-            rec.end_date = get_end_time_from_form()
+            rec.start_date = date_to_string(getDatetimeFromString(get_start_time_from_form()),'iso_datetime')
+            rec.end_date = date_to_string(getDatetimeFromString(get_end_time_from_form()),'iso_datetime')
+            if not rec.end_date:
+                rec.end_date = rec.start_date
+                
             if rec.task_user_id:
                 user = User(g.db).get(cleanRecordID(rec.task_user_id))
                 if user:
                     rec.first_name = user.first_name
                     rec.last_name = user.last_name
-            
+                    
+    shift_hours = int(request.form.get('shift_hours',0))
+    
+    if not shift_hours > 0 and rec.start_date and rec.end_date:
+        shift_hours = (getDatetimeFromString(rec.end_date)- getDatetimeFromString(rec.start_date)).seconds / 3600
         
     # display the form
     return render_template('attendance_edit.html',
@@ -191,7 +201,7 @@ def valid_form(rec):
                 start_date = request.form.get('start_date_for_hours','')
                 start_time = request.form.get('start_time_for_hours','')
                 if start_date and start_time:
-                    start_time = '{} {}'.format(start_date,start_time)
+                    start_time = '{} {}'.format(start_date,start_time).strip()
                     start_time = getDatetimeFromString(start_time) 
                     if start_time:
                         end_time = start_time + timedelta(seconds=shift_hours * 3600)
@@ -210,12 +220,12 @@ def valid_form(rec):
             
     else:
         # start and end times must be present
-        start_time = get_start_time_from_form()
+        start_time = getDatetimeFromString(get_start_time_from_form())
         if not start_time:
             flash("That is not a valid Start time")
             valid_form = False
         
-        end_time = get_end_time_from_form()
+        end_time = getDatetimeFromString(get_end_time_from_form())
     
         if not end_time:
             flash("That is not a valid End time")
@@ -238,7 +248,7 @@ def valid_form(rec):
 @mod.route('/tab_select/',methods=['POST'])
 @login_required
 def tab_select():
-    """Record the selected attenance input form tab in the user session"""
+    """Record the selected attendance input form tab in the user session"""
 
     tab_clicked = request.form.get('tab_clicked')
     if tab_clicked:
@@ -306,9 +316,9 @@ def attendance_sql(**kwargs):
     
     
 def get_start_time_from_form():
-    """Return a start time using form data else None"""
-    return getDatetimeFromString('{} {}'.format(request.form.get('att_start_date',''),request.form.get('att_start_time',''))) 
+    """Return a start time using form data else the empty string"""
+    return '{} {}'.format(request.form.get('att_start_date',request.form.get('start_date_for_hours','')),request.form.get('att_start_time',request.form.get('start_time_for_hours',''))).strip()
     
 def get_end_time_from_form():
-    """Return a end time using form data else None"""
-    return getDatetimeFromString('{} {}'.format(request.form.get('att_end_date',''),request.form.get('att_end_time',''))) 
+    """Return a end time using form data else the empty string"""
+    return '{} {}'.format(request.form.get('att_end_date',request.form.get('end_date_for_hours','')),request.form.get('att_end_time',request.form.get('end_time_for_hours',''))).strip()

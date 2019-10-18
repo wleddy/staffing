@@ -40,7 +40,7 @@
         {# important that this field only be included when recording "ad hoc" activities #}
         {{ input_field(rec.task_user_id,"task_user_id",type="hidden",id="task_user_id")}}
         
-        <h3 class="w3-panel w3-primary-color">New Attendance Record</h3>
+        <h3 class="w3-panel w3-primary-color">Ad Hoc Attendance Record</h3>
         {% if rec.task_user_id and rec.id != None %}
         <p class="w3-medium">Name: {{ rec.first_name}} {{rec.last_name}}</p>
         {% else %}
