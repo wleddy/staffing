@@ -1,0 +1,41 @@
+{# Display information for user when no jobs are available for display #}
+<div class="w3-row w3-secondary-color job-contain " style="margin-top:-1px;">
+    <h2>Sorry, we could not find any jobs to display...</h2>
+    <h3>The reason for this may be:</h3>
+    <div class="explainer-section">
+        <h4>There really are no jobs</h4>
+        <p>There are no jobs coming up in the future for the event you were interested in.</p>
+    </div>
+    {% if not g.user %}
+    <div class="explainer-section">
+        <h4>You're not logged in</h4>
+        <p>
+            Or because you are not logged in we don't know which jobs are available to you. 
+            Some jobs are only available to certain staff members or volunteers with specific
+            qualifications.
+        </p>
+        <p>
+            If you have an account, please <a href="{{ url_for('login.login')}}">log in</a> and try again.
+        </p>
+        <p>
+            If you do not have an account yet, you can <a href="{{ url_for('user.register')}}">register here</a>.
+        </p>
+    </div>
+    {% else %}
+    <div class="explainer-section">
+        <h4>Your account is not correctly set up</h4>
+        <p>
+            Or, you're account record does not indicate that you have the correct qualifications.
+            If this is incorrect, please <a href="{{ url_for('www.contact')}}">contact the administrator</a>
+            to discuss the issue.
+        </p>
+    </div>
+    {% endif %}
+</div>
+
+
+<style>
+    .explainer-section{margin-left:10pt;}
+    .explainer-section h4 {font-weight:bold;margin-bottom:0;}
+    .explainer-section p {margin-left:10pt;}
+</style>
