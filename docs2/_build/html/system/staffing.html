@@ -1,88 +1,35 @@
 
-
-<!doctype html>
+<!DOCTYPE html>
 
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
     <meta charset="utf-8" />
     <title>Staffing Module &#8212; Staffing 0.1.0 documentation</title>
-    <link rel="stylesheet" href="../_static/bizstyle.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
-    
     <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
     <script type="text/javascript" src="../_static/jquery.js"></script>
     <script type="text/javascript" src="../_static/underscore.js"></script>
     <script type="text/javascript" src="../_static/doctools.js"></script>
     <script type="text/javascript" src="../_static/language_data.js"></script>
-    <script type="text/javascript" src="../_static/bizstyle.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="Shotglass2 Docs" href="shotglass2.html" />
     <link rel="prev" title="Technical Documentation" href="index.html" />
-    <meta name="viewport" content="width=device-width,initial-scale=1.0">
-    <!--[if lt IE 9]>
-    <script type="text/javascript" src="_static/css3-mediaqueries.js"></script>
-    <![endif]-->
-  </head><body>
-    <div class="related" role="navigation" aria-label="related navigation">
-      <h3>Navigation</h3>
-      <ul>
-        <li class="right" style="margin-right: 10px">
-          <a href="../genindex.html" title="General Index"
-             accesskey="I">index</a></li>
-        <li class="right" >
-          <a href="../py-modindex.html" title="Python Module Index"
-             >modules</a> |</li>
-        <li class="right" >
-          <a href="shotglass2.html" title="Shotglass2 Docs"
-             accesskey="N">next</a> |</li>
-        <li class="right" >
-          <a href="index.html" title="Technical Documentation"
-             accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">Staffing 0.1.0 documentation</a> &#187;</li>
-          <li class="nav-item nav-item-1"><a href="index.html" accesskey="U">Technical Documentation</a> &#187;</li> 
-      </ul>
-    </div>
-      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
-        <div class="sphinxsidebarwrapper">
-  <h3><a href="../index.html">Table of Contents</a></h3>
-  <ul>
-<li><a class="reference internal" href="#">Staffing Module</a><ul>
-<li><a class="reference internal" href="#module-app">Root Application</a></li>
-<li><a class="reference internal" href="#module-staffing.models">Tables</a></li>
-</ul>
-</li>
-</ul>
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
 
-  <h4>Previous topic</h4>
-  <p class="topless"><a href="index.html"
-                        title="previous chapter">Technical Documentation</a></p>
-  <h4>Next topic</h4>
-  <p class="topless"><a href="shotglass2.html"
-                        title="next chapter">Shotglass2 Docs</a></p>
-  <div role="note" aria-label="source link">
-    <h3>This Page</h3>
-    <ul class="this-page-menu">
-      <li><a href="../_sources/system/staffing.rst.txt"
-            rel="nofollow">Show Source</a></li>
-    </ul>
-   </div>
-<div id="searchbox" style="display: none" role="search">
-  <h3 id="searchlabel">Quick search</h3>
-    <div class="searchformwrapper">
-    <form class="search" action="../search.html" method="get">
-      <input type="text" name="q" aria-labelledby="searchlabel" />
-      <input type="submit" value="Go" />
-    </form>
-    </div>
-</div>
-<script type="text/javascript">$('#searchbox').show(0);</script>
-        </div>
-      </div>
+  </head><body>
+  
 
     <div class="document">
       <div class="documentwrapper">
         <div class="bodywrapper">
+          
+
           <div class="body" role="main">
             
   <div class="section" id="staffing-module">
@@ -133,6 +80,19 @@
 <dl class="method">
 <dt id="staffing.models.ActivityType.create_table">
 <code class="sig-name descname">create_table</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#staffing.models.ActivityType.create_table" title="Permalink to this definition">¶</a></dt>
+<dd><p>Define and create the table</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="staffing.models.Attendance">
+<em class="property">class </em><code class="sig-prename descclassname">staffing.models.</code><code class="sig-name descname">Attendance</code><span class="sig-paren">(</span><em class="sig-param">db_connection</em><span class="sig-paren">)</span><a class="headerlink" href="#staffing.models.Attendance" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="shotglass2.html#shotglass2.takeabeltof.database.SqliteTable" title="shotglass2.takeabeltof.database.SqliteTable"><code class="xref py py-class docutils literal notranslate"><span class="pre">shotglass2.takeabeltof.database.SqliteTable</span></code></a></p>
+<p>Staffing User_Job Table</p>
+<dl class="method">
+<dt id="staffing.models.Attendance.create_table">
+<code class="sig-name descname">create_table</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#staffing.models.Attendance.create_table" title="Permalink to this definition">¶</a></dt>
 <dd><p>Define and create the table</p>
 </dd></dl>
 
@@ -249,6 +209,19 @@ Record that a particular notification has been sent so we don’t send it twice.
 </dd></dl>
 
 <dl class="class">
+<dt id="staffing.models.Task">
+<em class="property">class </em><code class="sig-prename descclassname">staffing.models.</code><code class="sig-name descname">Task</code><span class="sig-paren">(</span><em class="sig-param">db_connection</em><span class="sig-paren">)</span><a class="headerlink" href="#staffing.models.Task" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="shotglass2.html#shotglass2.takeabeltof.database.SqliteTable" title="shotglass2.takeabeltof.database.SqliteTable"><code class="xref py py-class docutils literal notranslate"><span class="pre">shotglass2.takeabeltof.database.SqliteTable</span></code></a></p>
+<p>Contains records of ad hoc user activities</p>
+<dl class="method">
+<dt id="staffing.models.Task.create_table">
+<code class="sig-name descname">create_table</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#staffing.models.Task.create_table" title="Permalink to this definition">¶</a></dt>
+<dd><p>Tasks are Adhock jobs that need to be accounted for but don’t appear on the calendar</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
 <dt id="staffing.models.UserJob">
 <em class="property">class </em><code class="sig-prename descclassname">staffing.models.</code><code class="sig-name descname">UserJob</code><span class="sig-paren">(</span><em class="sig-param">db_connection</em><span class="sig-paren">)</span><a class="headerlink" href="#staffing.models.UserJob" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="shotglass2.html#shotglass2.takeabeltof.database.SqliteTable" title="shotglass2.takeabeltof.database.SqliteTable"><code class="xref py py-class docutils literal notranslate"><span class="pre">shotglass2.takeabeltof.database.SqliteTable</span></code></a></p>
@@ -284,32 +257,77 @@ Record that a particular notification has been sent so we don’t send it twice.
 
 
           </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../index.html">Staffing</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<p class="caption"><span class="caption-text">Help for Users:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../user/index.html">How to Use the System</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Help for Developers:</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">Technical Documentation</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../index.html">Documentation overview</a><ul>
+  <li><a href="index.html">Technical Documentation</a><ul>
+      <li>Previous: <a href="index.html" title="previous chapter">Technical Documentation</a></li>
+      <li>Next: <a href="shotglass2.html" title="next chapter">Shotglass2 Docs</a></li>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+
+
+
+
+
+
+
+
         </div>
       </div>
       <div class="clearer"></div>
     </div>
-    <div class="related" role="navigation" aria-label="related navigation">
-      <h3>Navigation</h3>
-      <ul>
-        <li class="right" style="margin-right: 10px">
-          <a href="../genindex.html" title="General Index"
-             >index</a></li>
-        <li class="right" >
-          <a href="../py-modindex.html" title="Python Module Index"
-             >modules</a> |</li>
-        <li class="right" >
-          <a href="shotglass2.html" title="Shotglass2 Docs"
-             >next</a> |</li>
-        <li class="right" >
-          <a href="index.html" title="Technical Documentation"
-             >previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">Staffing 0.1.0 documentation</a> &#187;</li>
-          <li class="nav-item nav-item-1"><a href="index.html" >Technical Documentation</a> &#187;</li> 
-      </ul>
+    <div class="footer">
+      &copy;2019, Bill Leddy.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 2.2.1</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+      |
+      <a href="../_sources/system/staffing.rst.txt"
+          rel="nofollow">Page source</a>
     </div>
-    <div class="footer" role="contentinfo">
-        &#169; Copyright 2019, Bill Leddy.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 2.1.2.
-    </div>
+
+    
+
+    
   </body>
 </html>

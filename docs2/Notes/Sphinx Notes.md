@@ -10,10 +10,10 @@ From Terminal:
 * type `build html`.
 
 
-## Using Retex Editor
+## Using Retext Editor
 
 From Terminal:
 
-* Activate a virtualenv where retex is installed.
+* Activate a virtualenv where retext is installed.
 * type `retex` to start editor.
 * Type like it's your job.

@@ -1,58 +1,34 @@
 
 
-
-<!doctype html>
+<!DOCTYPE html>
 
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
     <meta charset="utf-8" />
     <title>Index &#8212; Staffing 0.1.0 documentation</title>
-    <link rel="stylesheet" href="_static/bizstyle.css" type="text/css" />
+    <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
-    
     <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
     <script type="text/javascript" src="_static/jquery.js"></script>
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
     <script type="text/javascript" src="_static/language_data.js"></script>
-    <script type="text/javascript" src="_static/bizstyle.js"></script>
     <link rel="index" title="Index" href="#" />
     <link rel="search" title="Search" href="search.html" />
-    <meta name="viewport" content="width=device-width,initial-scale=1.0">
-    <!--[if lt IE 9]>
-    <script type="text/javascript" src="_static/css3-mediaqueries.js"></script>
-    <![endif]-->
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
   </head><body>
-    <div class="related" role="navigation" aria-label="related navigation">
-      <h3>Navigation</h3>
-      <ul>
-        <li class="right" style="margin-right: 10px">
-          <a href="#" title="General Index"
-             accesskey="I">index</a></li>
-        <li class="right" >
-          <a href="py-modindex.html" title="Python Module Index"
-             >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">Staffing 0.1.0 documentation</a> &#187;</li> 
-      </ul>
-    </div>
-      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
-        <div class="sphinxsidebarwrapper">
-<div id="searchbox" style="display: none" role="search">
-  <h3 id="searchlabel">Quick search</h3>
-    <div class="searchformwrapper">
-    <form class="search" action="search.html" method="get">
-      <input type="text" name="q" aria-labelledby="searchlabel" />
-      <input type="submit" value="Go" />
-    </form>
-    </div>
-</div>
-<script type="text/javascript">$('#searchbox').show(0);</script>
-        </div>
-      </div>
+  
 
     <div class="document">
       <div class="documentwrapper">
         <div class="bodywrapper">
+          
+
           <div class="body" role="main">
             
 
@@ -75,6 +51,7 @@
  | <a href="#Q"><strong>Q</strong></a>
  | <a href="#R"><strong>R</strong></a>
  | <a href="#S"><strong>S</strong></a>
+ | <a href="#T"><strong>T</strong></a>
  | <a href="#U"><strong>U</strong></a>
  | <a href="#W"><strong>W</strong></a>
  
@@ -90,15 +67,17 @@
 </li>
       <li><a href="system/staffing.html#staffing.models.ActivityType">ActivityType (class in staffing.models)</a>
 </li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="system/shotglass2.html#shotglass2.users.models.User.add_role">add_role() (shotglass2.users.models.User method)</a>
 </li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="system/shotglass2.html#shotglass2.users.admin.Admin">Admin (class in shotglass2.users.admin)</a>
 </li>
       <li><a href="system/shotglass2.html#shotglass2.users.views.user.admin">admin() (in module shotglass2.users.views.user)</a>
 </li>
       <li><a href="system/staffing.html#module-app">app (module)</a>
+</li>
+      <li><a href="system/staffing.html#staffing.models.Attendance">Attendance (class in staffing.models)</a>
 </li>
       <li><a href="system/shotglass2.html#shotglass2.users.views.login.authenticate_user">authenticate_user() (in module shotglass2.users.views.login)</a>
 </li>
@@ -131,6 +110,8 @@
 </li>
         <li><a href="system/staffing.html#staffing.models.ActivityType.create_table">(staffing.models.ActivityType method)</a>
 </li>
+        <li><a href="system/staffing.html#staffing.models.Attendance.create_table">(staffing.models.Attendance method)</a>
+</li>
         <li><a href="system/staffing.html#staffing.models.Client.create_table">(staffing.models.Client method)</a>
 </li>
         <li><a href="system/staffing.html#staffing.models.Event.create_table">(staffing.models.Event method)</a>
@@ -144,6 +125,8 @@
         <li><a href="system/staffing.html#staffing.models.Location.create_table">(staffing.models.Location method)</a>
 </li>
         <li><a href="system/staffing.html#staffing.models.StaffNotification.create_table">(staffing.models.StaffNotification method)</a>
+</li>
+        <li><a href="system/staffing.html#staffing.models.Task.create_table">(staffing.models.Task method)</a>
 </li>
         <li><a href="system/staffing.html#staffing.models.UserJob.create_table">(staffing.models.UserJob method)</a>
 </li>
@@ -212,14 +195,16 @@
         <li><a href="system/staffing.html#staffing.models.EventDateLabel.get">(staffing.models.EventDateLabel method)</a>
 </li>
       </ul></li>
+      <li><a href="system/shotglass2.html#shotglass2.shotglass.get_app_config">get_app_config() (in module shotglass2.shotglass)</a>
+</li>
       <li><a href="system/staffing.html#staffing.models.UserJob.get_assigned_users">get_assigned_users() (staffing.models.UserJob method)</a>
 </li>
       <li><a href="system/shotglass2.html#shotglass2.users.models.User.get_by_username_or_email">get_by_username_or_email() (shotglass2.users.models.User method)</a>
 </li>
-      <li><a href="system/shotglass2.html#shotglass2.takeabeltof.database.SqliteTable.get_column_names">get_column_names() (shotglass2.takeabeltof.database.SqliteTable method)</a>
-</li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="system/shotglass2.html#shotglass2.takeabeltof.database.SqliteTable.get_column_names">get_column_names() (shotglass2.takeabeltof.database.SqliteTable method)</a>
+</li>
       <li><a href="system/shotglass2.html#shotglass2.users.views.pref.get_contact_email">get_contact_email() (in module shotglass2.users.views.pref)</a>
 </li>
       <li><a href="system/staffing.html#app.get_db">get_db() (in module app)</a>
@@ -318,11 +303,13 @@
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="system/shotglass2.html#shotglass2.shotglass.make_db_path">make_db_path() (in module shotglass2.shotglass)</a>
 </li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="system/shotglass2.html#shotglass2.takeabeltof.date_utils.make_tz_aware">make_tz_aware() (in module shotglass2.takeabeltof.date_utils)</a>
 </li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="system/shotglass2.html#shotglass2.users.views.password.matchPasswordToHash">matchPasswordToHash() (in module shotglass2.users.views.password)</a>
+</li>
+      <li><a href="system/shotglass2.html#shotglass2.users.models.User.max_role_rank">max_role_rank() (shotglass2.users.models.User method)</a>
 </li>
   </ul></td>
 </tr></table>
@@ -394,6 +381,8 @@
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="system/shotglass2.html#shotglass2.takeabeltof.database.SqliteTable.save">save() (shotglass2.takeabeltof.database.SqliteTable method)</a>
 </li>
+      <li><a href="system/shotglass2.html#shotglass2.users.views.user.save_table_search">save_table_search() (in module shotglass2.users.views.user)</a>
+</li>
       <li><a href="system/shotglass2.html#shotglass2.takeabeltof.database.SqliteTable.select">select() (shotglass2.takeabeltof.database.SqliteTable method)</a>
 
       <ul>
@@ -457,6 +446,14 @@
   </ul></td>
 </tr></table>
 
+<h2 id="T">T</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="system/staffing.html#staffing.models.Task">Task (class in staffing.models)</a>
+</li>
+  </ul></td>
+</tr></table>
+
 <h2 id="U">U</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
@@ -488,25 +485,70 @@
 
 
           </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="index.html">Staffing</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<p class="caption"><span class="caption-text">Help for Users:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="user/index.html">How to Use the System</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Help for Developers:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="system/index.html">Technical Documentation</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+
+
+
+
+
+
+
+
         </div>
       </div>
       <div class="clearer"></div>
     </div>
-    <div class="related" role="navigation" aria-label="related navigation">
-      <h3>Navigation</h3>
-      <ul>
-        <li class="right" style="margin-right: 10px">
-          <a href="#" title="General Index"
-             >index</a></li>
-        <li class="right" >
-          <a href="py-modindex.html" title="Python Module Index"
-             >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">Staffing 0.1.0 documentation</a> &#187;</li> 
-      </ul>
+    <div class="footer">
+      &copy;2019, Bill Leddy.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 2.2.1</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
     </div>
-    <div class="footer" role="contentinfo">
-        &#169; Copyright 2019, Bill Leddy.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 2.1.2.
-    </div>
+
+    
+
+    
   </body>
 </html>

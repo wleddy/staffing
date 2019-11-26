@@ -7,10 +7,15 @@ Welcome to Staffing's documentation!
 ====================================
 
 .. toctree::
-    :maxdepth: 1
-    :caption: Section Index:
+    :maxdepth: 2
+    :caption: Help for Users:
     
     user/index.rst
+    
+.. toctree::
+    :maxdepth: 1
+    :caption: Help for Developers:
+    
     system/index.rst
    
 
