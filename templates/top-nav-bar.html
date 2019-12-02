@@ -24,7 +24,7 @@
                 <a  class="w3-bar-item w3-button w3-border w3-drop-menu-color w3-drop-menu-hover-color" href="http://sacbike.org/contact/">&nbsp;&nbsp;Contact Us</a>
             </div>
         </div> -->
-        <a  class="w3-bar-item w3-button w3-border w3-drop-menu-color w3-drop-menu-hover-color" href="{{ url_for('static', filename='index.html')}}">Docs</a>
+        <a  class="w3-bar-item w3-button w3-border w3-primary-color w3-secondary-hover-color" href="{{ url_for('static', filename='index.html')}}">Docs</a>
         {% if g.admin and g.admin.has_access(g.user)%}
             <div style="display:none"><div style="display:none"><!-- just a place holder -->
             {% for item in g.admin.permissions %}
