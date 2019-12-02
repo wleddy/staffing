@@ -19,7 +19,7 @@ How to Create or Edit a Job record
 **************************************
 
 As an Admin or Event coordinator you will be able to `create and edit Jobs <#create-or-open-a-job-record>`_,
-`assign users <#assign-a-user>`_ to work a Job and `remove a user from a job <#remove-a-user-assignment>`_.
+`assign users <#assign-a-user>`_ to work a Job and `remove a user from a job <#assign-a-user>`_.
 
 Create or Open a Job Record
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^

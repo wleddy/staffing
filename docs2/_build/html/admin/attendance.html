@@ -16,7 +16,7 @@
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="How to Manage Location Records" href="locations.html" />
-    <link rel="prev" title="How to manage Job records" href="jobs.html" />
+    <link rel="prev" title="How to Assign Users to Jobs" href="assign_users_to_jobs.html" />
    
   <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
   
@@ -35,10 +35,105 @@
             
   <div class="section" id="how-to-manage-attendance-records">
 <h1>How to manage Attendance Records<a class="headerlink" href="#how-to-manage-attendance-records" title="Permalink to this headline">¶</a></h1>
-<p>(Jump to <a class="reference internal" href="#attendance-instructions"><span class="std std-ref">Creating and Editing Attendance</span></a>)</p>
+<p>(Jump to <a class="reference internal" href="#attendance-instructions"><span class="std std-ref">Creating and Editing Attendance Records</span></a>)</p>
 <p>The Attendance records are used to record the hours that users actually worked a <a class="reference external" href="jobs.html">Job</a>.</p>
-<div class="section" id="creating-and-editing-attendance">
-<span id="attendance-instructions"></span><h2>Creating and Editing Attendance<a class="headerlink" href="#creating-and-editing-attendance" title="Permalink to this headline">¶</a></h2>
+<p>When a user signs up for a job, or is assigned a job by you, a corresponding Attendance Record
+is created.</p>
+<p>Attendance records are used to track who did what for future reference. They are also very helpful in the case of paid
+staff so that you are able to pay them for their actual hours worked.</p>
+<div class="section" id="attendance-list">
+<h2>Attendance List<a class="headerlink" href="#attendance-list" title="Permalink to this headline">¶</a></h2>
+<p>To open the Attendance record list, select <span class="guilabel">Staffing Admin –&gt; Attendance</span> from the navigation menu.</p>
+<p>The Attendance list will open.</p>
+<blockquote>
+<div><a class="reference internal image-reference" href="../_images/search.png"><img alt="../_images/search.png" src="../_images/search.png" style="width: 500px;" /></a>
+<p>Because there will be <em>a lot</em> of Attendance records in the list view there is a special search
+form provided at the top of the list.</p>
+<ol class="arabic">
+<li><dl>
+<dt>If needed, you can create a new Attendance record for special “Ad Hoc” tasks.</dt><dd><p>Ad Hoc tasks are things that someone did, which you want to record, but was not part of an
+actual Event. These are often routine functions that the organization needs to do.</p>
+<p>In particular is a task is a paid staff function, you would want to record it here so it will be included
+in the <a class="reference external" href="attendance-report">Attendance Report</a>.</p>
+</dd>
+</dl>
+</li>
+<li><dl>
+<dt>Search for text.</dt><dd><p>Type something in the text box to search the items in the list. Use the drop down list to indicate which column
+to search in.</p>
+<p><strong>Save Your Search</strong>: Be sure to check the <span class="guilabel">Save Search</span> box so all your search criteria are preserved
+after you return from editing a record.</p>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>Search by Job Dates.</dt><dd><p>Enter the start and/or end dates to display in the list so you can focus on current events.</p>
+</dd>
+</dl>
+</li>
+</ol>
+</div></blockquote>
+</div>
+<div class="section" id="id1">
+<h2>Attendance Report<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h2>
+<blockquote>
+<div><p>Click the <span class="guilabel">Attendance Report</span> button to export a CSV (comma separated values) report of the Attendance
+records currently displayed in the list.</p>
+<p>This report can be opened in a spreadsheet program if you want to manipulate the data to bend it to your purposes
+such as submitting work hours for payroll.</p>
+</div></blockquote>
+<div class="section" id="creating-and-editing-attendance-records">
+<span id="attendance-instructions"></span><h3>Creating and Editing Attendance Records<a class="headerlink" href="#creating-and-editing-attendance-records" title="Permalink to this headline">¶</a></h3>
+<p>The form presented varies somewhat depending on whether you are editing an Event based record or a record
+created for an Ad Hoc task.</p>
+</div>
+</div>
+<div class="section" id="event-based-attendance">
+<h2>Event Based Attendance<a class="headerlink" href="#event-based-attendance" title="Permalink to this headline">¶</a></h2>
+<blockquote>
+<div><p>To edit an event based Attendance record, click on a record in the list to open the detail form.</p>
+<p>The Event info and date and time of the job are included automatically.</p>
+<a class="reference internal image-reference" href="../_images/detail_11.png"><img alt="../_images/detail_11.png" src="../_images/detail_11.png" style="width: 500px;" /></a>
+<ol class="arabic">
+<li><dl>
+<dt>Select the input style you prefer.</dt><dd><p>You can use the tabs to switch between form styles.</p>
+<p>One style allows you to enter the start and end times, the other allows you to enter the start time and
+the total hours worked.</p>
+</dd>
+</dl>
+</li>
+<li><dl>
+<dt>No Show?</dt><dd><p>If the user assigned to the job did not show you can click the <span class="guilabel">No Show</span> check box and save
+the record.</p>
+<p>This option is designed to indicate that someone was assigned a job and did not fulfill their commitment.</p>
+<p>If, on the other hand, the user had made arrangements to miss the shift or had informed you that they would not
+be able to make it, go to the <a class="reference external" href="jobs.html">Job record</a> and remove the users assignment. This will delete the
+corresponding Attendance record as well.</p>
+</dd>
+</dl>
+</li>
+<li><dl>
+<dt>Enter the Attendance times.</dt><dd><p>If the user attended the full shift, you do not need to do anything. Just save the record.</p>
+<p>Otherwise enter the time the user started the shift and either the time they left or the
+number of hours worked depending on the input style you’ve chosen.</p>
+<blockquote>
+<div><a class="reference internal image-reference" href="../_images/detail_21.png"><img alt="../_images/detail_21.png" src="../_images/detail_21.png" style="width: 300px;" /></a>
+</div></blockquote>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>Enter Milage.</dt><dd><p>If the user had reimbursable milage, enter the number of miles here.</p>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>Comments?</dt><dd><p>You can enter any comments you’d like here.</p>
+</dd>
+</dl>
+</li>
+</ol>
+</div></blockquote>
 </div>
 </div>
 
@@ -70,6 +165,7 @@
 <li class="toctree-l2"><a class="reference internal" href="activities.html">How to manage Activity records</a></li>
 <li class="toctree-l2"><a class="reference internal" href="events.html">How to manage Event records</a></li>
 <li class="toctree-l2"><a class="reference internal" href="jobs.html">How to manage Job records</a></li>
+<li class="toctree-l2"><a class="reference internal" href="assign_users_to_jobs.html">How to Assign Users to Jobs</a></li>
 <li class="toctree-l2 current"><a class="current reference internal" href="#">How to manage Attendance Records</a></li>
 <li class="toctree-l2"><a class="reference internal" href="locations.html">How to Manage Location Records</a></li>
 <li class="toctree-l2"><a class="reference internal" href="roles.html">How to manage Role Records</a></li>
@@ -86,7 +182,7 @@
 <ul>
   <li><a href="../index.html">Documentation overview</a><ul>
   <li><a href="index.html">Managing the Site</a><ul>
-      <li>Previous: <a href="jobs.html" title="previous chapter">How to manage Job records</a></li>
+      <li>Previous: <a href="assign_users_to_jobs.html" title="previous chapter">How to Assign Users to Jobs</a></li>
       <li>Next: <a href="locations.html" title="next chapter">How to Manage Location Records</a></li>
   </ul></li>
   </ul></li>
