@@ -15,7 +15,7 @@
     <link rel="shortcut icon" href="../_static/favicon.png"/>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="How to Manage Location Records" href="locations.html" />
+    <link rel="next" title="How to manage Attendance Records" href="attendance.html" />
     <link rel="prev" title="How to manage Event records" href="events.html" />
    
   <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
@@ -35,14 +35,116 @@
             
   <div class="section" id="how-to-manage-job-records">
 <h1>How to manage Job records<a class="headerlink" href="#how-to-manage-job-records" title="Permalink to this headline">¶</a></h1>
+<p>(Jump to <a class="reference internal" href="#job-instructions"><span class="std std-ref">How to Create or Edit a Job record</span></a>)</p>
 <p>Most Events will require one or more people to do one or more <strong>Jobs</strong>. It’s possible to have an Event with
-no jobs if, for example you only want the event to appear on the calendar.</p>
-<p>When staff and volunteers are using
-the system, they are actually signing up for a job.</p>
+no jobs if, for example you only want the event to appear on the calendar.
+When staff and volunteers are using the system sign up, they are actually signing up for a Job.</p>
 <p>Each Job record will have a start time and end time and will request one or more people for the job.</p>
+<p>The dates and times for each job may be different from the date and times of the event to which the
+job is associated.</p>
 <div class="section" id="how-to-create-or-edit-a-job-record">
-<h2>How to Create or Edit a Job record<a class="headerlink" href="#how-to-create-or-edit-a-job-record" title="Permalink to this headline">¶</a></h2>
-<p>From an <a class="reference external" href="events.html">Event</a>.</p>
+<span id="job-instructions"></span><h2>How to Create or Edit a Job record<a class="headerlink" href="#how-to-create-or-edit-a-job-record" title="Permalink to this headline">¶</a></h2>
+<p>As an Admin or Event coordinator you will be able to <a class="reference external" href="#create-or-open-a-job-record">create and edit Jobs</a>,
+<a class="reference external" href="#assign-a-user">assign users</a> to work a Job and <a class="reference external" href="#remove-a-user-assignment">remove a user from a job</a>.</p>
+<div class="section" id="create-or-open-a-job-record">
+<h3>Create or Open a Job Record<a class="headerlink" href="#create-or-open-a-job-record" title="Permalink to this headline">¶</a></h3>
+<p>From an <a class="reference external" href="events.html">Event</a> record…</p>
+<blockquote>
+<div><a class="reference internal image-reference" href="../_images/open1.png"><img alt="../_images/open1.png" src="../_images/open1.png" style="width: 500px;" /></a>
+<ol class="arabic simple">
+<li><p>To create a new job, click the <span class="guilabel">New Job</span> button.</p></li>
+<li><p>Or… click the <span class="guilabel">Edit</span> button to open an existing Job record.</p></li>
+<li><p>Or… click the <span class="guilabel">Assign</span> button to assign users to work the job.</p></li>
+</ol>
+</div></blockquote>
+</div>
+<div class="section" id="edit-a-job-record">
+<h3>Edit a Job Record<a class="headerlink" href="#edit-a-job-record" title="Permalink to this headline">¶</a></h3>
+<blockquote>
+<div><a class="reference internal image-reference" href="../_images/detail2.png"><img alt="../_images/detail2.png" src="../_images/detail2.png" style="width: 500px;" /></a>
+<ol class="arabic">
+<li><p>Enter a Job title</p></li>
+<li><dl>
+<dt>Create a description of the job</dt><dd><p>This is a public facing description of what the job is about.</p>
+<p>This is a good opportunity to give folks a reason to sign up for the job.</p>
+<p>The description may use <a class="reference external" href="https://www.markdownguide.org/basic-syntax">Markdown</a> syntax to create a rich presentation when viewed by visitors. (Or you can just type something.)</p>
+</dd>
+</dl>
+</li>
+<li><dl>
+<dt>Select the Skills Required.</dt><dd><p>Select one or more <a class="reference external" href="roles.html">Roles</a> that a user must have associated with their profile in order to sign up for
+this Job.</p>
+<p>In order for this job to be listed in the sign up page, a user must be logged in and they must have at lease one
+of the required roles.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Roles are hierarchical based on the role’s “Rank” so that a user with a role that has a higher rank than the rank of
+any of the roles selected will also be elegible to sign up for the job.</p>
+</div>
+</dd>
+</dl>
+</li>
+<li><p>Enter the start and end times for the job.</p></li>
+<li><dl class="simple">
+<dt>Enter the number of people you need for this job.</dt><dd><p>This will limit the number of people who can sign up.</p>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>Set the location for the job.</dt><dd><p>Set this if the job location is not the same as the default location for the event.</p>
+</dd>
+</dl>
+</li>
+</ol>
+</div></blockquote>
+</div>
+<div class="section" id="assign-a-user">
+<h3>Assign a User<a class="headerlink" href="#assign-a-user" title="Permalink to this headline">¶</a></h3>
+<p>As an Administrator or the Event coordinator, you have the ability to assign users to work the event.</p>
+<p>To start, click the <span class="guilabel">Assign</span> button from the Job list of the Event record.</p>
+<blockquote>
+<div><a class="reference internal image-reference" href="../_images/assign.png"><img alt="../_images/assign.png" src="../_images/assign.png" style="width: 500px;" /></a>
+<ol class="arabic">
+<li><dl>
+<dt>Search for a user to assign</dt><dd><p>Start typing the name of a user you want to assign to this job.</p>
+<p>When you find the name, click on it in the list to select it.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>You can assign any user to any job you like.</p>
+<p>You can also assign as many people to the job as you wish.</p>
+</div>
+</dd>
+</dl>
+</li>
+<li><p>Specify the number of “slots” you’re assigning the user in case they’re bringing a friend.</p></li>
+<li><dl>
+<dt>Click the <span class="guilabel">Add</span> button to make the assignment.</dt><dd><p>The user’s name will be added to the list at the top of the form.</p>
+<p>When you add a user to the job they will receive an email with their assignment
+info <strong>if the job date is in the future</strong> (<a class="reference external" href="#why-assign-users-to-past-jobs">Why would I do this?</a>).</p>
+</dd>
+</dl>
+</li>
+</ol>
+</div></blockquote>
+</div>
+<div class="section" id="remove-a-user-assignment">
+<h3>Remove a user assignment<a class="headerlink" href="#remove-a-user-assignment" title="Permalink to this headline">¶</a></h3>
+<blockquote>
+<div><p>You can also remove a user’s assignment by clicking the “X” next to their name in the list at the top of the form.</p>
+<p>When you remove a user’s assignment they will receive an email informing them of the change
+<strong>if the job date is in the future</strong> (<a class="reference external" href="#why-assign-users-to-past-jobs">Why would I do this?</a>).</p>
+</div></blockquote>
+</div>
+<div class="section" id="why-assign-users-to-past-jobs">
+<h3>Why Assign Users to Past Jobs<a class="headerlink" href="#why-assign-users-to-past-jobs" title="Permalink to this headline">¶</a></h3>
+<p>When a user signs up for a job, or is assigned a job by you, a corresponding <a class="reference external" href="attendance.html">Attendance Record</a>
+is created.</p>
+<p>Attendance records are used to track who did what for future reference. They are also very helpful in the case of paid
+staff so that you are able to pay them for their actual hours worked.</p>
+<p>There are times when in the heat of the moment you may need to shuffle staff around to cover all the bases. The system gives
+you the option to update the job assignments after the fact so that your records are accurate but without restricting
+how you actually do the work.</p>
+</div>
 </div>
 </div>
 
@@ -71,12 +173,18 @@ the system, they are actually signing up for a job.</p>
 <li class="toctree-l1 current"><a class="reference internal" href="index.html">Managing the Site</a><ul class="current">
 <li class="toctree-l2"><a class="reference internal" href="overview.html">Overview</a></li>
 <li class="toctree-l2"><a class="reference internal" href="calendar.html">The Calendar</a></li>
-<li class="toctree-l2"><a class="reference internal" href="activities.html">How to manage Activities</a></li>
+<li class="toctree-l2"><a class="reference internal" href="activities.html">How to manage Activity records</a></li>
 <li class="toctree-l2"><a class="reference internal" href="events.html">How to manage Event records</a></li>
 <li class="toctree-l2 current"><a class="current reference internal" href="#">How to manage Job records</a></li>
+<li class="toctree-l2"><a class="reference internal" href="attendance.html">How to manage Attendance Records</a></li>
 <li class="toctree-l2"><a class="reference internal" href="locations.html">How to Manage Location Records</a></li>
+<li class="toctree-l2"><a class="reference internal" href="roles.html">How to manage Role Records</a></li>
 </ul>
 </li>
+</ul>
+<p class="caption"><span class="caption-text">Help for Developers:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../dev/index.html">Technical Documentation</a></li>
 </ul>
 
 <div class="relations">
@@ -85,7 +193,7 @@ the system, they are actually signing up for a job.</p>
   <li><a href="../index.html">Documentation overview</a><ul>
   <li><a href="index.html">Managing the Site</a><ul>
       <li>Previous: <a href="events.html" title="previous chapter">How to manage Event records</a></li>
-      <li>Next: <a href="locations.html" title="next chapter">How to Manage Location Records</a></li>
+      <li>Next: <a href="attendance.html" title="next chapter">How to manage Attendance Records</a></li>
   </ul></li>
   </ul></li>
 </ul>

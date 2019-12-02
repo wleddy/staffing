@@ -74,25 +74,51 @@ Part 2
         few different locations. In that case, you will be able to select the specific location for each job that you need
         folks to do so they will know where to show up.
 
-Part 4
+    #. Choose the Event Manager.
+        Select the name of a manager from the drop down list. The manager's contact information will appear in the 
+        event Roster and will be the primary point of contact for staff and volunteers for this event.
+    #. Specify Client contact info if needed.
+         You can either select a client from the drop down list, or enter the information directly.
+         When you select a Client from the list, the contact info from the Client record is copied to the fields
+         below.
+    #. Enter a web site address, if any, with additional information about the event. The address will be 
+        displayed as a link in the signup page and calendar detail page.
+
+Part 3
 ^^^^^^
         
     .. image:: images/events/calendar_section.png
         :width: 500px
-
-    #. Update the Calendar information:
-        At a minimum you will need to set:
-
-        * The *Event Times* 
-           The date and time of the start and end of the public part of the event.
-        * The *Service Times*
-           The date and time of the start and end of the service you will be providing. 
-
-    #. Choose the Event Manager.
-        Select the name of a manager from the drop down list. The manager's contact information will appear in the event Roster and will be the primary point of contact for staff and volunteers for this event.
-    #. Specify Client contact info if needed.
-         You can either select a client from the drop down list, or enter the information directly.
-
+        
+    This section sets the details that are displayed to calendar visitors.
+    
+    #. Enter a Calendar Title if needed. 
+        This is the name of the event that will be displayed in the Calendar.
+        By default the Calendar title will be the same as the Activity title, but you can change it here.
+        
+    #. Check the *"Exclude from Calendar"* box 
+        If you want to hide the event from the calendar. It will still
+        show up in Signup lists so that people can signup to work the event.
+        
+    #. Change the *"Service Type"* if you would like. 
+        In the Calendar detail page, the Service Type is used as a page header
+        to give visitors an idea of what kind of service you're providing.
+        
+        You may want to change it here to make it clear what you're doing. For example, 
+        "Valet Bike Parking" instead of "Arena Parking".
+    
+    #. Set the  *Event Starts* and *Event Ends* 
+        These are the date and time of the start and end of the public part of the event.
+        In other words, when the "doors" open and close to the public.
+        
+        Also set the *Calendar Labels* for the start and end times. The labels are used so the times read naturally
+        to site visitors. So, for example, *"Doors Open: 7:00 pm - Doors Close: 11:00 pm"*.
+        
+    #. Set the *Service Times* for the event if needed.
+        The Service times represent the start and end of the service you will be providing.
+        This is used in the cases where you may be opening your service before the event starts to serve folks
+        arriving early or closing after the event ends to serve them as they leave.
+        
 
 Copying Events
 ^^^^^^^^^^^^^^
@@ -113,6 +139,10 @@ The original Event record and it's Jobs if any are left unchanged.
 
 Next steps...
 ^^^^^^^^^^^^^^^^^^
+
+.. image:: images/events/jobs.png
+    :width: 200px
+    
 Now that you have created an event, you will probably want to create some `Job records <jobs.html>`_ so people can actually sign up.
 
  

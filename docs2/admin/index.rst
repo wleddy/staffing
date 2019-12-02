@@ -22,5 +22,9 @@ with Administrator access.
     
     jobs.rst
     
+    attendance.rst
+    
     locations.rst
+    
+    roles.rst
     
