@@ -1,0 +1,200 @@
+
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta charset="utf-8" />
+    <title>How to manage Activities &#8212; Staffing 0.1.0 documentation</title>
+    <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <script type="text/javascript" src="../_static/language_data.js"></script>
+    <link rel="shortcut icon" href="../_static/favicon.png"/>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="How to manage Event records" href="events.html" />
+    <link rel="prev" title="The Calendar" href="calendar.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <div class="section" id="how-to-manage-activities">
+<h1>How to manage Activities<a class="headerlink" href="#how-to-manage-activities" title="Permalink to this headline">¶</a></h1>
+<p>(Jump to <a class="reference internal" href="#activity-instructions"><span class="std std-ref">Creating and Editing Activity Records</span></a>)</p>
+<p>All Events are organized within “Activities”. The Activity record should be thought of as the goal to be accomplished
+during one or more “Events” that are organized under that activity.</p>
+<p>For example, an Activity like “Bake Sale” might take place several times during the year, and over the course of a few
+years as well. Each “Event” associated with the Activity happens on a specific date. The Activity record provides a way to
+keep the Bake Sale events organized.</p>
+<p>By themselves, Activities have no date or time associated with them and will not appear on your web site calendar.</p>
+<div class="section" id="some-stratagies">
+<h2>Some Stratagies<a class="headerlink" href="#some-stratagies" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="single-activity">
+<h3>Single Activity<a class="headerlink" href="#single-activity" title="Permalink to this headline">¶</a></h3>
+<p>You must have one Activity record before you can create an Event record, but if you’re happy to keep all your events in one
+place then you only need one. As you organize more events this may become a bit cumbersome though.</p>
+</div>
+<div class="section" id="generic-activities">
+<h3>Generic Activities<a class="headerlink" href="#generic-activities" title="Permalink to this headline">¶</a></h3>
+<p>You can create a few generic Activity records just to create some general groupings. So for example you might create some
+Activities named:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>Training</p></li>
+<li><p>Parties</p></li>
+<li><p>Clean up Chores</p></li>
+<li><p>… etc …</p></li>
+</ul>
+</div></blockquote>
+<p>Then when you create an Event associated with each of these activities, you can give them more meaningful title for the
+calendar display so visitors to the web site will know what you’re talking about.</p>
+</div>
+<div class="section" id="very-specific">
+<h3>Very Specific<a class="headerlink" href="#very-specific" title="Permalink to this headline">¶</a></h3>
+<p>Many organizations will have events that recur annually, monthly, occasionally, what ever. In a case like that you may want
+to create an Activity record to group those events together and make them easier to find and update. So, for example, you
+might have some Activities like:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>St. Patrick’s Day Run</p></li>
+<li><p>Halloween Bike Ride</p></li>
+<li><p>… etc …</p></li>
+</ul>
+</div></blockquote>
+<p>The style of organization you use is up to you. It’s really just a way to help you manage more or less related events</p>
+</div>
+</div>
+<div class="section" id="creating-and-editing-activity-records">
+<span id="activity-instructions"></span><h2>Creating and Editing Activity Records<a class="headerlink" href="#creating-and-editing-activity-records" title="Permalink to this headline">¶</a></h2>
+<p>From the main menu, select <span class="guilabel">Staff Admin -&gt; Activity</span> to display the Activity List</p>
+<div class="section" id="activity-list">
+<h3>Activity List<a class="headerlink" href="#activity-list" title="Permalink to this headline">¶</a></h3>
+<a class="reference internal image-reference" href="../_images/list.png"><img alt="../_images/list.png" src="../_images/list.png" style="width: 500px;" /></a>
+<p>To create a new Activity record click the “Add a new record” link (1).</p>
+<p>To edit an existing Activity record click on one of the items in the list (2).</p>
+<p>The Activity Detail page will open.</p>
+</div>
+<div class="section" id="activity-detail">
+<h3>Activity Detail<a class="headerlink" href="#activity-detail" title="Permalink to this headline">¶</a></h3>
+<a class="reference internal image-reference" href="../_images/detail.png"><img alt="../_images/detail.png" src="../_images/detail.png" style="width: 500px;" /></a>
+<p>The information in the Activity record is used as the default values for some of the fields in the
+Event records that are associated with your Activity.</p>
+<blockquote>
+<div><ol class="arabic simple">
+<li><p>Activity Title: The name of the Activity. This is also the default name that appears in the Calendar view.</p></li>
+<li><p>Description: A public facing description of the Activity. Again, this is the default description for all
+Events that are associated with this Activity.</p></li>
+<li><p>Activity Type: This is primarily for internal organization and reporting purposes.
+(The site administrators can create activity types as needed.)</p></li>
+<li><p>Additional Info: This is information that is only displayed to staff members. A good place to put special instructions
+that you’d like to have appear in the roster.</p></li>
+<li><p>Event List: The list of events associated with this Activity. (<a class="reference external" href="events.html">More Info on Events</a>)
+These records represent the actual events that will appear on the calendar.</p></li>
+</ol>
+</div></blockquote>
+</div>
+<div class="section" id="next-steps">
+<h3>Next steps…<a class="headerlink" href="#next-steps" title="Permalink to this headline">¶</a></h3>
+<p>Now that you have created an Activity, you will probably want to create some <a class="reference external" href="events.html">Event records</a> that will appear on the Calendar.</p>
+</div>
+</div>
+</div>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+            <p class="logo"><a href="../index.html">
+              <img class="logo" src="../_static/html_logo.jpg" alt="Logo"/>
+            </a></p>
+<h1 class="logo"><a href="../index.html">Staffing</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<p class="caption"><span class="caption-text">Help for Admins:</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">Managing the Site</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="overview.html">Overview</a></li>
+<li class="toctree-l2"><a class="reference internal" href="calendar.html">The Calendar</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">How to manage Activities</a></li>
+<li class="toctree-l2"><a class="reference internal" href="events.html">How to manage Event records</a></li>
+<li class="toctree-l2"><a class="reference internal" href="jobs.html">How to manage Job records</a></li>
+<li class="toctree-l2"><a class="reference internal" href="locations.html">How to Manage Location Records</a></li>
+</ul>
+</li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../index.html">Documentation overview</a><ul>
+  <li><a href="index.html">Managing the Site</a><ul>
+      <li>Previous: <a href="calendar.html" title="previous chapter">The Calendar</a></li>
+      <li>Next: <a href="events.html" title="next chapter">How to manage Event records</a></li>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2019, Bill Leddy.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 2.2.1</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+      |
+      <a href="../_sources/admin/activities.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

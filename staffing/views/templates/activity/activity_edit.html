@@ -8,7 +8,7 @@
     <p>{{ input_field(rec.title,'title',label="Activity Title",req=True)}}</p>
     <p>{{ label_only(label="Description (Appears in Public Calendar)")}}</p>
     <p><textarea rows="7" name="description" style="width:100%;"  >{{rec.description |default('',True)}}</textarea></p>
-    <p>{{ select_field("activity_type_id","Activity Type (optional)", class="w3-border", req=True) }}
+    <p>{{ select_field("activity_type_id","Activity Type", class="w3-border", req=True) }}
             <option value="">Select an Activity Type</option>
             {% if activity_types %}
             {% for act_type in activity_types %}

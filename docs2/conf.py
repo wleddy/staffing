@@ -53,6 +53,8 @@ exclude_patterns = ['_build', 'Thumbs.db', '.DS_Store','Notes',]
 # a list of builtin themes.
 #
 html_theme = 'alabaster' #'nature' #'alabaster' #'bizstyle'
+html_logo = 'images/html_logo.jpg'
+html_favicon = 'images/favicon.png'
 
 # Add any paths that contain custom static files (such as style sheets) here,
 # relative to this directory. They are copied after the builtin static files,

@@ -1,0 +1,118 @@
+=====================================
+How to manage Event records
+=====================================
+
+(Jump to :ref:`event_instructions`)
+
+Event records are always associated with `Activity Records <activities.html>`_. Therefore, you will always start
+from an Activity record when creating and editing event records.
+
+Event records describe something that is happening on a specific date and the (usually) you will want to appear on the
+Calendar.
+
+.. note:: If you need folks to signup to do some things during your Event, you will need to also create some `Job records <jobs.html>`_ for the event.
+
+.. _event_instructions:
+
+How to Create or Edit an Event
+----------------------------------------------
+    .. image:: images/events/open.png
+                :width: 500px
+                
+    1. Starting from an `Activity Record <activities.html>`_ click on the :guilabel:`Add Event...` button
+    2. Or... Click the :guilabel:`Edit` button to open an existing record.
+
+        .. note:: You can Move or Copy an existing event to another date by clicking the button labeled :guilabel:`More...`. (`See details <#copying-events>`_ below)
+       
+    
+The Event Detail page will open. 
+
+There is a lot of information in the Event record, so
+for the purpose of these instructions, we've broken it up into a few parts.
+
+Part 1
+^^^^^^
+    .. image:: images/events/detail_1.png
+        :width: 500px
+
+    #. The Activity Title is copied from the Activity Record for reference here. This can't be changed here.
+    
+    #. Specify the Event Status.
+         If the event is ready to go, set the status to "Scheduled" and it will appear on the calendar and staff and volunteers will be able to sign up for jobs.
+     
+         On the other hand, you may set the status to "Pending" or "Cancelled" to keep it private.
+     
+       .. warning:: Marking an event as Cancelled will ***NOT*** cause a notification to be sent to staff or volunteers who have signed up for the event. You will need to do that by cancelling their assignment in the job records.
+     
+    #. Provide a detailed description of the event.
+        This is a public facing description of the Event that visitors to the site will see in the Calendar. You will want to
+        provide information that the general public will find useful and will hopefully encourage them to attend the event
+        and also to encourage our volunteers to sign up to help.
+        
+        By default, the description from the Activity is copied there, but you can enter a different, more specific, description
+        if you would like.
+        
+        The description may use `Markdown <https://www.markdownguide.org/basic-syntax>`_ syntax to create a rich presentation when viewed by visitors. (Or you can just type something.)
+        
+    #. Provide additional information if needed.
+        This is information that is only seen by staff members.
+        
+           
+Part 2
+^^^^^^
+
+    .. image:: images/events/detail_2.png
+        :width: 500px
+
+    #. Specify the default Location for the Event.
+        Select the location where the event will take place from the drop down list. This is the location that visitors
+        will see in the calendar as the location of the event.
+        
+        For more information on locations See `How to Manage Location Records <locations.html>`_.
+        
+        In some cases, the places where we will be performing the Jobs associated with an event are spread across a 
+        few different locations. In that case, you will be able to select the specific location for each job that you need
+        folks to do so they will know where to show up.
+
+Part 4
+^^^^^^
+        
+    .. image:: images/events/calendar_section.png
+        :width: 500px
+
+    #. Update the Calendar information:
+        At a minimum you will need to set:
+
+        * The *Event Times* 
+           The date and time of the start and end of the public part of the event.
+        * The *Service Times*
+           The date and time of the start and end of the service you will be providing. 
+
+    #. Choose the Event Manager.
+        Select the name of a manager from the drop down list. The manager's contact information will appear in the event Roster and will be the primary point of contact for staff and volunteers for this event.
+    #. Specify Client contact info if needed.
+         You can either select a client from the drop down list, or enter the information directly.
+
+
+Copying Events
+^^^^^^^^^^^^^^
+.. image:: images/events/copying_event.png
+    :width: 500px
+    
+Once you have held a few Events, you can save time if they repeat by making a copy rather than starting from scratch. Also, if
+the date of an Event changes, you can quickly Move the event to the new date.
+
+When you click the :guilabel:`More...` button in the event list, a dialog opens which allows you to Move or Copy the event.
+
+**Move** an Event: The date of the event record (and any jobs) will be changed to the new date you've entered. 
+
+**Copy** an Event: A new Event record will be created as a duplicate of the current event but with the date specified. Any 
+Jobs associated with the event will be duplicated as well but the staff and volunteer assignments will not. 
+The original Event record and it's Jobs if any are left unchanged.
+
+
+Next steps...
+^^^^^^^^^^^^^^^^^^
+Now that you have created an event, you will probably want to create some `Job records <jobs.html>`_ so people can actually sign up.
+
+ 

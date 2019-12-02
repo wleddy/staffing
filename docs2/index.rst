@@ -8,15 +8,15 @@ Welcome to Staffing's documentation!
 
 .. toctree::
     :maxdepth: 2
-    :caption: Help for Users:
+    :caption: Help for Admins:
     
-    user/index.rst
+    admin/index.rst
     
 .. toctree::
     :maxdepth: 1
     :caption: Help for Developers:
     
-    system/index.rst
+    dev/index.rst
    
 
 Indices and tables
