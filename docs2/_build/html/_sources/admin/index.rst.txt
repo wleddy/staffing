@@ -22,6 +22,8 @@ with Administrator access.
     
     jobs.rst
     
+    assign_users_to_jobs.rst
+    
     attendance.rst
     
     locations.rst
