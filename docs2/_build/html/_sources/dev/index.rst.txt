@@ -6,7 +6,7 @@ Technical Documentation
 
 The documentation here will be of interest to software developers. 
 
-`Return to Main site </>`_
+
 
 
 .. toctree::

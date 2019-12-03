@@ -6,7 +6,7 @@
 Welcome to Events documentation!
 ====================================
 
-`Return to Main site </>`_
+
 
 .. toctree::
     :maxdepth: 2
