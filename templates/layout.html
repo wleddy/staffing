@@ -12,14 +12,37 @@
     <link rel="icon" type="image/png" href="{{ url_for('static', filename='apple-touch-icon-114.png') }}"><!-- Opera Speed Dial, at least 144×114 px -->
     
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <!--  <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">   -->
-    <link rel="stylesheet" href="{{ url_for('static', filename='w3.css' )}}">
-    <link rel="stylesheet" href="{{ url_for('static', filename='default_style.css' )}}">
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css' )}}">
-	
+    
 	<script src="{{ url_for('static', filename='jquery.1.10.1.js') }}"></script>
 	<script src="{{ url_for('static', filename='common.js') }}"></script>
 	<script src="{{ url_for('static', filename='staffing.js') }}"></script>
+
+    {% if 'docs' in request.path or 'help' in request.path %}
+    <!-- For Sphynx Help pages -->
+    <link rel="stylesheet" href="{{ url_for('static',filename='_static/alabaster.css') }}" type="text/css" />
+    <link rel="stylesheet" href="{{ url_for('static',filename='_static/pygments.css') }}" type="text/css" />
+    <link rel="stylesheet" href="{{ url_for('static', filename='_static/custom.css') }}" type="text/css" />
+    <style>
+        h1.logo, div.footer {display:none;}
+        div.sphinxsidebarwrapper {padding:0 10px 18px 10px;}
+    </style>
+    <script type="text/javascript" id="documentation_options" data-url_root="./" src="{{ url_for('static', filename='_static/documentation_options.js') }}"></script>
+    <script type="text/javascript" src="{{ url_for('static', filename='_static/underscore.js') }}"></script>
+    <script type="text/javascript" src="{{ url_for('static', filename='_static/doctools.js') }}"></script>
+    <script type="text/javascript" src="{{ url_for('static', filename='_static/language_data.js') }}"></script>
+    <script type="text/javascript" src="{{ url_for('static', filename='_static/searchtools.js') }}"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="#" />
+    <script type="text/javascript" src="{{ url_for('static', filename='searchindex.js') }}" defer></script>
+    <!-- End Sphinx Help -->
+    {% endif %}
+    
+    <link rel="stylesheet" href="{{ url_for('static', filename='w3.css' )}}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='default_style.css' )}}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css' )}}">
+
+
+
 
     <script>
         $(window).resize(function(){set_menu_style();});
