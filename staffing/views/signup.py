@@ -41,7 +41,8 @@ def contact():
 @mod.route('/help/')
 @mod.route('/help')
 def help():
-    return "No help yet"
+    # send to sphinx help system
+    return redirect('/help/index.html')
     
     
 @mod.route('/more_info')
