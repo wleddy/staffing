@@ -534,6 +534,14 @@ role_names may be a string or a list</p>
 <dd><p>Save the table search string and column to the sesstion</p>
 </dd></dl>
 
+<span class="target" id="module-shotglass2.users.utils"></span><p>users.utils
+Some utility functions</p>
+<dl class="function">
+<dt id="shotglass2.users.utils.get_access_token">
+<code class="sig-prename descclassname">shotglass2.users.utils.</code><code class="sig-name descname">get_access_token</code><span class="sig-paren">(</span><em class="sig-param">token_length=24</em><span class="sig-paren">)</span><a class="headerlink" href="#shotglass2.users.utils.get_access_token" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return an access token that does not exist in the user table</p>
+</dd></dl>
+
 </div>
 <div class="section" id="module-shotglass2.users.views.pref">
 <span id="pref"></span><h3>Pref<a class="headerlink" href="#module-shotglass2.users.views.pref" title="Permalink to this headline">¶</a></h3>
@@ -547,6 +555,52 @@ role_names may be a string or a list</p>
 </div>
 <div class="section" id="utilities">
 <h2>Utilities<a class="headerlink" href="#utilities" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="module-shotglass2.takeabeltof.utils">
+<span id="general-purpose-utilities"></span><h3>General Purpose Utilities<a class="headerlink" href="#module-shotglass2.takeabeltof.utils" title="Permalink to this headline">¶</a></h3>
+<p>takeabeltof.utils
+Some utility functions</p>
+<dl class="function">
+<dt id="shotglass2.takeabeltof.utils.cleanRecordID">
+<code class="sig-prename descclassname">shotglass2.takeabeltof.utils.</code><code class="sig-name descname">cleanRecordID</code><span class="sig-paren">(</span><em class="sig-param">id</em><span class="sig-paren">)</span><a class="headerlink" href="#shotglass2.takeabeltof.utils.cleanRecordID" title="Permalink to this definition">¶</a></dt>
+<dd><p>return the integer version of id or else -1</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="shotglass2.takeabeltof.utils.formatted_phone_number">
+<code class="sig-prename descclassname">shotglass2.takeabeltof.utils.</code><code class="sig-name descname">formatted_phone_number</code><span class="sig-paren">(</span><em class="sig-param">phone</em>, <em class="sig-param">sep='-'</em>, <em class="sig-param">raw=False</em><span class="sig-paren">)</span><a class="headerlink" href="#shotglass2.takeabeltof.utils.formatted_phone_number" title="Permalink to this definition">¶</a></dt>
+<dd><p>Take what may be a phone number and return a formatted version of it or ‘’ or a tuple of found parts
+Taken from: <a class="reference external" href="https://www.diveinto.org/python3/regular-expressions.html">https://www.diveinto.org/python3/regular-expressions.html</a></p>
+</dd></dl>
+
+<dl class="function">
+<dt id="shotglass2.takeabeltof.utils.handle_request_error">
+<code class="sig-prename descclassname">shotglass2.takeabeltof.utils.</code><code class="sig-name descname">handle_request_error</code><span class="sig-paren">(</span><em class="sig-param">error=None</em>, <em class="sig-param">request=None</em><span class="sig-paren">)</span><a class="headerlink" href="#shotglass2.takeabeltof.utils.handle_request_error" title="Permalink to this definition">¶</a></dt>
+<dd><p>Usually used to handle a basic request error such as a db error</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="shotglass2.takeabeltof.utils.looksLikeEmailAddress">
+<code class="sig-prename descclassname">shotglass2.takeabeltof.utils.</code><code class="sig-name descname">looksLikeEmailAddress</code><span class="sig-paren">(</span><em class="sig-param">email=''</em><span class="sig-paren">)</span><a class="headerlink" href="#shotglass2.takeabeltof.utils.looksLikeEmailAddress" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return True if str email looks like a normal email address else False</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="shotglass2.takeabeltof.utils.render_markdown_for">
+<code class="sig-prename descclassname">shotglass2.takeabeltof.utils.</code><code class="sig-name descname">render_markdown_for</code><span class="sig-paren">(</span><em class="sig-param">file_name</em>, <em class="sig-param">bp=None</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#shotglass2.takeabeltof.utils.render_markdown_for" title="Permalink to this definition">¶</a></dt>
+<dd><p>Try to find the file to render and then do so
+if file_name has a leading slash, it will be treated as an apbolute path
+by os.path.join. If that’s not what you were expecting, you need to
+remove any leading slashes before calling this function.</p>
+<p>(In particular, the shotglass.home.docs route depends on this fact.)</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="shotglass2.takeabeltof.utils.send_static_file">
+<code class="sig-prename descclassname">shotglass2.takeabeltof.utils.</code><code class="sig-name descname">send_static_file</code><span class="sig-paren">(</span><em class="sig-param">filename</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#shotglass2.takeabeltof.utils.send_static_file" title="Permalink to this definition">¶</a></dt>
+<dd><p>Send the file if it exists, else try to send it from the static directory</p>
+</dd></dl>
+
+</div>
 <div class="section" id="module-shotglass2.takeabeltof.date_utils">
 <span id="date-utilities"></span><h3>Date Utilities<a class="headerlink" href="#module-shotglass2.takeabeltof.date_utils" title="Permalink to this headline">¶</a></h3>
 <p>Some date utilities</p>

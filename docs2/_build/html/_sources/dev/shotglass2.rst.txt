@@ -71,6 +71,9 @@ User
 .. automodule:: shotglass2.users.views.user
     :members:
     
+.. automodule:: shotglass2.users.utils
+    :members:
+    
 .. Role
 .. ^^^^^^^^^
 .. 
@@ -86,6 +89,12 @@ Pref
     
 Utilities
 ----------
+
+General Purpose Utilities
+^^^^^^^^^^^^^^^^^^^^^^^^^
+
+.. automodule:: shotglass2.takeabeltof.utils
+    :members:
 
 Date Utilities
 ^^^^^^^^^^^^^^^^
