@@ -102,6 +102,23 @@ any of the roles selected will also be elegible to sign up for the job.</p>
 <p>As an Administrator or the Event coordinator, you have the ability to <a class="reference external" href="assign_users_to_jobs.html">assign a job to a user</a> to work the event.</p>
 </div>
 </div>
+<div class="section" id="emails-and-reminders">
+<h2>Emails and Reminders<a class="headerlink" href="#emails-and-reminders" title="Permalink to this headline">¶</a></h2>
+<p>When a user signs up for a shift or an administrator assigns them a shift, the user will receive an email with the shift details.</p>
+<p>In addition, a few days before their shift, the user will receive another similar email as a reminder. The default is that the
+email will be sent 2 days in advance. The System administrator can change the number of days by changing the value in the “Commitment Reminder Days”
+value in the Preferences table. This is a system wide preference that effects all future reminders.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>As mentioned before, these emails are only sent when the shift is in future so that if you assign a user to a past shift
+in order to create an Assignment record, no emails will be sent to the user.</p>
+</div>
+<div class="section" id="reminder-trigger">
+<h3>Reminder Trigger<a class="headerlink" href="#reminder-trigger" title="Permalink to this headline">¶</a></h3>
+<p>The sending of reminder emails is triggered by calling a special web address: <a class="reference external" href="/process_notifications/">https://&lt;web site name&gt;/process_notifications/</a></p>
+<p>The notification web address requires that you be logged in but does not require any special privileges.</p>
+</div>
+</div>
 </div>
 
 

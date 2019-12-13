@@ -83,6 +83,12 @@ Part 2
          below.
     #. Enter a web site address, if any, with additional information about the event. The address will be 
         displayed as a link in the signup page and calendar detail page.
+    #. The "Event Prep Status" field is a place for a short note to track your preparation for the event.
+    #. The "Expected Event Size" field is a place for a short note about how large an event you are expecting
+        for planning purposes.
+    #. The "Number Served" field is a place to record the number of bikes you parked, people you feed, or whatever. This
+        will usually be a number.
+    #. The "Tips Received" field is a place to record the amount of tips received during the event.
 
 Part 3
 ^^^^^^

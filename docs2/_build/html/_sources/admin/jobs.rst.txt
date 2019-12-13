@@ -66,3 +66,25 @@ Assign a User
 ^^^^^^^^^^^^^^^
 As an Administrator or the Event coordinator, you have the ability to `assign a job to a user <assign_users_to_jobs.html>`_ to work the event.
 
+Emails and Reminders
+********************
+
+When a user signs up for a shift or an administrator assigns them a shift, the user will receive an email with the shift details.
+
+In addition, a few days before their shift, the user will receive another similar email as a reminder. The default is that the
+email will be sent 2 days in advance. The System administrator can change the number of days by changing the value in the "Commitment Reminder Days" 
+value in the Preferences table. This is a system wide preference that effects all future reminders.
+
+.. note:: As mentioned before, these emails are only sent when the shift is in future so that if you assign a user to a past shift
+    in order to create an Assignment record, no emails will be sent to the user.
+
+
+Reminder Trigger
+^^^^^^^^^^^^^^^^
+
+The sending of reminder emails is triggered by calling a special web address: `https://<web site name>/process_notifications/ </process_notifications/>`_
+
+The notification web address requires that you be logged in but does not require any special privileges.
+
+
+

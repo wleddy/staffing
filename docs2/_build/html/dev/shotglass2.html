@@ -101,17 +101,19 @@ the initial search so this works the same way.</p>
 <h2>Access Control<a class="headerlink" href="#access-control" title="Permalink to this headline">¶</a></h2>
 <div class="section" id="module-shotglass2.users.admin">
 <span id="access-administration"></span><h3>Access Administration<a class="headerlink" href="#module-shotglass2.users.admin" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="admin-py">
+<h4>admin.py<a class="headerlink" href="#admin-py" title="Permalink to this headline">¶</a></h4>
+<p>This module provides user access control.</p>
+<p>It’s primarily based on which database tables a user can see / update</p>
 <dl class="class">
 <dt id="shotglass2.users.admin.Admin">
 <em class="property">class </em><code class="sig-prename descclassname">shotglass2.users.admin.</code><code class="sig-name descname">Admin</code><span class="sig-paren">(</span><em class="sig-param">db</em><span class="sig-paren">)</span><a class="headerlink" href="#shotglass2.users.admin.Admin" title="Permalink to this definition">¶</a></dt>
-<dd><p>Register tables to be administered and check a user’s access permissions</p>
-<dl>
-<dt>Instanciate as:</dt><dd><p>admin = Admin(g.db)</p>
-</dd>
-<dt>Register an admin table:</dt><dd><p>Admin.register(TableObj,url,[,display_name=None[,minimum_rank_required=None[,roles=None]]])
-results in an item being added to self.permissions:
-self.permissions = [{table,display_name,url,minimum_rank_required(default = 99999999),roles(default = [])},]</p>
-<p>Registering a table again will replace the previous registration for that table.</p>
+<dd><p>An object to hold the list of access privilege requirements for database
+tables.</p>
+<p>The items in the Admin list may be used to create menu items for the web site and
+also provides functions to test the current users access privileges.</p>
+<dl class="simple">
+<dt>Instanciate as:</dt><dd><p>admin = Admin(<em>database connection</em>)</p>
 </dd>
 <dt>When assessing permissions test that the specified user (by id or username) has:</dt><dd><p>a role with at least minimum_rank_required
 OR
@@ -135,11 +137,64 @@ A shortcut I want to use in the menu template</p>
 <dl class="method">
 <dt id="shotglass2.users.admin.Admin.register">
 <code class="sig-name descname">register</code><span class="sig-paren">(</span><em class="sig-param">table</em>, <em class="sig-param">url</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#shotglass2.users.admin.Admin.register" title="Permalink to this definition">¶</a></dt>
-<dd><p>Add an item to the admin_list</p>
+<dd><p>Add a table item to the admin_list</p>
+<dl>
+<dt>Parameters:</dt><dd><p>table : Database table object
+url : str</p>
+<blockquote>
+<div><p>The url to be associated with the menu item created for this table</p>
+</div></blockquote>
+</dd>
+<dt>Example:</dt><dd><p>Admin.register(TableObj,url,[,display_name=None[,minimum_rank_required=None[,roles=None]]])</p>
+<dl class="simple">
+<dt>results in an item being added to self.permissions:</dt><dd><p>self.permissions = [{table,display_name,url,minimum_rank_required(default = 99999999),roles(default = [])},]</p>
+</dd>
+</dl>
+</dd>
+</dl>
+<p>Registering a table again will replace the previous registration for that table.</p>
 </dd></dl>
 
 </dd></dl>
 
+<dl class="function">
+<dt id="shotglass2.users.admin.silent_login">
+<code class="sig-prename descclassname">shotglass2.users.admin.</code><code class="sig-name descname">silent_login</code><span class="sig-paren">(</span><em class="sig-param">alert=True</em><span class="sig-paren">)</span><a class="headerlink" href="#shotglass2.users.admin.silent_login" title="Permalink to this definition">¶</a></dt>
+<dd><p>A decorator to test that a user is logged in or
+log in a user without displaying the login page first.</p>
+<p>If the user is not logged in or if valid credentials are not in the request form
+redirect to the login.login page, else process the request</p>
+<dl class="simple">
+<dt>Parameters</dt><dd><dl class="simple">
+<dt>alert<span class="classifier">bool</span></dt><dd><p>If True and login fails, Flash a failure message and email the system admin to
+inform admin of event.</p>
+</dd>
+</dl>
+</dd>
+<dt>Returns</dt><dd><p>Decorated function or redirect to login.login</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="shotglass2.users.admin.table_access_required">
+<code class="sig-prename descclassname">shotglass2.users.admin.</code><code class="sig-name descname">table_access_required</code><span class="sig-paren">(</span><em class="sig-param">table</em><span class="sig-paren">)</span><a class="headerlink" href="#shotglass2.users.admin.table_access_required" title="Permalink to this definition">¶</a></dt>
+<dd><p>A decorator that tests if the current user has sufficient privileges to access
+the table specified.</p>
+<p>If the user does not have sufficient access privileges the user is redirected 
+to the login.login with an appropreate message.</p>
+<dl class="simple">
+<dt>Parameters</dt><dd><dl class="simple">
+<dt>table<span class="classifier">Database table object</span></dt><dd><p>The table to which the user must have access</p>
+</dd>
+</dl>
+</dd>
+<dt>Returns</dt><dd><p>Decorated function or redirect to login.login</p>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
 </div>
 <div class="section" id="module-shotglass2.users.views.login">
 <span id="user-login"></span><h3>User Login<a class="headerlink" href="#module-shotglass2.users.views.login" title="Permalink to this headline">¶</a></h3>
@@ -669,7 +724,7 @@ This function will not convert an aware datetime to a new time zone</p>
 <dl class="function">
 <dt id="shotglass2.takeabeltof.jinja_filters.local_date_and_time_string">
 <code class="sig-prename descclassname">shotglass2.takeabeltof.jinja_filters.</code><code class="sig-name descname">local_date_and_time_string</code><span class="sig-paren">(</span><em class="sig-param">value</em><span class="sig-paren">)</span><a class="headerlink" href="#shotglass2.takeabeltof.jinja_filters.local_date_and_time_string" title="Permalink to this definition">¶</a></dt>
-<dd><p>3/1/19 6:33AM</p>
+<dd><p>Return a datetime as short date and AM/PM time. Ex: ‘3/1/19 6:33 AM’</p>
 </dd></dl>
 
 <dl class="function">
