@@ -134,6 +134,10 @@ class Event(SqliteTable):
             calendar_title TEXT,
             exclude_from_calendar INTEGER DEFAULT 0,
             status TEXT DEFAULT 'Scheduled',
+            prep_status TEXT,
+            event_size TEXT,
+            number_served NUMBER,
+            tips_received NUMBER,
             FOREIGN KEY (activity_id) REFERENCES activity(id) ON DELETE CASCADE
             """
                 
