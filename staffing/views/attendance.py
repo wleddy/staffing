@@ -264,17 +264,21 @@ def report():
     
     setExits()
     selected_recs = request.form.get('selected_recs','')
-    filename = "attendance_report_{}".format(date_to_string(local_datetime_now(),'iso_datetime'))
+    filename = "attendance_report_{}.csv".format(date_to_string(local_datetime_now(),'iso_datetime')).replace(' ','_')
     if selected_recs:
         # get attendance recs with this id
         recs = Attendance(g.db).query(attendance_sql(where="attendance.id in ({})".format(selected_recs)))
         if recs:
             result = render_template("attendance_report.csv", recs=recs)
-            return Response(result,
-                   mimetype="text/csv",
-                   headers={"Content-Disposition":
-                                "attachment;filename={}".format(filename)})
-            
+            headers={
+               "Content-Disposition":"attachment;filename={}".format(filename),
+                }
+
+            return Response(
+                    result,
+                    mimetype="text/csv",
+                    headers=headers
+                    )
             
     flash("No records to report")
     return redirect(g.listURL)
