@@ -287,7 +287,8 @@ def attendance_sql(**kwargs):
     """Return the sql statement to use to in input and edit forms"""
     
     # defaults are for list selection
-    where = kwargs.get('where',"date(job_start_date, 'localtime') <= date('now','localtime') and is_volunteer_job = 0")
+    #where = kwargs.get('where',"date(job_start_date, 'localtime') <= date('now','localtime') and is_volunteer_job = 0")
+    where = kwargs.get('where'," is_volunteer_job = 0")
     order_by = kwargs.get('order_by',"date(job_start_date,'localtime') DESC , activity_title, job_title, first_name, last_name")
     
     sql = """select
