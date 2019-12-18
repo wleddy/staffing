@@ -105,8 +105,7 @@
                 table_search('search_input','table_list',$('#col_select').val());
             }
             // now search rows by date if neeed
-            if (jobStartDate != ''){
-                if (jobEndDate == '') jobEndDate = '2050-12-31'; // search to end
+            if (jobStartDate != '' || jobEndDate != ''){
                 table_search_with_date(jobStartDate,jobStartColumn,jobEndDate,jobEndColumn,'table_list')
             }
             // save or delete the search text from session
@@ -117,7 +116,6 @@
             $(".row_id").each(function(index){
                 if (this.style.display !== 'none'){
                     selected_recs = (selected_recs + "," + this.title).replace(/^,/, '')
-
                 }
                 $("#selected_recs").val(selected_recs)
             })
@@ -140,13 +138,11 @@
                      hideRow = false;
                      start_td = tr[i].getElementsByTagName("td")[startDateCol];
                      end_td = tr[i].getElementsByTagName("td")[endDateCol];
-                     if (start_td && end_td) {
-                         try {                         
-                             startValue = new Date(start_td.textContent || start_td.innerText);
-                             endValue = new Date(end_td.textContent || end_td.innerText);
-                             if ((startValue < startDate) || (endValue > endDate)) hideRow = true;
-                         } catch(err) { // do nothing...
-                         }
+                     try {                         
+                         startValue = new Date(start_td.textContent || start_td.innerText || '1/1/2000');
+                         endValue = new Date(end_td.textContent || end_td.innerText || '12/31/2050');
+                         if ((startValue < startDate) || (endValue > endDate)) hideRow = true;
+                     } catch(err) { // do nothing...  
                      }
                      if (hideRow) {
                          tr[i].style.display = "none";
