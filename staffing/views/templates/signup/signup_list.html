@@ -107,6 +107,16 @@
                                   <span class="w3-small" id="job-date-less-{{ job.event_id }}-{{job.start_date[:10]}}" >&nbsp;<em>Hide this event</em></span>
                             </p>
                         </div>
+                        {% if job.event_staff_info and is_admin %}
+                        <div class="event-contain w3-row-padding w3-secondary-color" style="padding:3pt;">
+                            <div class="w3-small" >   
+                               <p><strong>Staff Only Info...</strong></p>
+                               <div class="w3-border w3-white" style="margin-left:6pt;padding:3pt;">
+                                   {{ job.event_staff_info | render_markdown }}
+                               </div>
+                            </div>
+                        </div>
+                        {% endif %}
                     </div>
                 {% endif %} {# show date? #}
             
