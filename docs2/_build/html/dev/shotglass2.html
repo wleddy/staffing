@@ -716,6 +716,15 @@ This function will not convert an aware datetime to a new time zone</p>
 </dd></dl>
 
 <dl class="function">
+<dt id="shotglass2.takeabeltof.jinja_filters.excel_date_and_time_string">
+<code class="sig-prename descclassname">shotglass2.takeabeltof.jinja_filters.</code><code class="sig-name descname">excel_date_and_time_string</code><span class="sig-paren">(</span><em class="sig-param">value</em><span class="sig-paren">)</span><a class="headerlink" href="#shotglass2.takeabeltof.jinja_filters.excel_date_and_time_string" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return a datetime as short date and AM/PM time with an extra space. 
+Ex: ‘3/1/19 6:33 AM’</p>
+<p>Excel does not seem to be able to recognize as a datetime without the space 
+before AM/PM</p>
+</dd></dl>
+
+<dl class="function">
 <dt id="shotglass2.takeabeltof.jinja_filters.iso_date_string">
 <code class="sig-prename descclassname">shotglass2.takeabeltof.jinja_filters.</code><code class="sig-name descname">iso_date_string</code><span class="sig-paren">(</span><em class="sig-param">value</em><span class="sig-paren">)</span><a class="headerlink" href="#shotglass2.takeabeltof.jinja_filters.iso_date_string" title="Permalink to this definition">¶</a></dt>
 <dd><p>YYYY-MM-DD</p>
@@ -724,7 +733,7 @@ This function will not convert an aware datetime to a new time zone</p>
 <dl class="function">
 <dt id="shotglass2.takeabeltof.jinja_filters.local_date_and_time_string">
 <code class="sig-prename descclassname">shotglass2.takeabeltof.jinja_filters.</code><code class="sig-name descname">local_date_and_time_string</code><span class="sig-paren">(</span><em class="sig-param">value</em><span class="sig-paren">)</span><a class="headerlink" href="#shotglass2.takeabeltof.jinja_filters.local_date_and_time_string" title="Permalink to this definition">¶</a></dt>
-<dd><p>Return a datetime as short date and AM/PM time. Ex: ‘3/1/19 6:33 AM’</p>
+<dd><p>Return a datetime as short date and AM/PM time. Ex: ‘3/1/19 6:33AM’</p>
 </dd></dl>
 
 <dl class="function">
