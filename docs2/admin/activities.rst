@@ -13,14 +13,15 @@ keep the Bake Sale events organized.
 
 By themselves, Activities have no date or time associated with them and will not appear on your web site calendar. 
 
-Some Stratagies
+Some Strategies
 ***************
 
 Single Activity
 ^^^^^^^^^^^^^^^
 
 You must have one Activity record before you can create an Event record, but if you're happy to keep all your events in one
-place then you only need one. As you organize more events this may become a bit cumbersome though.
+place then you only need one. As you organize more events this may become a bit cumbersome though. You can always create new
+Activities later if you wish.
 
 Generic Activities
 ^^^^^^^^^^^^^^^^^^

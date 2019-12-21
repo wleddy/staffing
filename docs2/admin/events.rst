@@ -7,7 +7,7 @@ How to manage Event records
 Event records are always associated with `Activity Records <activities.html>`_. Therefore, you will always start
 from an Activity record when creating and editing event records.
 
-Event records describe something that is happening on a specific date and the (usually) you will want to appear on the
+Event records describe something that is happening on a specific date and (usually) you will want to appear on the
 Calendar.
 
 .. note:: If you need folks to signup to do some things during your Event, you will need to also create some `Job records <jobs.html>`_ for the event.
@@ -22,7 +22,7 @@ How to Create or Edit an Event
     1. Starting from an `Activity Record <activities.html>`_ click on the :guilabel:`Add Event...` button
     2. Or... Click the :guilabel:`Edit` button to open an existing record.
 
-        .. note:: You can Move or Copy an existing event to another date by clicking the button labeled :guilabel:`More...`. (`See details <#copying-events>`_ below)
+    .. note:: You can Move or Copy an existing event to another date by clicking the button labeled :guilabel:`More...`. (`See details <#copying-events>`_ below)
        
     
 The Event Detail page will open. 
@@ -55,9 +55,11 @@ Part 1
         The description may use `Markdown <https://www.markdownguide.org/basic-syntax>`_ syntax to create a rich presentation when viewed by visitors. (Or you can just type something.)
         
     #. Provide additional information if needed.
-        This is information that is only seen by staff members.
+        This is information that is only seen by staff members. 
+        It appears in the Signup listing and the event Roster pages.
         
-           
+        This field also supports Markdown syntax.
+        
 Part 2
 ^^^^^^
 
