@@ -35,17 +35,17 @@
         appropieateness for purpose.
         
         return: true or false
-        
         */
         
-        // test the text of the date string for datitude
         var rightNow = new Date();
         
         if (dateString == undefined || dateString.length == 0){
             alert("Enter a date first...");
             return false;
         }
-        var da = dateString.split('/');
+        // replace '-' with '/' incase user is sloppy
+        var da = dateString.replace(/-/g,'/').split('/');
+        alert(da);
         if (!Array.isArray(da)){
             alert('"'+dateString+'"' + " could not create an array");
             return false;
@@ -70,17 +70,7 @@
             return false;
         }
     }
-    
-    function submitMoveForm(){
-        submitTheForm("move");
-        // submitModalForm(
-        // 'manage_event_form','{{url_for('event.manage_event')}}?action=move',
-        // 'event-list',
-        // '{{ url_for('activity.get_event_list')}}{{ rec.activity_id}}');
-    }
-    function submitCopyForm(){
-        submitTheForm("copy")
-    }
+
     function submitTheForm(action){
         submitModalForm(
         'manage_event_form','{{url_for('event.manage_event')}}?action='+action,
