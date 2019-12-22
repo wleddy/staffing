@@ -140,6 +140,9 @@ When you click the :guilabel:`More...` button in the event list, a dialog opens 
 
 **Move** an Event: The date of the event record (and any jobs) will be changed to the new date you've entered. 
 
+.. warning:: If there are people already signed up for the event that you just moved
+ they will not be informed of the change automatically. You'll need to tell them.
+
 **Copy** an Event: A new Event record will be created as a duplicate of the current event but with the date specified. Any 
 Jobs associated with the event will be duplicated as well but the staff and volunteer assignments will not. 
 The original Event record and it's Jobs if any are left unchanged.
