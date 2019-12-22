@@ -180,9 +180,10 @@ def manage_event(id=0):
         try:
             dup_date = coerce_datetime(request.form.get('new_date',''),'23:00:00')
             if dup_date:
-                # You can't move a set into the past
-                if dup_date < local_datetime_now():
-                    return "failure: You can't move or copy a set into the past"
+                # 12/22/19 - BL Now allow move or copy to past
+                # # You can't move a set into the past
+                # if dup_date < local_datetime_now():
+                #     return "failure: You can't move or copy a set into the past"
                     
                 #convert it to a string
                 dup_date = date_to_string(dup_date,'iso_date') #'YYYY-MM-DD'
