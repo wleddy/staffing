@@ -45,7 +45,6 @@
         }
         // replace '-' with '/' incase user is sloppy
         var da = dateString.replace(/-/g,'/').split('/');
-        alert(da);
         if (!Array.isArray(da)){
             alert('"'+dateString+'"' + " could not create an array");
             return false;
