@@ -65,6 +65,8 @@ class Attendance(SqliteTable):
         task_user_id INTEGER,
         task_id INTEGER,
         no_show INTEGER DEFAULT 0,
+        input_by TEXT, -- the name of person who entered times
+        input_date DATETIME,
         FOREIGN KEY (task_user_id) REFERENCES user(id) ON DELETE CASCADE,
         FOREIGN KEY (task_id) REFERENCES task(id) ON DELETE CASCADE,
         FOREIGN KEY (user_job_id) REFERENCES user_job(id) ON DELETE CASCADE """
