@@ -305,7 +305,7 @@ def attendance_sql(**kwargs):
     coalesce(user.first_name,task_user.first_name) as first_name,
     coalesce(user.last_name,task_user.last_name) as last_name,
     coalesce(nullif(event.calendar_title,''),activity.title,task_activity.title,'No Activity Title') as calendar_title,
-    coalesce(job.title,task.name) as job_title, 
+    coalesce(job.title,task.name,'No Job Title') as job_title, 
     
     -- 1 if a volunteer job, else 0
     coalesce((select 1 from job_role where job_role.role_id in ({vol_role_ids}) and job_role.job_id = job.id),0) as is_volunteer_job
