@@ -301,10 +301,10 @@ def attendance_sql(**kwargs):
     attendance.*,
     coalesce(job.start_date,attendance.start_date) as job_start_date,
     coalesce(job.end_date,attendance.end_date) as job_end_date,
-    coalesce(activity.title,task_activity.title) as activity_title, 
+    coalesce(activity.title,task_activity.title,'No Task Title') as activity_title, 
     coalesce(user.first_name,task_user.first_name) as first_name,
     coalesce(user.last_name,task_user.last_name) as last_name,
-    coalesce(nullif(event.calendar_title,''),activity.title,task_activity.title) as calendar_title,
+    coalesce(nullif(event.calendar_title,''),activity.title,task_activity.title,'No Activity Title') as calendar_title,
     coalesce(job.title,task.name) as job_title, 
     
     -- 1 if a volunteer job, else 0
