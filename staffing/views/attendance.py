@@ -89,6 +89,12 @@ def edit(att_id=0):
             
         if valid_form(fresh_rec):
             #import pdb;pdb.set_trace()
+            # 12/23/19 - BL update the input_date and input_by fields
+            if not fresh_rec.input_date:
+                fresh_rec.input_date = local_datetime_now()
+            if 'user_name' in session:
+                fresh_rec.input_by = session['user_name']
+                
             Attendance(g.db).save(fresh_rec)
             g.db.commit()
         
