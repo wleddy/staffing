@@ -225,6 +225,20 @@ login_on_success = True</p>
 <dd><p>Send reset password and send user an email if they forget their password</p>
 </dd></dl>
 
+<dl class="function">
+<dt id="shotglass2.users.views.login.setUserStatus">
+<code class="sig-prename descclassname">shotglass2.users.views.login.</code><code class="sig-name descname">setUserStatus</code><span class="sig-paren">(</span><em class="sig-param">userNameOrEmail</em>, <em class="sig-param">user_id</em><span class="sig-paren">)</span><a class="headerlink" href="#shotglass2.users.views.login.setUserStatus" title="Permalink to this definition">¶</a></dt>
+<dd><p>After the user’s login has authenticated, record some values
+in the session.</p>
+<p>user _str_: userNameOrEmail 
+user_id _int_: user record id
+user_name _str_: full name of user
+user_has_password _bool_: True if the user has a password</p>
+<p>also sets the globals:</p>
+<p>g.user = session[“user]
+g.user_has_password = session[“user_has_password”]</p>
+</dd></dl>
+
 </div>
 <div class="section" id="module-shotglass2.users.views.password">
 <span id="password-processing"></span><h3>Password Processing<a class="headerlink" href="#module-shotglass2.users.views.password" title="Permalink to this headline">¶</a></h3>
@@ -901,7 +915,7 @@ to_address_list=[list of tuples (recipient name,recipient address)]=None</p>
       &copy;2019, Bill Leddy.
       
       |
-      Powered by <a href="http://sphinx-doc.org/">Sphinx 2.2.1</a>
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 2.3.1</a>
       &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
       
       |

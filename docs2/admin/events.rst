@@ -4,11 +4,14 @@ How to manage Event records
 
 (Jump to :ref:`event_instructions`)
 
-Event records are always associated with `Activity Records <activities.html>`_. Therefore, you will always start
-from an Activity record when creating and editing event records.
+Event records describe something that is happening on a specific date and (usually) you will want 
+to appear on the `Calendar <calendar.html>`_.
 
-Event records describe something that is happening on a specific date and (usually) you will want to appear on the
-Calendar.
+Event records can be accessed and edited directly from the **Event** item of the main menu 
+or from their associated `Activity Record <activities.html>`_ .
+
+However, you can only create a new Event from an `Activity Record <activities.html>`_. Therefore, you will always start
+from an Activity record when creating and editing event records.
 
 .. note:: If you need folks to signup to do some things during your Event, you will need to also create some `Job records <jobs.html>`_ for the event.
 
