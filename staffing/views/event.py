@@ -29,6 +29,8 @@ def display():
     
     
 @mod.route('/edit/',methods=['POST',])
+@mod.route('/edit/<int:id>',methods=['GET','POST',])
+@mod.route('/edit/<int:id>/',methods=['GET','POST',])
 @mod.route('/edit/<int:id>/<int:activity_id>',methods=['GET','POST',])
 @mod.route('/edit/<int:id>/<int:activity_id>/',methods=['GET','POST',])
 @table_access_required(Event)

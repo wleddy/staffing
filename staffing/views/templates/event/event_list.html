@@ -4,8 +4,9 @@
 {% block body %}
 
       	<p id="addRecord">
-            <a href="{{ g.editURL }}0/">Add a new record</a>
-        &nbsp;&nbsp;{{ list_search_widget('event',{'Id':0,'Titel':1,'Status':2,'Service Start':3,'Event Start':4,},1) }}
+	      	{# can't add records from here... go to Activity #}
+            {# <a href="{{ g.editURL }}0/">Add a new record</a> #}
+        &nbsp;&nbsp;{{ list_search_widget('event',{'Id':0,'Title':1,'Status':2,'Service Start':3,'Event Start':4,},1) }}
         </p>
 	{%if recs %}
 		<table id="table_list" class="datatable w3-table w3-striped w3-hoverable">
@@ -19,7 +20,7 @@
 		{% for rec in recs %}
 	    <tr>
 			<td class="w3-hide-small" onclick="window.location='{{ g.editURL }}{{rec.id}}/'">{{ rec.id }}</td>
-			<td onclick="window.location='{{ g.editURL }}{{rec.id}}/'">{{ rec.activity_title }}</td>
+			<td onclick="window.location='{{ g.editURL }}{{rec.id}}/'" {% if rec.activity_title | length > 20 %}title="{{ rec.activity_title }}"{% endif %} %}>{{ rec.activity_title | truncate(20,False) }}</td>
 			<td onclick="window.location='{{ g.editURL }}{{rec.id}}/'">{{ rec.status|default("Unknown",true) }}</td>
 			<td onclick="window.location='{{ g.editURL }}{{rec.id}}/'">{{ rec.service_start_date | default("Not Set",true) | local_date_and_time_string }}</td>
 			<td class="w3-hide-small" onclick="window.location='{{ g.editURL }}{{rec.id}}/'">{{ rec.event_start_date | default("Not Set",true) | local_date_and_time_string }}</td>
