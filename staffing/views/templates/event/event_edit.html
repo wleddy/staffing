@@ -78,16 +78,12 @@
     <p>{{ input_field(rec.client_website,"client_website",label="Event Website", id="client_website", placeholder='http://example.com')}}</p>
     <h4>Planning Notes...</h4>
     <p>{{ input_field(rec.prep_status,"prep_status",label="Event Prep Status", id="prep_status")}}</p>
-    <p>{{ input_field(rec.event_size,"event_size",label="Expected Event Size", id="event_size")}}</p>
-    <div class="make-room">
-        <p class="w3-row w3-half fancy-input">{{ input_field(rec.number_served,"number_served",label="Number Served", id="number_served")}}</p>
+    <div class="">
         <p class="w3-row w3-half fancy-input" >{{ input_field(rec.event_size,"event_size",label="Expected Event Size", id="event_size")}}</p>
+        <p class="w3-row w3-half fancy-input">{{ input_field(rec.number_served,"number_served",label="Number Served", id="number_served")}}</p>
    </div>
-   <div class="w3-col">
-        <p class="w3-row w3-half fancy-input" >{{ input_field(rec.number_served,"number_served",label="Number Served", id="number_served")}}</p>
-        {% set tips_received = rec.tips_received | money %}
-        <p class="w3-row w3-half fancy-input" >{{ input_field(tips_received,"tips_received",label="Tips Received", id="tips_received")}}</p>
-   </div>
+    {% set tips_received = rec.tips_received | money %}
+    <p class="w3-row w3-half" >{{ input_field(tips_received,"tips_received",label="Tips Received", id="tips_received")}}</p>
 </div>
 <div class="w3-col w3-hide-small" style="width:20pt;">&nbsp;</div>
 <div class="w3-col l5 m5 s12" >
