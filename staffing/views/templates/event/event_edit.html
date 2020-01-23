@@ -42,7 +42,6 @@
             {% endif %}
         </select>
     </p>
-    {# TODO - update placeholders on contact input fields below when this changes #}
     <p>{{ select_field("client_id","Client", class="w3-border", extras=' onchange="updateClientFields(this);"') }}
             <option value="0">Select a Client</option>
             {% if clients %}
@@ -64,11 +63,18 @@
     <p>{{ input_field(rec.client_email,"client_email",label="Client Contact Email", id="client_email")}}</p>
     <p>{{ input_field(rec.client_phone,"client_phone",label="Client Contact Phone",id="client_phone")}}</p>
     <p>{{ input_field(rec.client_website,"client_website",label="Event Website", id="client_website", placeholder='http://example.com')}}</p>
+    <h4>Planning Notes...</h4>
     <p>{{ input_field(rec.prep_status,"prep_status",label="Event Prep Status", id="prep_status")}}</p>
     <p>{{ input_field(rec.event_size,"event_size",label="Expected Event Size", id="event_size")}}</p>
-    <p>{{ input_field(rec.number_served,"number_served",label="Number Served", id="number_served")}}</p>
-    {% set tips_received = rec.tips_received | money %}
-    <p>{{ input_field(tips_received,"tips_received",label="Tips Received", id="tips_received")}}</p>
+    <div class="w3-col">
+        <p class="w3-row w3-half">{{ input_field(rec.number_served,"number_served",label="Number Served", id="number_served")}}</p>
+        <p class="w3-row w3-half" >{{ input_field(rec.event_size,"event_size",label="Expected Event Size", id="event_size")}}</p>
+   </div>
+   <div class="w3-col">
+        <p class="w3-row w3-half" >{{ input_field(rec.number_served,"number_served",label="Number Served", id="number_served")}}</p>
+        {% set tips_received = rec.tips_received | money %}
+        <p class="w3-row w3-half" >{{ input_field(tips_received,"tips_received",label="Tips Received", id="tips_received")}}</p>
+   </div>
 </div>
 <div class="w3-col w3-hide-small" style="width:20pt;">&nbsp;</div>
 <div class="w3-col l5 m5 s12" >
