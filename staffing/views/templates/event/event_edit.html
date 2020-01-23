@@ -11,9 +11,17 @@
 {% block fieldset %}
 {% set placeholders = {}%} {# add dict items to set placeholders if needed. #}
 <div class="w3-col w3-half w3-left">
+    <p class="w3-center">
+        <a class="w3-button w3-primary-color w3-round-large" 
+        onclick="editFromList('{{ url_for('event.manage_event')}}{{ rec.id }}')"
+        >
+        Move or Copy Event...
+        </a>
+    </p>  
     {{ input_field(rec.id,"id",type="hidden",default=0)}}
     {{ input_field(rec.activity_id,"activity_id",type="hidden",default=-1)}}
     <p>{{ input_field(rec.activity_title,'activity title',extras='readonly')}}</p>
+
     <p>{{ select_field("status","Event Status", class="w3-border") }}
             {% for status in site_config.get("EVENT_STATUS_VALUES",["Scheduled","Pending","Cancelled"]) %}
                 <option value="{{status}}" {% if status == rec.status %}selected="selected" {% endif %}>{{status}}</option>
