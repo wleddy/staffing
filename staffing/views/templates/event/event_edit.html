@@ -11,6 +11,9 @@
 {% block fieldset %}
 {% set placeholders = {}%} {# add dict items to set placeholders if needed. #}
 <div class="w3-col w3-half w3-left">
+    
+    <!-- Need to save any chances to record prior to copy or move and
+        update the dates after move or better, redisplay entire form...
     <p class="w3-center">
         <a class="w3-button w3-primary-color w3-round-large" 
         onclick="editFromList('{{ url_for('event.manage_event')}}{{ rec.id }}')"
@@ -18,6 +21,8 @@
         Move or Copy Event...
         </a>
     </p>  
+    -->
+    
     {{ input_field(rec.id,"id",type="hidden",default=0)}}
     {{ input_field(rec.activity_id,"activity_id",type="hidden",default=-1)}}
     <p>{{ input_field(rec.activity_title,'activity title',extras='readonly')}}</p>
@@ -74,14 +79,14 @@
     <h4>Planning Notes...</h4>
     <p>{{ input_field(rec.prep_status,"prep_status",label="Event Prep Status", id="prep_status")}}</p>
     <p>{{ input_field(rec.event_size,"event_size",label="Expected Event Size", id="event_size")}}</p>
-    <div class="w3-col">
-        <p class="w3-row w3-half">{{ input_field(rec.number_served,"number_served",label="Number Served", id="number_served")}}</p>
-        <p class="w3-row w3-half" >{{ input_field(rec.event_size,"event_size",label="Expected Event Size", id="event_size")}}</p>
+    <div class="make-room">
+        <p class="w3-row w3-half fancy-input">{{ input_field(rec.number_served,"number_served",label="Number Served", id="number_served")}}</p>
+        <p class="w3-row w3-half fancy-input" >{{ input_field(rec.event_size,"event_size",label="Expected Event Size", id="event_size")}}</p>
    </div>
    <div class="w3-col">
-        <p class="w3-row w3-half" >{{ input_field(rec.number_served,"number_served",label="Number Served", id="number_served")}}</p>
+        <p class="w3-row w3-half fancy-input" >{{ input_field(rec.number_served,"number_served",label="Number Served", id="number_served")}}</p>
         {% set tips_received = rec.tips_received | money %}
-        <p class="w3-row w3-half" >{{ input_field(tips_received,"tips_received",label="Tips Received", id="tips_received")}}</p>
+        <p class="w3-row w3-half fancy-input" >{{ input_field(tips_received,"tips_received",label="Tips Received", id="tips_received")}}</p>
    </div>
 </div>
 <div class="w3-col w3-hide-small" style="width:20pt;">&nbsp;</div>
@@ -162,6 +167,10 @@
     </div>        
 </div>
       
+<style>
+    .fancy-input label, .fancy-input input {width:98%;}
+</style>
+
 <script>
     // set the placeholder text
     {% for key, value in placeholders.items() %}
