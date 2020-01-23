@@ -7,8 +7,10 @@ How to manage Event records
 Event records describe something that is happening on a specific date and (usually) you will want 
 to appear on the `Calendar <calendar.html>`_.
 
-Event records can be accessed and edited directly from the **Event** item of the main menu 
-or from their associated `Activity Record <activities.html>`_ .
+Event records can be accessed and edited from various starting points:
+    1. Drectly from the **Event** item of the main menu 
+    2. From the associated `Activity Record <activities.html>`_.
+    3. From the **Edit Event** link on the Calendar detail page for the event.
 
 However, you can only create a new Event from an `Activity Record <activities.html>`_. Therefore, you will always start
 from an Activity record when creating and editing event records.
