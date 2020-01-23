@@ -24,7 +24,7 @@ Editing the Event
 --------------------
 
 As an administrator, a link to the Event record is included on the page. Clicking the link
-will, no suprise, I hope, open the Event record for editing.
+will, no surprise I hope, open the Event record for editing.
 
 .. image:: images/calendar/edit_event_link.png
     :width: 300px
