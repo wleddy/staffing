@@ -34,7 +34,7 @@ def display():
 @table_access_required(Client)
 def edit(id=0):
     setExits()
-    g.title = 'Edit Activity Type Record'
+    g.title = 'Edit Client Record'
     id = cleanRecordID(id)
     if request.form:
         id = cleanRecordID(request.form.get("id"))

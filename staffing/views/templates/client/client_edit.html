@@ -13,6 +13,7 @@
         <p class="w3-col w3-half">{{ input_field(rec.contact_last_name,"contact_last_name",label="Contact Last Name") }}</p>
     </div>
     <p>{{ input_field(rec.email,"email",label="Email",req=True, type="email") }}
+    <p>{{ input_field(rec.website,"website",placeholder="http://example.com") }}
     <p>{{ input_field(rec.phone,"phone",label="Phone") }}
     <p>{{ input_field(rec.address,"address") }}</p>
     <p>{{ input_field(rec.city,"city") }}</p>
