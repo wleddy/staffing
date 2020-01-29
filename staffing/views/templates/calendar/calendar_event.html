@@ -25,7 +25,7 @@
             <h3><strong>{{ event.calendar_title}}</strong></h3>
             <p>
                 <em>Date:</em> <strong>{{ event.event_start_date | default('tbd',True)| abbr_date_string }}</strong>
-                {% if g.admin.has_access(g.user,Event) %}<a href="{{ url_for('event.edit')}}{{ event.event_id }}/"><em>(Edit Event)</em></a>{% endif %}
+                {% if g.admin.has_access(g.user,'Events') %}<a href="{{ url_for('event.edit')}}{{ event.event_id }}/"><em>(Edit Event)</em></a>{% endif %}
             </p>
             <div class="w3-row">
                 <p class="w3-col l1 m2 s2 w3-right-align">
