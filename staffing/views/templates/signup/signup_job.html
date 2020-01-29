@@ -72,9 +72,9 @@
                 {% else %}
                 <a class="w3-button w3-primary-color w3-round-medium w3-medium" 
                 {% if g.user %}
-                onclick="editFromList('{{ url_for('signup.signup')}}/{{ job.job_id }}')"
+                onclick="editFromList('{{ url_for('signup.signup')}}{{ job.job_id }}')"
                 {% else %}
-                href="{{ url_for('signup.signup')}}/{{ job.job_id }}"
+                href="{{ url_for('signup.signup')}}{{ job.job_id }}"
                 {% endif %}
                 >{% if job.user_job_positions %}Your Spot{% else %}Sign Up{% endif %}</a>
                 {% endif %}

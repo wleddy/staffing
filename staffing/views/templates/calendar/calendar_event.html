@@ -25,6 +25,7 @@
             <h3><strong>{{ event.calendar_title}}</strong></h3>
             <p>
                 <em>Date:</em> <strong>{{ event.event_start_date | default('tbd',True)| abbr_date_string }}</strong>
+                Admin = {{ is_admin }}
                 {% if g.admin %}<a href="{{ url_for('event.edit')}}{{ event.event_id }}/"><em>(Edit Event)</em></a>{% endif %}
             </p>
             <div class="w3-row">

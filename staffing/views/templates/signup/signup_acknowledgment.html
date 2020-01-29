@@ -1,23 +1,26 @@
 <div class="event-contain w3-row-padding w3-secondary-color w3-center" style="padding:20pt;"> 
     {% set shift_count = 1 %}
-    {% set button_text = 'Sign Me Up' %}
-    {% set notification_text = "<br><em>(You'll receive an email with all the details for your calendar.)</em>"%}
-    {% if not user_signed_up %}
-        {# user just cancelled #}
-        {% set notification_text = ""%}
-    {% endif %}
     <input type="hidden" name="positions" value="{{shift_count}}">
-    {% if user_signed_up %}
+    {% if signup_status == "success" %}
     <p>
         <span class="w3-xxlarge">Thanks!</span>
-       {{ notification_text | safe }}
+       <br><em>(You'll receive an email with all the details for your calendar.)</em>
    </p>
-   {% else %}
-   <p>
-       Sorry you had to cancel. Hope to see you at another event soon.
-   </p>
+   {% else  %}
+        {% if signup_status == "full" %}
+        <p>
+            <span class="w3-xxlarge">Sorry!</span>
+           <br><em>Looks like someone already took that spot.</em><br>
+            <em>(Try refreshing your browser to get a fresh list)</em>
+      </p>
+            
+       {% else %}
+       <p>
+           Sorry you had to cancel. Hope to see you at another event soon.
+       </p>
+       {% endif %}
    {% endif %}
-    </p>
+    <p>
     	<a class="w3-button w3-primary-color w3-round-medium " onclick="cancelModalForm()">Close</a>
     </p>
 </div>

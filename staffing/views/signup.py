@@ -102,13 +102,13 @@ def display():
 #####.   the extra 'signup/signup' routes are needed.
 ##### I could almost swear that this worked ok at one time.
 ###########################
-@mod.route('/signup/signup/<int:job_id>/',methods=['GET','POST',])
 @mod.route('/signup/signup/<int:job_id>',methods=['GET','POST',])
+@mod.route('/signup/signup/<int:job_id>/',methods=['GET','POST',])
 @mod.route('/signup/signup',methods=['GET','POST',])
-@mod.route('/signup/<int:job_id>/',methods=['GET','POST',])
 @mod.route('/signup/<int:job_id>',methods=['GET','POST',])
-@mod.route('/signup/',methods=['GET','POST',])
+@mod.route('/signup/<int:job_id>/',methods=['GET','POST',])
 @mod.route('/signup',methods=['GET','POST',])
+@mod.route('/signup/',methods=['GET','POST',])
 def signup(job_id=None):
     """Add or remove a signup
     May come from a modal dialog"""
@@ -163,18 +163,29 @@ def signup(job_id=None):
             positions = -1 # indicates a cancellation of all positions
             UserJob(g.db).delete(signup.id)
             g.db.commit()
-                
+            
         # record change
         if positions > 0:
             ##################
             # TODO - Don't allow any change after the day of the event...
             ###################
-            UserJob(g.db).update(signup,request.form)
-            signup.user_id = user_id
-            signup.job_id = job_id
-            signup.modified = local_datetime_now()
-            UserJob(g.db).save(signup)
-            g.db.commit()
+            
+            # ensure that there are still some slots available...
+            ###  it could happen that someone has signed up since the user
+            ###  loaded the signup page
+            if Job(g.db).filled(job_id) + positions <= Job(g.db).max_positions(job_id):
+                UserJob(g.db).update(signup,request.form)
+                signup.user_id = user_id
+                signup.job_id = job_id
+                signup.modified = local_datetime_now()
+                UserJob(g.db).save(signup)
+                g.db.commit()
+                
+            else:
+                # all positions are filled. Someone signed up since the page loaded
+                submission_ok = False
+                # not really 'success', but an appropreate message will be displayed
+                return 'success' 
             
         if submission_ok:
             # send some notices
@@ -226,8 +237,8 @@ def signup_success(id=0):
     return render_template('signup_job.html',job=job,is_admin=is_user_admin())
     
     
-@mod.route('/acknowledge_signup/<int:id>/',methods=['GET','POST',])
 @mod.route('/acknowledge_signup/<int:id>',methods=['GET','POST',])
+@mod.route('/acknowledge_signup/<int:id>/',methods=['GET','POST',])
 @mod.route('/acknowledge_signup/',methods=['GET','POST',])
 def acknowledge_signup(id=0):
     """Send a dialog to confirm the users signup choice"""
@@ -235,9 +246,22 @@ def acknowledge_signup(id=0):
     uj = UserJob(g.db).select(where="user_id = {} and job_id = {}".format(session.get('user_id',-1),cleanRecordID(id)))
     user_signed_up = uj != None
     
-    return render_template('signup_acknowledgment.html',user_signed_up=user_signed_up)
+    signup_status = "success"
+    if not uj:
+        signup_status = 'full'
         
+    return render_template('signup_acknowledgment.html',signup_status=signup_status)
+        
+@mod.route('/delete_position',methods=['GET',])
+@mod.route('/delete_position/',methods=['GET',])
+def acknowledge_deletion():
+    """Send a dialog after user cancels a position"""
     
+    signup_status = "cancel"
+
+    return render_template('signup_acknowledgment.html',signup_status=signup_status)
+
+
 @mod.route('/roster/<int:display_end_days>',methods=['GET','POST',])
 @mod.route('/roster/<int:display_end_days>/',methods=['GET','POST',])
 @mod.route('/roster',methods=['GET',])
