@@ -227,12 +227,20 @@ class Job(SqliteTable):
         """Return the number positions filled for this job"""
         out = 0
         cnt = self.db.execute('select sum(positions) as cnt from user_job where job_id=?',(job_id,)).fetchone()[0]
-        #import pdb;pdb.set_trace()
         if cnt:
             out = cnt
         return out
         
         
+    def max_positions(self,job_id):
+        """Return the maximum number of positions for this job"""
+        out = 0
+        cnt = self.db.execute('select max_positions from job where id=?',(job_id,)).fetchone()[0]
+        if cnt:
+            out = cnt
+        return out
+
+
 class JobRole(SqliteTable):
     """User roles that are required to signup for a job"""
     def __init__(self,db_connection):
