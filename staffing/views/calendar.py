@@ -2,6 +2,7 @@ from flask import request, session, g, redirect, url_for, abort, \
      render_template, flash, Blueprint
 from shotglass2.mapping.views.maps import simple_map
 from shotglass2.shotglass import get_site_config
+from shotglass2.users.models import User
 from shotglass2.users.admin import login_required, table_access_required
 from shotglass2.takeabeltof.utils import render_markdown_for, printException, cleanRecordID
 from shotglass2.takeabeltof.date_utils import datetime_as_string, local_datetime_now, getDatetimeFromString
@@ -60,7 +61,14 @@ def display(month=None,year=None):
         start_date = date(year,month,1)
     except:
         pass # use todays date
-            
+           
+    #import pdb;pdb.set_trace()
+    user_id = 0
+    if g.user:
+        try:
+           user_id = User(g.db).get(g.user).id 
+        except:
+           pass
     
     eom = calendar.monthrange(start_date.year,start_date.month)[1]
     end_date = start_date.replace(day=eom)    
@@ -71,7 +79,13 @@ def display(month=None,year=None):
     sql="""select 
     event.id as event_id, 
     coalesce(nullif(event.calendar_title,''),activity.title) as calendar_title,
-    event.event_start_date
+    event.event_start_date,
+    coalesce(
+        (select 1 from user_job where {user_id} = user_job.user_id and
+         user_job.job_id in (select id from job where job.event_id = event.id  ) 
+         LIMIT 1
+        ),
+    0) as is_yours
 
     from event
     join activity on activity.id = event.activity_id
@@ -81,6 +95,7 @@ def display(month=None,year=None):
     status_list=status_list,
     start_date=start_date,
     end_date=end_date,
+    user_id=user_id,
     )
             
     event_data = Event(g.db).query(sql)

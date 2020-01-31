@@ -1,6 +1,7 @@
 from flask import request, session, g, redirect, url_for, abort, \
      render_template, flash, Blueprint
 from shotglass2.users.admin import login_required, table_access_required
+from shotglass2.users.models import User
 from shotglass2.takeabeltof.utils import render_markdown_for, printException, cleanRecordID
 from shotglass2.takeabeltof.date_utils import datetime_as_string
 from staffing.models import Activity, Event, ActivityType
@@ -154,6 +155,14 @@ def get_event_recs(activity_id=None,**kwargs):
     if event_id:
         where = "event.id = {}".format(event_id)
         
+        
+    user_id = 0
+    if g.user:
+        try:
+           user_id = User(g.db).get(g.user).id 
+        except:
+           pass
+
     sql="""select event.id as event_id, 
     event.status,
     event.activity_id,
@@ -195,7 +204,14 @@ def get_event_recs(activity_id=None,**kwargs):
     as is_past_event,
     coalesce(
         (select 1 from activity join event as future_event on event.activity_id = activity.id where date(future_event.event_start_date,'localtime') > date('now','localtime') and activity.id = future_event.activity_id)
-     ,0) as has_future_events
+     ,0) as has_future_events,
+     coalesce(
+         (select 1 from user_job where {user_id} = user_job.user_id and
+          user_job.job_id in (select id from job where job.event_id = event.id  ) 
+          LIMIT 1
+         ),
+     0) as is_yours
+
     
     
     from event
@@ -205,7 +221,7 @@ def get_event_recs(activity_id=None,**kwargs):
     where {where}
     group by event.event_start_date, event.location_id, job_start_date
     order by event.event_start_date DESC
-    """.format(where=where)
+    """.format(where=where,user_id=user_id)
     event_recs = Event(g.db).query(sql)
     
     return event_recs

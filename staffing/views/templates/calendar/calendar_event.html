@@ -23,6 +23,15 @@
     <div class="w3-row" style="padding-top:16pt;padding-bottom:16pt;">
         <div class="w3-col w3-half w3-small" style="padding-left:1%;">
             <h3><strong>{{ event.calendar_title}}</strong></h3>
+            
+            {# set up the direct link to this event #}
+            {% set direct_url = url_for('signup.more_info') + event.activity_id | string  + "/#event-header-" + event.event_id | string  %}
+            
+            {% if event.is_yours %}
+                <p style="padding:6pt;border:2pt solid black;margin:6pt 12pt 6pt 0;text-align:center;" ><strong>You are signed up for this event.</strong>
+                    &nbsp;&nbsp;&nbsp;<a class="w3-button w3-primary-color w3-mobile w3-round-large" href="{{ direct_url }}">View Your Commitment</a></p>
+            {% endif %}
+
             <p>
                 <em>Date:</em> <strong>{{ event.event_start_date | default('tbd',True)| abbr_date_string }}</strong>
                 {% if g.admin.has_access(g.user,'Events') %}<a href="{{ url_for('event.edit')}}{{ event.event_id }}/"><em>(Edit Event)</em></a>{% endif %}
@@ -75,21 +84,26 @@
             <div style="padding-right:6pt;">
                 {{ event.event_description | render_markdown }}
             </div>
-            <div>
-            {# default link to generic signup list #}
-            {% set vol_url = url_for('signup.display') %}
-            {# link to the signup for this event #}
-            {% if event.is_past_event == 0 and event.activity_id and event.event_max_positions > 0 %}
-               {% set vol_url = url_for('signup.more_info') + event.activity_id | string  + "/#event-header-" + event.event_id | string  %}
+            {# set up the direct link to this event #}
+            {% set direct_url = url_for('signup.more_info') + event.activity_id | string  + "/#event-header-" + event.event_id | string  %}
+
+            {% if not event.is_yours %}
+                <div>
+                {# default link to generic signup list #}
+                {% set vol_url = url_for('signup.display') %}
+                {# link to the signup for this event #}
+                {% if event.is_past_event == 0 and event.activity_id and event.event_max_positions > 0 %}
+                   {% set vol_url = direct_url  %}
+                {% endif %}
+                {# link to future signups for this activity #}
+                {% if event.is_past_event == 1 and event.has_future_events == 1 %}
+                   {% set vol_url = url_for('signup.more_info') + event.activity_id | string  %}
+                {% endif %}
+                <p class="w3-medium">
+                    Would you like to help? <a href="{{ vol_url }}">Click here to Volunteer...</a>
+                </p>
+                </div>
             {% endif %}
-            {# link to future signups for this activity #}
-            {% if event.is_past_event == 1 and event.has_future_events == 1 %}
-               {% set vol_url = url_for('signup.more_info') + event.activity_id | string  %}
-            {% endif %}
-            <p class="w3-medium">
-                Would you like to help? <a href="{{ vol_url }}">Click here to Volunteer...</a>
-            </p>
-            </div>
             
         </div>
         {% if map_html %}
