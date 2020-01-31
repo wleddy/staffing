@@ -78,23 +78,21 @@
             z-index:2000;
         }
         
-        .theres-more {
+        .theres-more,.theres-more-yours {
             cursor:pointer;
         }
         
-        .yours, .yours-caption {
-            
-            background-image: url('/static/images/check_mark.png');
-            background-repeat: no-repeat;
-            background-position: top left;
-            padding-left:10pt;
-            background-size: 8pt 8pt;
+        .yours::before, .yours-caption::before, .theres-more-yours::before {
+            content: url('/static/images/check_mark.png');
+        }
+        .theres-more-yours {
+            background-color: rgba(128, 64, 3, 0.5);
         }
         .yours-caption {
             padding-left:20pt;
             background-size: 12pt 12pt;
         }
-        .yours-caption::before {
+        .yours-caption::after {
             content: 'Your Commitments';
         }
     </style>
@@ -134,6 +132,7 @@
                 {% set events_today = cal_list[week][day][event_list_position] | length %}
                 {% set day_number = cal_list[week][day][0]%}
                 {% set day_in_this_month = (day_number != 0)%}
+                {% set yours_are_hidden = [False] %}
                 <div class="w3-col w3-border w3-white day-col day-cell" style="padding:0 2pt;max-length:">
                     {% if day_in_this_month %}
                     <div id="full_day_display_{{day_number}}" class="full_day_display w3-small w3-border">
@@ -141,6 +140,10 @@
                         {% for event_num in range( events_today )%}
                             {% set event = event_data[cal_list[week][day][event_list_position][event_num]] %}
                             <p onclick="location='{{ url_for('calendar.event')}}{{event.event_id}}'" class="day-content {%if event.is_yours %}yours{% endif %}">{{event.calendar_title}}</p>
+                            {% if event_num > 2 and event.is_yours %}
+                                {% set _ = yours_are_hidden.pop(0) %}
+                                {% set _ = yours_are_hidden.append(True) %}
+                            {% endif %}
                         {% endfor %}
                     </div>
                     {% endif %}
@@ -156,7 +159,7 @@
                         {% endfor %}
                         {# lump all the extra events into a "more" line #}
                         {% if events_today > 3 %}
-                        <p class=" w3-primary-color theres-more" onclick="show_full_day({{day_number}})">&amp; {{ cal_list[week][day][2] | length - 2}} more...</p>
+                        <p class="theres-more{% if yours_are_hidden[0] %}-yours{% else %} w3-primary-color {% endif %}" onclick="show_full_day({{day_number}})">&amp; {{ cal_list[week][day][2] | length - 2}} more...</p>
                         {% endif %}
                     </div>
                 </div>
