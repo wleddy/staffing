@@ -85,17 +85,12 @@
         .yours::before, .yours-caption::before, .theres-more-yours::before {
             content: url('/static/images/check_mark.png');
         }
-        .theres-more-yours {
+       .theres-more-yours {
             background-color: rgba(128, 64, 3, 0.5);
         }
         .yours-caption {
-            padding-left:20pt;
-            background-size: 12pt 12pt;
         }
-        .yours-caption::after {
-            content: 'Your Commitments';
-        }
-    </style>
+   </style>
 
     <script>
         function show_full_day(day_number){
@@ -104,6 +99,11 @@
         }
         function hide_full_day(){
             $('#coverup, .full_day_display').hide()
+        }
+        function get_job_email(){
+            if(confirm("Get an email with all your future commitments?")){
+                editFromList('{{url_for('signup.send_user_commitment_email')}}{{g.user}}')
+            }
         }
     </script>
 {% endblock head %}
@@ -114,7 +114,17 @@
     {% set _ = calendar.setfirstweekday(calendar.SUNDAY) %}
     {% set event_list_position = 2 %} {# for my sanity #}
     <div id="calendar-contain">
-        {% if g.user %}<p class="yours-caption">&nbsp;</p>{% endif %}
+        {% if g.user %}
+        <div class="w3-row" style="margin-bottom:6pt;">
+            <p class="w3-col l1 m1 w3-hide-small">&nbsp;</p>
+            <p class="yours-caption w3-col l3 m4 s12 w3-center">&nbsp;Your Commitments</p>
+            <p class="w3-col l4 m3 w3-hide-small">&nbsp;</p>
+            <p class="w3-col l4 m3 s12 w3-center"><span class="w3-large">@</span> 
+                <a href="#" onclick="get_job_email();"
+                >Email your jobs...</a>
+            </p>
+        </div>
+        {% endif %}
         <div class="w3-row">
             <p class="w3-large w3-primary-color month-name">
                 <a class="month_arrow" href="{{ url_for('calendar.display')}}{{ last_month.month }}/{{ last_month.year }}">&#x3c;</a>&nbsp;&nbsp;

@@ -1,7 +1,7 @@
 from flask import request, session, g, redirect, url_for, abort, \
      render_template, flash, Blueprint
 from shotglass2.shotglass import get_site_config
-from shotglass2.takeabeltof.mailer import send_message
+from shotglass2.takeabeltof.mailer import send_message, email_admin
 from shotglass2.takeabeltof.utils import render_markdown_for, render_markdown_text, printException, cleanRecordID, looksLikeEmailAddress, formatted_phone_number
 from shotglass2.takeabeltof.date_utils import date_to_string, getDatetimeFromString, local_datetime_now
 from shotglass2.users.admin import login_required, table_access_required, silent_login
@@ -782,3 +782,62 @@ def get_volunteer_role_ids():
         vol_role_ids = ",".join([str(x.id) for x in vol_roles])
     
     return vol_role_ids
+    
+    
+@mod.route('/get_commitment_email/<user_name_or_email>/',methods=['GET',])
+@mod.route('/get_commitment_email/<user_name_or_email>',methods=['GET',])
+@mod.route('/get_commitment_email/',methods=['GET',])
+def send_user_commitment_email(user_name_or_email=None):
+    """Send an email to the user with all their future commitments
+    
+    Param: user_name_or_email : the user_name or email address
+    """
+    
+    #import pdb;pdb.set_trace()
+    
+    result = "No Result Yet"
+    
+    # get the user record
+    user = User(g.db).get(user_name_or_email)
+    if not user:
+        result = "Sorry: Could not find the user record."
+    # get all the job.id's for user's future jobs
+    sql = """
+        select user_job.user_id, user_job.job_id from user_job
+        join job on user_job.job_id = job.id
+        
+        where user_job.user_id = {user_id} and date(job.start_date,'localtime') >= '{today}'
+    """.format(user_id=user.id,today=date_to_string(local_datetime_now(),'iso_date'))
+    user_jobs = UserJob(g.db).query(sql)
+    
+    job_data = None
+    jobs_list = None
+    if user_jobs:
+        jobs_list = ','.join([str(x.job_id) for x in user_jobs])
+    if jobs_list:
+        job_data = get_job_rows(None,None,"job.id in ({})".format(jobs_list),[],is_admin=True)
+    if job_data:
+
+        try:
+            send_signup_email(job_data,
+                user,
+                'announce/email/commitment_reminder.md',
+                mod,
+                escape=False,
+                subject="Your Commitments for {}".format(get_site_config()["SITE_NAME"]),
+                renminder_type="future",
+                )
+            
+            result = 'Your commitment report has been emailed to you.'
+            
+        except Exception as e:
+            mes = "An error occured while sending user commitment email. Err: {}".format(str(e))
+            printException(mes)
+            email_admin(mes)
+            
+            result = "Sorry: Something wierd happened and we were not able to send an email. We'll look into it."
+    else:
+        result =  'Sorry: No Future Commitments found.'
+        
+        
+    return render_template('get_commitment_result.html',result=result)
