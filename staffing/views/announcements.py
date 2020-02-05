@@ -54,6 +54,7 @@ def send_signup_email(job_data_list,user,template_path,bp,**kwargs):
         ical=ical,
         description=description,
         job_data_list=job_data_list,
+        user=user,
         **kwargs
         )
             

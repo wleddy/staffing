@@ -35,9 +35,44 @@ def home():
 @mod.route('/contact/', methods=['GET','POST',])
 @mod.route('/contact', methods=['GET','POST',])
 def contact():
-    """Delecate the actual contact function to wwww"""
+    """Delegate the actual contact function to wwww"""
     return home_contact()
 
+@mod.route('/contact_event_manager/<job_id>', methods=['GET','POST',])
+@mod.route('/contact_event_manager/<job_id>/', methods=['GET','POST',])
+@mod.route('/contact_event_manager/', methods=['GET','POST',])
+def contact_event_manager(job_id=''):
+    """User wants to contact the event manager"""
+    
+    #import pdb;pdb.set_trace()
+    
+    job_id = cleanRecordID(job_id)
+    job_data = get_job_rows(None,None,'job.id = {}'.format(job_id),is_admin=True)
+    if job_data:
+        job_data = job_data[0]
+        custom_message = render_markdown_for('announce/email/contact_event_manager_message.md',job_data=job_data,bp=mod)
+        to_addr=""
+        to_contact=""
+        if job_data.event_manager_email:
+            to_addr=job_data.event_manager_email
+            to_contact="{} {}".format(job_data.event_manager_first_name,job_data.event_manager_last_name)
+        subject='Contact regarding job: {}'.format(job_data.job_title)
+        
+        return home_contact(
+            subject=subject,
+            to_addr=to_addr,
+            to_contact=to_contact,
+            custom_message = custom_message,
+            )
+    
+    email_admin(
+        subject="Error contacting Event Manager",
+        message="No job found in signup.contact_event_manager. job_id = {}".format(job_id),
+    )
+    flash("Sorry: Could not find the information for your request.")
+    return redirect('/')
+    
+    
 @mod.route('/help/')
 @mod.route('/help')
 def help():
@@ -832,8 +867,7 @@ def send_user_commitment_email(user_name_or_email=None):
             
         except Exception as e:
             mes = "An error occured while sending user commitment email. Err: {}".format(str(e))
-            printException(mes)
-            email_admin(mes)
+            email_admin(mes,printException(mes))
             
             result = "Sorry: Something wierd happened and we were not able to send an email. We'll look into it."
     else:

@@ -11,8 +11,8 @@ You have the following commitments coming up.
 You have the following commitments coming up in the next few days.
 {% endif %}
 
-If you are unable to make it to any of the events, please [contact us](http://{{config.HOST_NAME}}{{ url_for('signup.contact')}})
-as soon as possible so we can arrange for someone to take your place.
+If you are unable to make it to any of the events, please contact the Event Manager using the 
+contact links below as soon as possible so we can arrange for someone to take your place.
 
 {% if job_data_list %}
 ---
@@ -28,19 +28,21 @@ as soon as possible so we can arrange for someone to take your place.
 
 > Location: {{job_data.job_loc_name}}  
 
+> Questions about this shift? [Contact Event Manager](http://{{config.HOST_NAME}}{{ url_for('signup.contact_event_manager')}}{{ job_data.job_id | default('',True) }}/).
+
 {{ directions_snippet(job_data) }}
 
 ---
 {% endfor %}
-
-
-{% else %}
-Hummm... something when wrong... there are no jobs listed.
-
-{% endif %}
 
 {% if ical %}
 The attached file will add (or update) your shifts on your calendar. 
 
 (Usually you can tap or double click to open it.)
 {% endif %}
+
+{% else %}
+Hummm... something when wrong... there are no jobs listed.
+
+{% endif %}
+
