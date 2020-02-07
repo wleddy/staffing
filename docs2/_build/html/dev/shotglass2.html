@@ -44,6 +44,15 @@
 </dd></dl>
 
 <dl class="function">
+<dt id="shotglass2.shotglass.get_menu_items">
+<code class="sig-prename descclassname">shotglass2.shotglass.</code><code class="sig-name descname">get_menu_items</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#shotglass2.shotglass.get_menu_items" title="Permalink to this definition">¶</a></dt>
+<dd><p>The default items for the navigation menu</p>
+<p>So that you can add items to the menu without modifying
+shotglass2/templates/top-nav.html.</p>
+<p>Modify this list instead.</p>
+</dd></dl>
+
+<dl class="function">
 <dt id="shotglass2.shotglass.get_site_config">
 <code class="sig-prename descclassname">shotglass2.shotglass.</code><code class="sig-name descname">get_site_config</code><span class="sig-paren">(</span><em class="sig-param">this_app=None</em><span class="sig-paren">)</span><a class="headerlink" href="#shotglass2.shotglass.get_site_config" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns a copy of the current app.config.
@@ -125,6 +134,8 @@ a role (by name) in the list roles</p>
 <code class="sig-name descname">has_access</code><span class="sig-paren">(</span><em class="sig-param">user_name</em>, <em class="sig-param">table=None</em><span class="sig-paren">)</span><a class="headerlink" href="#shotglass2.users.admin.Admin.has_access" title="Permalink to this definition">¶</a></dt>
 <dd><p>Test to see if the user represented by user name has access to ANY admin items
 If a table class is specified, only check to see if user has access to that table</p>
+<p>If ‘table’ is a string, look for permissions by the display_name.
+Useful when testing the permissions from a template where the table object is not available.</p>
 </dd></dl>
 
 <dl class="method">
@@ -140,10 +151,7 @@ A shortcut I want to use in the menu template</p>
 <dd><p>Add a table item to the admin_list</p>
 <dl>
 <dt>Parameters:</dt><dd><p>table : Database table object
-url : str</p>
-<blockquote>
-<div><p>The url to be associated with the menu item created for this table</p>
-</div></blockquote>
+url : str The url to be associated with the menu item created for this table</p>
 </dd>
 <dt>Example:</dt><dd><p>Admin.register(TableObj,url,[,display_name=None[,minimum_rank_required=None[,roles=None]]])</p>
 <dl class="simple">
@@ -289,6 +297,13 @@ a list of <cite>namedlist</cite> objects or <cite>None</cite> if no records are 
 <em class="property">class </em><code class="sig-prename descclassname">shotglass2.takeabeltof.database.</code><code class="sig-name descname">SqliteTable</code><span class="sig-paren">(</span><em class="sig-param">db_connection</em><span class="sig-paren">)</span><a class="headerlink" href="#shotglass2.takeabeltof.database.SqliteTable" title="Permalink to this definition">¶</a></dt>
 <dd><p>Handle some basic interactions with a table</p>
 <dl class="method">
+<dt id="shotglass2.takeabeltof.database.SqliteTable.alert_admin">
+<code class="sig-name descname">alert_admin</code><span class="sig-paren">(</span><em class="sig-param">message</em><span class="sig-paren">)</span><a class="headerlink" href="#shotglass2.takeabeltof.database.SqliteTable.alert_admin" title="Permalink to this definition">¶</a></dt>
+<dd><p>Send an email to the admin address if an error is encountered or
+if you just fell like talking…</p>
+</dd></dl>
+
+<dl class="method">
 <dt id="shotglass2.takeabeltof.database.SqliteTable.commit">
 <code class="sig-name descname">commit</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#shotglass2.takeabeltof.database.SqliteTable.commit" title="Permalink to this definition">¶</a></dt>
 <dd><p>A convenience to be able to call commit on the database from a table object</p>
@@ -317,6 +332,12 @@ Return True or False</p>
 <dt id="shotglass2.takeabeltof.database.SqliteTable.get_column_names">
 <code class="sig-name descname">get_column_names</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#shotglass2.takeabeltof.database.SqliteTable.get_column_names" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return a list of column names for the table</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="shotglass2.takeabeltof.database.SqliteTable.get_column_type">
+<code class="sig-name descname">get_column_type</code><span class="sig-paren">(</span><em class="sig-param">column_name</em><span class="sig-paren">)</span><a class="headerlink" href="#shotglass2.takeabeltof.database.SqliteTable.get_column_type" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the Sqlite column type (as text) for the specifed column name</p>
 </dd></dl>
 
 <dl class="method">
@@ -399,9 +420,9 @@ an update version of the data.</p>
 <dl class="method">
 <dt id="shotglass2.takeabeltof.database.SqliteTable.update">
 <code class="sig-name descname">update</code><span class="sig-paren">(</span><em class="sig-param">rec</em>, <em class="sig-param">form</em>, <em class="sig-param">save=False</em><span class="sig-paren">)</span><a class="headerlink" href="#shotglass2.takeabeltof.database.SqliteTable.update" title="Permalink to this definition">¶</a></dt>
-<dd><p>Update the rec with the matching elements in form
-rec is a record namedlist 
-form is an InmutableMultiDict or a dictionary object</p>
+<dd><p>Update the rec, with the matching elements in form</p>
+<p>rec is a record namedlist of an existing or new reocrd.</p>
+<p>form is a dictionary like object with the new data. Usually request.form</p>
 <p>The id element is never updated. Before calling this method be sure that any elements
 in form that have names matching names in rec contain the values you want.</p>
 <p>Optionally can save the rec (but not committed) after update</p>
@@ -637,8 +658,15 @@ Some utility functions</p>
 <dl class="function">
 <dt id="shotglass2.takeabeltof.utils.formatted_phone_number">
 <code class="sig-prename descclassname">shotglass2.takeabeltof.utils.</code><code class="sig-name descname">formatted_phone_number</code><span class="sig-paren">(</span><em class="sig-param">phone</em>, <em class="sig-param">sep='-'</em>, <em class="sig-param">raw=False</em><span class="sig-paren">)</span><a class="headerlink" href="#shotglass2.takeabeltof.utils.formatted_phone_number" title="Permalink to this definition">¶</a></dt>
-<dd><p>Take what may be a phone number and return a formatted version of it or ‘’ or a tuple of found parts
-Taken from: <a class="reference external" href="https://www.diveinto.org/python3/regular-expressions.html">https://www.diveinto.org/python3/regular-expressions.html</a></p>
+<dd><p>Take what may be a phone number and return a formatted version of it.</p>
+<dl>
+<dt>params:</dt><dd><p>phone: a string that may be a phone number</p>
+<p>sep: the string value to use as a separator in the converted string</p>
+<p>raw: if True the function returns a tuple of found parts</p>
+</dd>
+</dl>
+<p>If the value can’t be converted, the value is returned unchanged.</p>
+<p>Taken from: <a class="reference external" href="https://www.diveinto.org/python3/regular-expressions.html">https://www.diveinto.org/python3/regular-expressions.html</a></p>
 </dd></dl>
 
 <dl class="function">
@@ -654,6 +682,17 @@ Taken from: <a class="reference external" href="https://www.diveinto.org/python3
 </dd></dl>
 
 <dl class="function">
+<dt id="shotglass2.takeabeltof.utils.printException">
+<code class="sig-prename descclassname">shotglass2.takeabeltof.utils.</code><code class="sig-name descname">printException</code><span class="sig-paren">(</span><em class="sig-param">mes='An Unknown Error Occurred'</em>, <em class="sig-param">level='error'</em>, <em class="sig-param">err=None</em><span class="sig-paren">)</span><a class="headerlink" href="#shotglass2.takeabeltof.utils.printException" title="Permalink to this definition">¶</a></dt>
+<dd><p>Generate an error message, write it to the log and return the resulting
+text.</p>
+<p>mes: Some message text specific to the supposed cause of the error.</p>
+<p>level: Any of ‘error’, ‘info’, ‘debug’</p>
+<p>When logging or in debug mode attempts to generate a description of the error
+location.</p>
+</dd></dl>
+
+<dl class="function">
 <dt id="shotglass2.takeabeltof.utils.render_markdown_for">
 <code class="sig-prename descclassname">shotglass2.takeabeltof.utils.</code><code class="sig-name descname">render_markdown_for</code><span class="sig-paren">(</span><em class="sig-param">file_name</em>, <em class="sig-param">bp=None</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#shotglass2.takeabeltof.utils.render_markdown_for" title="Permalink to this definition">¶</a></dt>
 <dd><p>Try to find the file to render and then do so
@@ -661,6 +700,20 @@ if file_name has a leading slash, it will be treated as an apbolute path
 by os.path.join. If that’s not what you were expecting, you need to
 remove any leading slashes before calling this function.</p>
 <p>(In particular, the shotglass.home.docs route depends on this fact.)</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="shotglass2.takeabeltof.utils.render_markdown_text">
+<code class="sig-prename descclassname">shotglass2.takeabeltof.utils.</code><code class="sig-name descname">render_markdown_text</code><span class="sig-paren">(</span><em class="sig-param">text_to_render</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#shotglass2.takeabeltof.utils.render_markdown_text" title="Permalink to this definition">¶</a></dt>
+<dd><p>Convert text_to_render to html</p>
+<p>Renders the markdown as a template first so that any included Jinja template values
+will be rendered to text before markdown conversion to html.</p>
+<p>__kwargs__ can contain anything that you want to use in the template context.</p>
+<dl class="simple">
+<dt>The following kwargs may also be present:</dt><dd><p>escape: Default to True. If false any included html in the text will be left as-is
+and not escaped for display</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="function">
@@ -727,6 +780,14 @@ This function will not convert an aware datetime to a new time zone</p>
 <dt id="shotglass2.takeabeltof.jinja_filters.abbr_date_string">
 <code class="sig-prename descclassname">shotglass2.takeabeltof.jinja_filters.</code><code class="sig-name descname">abbr_date_string</code><span class="sig-paren">(</span><em class="sig-param">value</em><span class="sig-paren">)</span><a class="headerlink" href="#shotglass2.takeabeltof.jinja_filters.abbr_date_string" title="Permalink to this definition">¶</a></dt>
 <dd><p>Mon. Mar. 4, 2019</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="shotglass2.takeabeltof.jinja_filters.default_if_none">
+<code class="sig-prename descclassname">shotglass2.takeabeltof.jinja_filters.</code><code class="sig-name descname">default_if_none</code><span class="sig-paren">(</span><em class="sig-param">data</em>, <em class="sig-param">value=''</em>, <em class="sig-param">default_on_false=False</em><span class="sig-paren">)</span><a class="headerlink" href="#shotglass2.takeabeltof.jinja_filters.default_if_none" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the default value if data is None</p>
+<p>Optionally, if default_on_false is True, return the default value
+if data evaluates as False.</p>
 </dd></dl>
 
 <dl class="function">
