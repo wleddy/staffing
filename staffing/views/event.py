@@ -323,6 +323,21 @@ def valid_input(rec):
         valid_data = False
         flash("You must select a default location.")
         
+    #Number Served and Tips received must be numbers
+    try:
+        if rec.number_served != None and type(rec.number_served) == str and rec.number_served.strip() != '':
+            x = int(float(rec.number_served))
+    except:
+        flash("Number Served must be a number")
+        valid_data = False
+        
+    try:
+        if rec.tips_received != None and type(rec.tips_received) == str and rec.tips_received.strip() != '':
+            x = float(rec.tips_received)
+    except:
+        flash("Tips Received must be a number")
+        valid_data = False
+        
     if not rec.exclude_from_calendar:
         # validate and convert start and end dates to timezone aware date strings
         form_datetime = request.form.get("event_start_date",'')
