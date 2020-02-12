@@ -213,6 +213,12 @@ def manage_event(id=0):
                     #make a new event record
                     new_event_rec = event_table.new()
                     event_table.update(new_event_rec,orig_event_dict)
+                    
+                    # the planning fields need to be cleared
+                    new_event_rec.event_size =None
+                    new_event_rec.number_served = None
+                    new_event_rec.tips_received = None
+                    
                     event_table.save(new_event_rec)
                 else:
                     new_event_rec=event_rec # to make it easier to refer by either name
