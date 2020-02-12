@@ -18,8 +18,12 @@ class Activity(SqliteTable):
         sql = """
         title TEXT,
         description TEXT,
-        activity_type_id INTEGER
-        activity_info TEXT
+        activity_type_id INTEGER,
+        activity_info TEXT,
+        contract_date DATETIME,
+        total_contract_price NUMBER,
+        per_event_contract_price NUMBER,
+        contract_notes TEXT
         """
                 
         super().create_table(sql)
@@ -140,6 +144,10 @@ class Event(SqliteTable):
             event_size TEXT,
             number_served NUMBER,
             tips_received NUMBER,
+            contract_date DATETIME,
+            total_contract_price NUMBER,
+            per_event_contract_price NUMBER,
+            contract_notes TEXT,
             FOREIGN KEY (activity_id) REFERENCES activity(id) ON DELETE CASCADE
             """
                 

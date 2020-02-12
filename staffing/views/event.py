@@ -2,7 +2,7 @@ from flask import request, session, g, redirect, url_for, abort, \
      render_template, flash, Blueprint
 from shotglass2.shotglass import get_site_config
 from shotglass2.users.admin import login_required, table_access_required
-from shotglass2.takeabeltof.utils import render_markdown_for, printException, cleanRecordID
+from shotglass2.takeabeltof.utils import render_markdown_for, printException, cleanRecordID, Numeric
 from shotglass2.takeabeltof.date_utils import date_to_string, getDatetimeFromString, local_datetime_now
 from staffing.models import Event, Location, ActivityType, Client, EventDateLabel, Job, JobRole, UserJob
 from shotglass2.users.models import User
@@ -87,7 +87,7 @@ def render_edit_form(id,activity_id):
         return abort(404)
         
     if id > 0:
-        rec = event.get(id)
+        rec = _get_event_rec(id)
         if not rec:
             flash("Record Not Found")
             return redirect(g.listURL)
@@ -100,7 +100,7 @@ def render_edit_form(id,activity_id):
         g.db.commit()
         g.cancelURL = g.cancelURL + str(rec.id)
         # fetch the record again to load the related activity data
-        rec = event.get(rec.id)
+        rec = _get_event_rec(rec.id)
 
     if request.form:
         #import pdb;pdb.set_trace()
@@ -315,6 +315,28 @@ def delete_from_activity(activity_id=-1,id=0):
     g.listURL = url_for('activity.edit') + str(cleanRecordID(activity_id))
     return handle_delete(id)
     
+    
+def _get_event_rec(event_id):
+    # Return the event record for use in the edit form
+    
+    sql = """select event.*, 
+    coalesce(activity.contract_date,'') as activity_contract_date,
+    coalesce(activity.total_contract_price,'') as activity_total_contract_price,
+    coalesce(activity.per_event_contract_price,'') as activity_per_event_contract_price,
+    coalesce(activity.contract_notes,'') as activity_contract_notes,
+    coalesce(activity.description,'') as activity_description,
+    coalesce(activity.activity_info,'') as activity_info,
+    activity.title as activity_title
+    from event
+    
+    join activity on event.activity_id = activity.id
+    
+     where event.id = {}
+     
+    """.format(event_id)
+    
+    return Event(g.db).query_one(sql)
+    
 def valid_input(rec):
     valid_data = True
     
@@ -324,20 +346,53 @@ def valid_input(rec):
         flash("You must select a default location.")
         
     #Number Served and Tips received must be numbers
-    try:
-        if rec.number_served != None and type(rec.number_served) == str and rec.number_served.strip() != '':
-            x = int(float(rec.number_served))
-    except:
-        flash("Number Served must be a number")
-        valid_data = False
+    if rec.number_served:
+        n = Numeric(rec.number_served)
+        if n.is_number:
+            rec.number_served = n.int
+        else:
+            flash("Number Served must be a number")
+            valid_data = False
         
-    try:
-        if rec.tips_received != None and type(rec.tips_received) == str and rec.tips_received.strip() != '':
-            x = float(rec.tips_received)
-    except:
-        flash("Tips Received must be a number")
-        valid_data = False
-        
+    if rec.tips_received:
+        n = Numeric(rec.tips_received)
+        if n.is_number:
+            rec.tips_received = n.float
+        else:
+            flash("Tips Received must be a number")
+            valid_data = False
+            
+    form_datetime = request.form.get("contract_date",'')
+    if form_datetime:
+        temp_datetime = getDatetimeFromString(form_datetime)
+        if temp_datetime == None:
+            #Failed conversion
+            valid_data = False
+            flash("That is not a valid Contract date")
+
+    #import pdb;pdb.set_trace()
+    if rec.total_contract_price:
+        n = Numeric(rec.total_contract_price)
+        if n.is_number:
+            rec.total_contract_price = n.float
+            if rec.total_contract_price < 0:
+                flash("Total Contract Price must be greater than zero. (or leave it empty)")
+                valid_data = False
+        else:
+            flash("Total Contract Price must be a number")
+            valid_data = False
+         
+    if rec.per_event_contract_price:
+        n = Numeric(rec.per_event_contract_price)
+        if n.is_number:
+            rec.per_event_contract_price = n.float
+            if rec.per_event_contract_price < 0:
+                flash("Event Contract Price must be greater than zero. (or leave it empty)")
+                valid_data = False
+        else:
+            flash("Event Contract Price must be a number")
+            valid_data = False
+            
     if not rec.exclude_from_calendar:
         # validate and convert start and end dates to timezone aware date strings
         form_datetime = request.form.get("event_start_date",'')

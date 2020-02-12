@@ -2,8 +2,8 @@ from flask import request, session, g, redirect, url_for, abort, \
      render_template, flash, Blueprint
 from shotglass2.users.admin import login_required, table_access_required
 from shotglass2.users.models import User
-from shotglass2.takeabeltof.utils import render_markdown_for, printException, cleanRecordID
-from shotglass2.takeabeltof.date_utils import datetime_as_string
+from shotglass2.takeabeltof.utils import render_markdown_for, printException, cleanRecordID, Numeric
+from shotglass2.takeabeltof.date_utils import date_to_string, getDatetimeFromString, local_datetime_now
 from staffing.models import Activity, Event, ActivityType
 from staffing.views.event import edit as edit_event, edit_from_activity as edit_event_from_activity
 
@@ -58,7 +58,7 @@ def edit(id=0):
         g.cancelURL = url_for('.delete') + str(rec.id)
         g.db.commit()
     
-    if request.form and save_activity():
+    if request.form and save_activity(rec):
         return redirect(g.listURL)
         
     activity_types = ActivityType(g.db).select()
@@ -72,9 +72,10 @@ def edit(id=0):
         )
     
     
-def save_activity():
+def save_activity(rec=None):
     activity = Activity(g.db)
-    rec = activity.get(request.form.get('id',-1))
+    if not rec:
+        rec = activity.get(cleanRecordID(request.form.get('id',-1)))
     if rec:
         activity.update(rec,request.form)
         if valid_input(rec):
@@ -238,5 +239,37 @@ def valid_input(rec):
     if not rec.activity_type_id:
         valid_data = False
         flash("You must select an Activity Type")
+        
+        
+    form_datetime = request.form.get("contract_date",'')
+    if form_datetime:
+        temp_datetime = getDatetimeFromString(form_datetime)
+        if temp_datetime == None:
+            #Failed conversion
+            valid_data = False
+            flash("That is not a valid Contract date")
+    
+    #import pdb;pdb.set_trace()
+    if rec.total_contract_price:
+        n = Numeric(rec.total_contract_price)
+        if n.is_number:
+            rec.total_contract_price = n.float
+            if rec.total_contract_price < 0:
+                flash("Total Contract Price must be greater than zero.")
+                valid_data = False
+        else:
+            flash("Total Contract Price must be a number")
+            valid_data = False
 
+    if rec.per_event_contract_price:
+        n = Numeric(rec.per_event_contract_price)
+        if n.is_number:
+            rec.per_event_contract_price = n.float
+            if rec.per_event_contract_price < 0:
+                flash("Event Contract Price must be greater than zero.")
+                valid_data = False
+        else:
+            flash("Event Contract Price must be a number")
+            valid_data = False
+            
     return valid_data

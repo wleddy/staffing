@@ -12,13 +12,23 @@
             <option value="">Select an Activity Type</option>
             {% if activity_types %}
             {% for act_type in activity_types %}
-                <option value="{{act_type.id}}" {% if act_type.id == rec.activity_type_id %}selected="selected" {% endif %}>{{act_type.type}}</option>
+                <option value="{{act_type.id}}" {% if act_type.id == rec.activity_type_id | int %}selected="selected" {% endif %}>{{act_type.type}}</option>
             {% endfor %}
             {% endif %}
         </select>
     </p>
     <p>{{ label_only(label="Additional Info (Staff View Only)")}}</p>
     <p><textarea rows="7" name="activity_info" style="width:100%;"  >{{rec.activity_info |default('',True)}}</textarea></p>
+    <h3>Contract Info</h3>
+     <p class="">{{ input_field(rec.contract_date,"contract_date",type="date",placeholder="MM/DD/YYYY")}}</p>
+     <div class="w3-row">
+         {% set per_event_contract_price = rec.per_event_contract_price | money %}
+         <p class="w3-col w3-half">{{ input_field(per_event_contract_price,"per_event_contract_price", type="text",placeholder="0.00")}}</p>
+         {% set total_contract_price = rec.total_contract_price | money %}
+         <p class="w3-col w3-half">{{ input_field(total_contract_price,"total_contract_price", type="text",placeholder="0.00")}}</p>
+    </div>
+    <p>{{ label_only(label="Contract Notes")}}</p>
+    <p><textarea rows="7" name="contract_notes" style="width:100%;"  >{{rec.contract_notes |default('',True)}}</textarea></p>
     
 </div>
                 

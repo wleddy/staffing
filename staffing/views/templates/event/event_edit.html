@@ -36,7 +36,7 @@
     <p>{{ label_only(label="Description (Appears in Public Calendar)")}}</p>
     <p><textarea rows="7" name="description" style="width:100%;" placeholder="{{rec.activity_description | default('',True) }}" >{{rec.description |default('',True)}}</textarea></p>
     <p>{{ label_only(label="Staff Only information (not visible to public)")}}</p>
-    <p><textarea rows="5" name="staff_info" style="width:100%;" >{{rec.staff_info |default('',True)}}</textarea></p>
+    <p><textarea rows="5" name="staff_info" style="width:100%;" placeholder="{{rec.activity_info}}">{{rec.staff_info |default_if_none('')}}</textarea></p>
     <p>{{ select_field("location_id","Default Location (May override in Jobs)", class="w3-border", req=True ) }}
             <option value="0">Select a location</option>
             {% if locations %}
@@ -50,7 +50,7 @@
             <option value="0">Select an Event Manager</option>
             {% if event_managers %}
             {% for manager in event_managers %}
-                <option value="{{manager.id}}" {% if manager.id == rec.manager_user_id %}selected="selected" {% endif %}>{{manager.first_name}} {{manager.last_name}}</option>
+                <option value="{{manager.id}}" {% if manager.id == rec.manager_user_id | int %}selected="selected" {% endif %}>{{manager.first_name}} {{manager.last_name}}</option>
             {% endfor %}
             {% endif %}
         </select>
@@ -76,14 +76,30 @@
     <p>{{ input_field(rec.client_email,"client_email",label="Client Contact Email", id="client_email")}}</p>
     <p>{{ input_field(rec.client_phone,"client_phone",label="Client Contact Phone",id="client_phone")}}</p>
     <p>{{ input_field(rec.client_website,"client_website",label="Event Website", id="client_website", placeholder='http://example.com')}}</p>
-    <h4>Planning Notes...</h4>
+    <h4>Planning Notes</h4>
     <p>{{ input_field(rec.prep_status,"prep_status",label="Event Prep Status", id="prep_status")}}</p>
-    <div class="">
-        <p class="w3-row w3-half fancy-input" >{{ input_field(rec.event_size,"event_size",label="Expected Event Size", id="event_size")}}</p>
-        <p class="w3-row w3-half fancy-input">{{ input_field(rec.number_served,"number_served",label="Number Served", id="number_served")}}</p>
+    <p class="" >{{ input_field(rec.event_size,"event_size",label="Expected Event Size", id="event_size")}}</p>
+    <div class="w3-row">
+        <p class="w3-col w3-half ">{{ input_field(rec.number_served,"number_served",label="Number Served", id="number_served")}}</p>
+        <p class="w3-col w3-half" >{{ input_field(rec.tips_received,"tips_received",label="Tips Received", id="tips_received",placeholder="0.00")}}</p>
    </div>
-    {% set tips_received = rec.tips_received | money %}
-    <p class="w3-row w3-half" >{{ input_field(tips_received,"tips_received",label="Tips Received", id="tips_received")}}</p>
+    <h4>Contract Info</h4>
+     {% if rec.contract_date | default_if_none('') == '' and rec.activity_contract_date != None %}
+         {% set _ = placeholders.update({"contract_date": rec.activity_contract_date | local_date_string })%}
+     {% endif %}
+     <p class="">{{ input_field(rec.contract_date,"contract_date",type="date",id="contract_date", placeholder="MM/DD/YYYY")}}</p>
+     <div class="w3-row">
+         {% if (rec.per_event_contract_price | default_if_none('') == '' or rec.per_event_contract_price | int == 0 ) and rec.activity_per_event_contract_price != None %}
+             {% set _ = placeholders.update({"per_event_contract_price": rec.activity_per_event_contract_price | money })%}
+         {% endif %}
+         <p class="w3-col w3-half">{{ input_field(rec.per_event_contract_price,"per_event_contract_price", type="text",id="per_event_contract_price",placeholder="0.00")}}</p>
+         {% if (rec.total_contract_price | default_if_none('') == '' or rec.total_contract_price | int == 0  ) and rec.activity_total_contract_price != None %}
+             {% set _ = placeholders.update({"total_contract_price": rec.activity_total_contract_price | money })%}
+         {% endif %}
+         <p class="w3-col w3-half">{{ input_field(rec.total_contract_price,"total_contract_price", type="text",id="total_contract_price",placeholder="0.00")}}</p>
+    </div>
+    <p><textarea rows="7" name="contract_notes" id="contract_notes" style="width:100%;" placeholder="{{rec.activity_contract_notes }}" >{{rec.contract_notes |default('',True)}}</textarea></p>
+    
 </div>
 <div class="w3-col w3-hide-small" style="width:20pt;">&nbsp;</div>
 <div class="w3-col l5 m5 s12" >
@@ -163,10 +179,6 @@
     </div>        
 </div>
       
-<style>
-    .fancy-input label, .fancy-input input {width:98%;}
-</style>
-
 <script>
     // set the placeholder text
     {% for key, value in placeholders.items() %}
