@@ -215,7 +215,8 @@ def manage_event(id=0):
                     event_table.update(new_event_rec,orig_event_dict)
                     
                     # the planning fields need to be cleared
-                    new_event_rec.event_size =None
+                    new_event_rec.prep_status = None
+                    new_event_rec.event_size = None
                     new_event_rec.number_served = None
                     new_event_rec.tips_received = None
                     
