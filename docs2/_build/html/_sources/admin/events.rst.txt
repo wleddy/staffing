@@ -35,8 +35,8 @@ The Event Detail page will open.
 There is a lot of information in the Event record, so
 for the purpose of these instructions, we've broken it up into a few parts.
 
-Part 1
-^^^^^^
+Part 1 - The Basics
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
     .. image:: images/events/detail_1.png
         :width: 500px
 
@@ -57,6 +57,8 @@ Part 1
         By default, the description from the Activity is copied there, but you can enter a different, more specific, description
         if you would like.
         
+        .. tip:: Take a few minutes to work on a decent description. It doesn't have to be lengthy, but give people an idea why they might want to attend.
+        
         The description may use `Markdown <https://www.markdownguide.org/basic-syntax>`_ syntax to create a rich presentation when viewed by visitors. (Or you can just type something.)
         
     #. Provide additional information if needed.
@@ -65,8 +67,8 @@ Part 1
         
         This field also supports Markdown syntax.
         
-Part 2
-^^^^^^
+Part 2 - Location and Contacts
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
     .. image:: images/events/detail_2.png
         :width: 500px
@@ -86,24 +88,53 @@ Part 2
         event Roster and will be the primary point of contact for staff and volunteers for this event.
     #. Specify Client contact info if needed.
          You can either select a client from the drop down list, or enter the information directly.
+         
          When you select a Client from the list, the contact info from the Client record is copied to the fields
-         below.
+         below. You can change any of the contact information that was copied in, but your changes will only apply
+         to this event. They will not be saved to the `Contact record <clients.html>`_.
     #. Enter a web site address, if any, with additional information about the event. The address will be 
         displayed as a link in the signup page and calendar detail page.
-    #. The "Event Prep Status" field is a place for a short note to track your preparation for the event.
-    #. The "Expected Event Size" field is a place for a short note about how large an event you are expecting
-        for planning purposes.
-    #. The "Number Served" field is a place to record the number of bikes you parked, people you feed, or whatever. This
-        will usually be a number.
-    #. The "Tips Received" field is a place to record the amount of tips received during the event.
-
-Part 3
-^^^^^^
         
-    .. image:: images/events/calendar_section.png
+Part 3 - Event Preparation
+^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+    This section is designed to hold information useful during the planning for an upcoming event and
+    also to the record the number actually served.
+       
+    .. image:: images/events/detail_3.png
         :width: 500px
         
+        
+    #. "Event Prep Status"  is a place for a short note to track your preparation for the event.
+    #. "Expected Event Size"  is a place for a short note about how large an event you are expecting
+        for planning purposes such as "Large", "Small" etc.
+    #. "Number Served"  is a place to record the number of bikes you parked, people you feed, or whatever. 
+        This must be an actual number.
+    #. "Tips Received"  is a place to record the amount of tips received during the event.
+
+Part 4 - Contract Info
+^^^^^^^^^^^^^^^^^^^^^^^
+
+    The Contract section is a place to track additional planning information (mostly) for events where you
+    are being paid by the organizers. 
+    
+    .. tip:: The Contract fields in each Event record "shadow" the matching fields in the event's Activity record. There is no need to renter the information here unless it's different for this event.
+       
+    .. image:: images/events/detail_4.png
+        :width: 500px
+        
+        
+    #. "Contract Date" is a place to record the date a contract was accepted by the client.
+    #. "Per Event Contact Price" and "Total Contract Price" fields provide a place to record the either or both of these values depending on the terms of the contract. 
+    #. "Contract Notes" is for just that. Anything you'd like to say about the contract.
+
+Part 5 - The Calendar Settings
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        
     This section sets the details that are displayed to calendar visitors.
+    
+    .. image:: images/events/calendar_section.png
+        :width: 500px
     
     #. Enter a Calendar Title if needed. 
         This is the name of the event that will be displayed in the Calendar.

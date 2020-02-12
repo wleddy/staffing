@@ -649,6 +649,21 @@ Some utility functions</p>
 <span id="general-purpose-utilities"></span><h3>General Purpose Utilities<a class="headerlink" href="#module-shotglass2.takeabeltof.utils" title="Permalink to this headline">¶</a></h3>
 <p>takeabeltof.utils
 Some utility functions</p>
+<dl class="class">
+<dt id="shotglass2.takeabeltof.utils.Numeric">
+<em class="property">class </em><code class="sig-prename descclassname">shotglass2.takeabeltof.utils.</code><code class="sig-name descname">Numeric</code><span class="sig-paren">(</span><em class="sig-param">value</em><span class="sig-paren">)</span><a class="headerlink" href="#shotglass2.takeabeltof.utils.Numeric" title="Permalink to this definition">¶</a></dt>
+<dd><p>Try to convert the input value to a number</p>
+<dl>
+<dt>Instanciate as:</dt><dd><p>n = Numeric(&lt;int | float&gt;) or</p>
+<p>n = Numeric(&lt;number like string&gt;)</p>
+</dd>
+</dl>
+<p>self.is_number returns True if conversion was successful</p>
+<p>self.int returns integer value</p>
+<p>self.float returns float value</p>
+<p>accessing int or float if is_number is False results in a ValueError</p>
+</dd></dl>
+
 <dl class="function">
 <dt id="shotglass2.takeabeltof.utils.cleanRecordID">
 <code class="sig-prename descclassname">shotglass2.takeabeltof.utils.</code><code class="sig-name descname">cleanRecordID</code><span class="sig-paren">(</span><em class="sig-param">id</em><span class="sig-paren">)</span><a class="headerlink" href="#shotglass2.takeabeltof.utils.cleanRecordID" title="Permalink to this definition">¶</a></dt>

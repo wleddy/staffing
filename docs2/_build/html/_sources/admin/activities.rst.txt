@@ -92,10 +92,29 @@ Event records that are associated with your Activity.
     5. Event List: The list of events associated with this Activity. (`More Info on Events <events.html>`_)
        These records represent the actual events that will appear on the calendar.
 
+Contract Info
+^^^^^^^^^^^^^^^^^^^^^^^
+
+    The Contract section is a place to track additional planning information (mostly) for Activities where you
+    are being paid by the organizers. 
+    
+    .. tip:: The Contract fields here are "shadowed" in the matching fields in the Event records. Changing the info here will be reflected in the related events ***unless*** the event record already contains unique information.
+       
+    .. image:: images/events/detail_4.png
+        :width: 500px
+        
+        
+    #. "Contract Date" is a place to record the date a contract was accepted by the client.
+    #. "Per Event Contact Price" and "Total Contract Price" fields provide a place to record the either or both of these values depending on the terms of the contract. 
+    #. "Contract Notes" is for just that. Anything you'd like to say about the contract.
+
     
 
 Next steps...
 ^^^^^^^^^^^^^^^^^^
+.. image:: images/activity/add_event.png
+    :width: 200px
+
 Now that you have created an Activity, you will probably want to create some `Event records <events.html>`_ that will appear on the Calendar.
 
 

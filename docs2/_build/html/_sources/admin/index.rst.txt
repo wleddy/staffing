@@ -20,7 +20,13 @@ with Administrator access.
     
     activities.rst
     
+.. toctree::
+    :maxdepth: 3
+    
     events.rst
+    
+.. toctree::
+    :maxdepth: 2
     
     jobs.rst
     
@@ -31,4 +37,6 @@ with Administrator access.
     locations.rst
     
     roles.rst
+    
+    clients.rst
     
