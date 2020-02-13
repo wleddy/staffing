@@ -159,9 +159,20 @@ class Event(SqliteTable):
         """
         
         
-        sql="""select event.*, activity.title as activity_title, 
-        activity.description as activity_description ,
+        sql="""select event.*, 
         coalesce(nullif(event.calendar_title,''),activity.title) as event_title,
+        activity.title as activity_title,
+        coalesce(nullif(event.description,''),activity.description,'') as event_description,
+        coalesce(nullif(event.staff_info,''),activity.activity_info,'') as event_staff_info,
+        coalesce(nullif(event.contract_date,''),activity.contract_date,'') as event_contract_date,
+        activity.contract_date as activity_contract_date,
+        coalesce(nullif(event.total_contract_price,''),activity.total_contract_price,'') as event_total_contract_price,
+        coalesce(nullif(event.per_event_contract_price,''),activity.per_event_contract_price,'') as event_per_event_contract_price,
+        activity.per_event_contract_price as activity_per_event_contract_price,
+        coalesce(nullif(event.contract_notes,''),activity.contract_notes,'') as event_contract_notes,
+        activity.contract_notes as activity_contract_notes,
+        activity.total_contract_price as activity_total_contract_price,
+        activity.description as activity_description ,
         (select type from activity_type where activity_type.id = activity.activity_type_id ) as activity_service_type
         from event 
         join activity on activity.id = event.activity_id
