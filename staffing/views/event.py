@@ -1,5 +1,5 @@
 from flask import request, session, g, redirect, url_for, abort, \
-     render_template, flash, Blueprint
+     render_template, flash, Blueprint, Response
 from shotglass2.shotglass import get_site_config
 from shotglass2.users.admin import login_required, table_access_required
 from shotglass2.takeabeltof.utils import render_markdown_for, printException, cleanRecordID, Numeric
@@ -87,7 +87,7 @@ def render_edit_form(id,activity_id):
         return abort(404)
         
     if id > 0:
-        rec = _get_event_rec(id)
+        rec = event.get(id)
         if not rec:
             flash("Record Not Found")
             return redirect(g.listURL)
@@ -100,7 +100,7 @@ def render_edit_form(id,activity_id):
         g.db.commit()
         g.cancelURL = g.cancelURL + str(rec.id)
         # fetch the record again to load the related activity data
-        rec = _get_event_rec(rec.id)
+        rec = event.get(rec.id)
 
     if request.form:
         #import pdb;pdb.set_trace()
@@ -322,28 +322,35 @@ def delete_from_activity(activity_id=-1,id=0):
     g.listURL = url_for('activity.edit') + str(cleanRecordID(activity_id))
     return handle_delete(id)
     
+@mod.route('/report',methods=['POST'])
+@mod.route('/report/',methods=['POST'])
+@table_access_required(Event)
+def report():
+    """Export the current selection of records as csv text"""
+
+    setExits()
+    #import pdb;pdb.set_trace()
+    selected_recs = request.form.get('selected_recs','')
+    filename = "event_report_{}.csv".format(date_to_string(local_datetime_now(),'iso_datetime')).replace(' ','_')
+    if selected_recs:
+        # get attendance recs with this id
+        recs = Event(g.db).select(where="event.id in ({})".format(selected_recs))
+        if recs:
+            result = render_template("event_report.csv", recs=recs)
+            headers={
+               "Content-Disposition":"attachment;filename={}".format(filename),
+                }
+
+            return Response(
+                    result,
+                    mimetype="text/csv",
+                    headers=headers
+                    )
+        
+    flash("No records to report")
+    return redirect(g.listURL)
     
-def _get_event_rec(event_id):
-    # Return the event record for use in the edit form
-    
-    sql = """select event.*, 
-    coalesce(activity.contract_date,'') as activity_contract_date,
-    coalesce(activity.total_contract_price,'') as activity_total_contract_price,
-    coalesce(activity.per_event_contract_price,'') as activity_per_event_contract_price,
-    coalesce(activity.contract_notes,'') as activity_contract_notes,
-    coalesce(activity.description,'') as activity_description,
-    coalesce(activity.activity_info,'') as activity_info,
-    activity.title as activity_title
-    from event
-    
-    join activity on event.activity_id = activity.id
-    
-     where event.id = {}
-     
-    """.format(event_id)
-    
-    return Event(g.db).query_one(sql)
-    
+
 def valid_input(rec):
     valid_data = True
     
@@ -358,7 +365,7 @@ def valid_input(rec):
         if n.is_number:
             rec.number_served = n.int
         else:
-            flash("Number Served must be a number")
+            flash("Number Served must be a number (or empty)")
             valid_data = False
         
     if rec.tips_received:
@@ -366,7 +373,7 @@ def valid_input(rec):
         if n.is_number:
             rec.tips_received = n.float
         else:
-            flash("Tips Received must be a number")
+            flash("Tips Received must be a number (or empty)")
             valid_data = False
             
     form_datetime = request.form.get("contract_date",'')
@@ -386,7 +393,7 @@ def valid_input(rec):
                 flash("Total Contract Price must be greater than zero. (or leave it empty)")
                 valid_data = False
         else:
-            flash("Total Contract Price must be a number")
+            flash("Total Contract Price must be a number (or empty)")
             valid_data = False
          
     if rec.per_event_contract_price:
@@ -397,7 +404,7 @@ def valid_input(rec):
                 flash("Event Contract Price must be greater than zero. (or leave it empty)")
                 valid_data = False
         else:
-            flash("Event Contract Price must be a number")
+            flash("Event Contract Price must be a number (or empty)")
             valid_data = False
             
     if not rec.exclude_from_calendar:

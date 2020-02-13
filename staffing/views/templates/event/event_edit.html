@@ -84,18 +84,12 @@
         <p class="w3-col w3-half" >{{ input_field(rec.tips_received,"tips_received",label="Tips Received", id="tips_received",placeholder="0.00")}}</p>
    </div>
     <h4>Contract Info</h4>
-     {% if rec.contract_date | default_if_none('') == '' and rec.activity_contract_date != None %}
-         {% set _ = placeholders.update({"contract_date": rec.activity_contract_date | local_date_string })%}
-     {% endif %}
+     {% set _ = placeholders.update({"contract_date": rec.activity_contract_date | local_date_string })%}
      <p class="">{{ input_field(rec.contract_date,"contract_date",type="date",id="contract_date", placeholder="MM/DD/YYYY")}}</p>
      <div class="w3-row">
-         {% if (rec.per_event_contract_price | default_if_none('') == '' or rec.per_event_contract_price | int == 0 ) and rec.activity_per_event_contract_price != None %}
-             {% set _ = placeholders.update({"per_event_contract_price": rec.activity_per_event_contract_price | money })%}
-         {% endif %}
+         {% set _ = placeholders.update({"per_event_contract_price": rec.activity_per_event_contract_price | money })%}
          <p class="w3-col w3-half">{{ input_field(rec.per_event_contract_price,"per_event_contract_price", type="text",id="per_event_contract_price",placeholder="0.00")}}</p>
-         {% if (rec.total_contract_price | default_if_none('') == '' or rec.total_contract_price | int == 0  ) and rec.activity_total_contract_price != None %}
-             {% set _ = placeholders.update({"total_contract_price": rec.activity_total_contract_price | money })%}
-         {% endif %}
+         {% set _ = placeholders.update({"total_contract_price": rec.activity_total_contract_price | money })%}
          <p class="w3-col w3-half">{{ input_field(rec.total_contract_price,"total_contract_price", type="text",id="total_contract_price",placeholder="0.00")}}</p>
     </div>
     <p><textarea rows="7" name="contract_notes" id="contract_notes" style="width:100%;" placeholder="{{rec.activity_contract_notes }}" >{{rec.contract_notes |default('',True)}}</textarea></p>
