@@ -17,6 +17,7 @@
         
         Find in:
             {% set search_columns_dict = {"Title":1,"Status":2,"Event Date":3,"Prep Status":5,"Contract Date":6,} %}
+            {% set default_columns_select = 1 %}
             <select id="col_select" name="col_select" onchange="doSearch()">
                 {% for key, value in search_columns_dict.items() %}
                 <option value="{{ value }}" >{{ key }}</option>
@@ -160,8 +161,7 @@
          $(document).ready(function(){
     
            {# ex of session['table_search'] = {'user_job': {'table_search_column': '0', 'table_search_text': 'bill'}} #}
-    
-           {% set table_search_column =  '0' %}
+           {% set table_search_column =  default_columns_select %}
            {% set table_search_text =  '' %}
            {% set save_search = ''%}
            
