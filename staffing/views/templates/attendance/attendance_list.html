@@ -13,6 +13,8 @@
 {% block body %}
 
     {% set search_columns_dict = {"Event":0,"Job":1,"Name":2,"Job Date":3,"Attendance":5,"Comment":6} %}
+    {% set default_columns_select = 0 %}
+    
       	<p id="addRecord"><a href="{{ g.editURL }}0/">Add new record</a>&nbsp;&nbsp;
     Find in:
         <select id="col_select" name="col_select" onchange="doSearch()">
@@ -59,7 +61,7 @@
             {% if (not rec.start_date or not rec.end_date) and rec.no_show != 1 %} w3-pale-blue
             {% elif rec.start_date != rec.job_start_date or rec.end_date != rec.job_end_date or rec.no_show == 1 %} w3-pale-red
             {% endif %}
-        " title="{{ rec.id }}">
+        " tabindex="{{ rec.id }}">
 			<td onclick="window.location='{{ g.editURL }}{{rec.id}}/'" >{{ rec.calendar_title | truncate(20, True) }}</td>
 			<td onclick="window.location='{{ g.editURL }}{{rec.id}}/'" >{{ rec.job_title | truncate(20, True) }}</td>
 			<td onclick="window.location='{{ g.editURL }}{{rec.id}}/'" >{{ rec.first_name }} {{ rec.last_name }}</td>
@@ -115,7 +117,7 @@
             var selected_recs = "";
             $(".row_id").each(function(index){
                 if (this.style.display !== 'none'){
-                    selected_recs = (selected_recs + "," + this.title).replace(/^,/, '')
+                    selected_recs = (selected_recs + "," + this.tabIndex).replace(/^,/, '')
                 }
                 $("#selected_recs").val(selected_recs)
             })
@@ -159,7 +161,7 @@
     
            {# ex of session['table_search'] = {'user_job': {'table_search_column': '0', 'table_search_text': 'bill'}} #}
     
-           {% set table_search_column =  '0' %}
+           {% set table_search_column =  default_columns_select %}
            {% set table_search_text =  '' %}
            {% set save_search = ''%}
            

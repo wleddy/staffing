@@ -59,7 +59,7 @@
 			<th class="w3-hide-small">Contract Date</th>
 		</tr>
 		{% for rec in recs %}
-	    <tr class="data_row"  title="{{ rec.id }}">
+	    <tr class="data_row"  tabindex="{{ rec.id }}">
 			<td class="w3-hide-small"  onclick="window.location='{{ g.editURL }}{{rec.id}}/'">{{ rec.id }}</td>
 			<td onclick="window.location='{{ g.editURL }}{{rec.id}}/'" {% if rec.activity_title | length > 20 %}title="{{ rec.activity_title }}"{% endif %} %}>{{ rec.activity_title | truncate(20,False) }}</td>
 			<td onclick="window.location='{{ g.editURL }}{{rec.id}}/'">{{ rec.status|default("Unknown",true) }}</td>
@@ -114,7 +114,7 @@
             var selected_recs = "";
             $(".data_row").each(function(index){
                 if (this.style.display !== 'none'){
-                    selected_recs = (selected_recs + "," + this.title).replace(/^,/, '')
+                    selected_recs = (selected_recs + "," + this.tabIndex).replace(/^,/, '')
                 }
                 $("#selected_recs").val(selected_recs)
             })
