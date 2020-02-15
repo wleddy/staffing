@@ -61,15 +61,15 @@ def get_db(filespec=None):
     # filespec if you want to use a different database
     # for the current request.
     
-        
-    # test the path, if not found, create it
-    initialize = shotglass.make_db_path(filespec)
-        
-    g.db = Database(filespec).connect()
-    if initialize:
+    # test the path, if not found, try to create it
+    if shotglass.make_db_path(filespec):
+        g.db = Database(filespec).connect()
         initalize_all_tables(g.db)
             
-    return g.db
+        return g.db
+    else:
+        # was unable to create a path to the database
+        raise IOError("Unable to create path to () in app.get_db".format(filespec))
 
 
 @app.context_processor
