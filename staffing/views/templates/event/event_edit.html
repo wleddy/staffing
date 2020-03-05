@@ -35,6 +35,7 @@
     </p>
     <p>{{ label_only(label="Description (Appears in Public Calendar)")}}</p>
     <p><textarea rows="7" name="description" style="width:100%;" placeholder="{{rec.activity_description | default('',True) }}" >{{rec.description |default('',True)}}</textarea></p>
+    <p>{{ input_field(rec.client_website,"client_website",label="Event Website", id="client_website", placeholder='http://example.com')}}</p>
     <p>{{ label_only(label="Staff Only information (not visible to public)")}}</p>
     <p><textarea rows="5" name="staff_info" style="width:100%;" placeholder="{{rec.activity_info}}">{{rec.staff_info |default_if_none('')}}</textarea></p>
     <p>{{ select_field("location_id","Default Location (May override in Jobs)", class="w3-border", req=True ) }}
@@ -75,7 +76,6 @@
     <p>{{ input_field(rec.client_contact,"client_contact",label="Client Contact", id="client_contact")}}</p>
     <p>{{ input_field(rec.client_email,"client_email",label="Client Contact Email", id="client_email")}}</p>
     <p>{{ input_field(rec.client_phone,"client_phone",label="Client Contact Phone",id="client_phone")}}</p>
-    <p>{{ input_field(rec.client_website,"client_website",label="Event Website", id="client_website", placeholder='http://example.com')}}</p>
     <h4>Planning Notes</h4>
     <p>{{ input_field(rec.prep_status,"prep_status",label="Event Prep Status", id="prep_status")}}</p>
     <p class="" >{{ input_field(rec.event_size,"event_size",label="Expected Event Size", id="event_size")}}</p>
