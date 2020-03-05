@@ -122,7 +122,7 @@ def render_edit_form(id,activity_id):
     client = Client(g.db).get(rec.client_id)
     locations = Location(g.db).select()
     # only users of sufficient rank can manage an event
-    where = "user.id in (select user_id from user_role where role_id in (select role.id from role where rank >= {}))".format(get_site_config().get('MINIMUM_MANAGER_RANK',70))
+    where = "user.id in (select user_id from user_role where role_id in (select role.id from role where rank >= {}))".format(get_site_config().get('MINIMUM_MANAGER_RANK',100))
     event_managers = User(g.db).select(where=where)
     job_embed_list = get_job_list_for_event(rec.id)
        
