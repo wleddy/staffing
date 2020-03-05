@@ -22,19 +22,26 @@
 <div class="w3-panel w3-card-2 w3-secondary-color">
     <div class="w3-row" style="padding-top:16pt;padding-bottom:16pt;">
         <div class="w3-col w3-half w3-small" style="padding-left:1%;">
-            <h3><strong>{{ event.calendar_title}}</strong></h3>
-            
-            {# set up the direct link to this event #}
-            {% set direct_url = url_for('signup.more_info') + event.activity_id | string  + "/#event-header-" + event.event_id | string  %}
-            
             {% if event.is_yours %}
                 <p style="padding:6pt;border:2pt solid black;margin:6pt 12pt 6pt 0;text-align:center;" ><strong>You are signed up for this event.</strong>
                     &nbsp;&nbsp;&nbsp;<a class="w3-button w3-primary-color w3-mobile w3-round-large" href="{{ direct_url }}">View Your Commitment</a></p>
             {% endif %}
+            <h3>
+                <strong>{{ event.calendar_title}}</strong>
+                {% if g.admin.has_access(g.user,'Events') %}<a href="{{ url_for('event.edit')}}{{ event.event_id }}/"><em class="w3-small">(Edit Event)</em></a>{% endif %}
+            </h3>
+            <div class="sg-cal-event-desc">
+                {{ event.event_description | render_markdown }}
+            </div>
+            {% if event.website %}
+            <p>Event Web Site: {{event.website | weblink }}</p>
+            {% endif %}
+            {# set up the direct link to this event #}
+            {% set direct_url = url_for('signup.more_info') + event.activity_id | string  + "/#event-header-" + event.event_id | string  %}
+
 
             <p>
                 <em>Date:</em> <strong>{{ event.event_start_date | default('tbd',True)| abbr_date_string }}</strong>
-                {% if g.admin.has_access(g.user,'Events') %}<a href="{{ url_for('event.edit')}}{{ event.event_id }}/"><em>(Edit Event)</em></a>{% endif %}
             </p>
             <div class="w3-row">
                 <p class="w3-col l1 m2 s2 w3-right-align">
@@ -81,12 +88,7 @@
                 <p><em>Location to be determined</em></p>
                 {% endif %}
             </div>
-            <div style="padding-right:6pt;">
-                {{ event.event_description | render_markdown }}
-            </div>
-            {# set up the direct link to this event #}
-            {% set direct_url = url_for('signup.more_info') + event.activity_id | string  + "/#event-header-" + event.event_id | string  %}
-
+            {# build link to best signup page #}
             {% if not event.is_yours %}
                 <div>
                 {# default link to generic signup list #}

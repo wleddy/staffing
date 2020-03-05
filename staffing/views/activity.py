@@ -143,10 +143,9 @@ def delete(id=0):
     
 def get_event_recs(activity_id=None,**kwargs):
     """Return a list of event records or None
-     if 'event_id' is in kwargs, search for a single event, else 
-     search for all events associated with activity_id.
-     
     
+     If 'event_id' is in kwargs, search for a single event, else 
+     search for all events associated with activity_id.
     """
     
     activity_id = activity_id if activity_id else 0
@@ -211,7 +210,8 @@ def get_event_recs(activity_id=None,**kwargs):
           user_job.job_id in (select id from job where job.event_id = event.id  ) 
           LIMIT 1
          ),
-     0) as is_yours
+     0) as is_yours,
+     coalesce(event.client_website,client.website,'') website
 
     
     
@@ -219,6 +219,7 @@ def get_event_recs(activity_id=None,**kwargs):
     join activity on activity.id = event.activity_id
     left join job on event.id = job.event_id
     left join location on event_location_id = location.id
+    left join client on event.client_id = client.id
     where {where}
     group by event.event_start_date, event.location_id, job_start_date
     order by event.event_start_date DESC
