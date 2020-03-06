@@ -19,6 +19,8 @@
 {% endblock page_header %}
 
 {% block body %}
+{# set up the direct link to this event #}
+{% set direct_url = url_for('signup.more_info') + event.activity_id | string  + "/#event-header-" + event.event_id | string  %}
 <div class="w3-panel w3-card-2 w3-secondary-color">
     <div class="w3-row" style="padding-top:16pt;padding-bottom:16pt;">
         <div class="w3-col w3-half w3-small" style="padding-left:1%;">
@@ -36,10 +38,7 @@
             {% if event.website %}
             <p>Event Web Site: {{event.website | weblink }}</p>
             {% endif %}
-            {# set up the direct link to this event #}
-            {% set direct_url = url_for('signup.more_info') + event.activity_id | string  + "/#event-header-" + event.event_id | string  %}
-
-
+            
             <p>
                 <em>Date:</em> <strong>{{ event.event_start_date | default('tbd',True)| abbr_date_string }}</strong>
             </p>
