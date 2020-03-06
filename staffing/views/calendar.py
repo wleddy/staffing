@@ -6,7 +6,7 @@ from shotglass2.users.models import User
 from shotglass2.users.admin import login_required, table_access_required
 from shotglass2.takeabeltof.utils import render_markdown_for, printException, cleanRecordID
 from shotglass2.takeabeltof.date_utils import datetime_as_string, local_datetime_now, getDatetimeFromString
-from staffing.models import Event, Location, ActivityType
+from staffing.models import Event, Location, ActivityGroup
 from staffing.views.activity import get_event_recs
 from staffing.views.signup import get_job_rows, get_activity_location_list
 
@@ -78,6 +78,8 @@ def display(month=None,year=None):
         
     sql="""select 
     event.id as event_id, 
+    activity_group.display_style as activity_type_style,
+    activity_type.activity_group_id,
     coalesce(nullif(event.calendar_title,''),activity.title) as calendar_title,
     event.event_start_date,
     coalesce(
@@ -89,6 +91,8 @@ def display(month=None,year=None):
 
     from event
     join activity on activity.id = event.activity_id
+    left join activity_type on activity_type.id = activity.activity_type_id
+    left join activity_group on activity_group.id = activity_type.activity_group_id
     where lower(event.status) in ({status_list}) and date(event.event_start_date,'localtime') >= date('{start_date}') and date(event.event_end_date,'localtime') <= date('{end_date}')
     order by event.event_start_date
     """.format(
@@ -98,6 +102,8 @@ def display(month=None,year=None):
     user_id=user_id,
     )
             
+    activity_groups = ActivityGroup(g.db).select()
+    
     event_data = Event(g.db).query(sql)
     
     event_list_dict = {}
@@ -152,6 +158,7 @@ def display(month=None,year=None):
                             last_month=last_month,
                             next_month=next_month,
                             today = today,
+                            activity_groups=activity_groups,
                             )
 
 
@@ -199,6 +206,21 @@ def event(event_id=None):
         
     return render_template('calendar_event.html',event=event,map_html=map_html,event_locations=event_locations)
     
+@mod.route('calendar/save_filter/<action>/<int:group_id>')
+@mod.route('calendar/save_filter/<action>/<int:group_id>/')
+@mod.route('calendar/save_filter/')
+def save_group_filter(action='remove',group_id=0):
+    """Save the users calendar filter prefs. We are actually saving the activity groups to 
+    hide, so 'add' removes it from the set and 'remove' adds it... simple, huh? """
+    
+    if not "calendar_group_filter" in session:
+        session['calendar_group_filter']=[]
+    if action == 'add' and group_id in session['calendar_group_filter']:
+        session['calendar_group_filter'].pop(session['calendar_group_filter'].index(group_id))
+    if action == 'remove'and group_id not in session['calendar_group_filter']:
+        session['calendar_group_filter'].append(group_id)
+        
+    return 'Ok'
     
 def get_event_status_where():
     return " and lower(event.status) = 'scheduled' "
