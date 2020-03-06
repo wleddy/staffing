@@ -8,7 +8,8 @@ from shotglass2.takeabeltof.jinja_filters import register_jinja_filters
 from shotglass2.takeabeltof.utils import cleanRecordID
 from shotglass2.users.views.login import setUserStatus
 from shotglass2.users.admin import Admin
-from staffing.models import Activity, Event, Job, Location, ActivityType, UserJob, EventDateLabel, Client, Attendance, Task
+from staffing.models import Activity, Event, Job, Location, ActivityType, UserJob, EventDateLabel, Client, \
+    Attendance, Task, ActivityGroup
 
 # Create app
 # setting static_folder to None allows me to handle loading myself
@@ -120,6 +121,7 @@ def _before():
         g.admin.register(Job,url_for('signup.roster'),display_name='',minimum_rank_required=80,add_to_menu=False)
         #location
         g.admin.register(Location,url_for('location.display'),display_name='Locations',minimum_rank_required=500,roles=['admin','activity manager'])
+        g.admin.register(ActivityGroup,url_for('activity_group.display'),display_name='Activity Groups',minimum_rank_required=500,roles=['admin','activity manager'])
         g.admin.register(ActivityType,url_for('activity_type.display'),display_name='Activity Types',minimum_rank_required=500,roles=['admin','activity manager'])
         g.admin.register(EventDateLabel,url_for('event_date_label.display'),display_name='Date Labels',minimum_rank_required=500,roles=['admin','activity manager'])
         g.admin.register(Client,url_for('client.display'),display_name='Clients',minimum_rank_required=500,roles=['admin','activity manager'])
@@ -151,7 +153,8 @@ def server_error(error):
 # Direct to a specific server for static content
 app.add_url_rule('/static/<path:filename>','static',shotglass.static)
 
-from staffing.views import signup, calendar, event, activity,location, job, activity_type, attendance, task, event_date_label, client
+from staffing.views import signup, calendar, event, activity,location, job, activity_type, \
+    attendance, task, event_date_label, client, activity_group
     
 app.add_url_rule('/','display',calendar.display) # Make the calendar our home page...
     
@@ -166,6 +169,7 @@ app.register_blueprint(attendance.mod)
 app.register_blueprint(task.mod)
 app.register_blueprint(event_date_label.mod)
 app.register_blueprint(client.mod)
+app.register_blueprint(activity_group.mod)
 
 ## Setup the routes for users
 shotglass.register_users(app)

@@ -1,0 +1,47 @@
+{% extends "form_layout.html" %}
+
+{% from "_form_helpers.html" import input_field, select_field, radio_field, checkbox_field, label_only %}
+
+{% block fieldset %}
+<fieldset>
+    <p>{{ input_field(rec.id,"id",type="hidden",default=0)}}</p>
+    <p>{{ input_field(rec.name,'name',req=True)}}</p>
+    <p>{{ input_field(rec.description,'description')}}</p>
+    {% set style_dict = {'Blue': 'blue-background', 'Coffee': 'coffee-background','Green': 'green-background', 'Red':'red-background','Silver':'silver-background','Turquoise':'turquoise-background','Yellow':'yellow-background',}%}
+    <div class="w3-row">
+        <p id="color_swatch" class="w3-col l1 m1 s12 w3-center">Hello!</p>
+        <p class="w3-col w3-hide-small" style="max-width:6pt;" >&nbsp;</p>
+        <p class="w3-col l10 m10 s12">
+            {{ select_field("display_style","Display Style", id="style_select", class="w3-border") }}
+                <option value="None">Use Default Style</option>
+                {% for name, style in style_dict.items() %}
+                    <option value="{{style}}" {% if style == rec.display_style %}selected="selected" {% endif %}>{{name}}</option>
+                {% endfor %}
+            </select>
+        </p>
+        
+    </div>
+    <style>
+        #color_swatch {
+            margin:2pt;
+            min-height:30pt;
+            border:1pt solid black;
+            padding-top:6pt;
+        }
+    </style>
+    <script>
+        function set_swatch(style){
+            var base_classes = ['w3-col','l1','m1','s12','w3-center'];
+            var classList = $('#color_swatch').attr('class').split(/\s+/);
+            $.each(classList, function(index, item) {
+                if(base_classes.indexOf(item) == -1) {
+                     $('#color_swatch').removeClass(item);
+                }
+            });
+            $('#color_swatch').addClass(style);
+        }
+        $('#style_select').on('change',function(){set_swatch(this.value)});
+        set_swatch('{{ rec.display_style }}')
+    </script>
+</fieldset>
+{% endblock fieldset %}

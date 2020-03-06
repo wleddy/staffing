@@ -7,6 +7,15 @@
     <p>{{ input_field(rec.id,"id",type="hidden",default=0)}}</p>
     <p>{{ input_field(rec.type,'type',req=True)}}</p>
     <p>{{ input_field(rec.description,'description')}}</p>
-      
+    <p>
+        {{ select_field("activity_group_id","Activity Group") }}
+            <option value="0">No Group Set</option>
+            {% if activity_groups %}
+            {% for group in activity_groups %}
+                <option value="{{group.id}}" {% if group.id == rec.activity_group_id %}selected="selected" {% endif %}>{{group.name}}</option>
+            {% endfor %}
+            {% endif %}
+        </select>
+    </p>
 </fieldset>
 {% endblock fieldset %}

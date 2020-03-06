@@ -18,28 +18,6 @@
     width:0px;
 }
 
-/* for signup pages */
-.event-contain{margin:6pt 0 0 0;}
-@media (min-width:993px){.event-contain{margin:10pt 16.6666% 0 16.6666%;}}
-.job-contain{margin:0;}
-@media (min-width:993px){.job-contain{margin:0 16.6666%;}}
-.participant-badge {padding:7pt;min-width:29pt;}
-.filled-bar {cursor:text;padding:3pt 0pt}
-
-/* special styling for old event listings */
-.past-event, hr.past-event{
-    background-color:#ddd;
-    color:black;
-}
-div.past-event{
-    padding-top:12pt;
-}
-
-hr.past-event{
-    padding:0;
-    margin:0;
-    border-color:black;
-}
 
 /*p {margin-top:0;margin-bottom:.4em;}*/
 
@@ -120,7 +98,56 @@ pre {
 */
 
 
+/* Some styles for staffing */
+
+/* for signup pages */
+.event-contain{margin:6pt 0 0 0;}
+@media (min-width:993px){.event-contain{margin:10pt 16.6666% 0 16.6666%;}}
+.job-contain{margin:0;}
+@media (min-width:993px){.job-contain{margin:0 16.6666%;}}
+.participant-badge {padding:7pt;min-width:29pt;}
+.filled-bar {cursor:text;padding:3pt 0pt}
+
+/* special styling for old event listings */
+.past-event, hr.past-event{
+    background-color:#ddd;
+    color:black;
+}
+div.past-event{
+    padding-top:12pt;
+}
+
+hr.past-event{
+    padding:0;
+    margin:0;
+    border-color:black;
+}
+
 /* set the open shift colors for the spreadheet view of roster */
 .filled-shift, .filled-volunteer-shift {background-color:lightgreen;}
 .open-shift {background-color:yellow;}
 .open-volunteer-shift {background-color:lightblue;}
+
+/* some background colors for event types */
+/* at least initially used for calendar activity types */
+.yellow-background {
+    background-color: rgba(255, 255, 0, 0.5);
+}
+.green-background {
+    background-color: rgba(0, 143, 0, 0.3);
+}
+.red-background {
+    background-color: rgba(194, 0, 0, 0.3);
+}
+.blue-background {
+    background-color: rgba(0, 0, 178, 0.3);
+}
+.turquoise-background {
+    background-color: rgba(0, 255, 253, 0.5);
+}
+.coffee-background {
+    background-color: rgba(128, 63, 0, 0.3);
+}
+.silver-background {
+    background-color: rgba(214, 214, 214, 1.0);
+}

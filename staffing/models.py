@@ -28,6 +28,26 @@ class Activity(SqliteTable):
                 
         super().create_table(sql)
 
+class ActivityGroup(SqliteTable):
+    """Logical groups for Activities. At the moment only
+    used in the calendar display."""
+    def __init__(self,db_connection):
+        super().__init__(db_connection)
+        self.table_name = 'activity_group'
+        self.order_by_col = 'lower(name), id'
+        self.defaults = {}
+
+    def create_table(self):
+        """Define and create the table"""
+
+        sql = """
+        name TEXT NOT NULL,
+        description TEXT,
+        display_style TEXT -- a CSS style name
+        """
+
+        super().create_table(sql)
+
 
 class ActivityType(SqliteTable):
     """Categorize events"""
@@ -42,7 +62,8 @@ class ActivityType(SqliteTable):
 
         sql = """
         type TEXT NOT NULL,
-        description TEXT
+        description TEXT,
+        activity_group_id INTEGER
         """
 
         super().create_table(sql)
@@ -412,8 +433,9 @@ class UserJob(SqliteTable):
 
 
 def init_event_db(db):
-    """Create a intial user record."""
+    """Create tables if needed."""
     Activity(db).create_table()
+    ActivityGroup(db).create_table()
     ActivityType(db).create_table()
     Attendance(db).create_table()
     Client(db).create_table()

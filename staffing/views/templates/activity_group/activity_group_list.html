@@ -1,0 +1,32 @@
+{% extends "layout.html" %}
+{% from "_layout_helpers.html" import list_search_widget %}
+{% block title %}{{ g.title }}{% endblock %}
+{% block body %}
+    <style>
+        .styling { padding:2pt 10pt;}
+    </style>
+      	<p id="addRecord"><a href="{{ g.editURL }}0/">Add a new record</a>
+        &nbsp;&nbsp;{{ list_search_widget('activity_type',{'Id':0,'Activity Group':1,'Description':2},1) }}
+
+        </p>
+	{%if recs %}
+		<table id="table_list" class="datatable w3-table w3-striped w3-hoverable">
+		<tr class="w3-primary-color">
+			<th>Id</th>
+			<th>Activity Group</th>
+			<th class="w3-hide-small" >Description</th>
+			<th class="w3-hide-small" >Styling</th>
+		</tr>
+		{% for rec in recs %}
+	    <tr>
+			<td onclick="window.location='{{ g.editURL }}{{rec.id}}/'">{{ rec.id }}</a></td>
+			<td onclick="window.location='{{ g.editURL }}{{rec.id}}/'">{{ rec.name }}</a></td>
+			<td class="w3-hide-small" onclick="window.location='{{ g.editURL }}{{rec.id}}/'">{{ rec.description | truncate(60) }}</td>
+			<td class="w3-hide-small" onclick="window.location='{{ g.editURL }}{{rec.id}}/'"><span class="{{ rec.display_style }} styling">{{ rec.name | truncate(10) }}</span></td>
+		</tr>
+		{% endfor %}
+	  </table>
+  	{% else %}
+    	<p><em>No records here so far</em></p>
+	{% endif %}
+{% endblock %}
