@@ -106,7 +106,15 @@
                                   <span class="w3-small" id="job-date-more-{{ job.event_id }}-{{job.start_date[:10]}}" style="display:none;">&nbsp;<em>Show this event</em></span>
                                   <span class="w3-small" id="job-date-less-{{ job.event_id }}-{{job.start_date[:10]}}" >&nbsp;<em>Hide this event</em></span>
                             </p>
+                          {% if job.activity_title != job.calendar_title %}
+                          <p class="w3-large"><strong>{{ job.calendar_title }}</strong></p>
+                          {% endif %}
                         </div>
+                        {% if job.activity_description != job.event_description %}
+                        <div class="event-contain w3-row-padding w3-secondary-color">
+                            {{ job.event_description | render_markdown }}
+                        </div>
+                        {% endif %}
                         {% if job.event_staff_info and is_admin %}
                         <div class="event-contain w3-row-padding w3-secondary-color" style="padding:3pt;">
                             <div class="w3-small" >   
@@ -120,7 +128,7 @@
                     </div>
                 {% endif %} {# show date? #}
             
-                    <p id="event-title-{{ job.job_id }}" title="{{ job.activity_title }}" style="font-size:1pt;padding:0;margin:0;">&nbsp;<!-- A marker to hold the title --></p>
+                    <p id="event-title-{{ job.job_id }}" title="{{ job.calendar_title }}" style="font-size:1pt;padding:0;margin:0;">&nbsp;<!-- A marker to hold the title --></p>
                 <div class="job-date-container-{{ job.event_id }}-{{job.start_date[:10]}}">
                     
                     <div id="job-body{{job.job_id}}" >
