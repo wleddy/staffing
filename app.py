@@ -187,13 +187,15 @@ def default_home():
     
 @app.route('/rss', methods=['GET',])
 @app.route('/rss/', methods=['GET',])
+@app.route('/feed', methods=['GET',])
+@app.route('/feed/', methods=['GET',])
 def get_rss_feed():
     """Return a fully formed RSS feed of the Event records"""
 
     from feedme.feedme import FeedMe
     from shotglass2.shotglass import get_site_config
     from shotglass2.takeabeltof.date_utils import local_datetime_now, getDatetimeFromString
-    from shotglass2.takeabeltof.jinja_filters import long_date_string
+    from shotglass2.takeabeltof.jinja_filters import long_date_string, render_markdown
     from staffing.models import Event
 
     site_config=get_site_config()
@@ -213,9 +215,9 @@ def get_rss_feed():
             d = {}
             d.update({'title':rec.event_title})
             create_date = getDatetimeFromString(rec.created)
-            created = "Created: {}\r\r".format(long_date_string(create_date))
+            created = "Created: {}\n\n".format(long_date_string(create_date))
             
-            d.update({'description':created + rec.event_description})
+            d.update({'description':render_markdown(created + rec.event_description)})
             d.update({'pubDate':create_date})
             link = 'http://' + site_config['HOST_NAME'] + url_for('calendar.event') + str(rec.id) + '/'
             d.update({'link':link})
