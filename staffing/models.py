@@ -169,16 +169,30 @@ class Event(SqliteTable):
             total_contract_price NUMBER,
             per_event_contract_price NUMBER,
             contract_notes TEXT,
+            created DATETIME,
+            modified DATETIME,
             FOREIGN KEY (activity_id) REFERENCES activity(id) ON DELETE CASCADE
             """
                 
         super().create_table(sql)
         
         
+    def new(self):
+        """Setup a new record"""
+        rec = super().new()
+        rec.created = local_datetime_now()
+        rec.modified = rec.created
+        return rec
+
+    def save(self,rec,**kwargs):
+        rec.modified = local_datetime_now()
+        row_id = super().save(rec,**kwargs)
+        return row_id
+
+
     def select(self,**kwargs):
         """Extend `select` to include Activity fields in the result set
         """
-        
         
         sql="""select event.*, 
         coalesce(nullif(event.calendar_title,''),activity.title) as event_title,

@@ -18,3 +18,5 @@ passenger.*
 shotglass2/
 #### in case it change the name
 shotglass/
+
+/feedme/

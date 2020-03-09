@@ -214,6 +214,9 @@ def manage_event(id=0):
                     new_event_rec = event_table.new()
                     event_table.update(new_event_rec,orig_event_dict)
                     
+                    # give it a fresh creation date
+                    new_event_rec.created = local_datetime_now()
+                    
                     # the planning fields need to be cleared
                     new_event_rec.prep_status = None
                     new_event_rec.event_size = None
