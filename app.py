@@ -184,36 +184,7 @@ def default_home():
     # if no subdomain
     return "Know Whan Hom"
     
-    
-    
-@app.route('/enclosure/<path:path>/<int:rec_id>', methods=['GET',])
-@app.route('/enclosure/<path:path>/<int:rec_id>/', methods=['GET',])
-@app.route('/enclosure/', methods=['GET',])
-def get_rss_enclosure(path=None,rec_id=None):
-    """Genereate a resource represented in an enclosure in the rss feed.
-    
-    The data created here is not actually included in the feed. A representation
-    is attached to the feed so the reader can download the data from here when needed.
-    """
-    #import pdb;pdb.set_trace()
-    
-    data = ""
-    rec_id = cleanRecordID(rec_id)
-    if path:
-        if path.lower() == 'event':
-            if rec_id > 0:
-                rec = Event(g.db).get(rec_id)
-                data = render_template('rss/event_enclosure.html',rec=rec)
-        elif path == 'something else':
-            # jost so i remember how I thought this would work
-            pass
-            
-        else:
-            pass # there is no matching path
-    
-    return data
-    
-    
+
 @app.route('/rss', methods=['GET',])
 @app.route('/rss/', methods=['GET',])
 @app.route('/feed', methods=['GET',])
@@ -229,9 +200,10 @@ def get_rss_feed():
 
     site_config=get_site_config()
 
-    feeder = FeedMe(title="Events from the calendar at {}".format(site_config['SITE_NAME']),
-            link = 'http://' + site_config['HOST_NAME'],
-            description = "Future Events from {}".format(site_config['SITE_NAME']),
+    host = 'http://' + site_config['HOST_NAME']
+    feeder = FeedMe(title="{} Events".format(site_config['SITE_NAME']),
+            link = host,
+            description = "Future Events from the {} calendar".format(site_config['SITE_NAME']),
             )
         
     recs = Event(g.db).select(
@@ -240,20 +212,11 @@ def get_rss_feed():
             )
     items = []
     if recs:
-        host = 'http://' + site_config['HOST_NAME']
         for rec in recs:
             d = {}
             pub_date = getDatetimeFromString(rec.created)
-            #created = "Created: {}\n\n".format(long_date_string(create_date))
-            # Create enclosure dict
-            enc = {'url':host + url_for('.get_rss_enclosure') + 'event/' + str(rec.id), 'type':'text/html'}
-            data = get_rss_enclosure('event',rec.id)
-            if data:
-                enc.update({'length':len(data),})
-                d.update({'enclosure':enc,})
                 
             d.update({'title':rec.event_title})
-            
             d.update({'description':rec.event_description})
             d.update({'pubDate':pub_date})
             link = host + url_for('calendar.event') + str(rec.id) + '/'
