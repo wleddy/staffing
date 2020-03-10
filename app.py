@@ -1,4 +1,4 @@
-from flask import Flask, g, session, request, redirect, flash, abort, url_for, session
+from flask import Flask, g, session, request, redirect, flash, abort, url_for, session, render_template
 from flask_mail import Mail
 import os
 from shotglass2 import shotglass
@@ -185,6 +185,35 @@ def default_home():
     return "Know Whan Hom"
     
     
+    
+@app.route('/enclosure/<path:path>/<int:rec_id>', methods=['GET',])
+@app.route('/enclosure/<path:path>/<int:rec_id>/', methods=['GET',])
+@app.route('/enclosure/', methods=['GET',])
+def get_rss_enclosure(path=None,rec_id=None):
+    """Genereate a resource represented in an enclosure in the rss feed.
+    
+    The data created here is not actually included in the feed. A representation
+    is attached to the feed so the reader can download the data from here when needed.
+    """
+    #import pdb;pdb.set_trace()
+    
+    data = ""
+    rec_id = cleanRecordID(rec_id)
+    if path:
+        if path.lower() == 'event':
+            if rec_id > 0:
+                rec = Event(g.db).get(rec_id)
+                data = render_template('rss/event_enclosure.html',rec=rec)
+        elif path == 'something else':
+            # jost so i remember how I thought this would work
+            pass
+            
+        else:
+            pass # there is no matching path
+    
+    return data
+    
+    
 @app.route('/rss', methods=['GET',])
 @app.route('/rss/', methods=['GET',])
 @app.route('/feed', methods=['GET',])
@@ -211,15 +240,23 @@ def get_rss_feed():
             )
     items = []
     if recs:
+        host = 'http://' + site_config['HOST_NAME']
         for rec in recs:
             d = {}
+            pub_date = getDatetimeFromString(rec.created)
+            #created = "Created: {}\n\n".format(long_date_string(create_date))
+            # Create enclosure dict
+            enc = {'url':host + url_for('.get_rss_enclosure') + 'event/' + str(rec.id), 'type':'text/html'}
+            data = get_rss_enclosure('event',rec.id)
+            if data:
+                enc.update({'length':len(data),})
+                d.update({'enclosure':enc,})
+                
             d.update({'title':rec.event_title})
-            create_date = getDatetimeFromString(rec.created)
-            created = "Created: {}\n\n".format(long_date_string(create_date))
             
-            d.update({'description':render_markdown(created + rec.event_description)})
-            d.update({'pubDate':create_date})
-            link = 'http://' + site_config['HOST_NAME'] + url_for('calendar.event') + str(rec.id) + '/'
+            d.update({'description':rec.event_description})
+            d.update({'pubDate':pub_date})
+            link = host + url_for('calendar.event') + str(rec.id) + '/'
             d.update({'link':link})
             d.update({'permalink':link})
         
@@ -232,7 +269,7 @@ def get_rss_feed():
             'pubDate':local_datetime_now(),
             }
         )
-        
+    # import pdb;pdb.set_trace()
     feed =  feeder.get_feed(items)
     
     return feed
