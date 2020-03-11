@@ -201,7 +201,7 @@ def get_rss_feed():
     site_config=get_site_config()
 
     host = 'http://' + site_config['HOST_NAME']
-    feeder = FeedMe(title="{} Events".format(site_config['SITE_NAME']),
+    feeder = FeedMe(title=site_config['SITE_NAME'],
             link = host,
             description = "Future Events from the {} calendar".format(site_config['SITE_NAME']),
             )
