@@ -200,7 +200,9 @@ def get_rss_feed():
 
     site_config=get_site_config()
 
-    host = 'http://' + site_config['HOST_NAME']
+    host = request.url_root
+    link_root = host[:-1] + url_for('calendar.event')
+    
     feeder = FeedMe(title=site_config['SITE_NAME'],
             link = host,
             description = "Future Events from the {} calendar".format(site_config['SITE_NAME']),
@@ -215,11 +217,11 @@ def get_rss_feed():
         for rec in recs:
             d = {}
             pub_date = getDatetimeFromString(rec.created)
+            link = link_root + str(rec.id) + '/'
                 
             d.update({'title':rec.event_title})
-            d.update({'description':rec.event_description})
+            d.update({'description':rec.event_description + ' - ' + link})
             d.update({'pubDate':pub_date})
-            link = host + url_for('calendar.event') + str(rec.id) + '/'
             d.update({'link':link})
             d.update({'permalink':link})
         
