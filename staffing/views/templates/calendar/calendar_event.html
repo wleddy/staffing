@@ -35,7 +35,7 @@
             <div class="sg-cal-event-desc">
                 {{ event.event_description | render_markdown }}
             </div>
-            {% if event.website %}
+            {% if event.website | weblink %}
             <p>Event Web Site: {{event.website | weblink }}</p>
             {% endif %}
             

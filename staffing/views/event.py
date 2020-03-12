@@ -108,10 +108,19 @@ def render_edit_form(id,activity_id):
         rec.exclude_from_calendar = request.form.get('exclude_from_calendar',0) #checkbox value
         rec.location_id = cleanRecordID(request.form.get('location_id',-1))
         # ensure that web address is absolute
-        if rec.client_website:
-            data_part = rec.client_website.partition("//")
-            if data_part[0][:4] != 'http':
-                rec.client_website = 'http://' + rec.client_website
+        if rec.client_website.strip():
+            parts = rec.client_website.partition("//")
+            data_part = [x.strip() for x in parts] #convert to a list to make it simplier
+                
+            if data_part[0] != '' and data_part[1] == '' and data_part[2] == '':
+                # no // present. host name at [0]
+                data_part[2] = data_part[0]
+                
+            if data_part[2].strip() == '':
+                rec.client_website = None
+                
+            elif data_part[0][:4] != 'http':
+                rec.client_website = 'http://' + data_part[2]
             
         if valid_input(rec):
             event.save(rec)
