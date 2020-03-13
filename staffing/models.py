@@ -25,8 +25,9 @@ class Activity(SqliteTable):
         per_event_contract_price NUMBER,
         contract_notes TEXT
         """
-                
+        
         super().create_table(sql)
+            
 
 class ActivityGroup(SqliteTable):
     """Logical groups for Activities. At the moment only
@@ -195,6 +196,11 @@ class Event(SqliteTable):
         """
         
         sql="""select event.*, 
+        (select location.location_name from location) as event_default_location_name,
+        (select location.street_address from location) as event_default_location_address,
+        (select location.city from location) as event_default_location_city,
+        (select location.state from location) as event_default_location_state,
+        (select location.zip from location) as event_default_location_zip,
         coalesce(nullif(event.calendar_title,''),activity.title) as event_title,
         activity.title as activity_title,
         coalesce(nullif(event.description,''),activity.description,'') as event_description,
@@ -211,9 +217,11 @@ class Event(SqliteTable):
         (select type from activity_type where activity_type.id = activity.activity_type_id ) as activity_service_type
         from event 
         join activity on activity.id = event.activity_id
+        left join location on location.id = event.location_id
         where {} order by {}""".format(kwargs.get('where',1),kwargs.get('order_by',self.order_by_col))
         
         return self.query(sql)
+        
         
     def get(self, id):
         out = self.select(where=self.table_name + ".id={}".format(cleanRecordID(id)))
@@ -221,6 +229,34 @@ class Event(SqliteTable):
             return out[0]
             
         return None
+
+
+    def locations(self,id):
+        """Return a selection of all the locations for the event"""
+        loc_ids = set()
+        id = cleanRecordID(id)
+    
+        sql = """select distinct event.location_id as event_loc_id, job.location_id as job_loc_id from event
+        left join job on job.event_id = event.id
+        where event.id = {}
+        """.format(id)
+
+        recs = self.query(sql)
+        #import pdb;pdb.set_trace()
+        if recs:
+            for rec in recs:
+                if rec.job_loc_id:
+                    # this job has its own location
+                    loc_ids.add(rec.job_loc_id)
+                elif rec.event_loc_id:
+                    # this job is at the default location
+                    loc_ids.add(rec.event_loc_id)
+            
+        if loc_ids:
+            return Location(self.db).select(where='id in ({})'.format(','.join(str(x) for x in loc_ids)))
+    
+        return None
+        
         
 class EventDateLabel(SqliteTable):
     """A place to put the labels used to make event.<event|service>_start_date and end dates user friendly

@@ -4,11 +4,12 @@ from shotglass2.shotglass import get_site_config
 from shotglass2.takeabeltof.mailer import send_message, email_admin
 from shotglass2.takeabeltof.utils import render_markdown_for, render_markdown_text, printException, cleanRecordID, looksLikeEmailAddress, formatted_phone_number
 from shotglass2.takeabeltof.date_utils import date_to_string, getDatetimeFromString, local_datetime_now
+from shotglass2.takeabeltof.jinja_filters import default_if_none
 from shotglass2.users.admin import login_required, table_access_required, silent_login
 from shotglass2.users.models import Role, User
 from shotglass2.users.views.login import authenticate_user, setUserStatus, logout as log_user_out, login as log_user_in
 from shotglass2.www.views.home import contact as home_contact
-from staffing.models import Event, Location, Job, UserJob, JobRole
+from staffing.models import Event, Location, Job, UserJob, JobRole, Activity
 from staffing.views.announcements import send_signup_email, process_commitment_reminder
 from datetime import timedelta, datetime
 
@@ -553,6 +554,7 @@ def get_job_rows(start_date=None,end_date=None,where='',user_skills=[],is_admin=
     event_manager.email as event_manager_email,
     event_manager.phone as event_manager_phone,
     event_location.id as event_loc_id,
+    null as event_header_location_name, -- a placeholder
     event_location.location_name as event_loc_name,
     event_location.street_address as event_loc_street_address,
     event_location.city as event_loc_city,
@@ -634,24 +636,17 @@ def get_job_rows(start_date=None,end_date=None,where='',user_skills=[],is_admin=
             if job.activity_id != last_activity_id:
                 last_activity_id = job.activity_id
                 
-                # clear the location names
-                activity_location_name = None
-
-                # Get a list location ids of all events and jobs for this activity
-                activity_location_list = get_activity_location_list(job.activity_id,where)
+                # need to set this each time the activity changes in the list
+                activity_location_name = 'tbd'
+                activity_locations = get_activity_location_list(job.activity_id,where)
+                if activity_locations:
+                    if len(activity_locations) == 1:
+                        activity_location_name = activity_locations[0].location_name
+                    elif len(activity_locations) > 1:
+                        activity_location_name = "Multiple Locations"
+         
+                job.activity_loc_name = activity_location_name
                 
-                #import pdb;pdb.set_trace()
-                               
-                unique_activity_locations = len(activity_location_list)
-                if unique_activity_locations > 1:
-                    activity_location_name = "Multiple Locations"
-                elif unique_activity_locations == 1:
-                    activity_location_name = job.event_loc_name
-                    if not activity_location_name:
-                        act_loc = Location(g.db).get(activity_location_list[0])
-                        if act_loc:
-                            activity_location_name = act_loc.location_name
-                        
                 # generate a list of all dates of events for this activity in this selection of jobs
                 # get a selection of jobs for this actvity's events
                 sql = """
@@ -671,86 +666,54 @@ def get_job_rows(start_date=None,end_date=None,where='',user_skills=[],is_admin=
             #import pdb;pdb.set_trace()
             job.event_date_list = dates_list
             
-            job.activity_loc_name = activity_location_name
-                    
             # Location resolution...
             # job.event_loc_* and job.job_loc_* fields will all be populated for display
             # defaults
-            event_default_loc = ('tbd',None,None) # location unkonown
-            event_default_loc_street_address = ''
-            event_default_loc_city = ''
-            event_default_loc_state = ''
-            event_default_loc_zip = ''
-            event_default_loc_id = None
+            job.event_header_location_name = default_if_none(job.event_loc_name,'tdb')
+            event_default_loc = (job.event_header_location_name, job.event_loc_lat, job.event_loc_lng)
+            event_default_loc_street_address = default_if_none(job.event_loc_street_address,'')
+            event_default_loc_city = default_if_none(job.event_loc_city,'')
+            event_default_loc_state = default_if_none(job.event_loc_state,'')
+            event_default_loc_zip = default_if_none(job.event_loc_zip,'')
+            event_default_loc_id = default_if_none(job.event_loc_id,None)
             
-            if job.event_loc_name:
-                # Set the defaults to event loc
-                event_default_loc = (job.event_loc_name, job.event_loc_lat, job.event_loc_lng)
-                event_default_loc_street_address = job.event_loc_street_address
-                event_default_loc_city = job.event_loc_city
-                event_default_loc_state = job.event_loc_state
-                event_default_loc_zip = job.event_loc_zip
-                event_default_loc_id = job.event_loc_id
+            # get unique location list for event related to this job
+            event_locations = Event(g.db).locations(job.event_id)
                 
-            elif job.job_loc_name:
-                #set default to the job location
-                event_default_loc = (job.job_loc_name, job.job_loc_lat, job.job_loc_lng)
-                event_default_loc_street_address = job.job_loc_street_address
-                event_default_loc_city = job.job_loc_city
-                event_default_loc_state = job.job_loc_state
-                event_default_loc_zip = job.job_loc_zip
-                event_default_loc_id = job.job_loc_id
+            # import pdb;pdb.set_trace()
+            if event_locations:
+                if len(event_locations) > 1:
+                    job.event_header_location_name = 'Multiple Locations'
+                else:
+                    if event_locations[0].id == job.job_loc_id:
+                        # there is only one location and it is not the event location
+                        # use the job location for the event location
+                        event_default_loc = (job.job_loc_name, job.job_loc_lat, job.job_loc_lng)
+                        event_default_loc_street_address = job.job_loc_street_address
+                        event_default_loc_city = job.job_loc_state
+                        event_default_loc_zip = job.job_loc_zip
+                        event_default_loc_id = job.job_loc_id
                 
+                # finally, set the event and job locations if not already
+                if not job.job_loc_name:
+                    job.job_loc_name, job.job_loc_lat, job.job_loc_lng = event_default_loc
+                    job.job_loc_street_address = event_default_loc_street_address
+                    job.job_loc_city = event_default_loc_city
+                    job.job_loc_state = event_default_loc_state
+                    job.job_loc_zip = event_default_loc_zip
+                    job.job_loc_id = event_default_loc_id
             
-            # use defaults if needed
-            if job.event_loc_name == None:
-                job.event_loc_name, job.event_loc_lat, job.event_loc_lng = event_default_loc
-                job.event_loc_street_address = event_default_loc_street_address
-                job.event_loc_city = event_default_loc_city
-                job.event_loc_state = event_default_loc_state
-                job.event_loc_zip = event_default_loc_zip
-                job.event_loc_id = event_default_loc_id
-            
-            if job.job_loc_name == None:
-                job.job_loc_name, job.job_loc_lat, job.job_loc_lng = event_default_loc
-                job.job_loc_street_address = event_default_loc_street_address
-                job.job_loc_city = event_default_loc_city
-                job.job_loc_state = event_default_loc_state
-                job.job_loc_zip = event_default_loc_zip
-                job.job_loc_id = event_default_loc_id
-                    
-            # if there are multiple locations for this event, set the event location info accordingly
-            sql = """
-            select job.location_id from event 
-            join job on job.event_id = event.id
-            where job.event_id ={event_id} and job.location_id <> event.location_id
-            """.format(event_id=job.event_id)
-            
-            job_locs = Event(g.db).query(sql)
-            
-            event_location_count = 0
-            if cleanRecordID(job.event_loc_id) > 0:
-                event_location_count = 1
-            if job_locs:
-                for x in job_locs:
-                    if x.location_id != job.event_loc_id:
-                        event_location_count += 1
-            
-                if event_location_count > 1:
-                    # set event to Multiple Locatons
-                    job.event_loc_name, job.event_loc_lat, job.event_loc_lng = ('Multiple Locations',None,None) 
-                    job.event_loc_street_address = ''
-                    job.event_loc_city = ''
-                    job.event_loc_state = ''
-                    job.event_loc_zip = ''
-                    job.event_loc_id = None
-                                        
+                if not job.event_loc_name:
+                    job.event_loc_name, job.event_loc_lat, job.event_loc_lng = event_default_loc
+                    job.event_loc_street_address = event_default_loc_street_address
+                    job.event_loc_city = event_default_loc_city
+                    job.event_loc_state = event_default_loc_state
+                    job.event_loc_zip = event_default_loc_zip
+                    job.event_loc_id = event_default_loc_id
 
             if g.user:
                 #if not logged in, can't see any of this anyway...
                 populate_participant_list(job)
-                
-                
                     
             ##################
             ## There really ought to be a way to do these 2 queries within the main query
@@ -780,10 +743,13 @@ def get_job_rows(start_date=None,end_date=None,where='',user_skills=[],is_admin=
     
     
 def get_activity_location_list(activity_id,where_clause=''):
-    """Get a list location ids of all events and jobs for this activity"""
+    """Get a selection of location records or None for this activity but limited
+    to only the jobs in the current signup selection"""
     
     if where_clause:
         where_clause = " and " + where_clause
+        
+    activity_location_list = []
         
     sql = """
     select distinct event.location_id as event_loc_id, job.location_id as job_loc_id from event
@@ -792,22 +758,22 @@ def get_activity_location_list(activity_id,where_clause=''):
     where event.activity_id = {activity_id} {where_clause}
     """.format(activity_id=cleanRecordID(activity_id),where_clause=where_clause)
     
-    loc_recs = Job(g.db).query(sql)
+    recs = Event(g.db).query(sql)
     
-    activity_location_list = []
-    if not loc_recs:
-        # no location set at all (this should never really happen...)
-        activity_location_name = "tbd"
-    else:
-        for x in loc_recs:
-            if x.event_loc_id and x.event_loc_id not in activity_location_list:
-                activity_location_list.append(x.event_loc_id)
-            if x.job_loc_id and x.job_loc_id not in activity_location_list:
-                activity_location_list.append(x.job_loc_id)
+    loc_ids = set()
+    if recs:
+        for rec in recs:
+            if rec.job_loc_id:
+                loc_ids.add(rec.job_loc_id)
+            elif rec.event_loc_id:
+                loc_ids.add(rec.event_loc_id)
+                    
+    if loc_ids:
+        return Location(g.db).select(where='id in ({})'.format(','.join(str(x) for x in loc_ids)))
     
-    return activity_location_list
+    return None
     
-    
+        
 def get_volunteer_role_ids():
     #get the ids for vounteer roles
     l= ['"' + x + '"' for x in get_site_config().get('DEFAULT_USER_ROLES',['volunteer','user'])]
@@ -866,7 +832,7 @@ def send_user_commitment_email(user_name_or_email=None):
             result = 'Your commitment report has been emailed to you.'
             
         except Exception as e:
-            mes = "An error occured while sending user commitment email. Err: {}".format(str(e))
+            mes = "An error occurred while sending user commitment email. Err: {}".format(str(e))
             email_admin(mes,printException(mes))
             
             result = "Sorry: Something wierd happened and we were not able to send an email. We'll look into it."
