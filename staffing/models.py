@@ -195,12 +195,49 @@ class Event(SqliteTable):
         """Extend `select` to include Activity fields in the result set
         """
         
-        sql="""select event.*, 
+        # sql="""select event.*,
+        # (select location.location_name from location) as event_default_location_name,
+        # (select location.street_address from location) as event_default_location_address,
+        # (select location.city from location) as event_default_location_city,
+        # (select location.state from location) as event_default_location_state,
+        # (select location.zip from location) as event_default_location_zip,
+        # coalesce(nullif(event.calendar_title,''),activity.title) as event_title,
+        # activity.title as activity_title,
+        # coalesce(nullif(event.description,''),activity.description,'') as event_description,
+        # coalesce(nullif(event.staff_info,''),activity.activity_info,'') as event_staff_info,
+        # coalesce(nullif(event.contract_date,''),activity.contract_date,'') as event_contract_date,
+        # activity.contract_date as activity_contract_date,
+        # coalesce(nullif(event.total_contract_price,''),activity.total_contract_price,'') as event_total_contract_price,
+        # coalesce(nullif(event.per_event_contract_price,''),activity.per_event_contract_price,'') as event_per_event_contract_price,
+        # activity.per_event_contract_price as activity_per_event_contract_price,
+        # coalesce(nullif(event.contract_notes,''),activity.contract_notes,'') as event_contract_notes,
+        # activity.contract_notes as activity_contract_notes,
+        # activity.total_contract_price as activity_total_contract_price,
+        # activity.description as activity_description ,
+        # (select type from activity_type where activity_type.id = activity.activity_type_id ) as activity_service_type
+        # from event
+        # join activity on activity.id = event.activity_id
+        # left join location on location.id = event.location_id
+        # where {} order by {}""".format(kwargs.get('where',1),kwargs.get('order_by',self.order_by_col))
+        #
+        # return self.query(sql)
+        
+        user_id = kwargs.get('user_id',0)
+
+        sql="""select event.*,
         (select location.location_name from location) as event_default_location_name,
         (select location.street_address from location) as event_default_location_address,
         (select location.city from location) as event_default_location_city,
         (select location.state from location) as event_default_location_state,
         (select location.zip from location) as event_default_location_zip,
+        activity_group.display_style as activity_group_style,
+        activity_type.activity_group_id,
+        -- This is mostly for calendar to know if the user is assigned to this event
+        coalesce(
+            (select 1 from user_job where {user_id} = user_job.user_id and
+             user_job.job_id in (select id from job where job.event_id = event.id LIMIT 1 ) 
+            ),
+        0) as is_yours,
         coalesce(nullif(event.calendar_title,''),activity.title) as event_title,
         activity.title as activity_title,
         coalesce(nullif(event.description,''),activity.description,'') as event_description,
@@ -215,14 +252,21 @@ class Event(SqliteTable):
         activity.total_contract_price as activity_total_contract_price,
         activity.description as activity_description ,
         (select type from activity_type where activity_type.id = activity.activity_type_id ) as activity_service_type
-        from event 
+        from event
         join activity on activity.id = event.activity_id
         left join location on location.id = event.location_id
-        where {} order by {}""".format(kwargs.get('where',1),kwargs.get('order_by',self.order_by_col))
-        
+        left join activity_type on activity_type.id = activity.activity_type_id
+        left join activity_group on activity_group.id = activity_type.activity_group_id
+        where {where} order by {order_by}
+        """.format(
+            where=kwargs.get('where',1),
+            order_by=kwargs.get('order_by',self.order_by_col),
+            user_id=user_id,
+            )
+
         return self.query(sql)
-        
-        
+
+
     def get(self, id):
         out = self.select(where=self.table_name + ".id={}".format(cleanRecordID(id)))
         if type(out) == list and len(out) > 0:

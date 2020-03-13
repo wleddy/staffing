@@ -77,34 +77,16 @@ def display(month=None,year=None):
     status_list = ['scheduled',] # this may come from form in future
     status_list = "'" + "','".join(status_list) + "'" 
         
-    sql="""select 
-    event.id as event_id, 
-    activity_group.display_style as activity_type_style,
-    activity_type.activity_group_id,
-    coalesce(nullif(event.calendar_title,''),activity.title) as calendar_title,
-    event.event_start_date,
-    coalesce(
-        (select 1 from user_job where {user_id} = user_job.user_id and
-         user_job.job_id in (select id from job where job.event_id = event.id LIMIT 1 ) 
-        ),
-    0) as is_yours
-
-    from event
-    join activity on activity.id = event.activity_id
-    left join activity_type on activity_type.id = activity.activity_type_id
-    left join activity_group on activity_group.id = activity_type.activity_group_id
-    where lower(event.status) in ({status_list}) and date(event.event_start_date,'localtime') >= date('{start_date}') and date(event.event_end_date,'localtime') <= date('{end_date}')
+    where = """lower(event.status) in ({status_list}) and date(event.event_start_date,'localtime') >= date('{start_date}') and date(event.event_end_date,'localtime') <= date('{end_date}')
     and event.exclude_from_calendar = 0
-    order by event.event_start_date
     """.format(
-    status_list=status_list,
-    start_date=start_date,
-    end_date=end_date,
-    user_id=user_id,
-    )
+        status_list=status_list,
+        start_date=start_date,
+        end_date=end_date,
+        )
+    order_by = "event.event_start_date"
     
-    # import pdb;pdb.set_trace()
-    event_data = Event(g.db).query(sql)
+    event_data = Event(g.db).select(where = where, order_by=order_by, user_id=user_id)
     
     activity_groups = ActivityGroup(g.db).select()
     event_list_dict = {}

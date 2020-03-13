@@ -114,7 +114,7 @@
 {% endblock head %}
 
 {% macro calendar_entry(event)%}
-    <p grp="{{ event.activity_group_id }}" onclick="location='{{ url_for('calendar.event')}}{{event.event_id}}'" class="day-content {{ event.activity_type_style }} {%if event.is_yours %}yours{% endif %}">{{event.calendar_title}}</p>
+    <p grp="{{ event.activity_group_id }}" onclick="location='{{ url_for('calendar.event')}}{{event.id}}'" class="day-content {{ event.activity_group_style }} {%if event.is_yours %}yours{% endif %}">{{event.event_title}}</p>
 {% endmacro %}
 
 {% macro activity_filter() %}
