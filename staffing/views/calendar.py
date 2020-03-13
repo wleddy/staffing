@@ -74,7 +74,8 @@ def display(month=None,year=None):
     end_date = start_date.replace(day=eom)    
     
     #import pdb;pdb.set_trace()
-    status_list = "'scheduled'" # this can come from form in future
+    status_list = ['scheduled',] # this may come from form in future
+    status_list = "'" + "','".join(status_list) + "'" 
         
     sql="""select 
     event.id as event_id, 
@@ -84,8 +85,7 @@ def display(month=None,year=None):
     event.event_start_date,
     coalesce(
         (select 1 from user_job where {user_id} = user_job.user_id and
-         user_job.job_id in (select id from job where job.event_id = event.id  ) 
-         LIMIT 1
+         user_job.job_id in (select id from job where job.event_id = event.id LIMIT 1 ) 
         ),
     0) as is_yours
 
@@ -94,6 +94,7 @@ def display(month=None,year=None):
     left join activity_type on activity_type.id = activity.activity_type_id
     left join activity_group on activity_group.id = activity_type.activity_group_id
     where lower(event.status) in ({status_list}) and date(event.event_start_date,'localtime') >= date('{start_date}') and date(event.event_end_date,'localtime') <= date('{end_date}')
+    and event.exclude_from_calendar = 0
     order by event.event_start_date
     """.format(
     status_list=status_list,
@@ -101,11 +102,11 @@ def display(month=None,year=None):
     end_date=end_date,
     user_id=user_id,
     )
-            
-    activity_groups = ActivityGroup(g.db).select()
     
+    # import pdb;pdb.set_trace()
     event_data = Event(g.db).query(sql)
     
+    activity_groups = ActivityGroup(g.db).select()
     event_list_dict = {}
     if event_data:
         data_row = 0
@@ -218,5 +219,3 @@ def save_group_filter(action='remove',group_id=0):
         
     return 'Ok'
     
-def get_event_status_where():
-    return " and lower(event.status) = 'scheduled' "
