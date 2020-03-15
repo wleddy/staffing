@@ -475,10 +475,6 @@ def get_job_rows(start_date=None,end_date=None,where='',user_skills=[],is_admin=
         if rec and rec.id not in default_skill_list:
             default_skill_list.append(rec.id)
             
-    volunteer_skills = "0"
-    if default_skill_list:
-        volunteer_skills = '{}'.format(','.join([str(x) for x in default_skill_list]))
-        
     where_skills = ''
     if is_admin:
         # admins see everything
@@ -622,7 +618,7 @@ def get_job_rows(start_date=None,end_date=None,where='',user_skills=[],is_admin=
     {group_by}
     order by {order_by}
     """
-    sql = sql.format(where=where,order_by=order_by,group_by=group_by,volunteer_skills=volunteer_skills,vol_role_ids=vol_role_ids,)
+    sql = sql.format(where=where,order_by=order_by,group_by=group_by,vol_role_ids=vol_role_ids,)
     #print(sql)
     #import pdb;pdb.set_trace()            
     jobs = Job(g.db).query(sql)
