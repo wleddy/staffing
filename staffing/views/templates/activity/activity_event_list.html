@@ -1,16 +1,20 @@
+{% macro status_note(event) %}
+    {% set icon = 'images/check_mark.png' %}
+    {% if event.status.lower() == "pending" %}{% set icon = 'images/question_mark.png' %}{% endif %}
+    {% if event.status.lower() == "cancelled" %}{% set icon = 'images/red_x.png' %}{% endif %}
+    {% if event.status.lower() == "postponed" %}{% set icon = 'images/postponed.png' %}{% endif %}
+    <img src="{{ url_for('static',filename=icon)}}" alt="{{ event.status }}"/>
+    {% if event.status.lower() != "scheduled" %}
+    <span class="w3-small"><em>&mdash; {{ event.status }} &mdash;</em></span><br>
+    {% endif %}
+
+{% endmacro %}
+
 {% for event in event_recs %}
 <div class="w3-row {% if event.is_past_event == 1 %} past-event {% endif %}">
     <div class="w3-col w3-threequarter">
         <p>
-            {% if event.status.lower() == "pending" %}
-                <img src="{{ url_for('static',filename='images/question_mark.png')}}" alt="{{ event.status }}"/>
-                <span class="w3-small"><em>&mdash; Pending &mdash;</em></span><br>
-            {% elif event.status.lower() == 'cancelled' %}
-                 <img src="{{ url_for('static',filename='images/red_x.png')}}" alt="{{ event.status }}"/>
-                <span class="w3-small w3-text-red"><em>&mdash; Cancelled &mdash;</em></span><br>
-            {% else %}
-                 <img src="{{ url_for('static',filename='images/check_mark.png')}}" alt="{{ event.status }}"/>
-            {% endif %}
+            {{ status_note(event) }}
             <strong>{{event.calendar_title}}</strong> <br>
             <span class="w3-small">
             {% if event.job_start_date %}{{event.job_start_date | default('Not Set',True) | short_day_and_date_and_time_string }}
