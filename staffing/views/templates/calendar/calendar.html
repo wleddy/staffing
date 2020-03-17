@@ -59,7 +59,8 @@
             margin:0;
         }
         .day-cell{
-            min-height:80pt
+            height:80pt;
+            overflow:scroll;
         }
         .day-number{
             text-align:right;
@@ -114,7 +115,13 @@
 {% endblock head %}
 
 {% macro calendar_entry(event)%}
-    <p grp="{{ event.activity_group_id }}" onclick="location='{{ url_for('calendar.event')}}{{event.id}}'" class="day-content {{ event.activity_group_style }} {%if event.is_yours %}yours{% endif %}">{{event.event_title}}</p>
+    {% set status_var = True %}
+    <p grp="{{ event.activity_group_id }}" onclick="location='{{ url_for('calendar.event')}}{{event.id}}'" class="day-content {{ event.activity_group_style }} {%if event.is_yours %}yours{% endif %}">
+        {% if event.status | lower != 'scheduled' %}
+        <span class="w3-tiny">[{{ event.status | upper }}]<br>&nbsp;</span>
+        {% endif %}
+        {{event.event_title}}
+    </p>
 {% endmacro %}
 
 {% macro activity_filter() %}
@@ -173,8 +180,9 @@
                 {% set day_number = cal_list[week][day][0]%}
                 {% set day_in_this_month = (day_number != 0)%}
                 {% set yours_are_hidden = [False] %}
-                <div class="w3-col w3-border w3-white day-col day-cell" style="padding:0 2pt;max-length:">
+                <div class="w3-col w3-border w3-white day-col day-cell" style="padding:0 2pt;">
                     {% if day_in_this_month %}
+                    {# All events list #}
                     <div id="full_day_display_{{day_number}}" class="full_day_display w3-small w3-border">
                         <p class="day-number w3-primary-color">{{ day_number }}</p>
                         {% for event_num in range( events_today )%}
@@ -190,6 +198,7 @@
                     <p class="day-number {% if today and start_date and today.day == day_number and today.month == start_date.month %}today{% endif %}">
                         {% if day_in_this_month %}{{ day_number }}{% else %}&nbsp;{% endif %}
                     </p>
+                    {# events that fit list #}
                     <div class="w3-small">
                         {% for event_num in range( events_today )%}
                             {% if event_num <= 1 or events_today < 4 %}

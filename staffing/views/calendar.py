@@ -74,7 +74,7 @@ def display(month=None,year=None):
     end_date = start_date.replace(day=eom)    
     
     #import pdb;pdb.set_trace()
-    status_list = ['scheduled',] # this may come from form in future
+    status_list = ['scheduled','cancelled','postponed'] # this may come from form in future
     status_list = "'" + "','".join(status_list) + "'" 
         
     where = """lower(event.status) in ({status_list}) and date(event.event_start_date,'localtime') >= date('{start_date}') and date(event.event_end_date,'localtime') <= date('{end_date}')

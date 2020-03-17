@@ -23,6 +23,10 @@
 {% set direct_url = url_for('signup.more_info') + event.activity_id | string  + "/#event-header-" + event.event_id | string  %}
 <div class="w3-panel w3-card-2 w3-secondary-color">
     <div class="w3-row" style="padding-top:16pt;padding-bottom:16pt;">
+        {% if event.status | lower != 'scheduled' %}
+        <h4 class="w3-primary-color w3-center">This event is {{ event.status | upper }}</h4>
+        
+        {% endif %}
         <div class="w3-col w3-half w3-small" style="padding-left:1%;">
             {% if event.is_yours %}
                 <p style="padding:6pt;border:2pt solid black;margin:6pt 12pt 6pt 0;text-align:center;" ><strong>You are signed up for this event.</strong>
