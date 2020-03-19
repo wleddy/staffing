@@ -22,17 +22,20 @@
             display:none;
         }
         .group_check_box, .group_uncheck_box {
-            margin:0 2pt !important;
+            margin:2pt 2pt !important;
             padding-left:16pt !important;
+            padding-top:2pt !important;
             background-image: url('/static/images/input_checked.png');
             background-repeat:no-repeat;
+            line-height:1.2;
+            width:19.3%;
         }
         .group_uncheck_box{
             background-image: url('/static/images/input_unchecked.png');
         }
       .day-content, .group_check_box, .group_uncheck_box{
                 font-family: condensed-font, sans-serif;
-                font-size:1.25em;
+                font-size:1.05em;
                 line-height:1;
                 white-space: nowrap;
                 overflow:hidden;
@@ -60,6 +63,11 @@
         @media (max-width:993px){
             #calendar-contain{
                 width:99%;
+            }
+        }
+        @media (max-width:760px){
+            .group_check_box, .group_uncheck_box {
+                width:100%;
             }
         }
         
@@ -138,12 +146,12 @@
     <div class="w3-row-padding w3-padding-bottom">
         <h4>Select Event Types to Display</h4>
         {% if activity_groups %}
-            <div class="w3-row" style="margin-bottom:.6em">
+            <div class="w3-row" style="margin-bottom:.4em">
             {% set group_count = [0]%}
             {% for group in activity_groups %}
                 {% set _  = group_count.append(group_count[0]+ 1) %}{% set _ = group_count.pop(0) %}
                 {% if group_count[0] % 7 == 0 %}<br>{% endif %}
-                <p class="w3-col l2 m2 s12 group_check_box {{group.display_style}}" checked="checked" style="padding:0 4pt 1pt 2pt;" id="activity_group_{{group.id}}" value="{{ group.id }}" onclick="save_filter(this)">&nbsp;{{ group.name | replace(' ','&nbsp;') | safe }}</p>
+                <p class="w3-col group_check_box {{group.display_style}}" checked="checked" style="padding:0 4pt 1pt 2pt;" id="activity_group_{{group.id}}" value="{{ group.id }}" onclick="save_filter(this)">&nbsp;{{ group.name | replace(' ','&nbsp;') | safe }}</p>
                 <span class="w3-hide-medium w3-hide-large"><br></span>
             {% endfor %}
         </div>
@@ -192,7 +200,7 @@
                 <div class="w3-col w3-border w3-white day-col day-cell" style="padding:0 2pt;">
                     {% if day_in_this_month %}
                     {# All events list #}
-                    <div id="full_day_display_{{day_number}}" class="full_day_display w3-small w3-border">
+                    <div id="full_day_display_{{day_number}}" class="full_day_display w3-border">
                         <p class="day-number w3-primary-color">{{ day_number }}</p>
                         {% for event_num in range( events_today )%}
                             {% set event = event_data[cal_list[week][day][event_list_position][event_num]] %}
@@ -208,7 +216,7 @@
                         {% if day_in_this_month %}{{ day_number }}{% else %}&nbsp;{% endif %}
                     </p>
                     {# events that fit list #}
-                    <div class="w3-small">
+                    <div>
                         {% for event_num in range( events_today )%}
                             {% if event_num <= 1 or events_today < 4 %}
                             {% set event = event_data[cal_list[week][day][event_list_position][event_num]] %}
