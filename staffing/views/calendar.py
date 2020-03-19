@@ -13,7 +13,7 @@ from staffing.views.signup import get_job_rows
 
 import calendar
 from datetime import date, timedelta
-from ical.ical import ICal
+# from ical.ical import ICal
 
 
 mod = Blueprint('calendar',__name__, template_folder='templates/calendar', url_prefix='')
