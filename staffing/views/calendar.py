@@ -206,34 +206,34 @@ def save_group_filter(action='remove',group_id=0):
     return 'Ok'
     
     
-@mod.route('subscribe/<calendar_name>/',methods=['GET','PROPFIND','OPTIONS',])
-@mod.route('subscribe/<calendar_name>',methods=['GET','PROPFIND','OPTIONS',])
-@mod.route('subscribe',methods=['GET','PROPFIND','OPTIONS',])
-@mod.route('subscribe/',methods=['GET','PROPFIND','OPTIONS',])
-def subscribe(calendar_name=''):
-    """Return an icalendar text. """
-    # import pdb;pdb.set_trace()
-    site_config = get_site_config()
-    if not calendar_name:
-        calendar_name = site_config['SITE_NAME']
-    ical = ICal(calendar_name=calendar_name)
-    
-    recs = Event(g.db).select(where="event.event_start_date > datetime('{}')".format(local_datetime_now() - timedelta(days=30)))
-    
-    if recs:
-        for rec in recs:
-            ical.add_event(
-                "{}.{}.{}".format(
-                rec.id,
-                rec.activity_id,
-                site_config['HOST_NAME']
-                ),
-               rec.event_start_date,
-               rec.event_end_date,
-                rec.event_title,
-                url = request.url_root,
-            )
-    
-    return ical.get()
-    
+# @mod.route('subscribe/<calendar_name>/',methods=['GET','PROPFIND','OPTIONS',])
+# @mod.route('subscribe/<calendar_name>',methods=['GET','PROPFIND','OPTIONS',])
+# @mod.route('subscribe',methods=['GET','PROPFIND','OPTIONS',])
+# @mod.route('subscribe/',methods=['GET','PROPFIND','OPTIONS',])
+# def subscribe(calendar_name=''):
+#     """Return an icalendar text. """
+#     # import pdb;pdb.set_trace()
+#     site_config = get_site_config()
+#     if not calendar_name:
+#         calendar_name = site_config['SITE_NAME']
+#     ical = ICal(calendar_name=calendar_name)
+#
+#     recs = Event(g.db).select(where="event.event_start_date > datetime('{}')".format(local_datetime_now() - timedelta(days=30)))
+#
+#     if recs:
+#         for rec in recs:
+#             ical.add_event(
+#                 "{}.{}.{}".format(
+#                 rec.id,
+#                 rec.activity_id,
+#                 site_config['HOST_NAME']
+#                 ),
+#                rec.event_start_date,
+#                rec.event_end_date,
+#                 rec.event_title,
+#                 url = request.url_root,
+#             )
+#
+#     return ical.get()
+#
     
