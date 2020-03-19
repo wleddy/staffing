@@ -195,33 +195,6 @@ class Event(SqliteTable):
         """Extend `select` to include Activity fields in the result set
         """
         
-        # sql="""select event.*,
-        # (select location.location_name from location) as event_default_location_name,
-        # (select location.street_address from location) as event_default_location_address,
-        # (select location.city from location) as event_default_location_city,
-        # (select location.state from location) as event_default_location_state,
-        # (select location.zip from location) as event_default_location_zip,
-        # coalesce(nullif(event.calendar_title,''),activity.title) as event_title,
-        # activity.title as activity_title,
-        # coalesce(nullif(event.description,''),activity.description,'') as event_description,
-        # coalesce(nullif(event.staff_info,''),activity.activity_info,'') as event_staff_info,
-        # coalesce(nullif(event.contract_date,''),activity.contract_date,'') as event_contract_date,
-        # activity.contract_date as activity_contract_date,
-        # coalesce(nullif(event.total_contract_price,''),activity.total_contract_price,'') as event_total_contract_price,
-        # coalesce(nullif(event.per_event_contract_price,''),activity.per_event_contract_price,'') as event_per_event_contract_price,
-        # activity.per_event_contract_price as activity_per_event_contract_price,
-        # coalesce(nullif(event.contract_notes,''),activity.contract_notes,'') as event_contract_notes,
-        # activity.contract_notes as activity_contract_notes,
-        # activity.total_contract_price as activity_total_contract_price,
-        # activity.description as activity_description ,
-        # (select type from activity_type where activity_type.id = activity.activity_type_id ) as activity_service_type
-        # from event
-        # join activity on activity.id = event.activity_id
-        # left join location on location.id = event.location_id
-        # where {} order by {}""".format(kwargs.get('where',1),kwargs.get('order_by',self.order_by_col))
-        #
-        # return self.query(sql)
-        
         user_id = kwargs.get('user_id',0)
 
         sql="""select event.*,
