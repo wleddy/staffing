@@ -1,5 +1,6 @@
 from flask import request, session, g, redirect, url_for, abort, \
      render_template, flash, Blueprint
+     
 from shotglass2.mapping.views.maps import simple_map
 from shotglass2.shotglass import get_site_config
 from shotglass2.users.models import User
@@ -12,6 +13,8 @@ from staffing.views.signup import get_job_rows
 
 import calendar
 from datetime import date, timedelta
+from ical.ical import ICal
+
 
 mod = Blueprint('calendar',__name__, template_folder='templates/calendar', url_prefix='')
 
@@ -21,7 +24,8 @@ def setExits():
     # g.editURL = url_for('.edit')
     # g.deleteURL = url_for('.delete')
     g.title = 'Calendar'
-
+    
+    
 @mod.route('calendar/<int:month>/')
 @mod.route('calendar/<int:month>')
 @mod.route('calendar/<int:month>/<int:year>/')
@@ -190,14 +194,46 @@ def event(event_id=None):
 @mod.route('calendar/save_filter/')
 def save_group_filter(action='remove',group_id=0):
     """Save the users calendar filter prefs. We are actually saving the activity groups to 
-    hide, so 'add' removes it from the set and 'remove' adds it... simple, huh? """
-    
+    hide """
+    # import pdb;pdb.set_trace()
     if not "calendar_group_filter" in session:
         session['calendar_group_filter']=[]
-    if action == 'add' and group_id in session['calendar_group_filter']:
+    if action == 'remove' and group_id in session['calendar_group_filter']:
         session['calendar_group_filter'].pop(session['calendar_group_filter'].index(group_id))
-    if action == 'remove'and group_id not in session['calendar_group_filter']:
+    if action == 'add'and group_id not in session['calendar_group_filter']:
         session['calendar_group_filter'].append(group_id)
         
     return 'Ok'
+    
+    
+@mod.route('subscribe/<calendar_name>/',methods=['GET','PROPFIND','OPTIONS',])
+@mod.route('subscribe/<calendar_name>',methods=['GET','PROPFIND','OPTIONS',])
+@mod.route('subscribe',methods=['GET','PROPFIND','OPTIONS',])
+@mod.route('subscribe/',methods=['GET','PROPFIND','OPTIONS',])
+def subscribe(calendar_name=''):
+    """Return an icalendar text. """
+    # import pdb;pdb.set_trace()
+    site_config = get_site_config()
+    if not calendar_name:
+        calendar_name = site_config['SITE_NAME']
+    ical = ICal(calendar_name=calendar_name)
+    
+    recs = Event(g.db).select(where="event.event_start_date > datetime('{}')".format(local_datetime_now() - timedelta(days=30)))
+    
+    if recs:
+        for rec in recs:
+            ical.add_event(
+                "{}.{}.{}".format(
+                rec.id,
+                rec.activity_id,
+                site_config['HOST_NAME']
+                ),
+               rec.event_start_date,
+               rec.event_end_date,
+                rec.event_title,
+                url = request.url_root,
+            )
+    
+    return ical.get()
+    
     

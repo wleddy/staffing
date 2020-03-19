@@ -21,8 +21,16 @@
             z-index:3000;
             display:none;
         }
-
-      .day-content{
+        .group_check_box, .group_uncheck_box {
+            margin:0 2pt !important;
+            padding-left:16pt !important;
+            background-image: url('/static/images/input_checked.png');
+            background-repeat:no-repeat;
+        }
+        .group_uncheck_box{
+            background-image: url('/static/images/input_unchecked.png');
+        }
+      .day-content, .group_check_box, .group_uncheck_box{
                 font-family: condensed-font, sans-serif;
                 font-size:1.25em;
                 line-height:1;
@@ -130,15 +138,15 @@
     <div class="w3-row-padding w3-padding-bottom">
         <h4>Select Event Types to Display</h4>
         {% if activity_groups %}
-            <p style="margin-bottom:.6em">
+            <div class="w3-row" style="margin-bottom:.6em">
             {% set group_count = [0]%}
             {% for group in activity_groups %}
                 {% set _  = group_count.append(group_count[0]+ 1) %}{% set _ = group_count.pop(0) %}
                 {% if group_count[0] % 7 == 0 %}<br>{% endif %}
-                <label class="{{group.display_style}}" style="padding:0 4pt 1pt 2pt;"><input type="checkbox" id="activity_group_{{group.id}}" style="position:relative;top:-1pt;" value="{{ group.id }}" checked onclick="save_filter(this)">&nbsp;{{ group.name | replace(' ','&nbsp;') | safe }}</label><span class="w3-hide-small">&nbsp;&nbsp;</span>
+                <p class="w3-col l2 m2 s12 group_check_box {{group.display_style}}" checked="checked" style="padding:0 4pt 1pt 2pt;" id="activity_group_{{group.id}}" value="{{ group.id }}" onclick="save_filter(this)">&nbsp;{{ group.name | replace(' ','&nbsp;') | safe }}</p>
                 <span class="w3-hide-medium w3-hide-large"><br></span>
             {% endfor %}
-            </p>
+        </div>
         {% else %}
         <p>Humm... Something went wrong here.</p>
         {% endif %}
@@ -224,20 +232,38 @@
 <script>
     function save_filter(checkbox){
         // save the change to session
-        var action = 'add'
-        if (checkbox.checked != true) {action = 'remove';}
-        $.get('{{ url_for('calendar.save_group_filter')}}'+action+'/'+checkbox.value+"/");
-        group_toggle(checkbox.value);
+        // adding a group hides it from the display
+        var action = 'remove';
+        var elm = $('#'+checkbox.id);
+        var checked = elm.attr('checked');
+        var grp_id =elm.attr('value');
+        if (checked == 'checked'){ 
+            action='add'; 
+            elm.attr('checked',false);
+            elm.removeClass('group_check_box');
+            elm.addClass('group_uncheck_box')
+        } else { 
+            elm.attr('checked','checked'); 
+            elm.addClass('group_check_box');
+            elm.removeClass('group_uncheck_box')
+        }
+        $.get('{{ url_for('calendar.save_group_filter')}}'+action+'/'+grp_id+"/");
+        
+        group_toggle(grp_id);
     }
     function group_toggle(value){
         $('[grp='+value+']').toggle()
     }
     // recover group filter from session
     // all are enabled by default so only hide those in set
+    var elm;
     {% if 'calendar_group_filter' in session %}
         {% for group_id in session['calendar_group_filter'] %}
             group_toggle({{group_id}})
-            $('#activity_group_'+{{group_id}}).prop('checked',false);
+            elm = $('#activity_group_'+{{group_id}});
+            elm.attr('checked',false);
+            elm.removeClass('group_check_box');
+            elm.addClass('group_uncheck_box')
         {% endfor %}
     {% endif %}
 </script>
