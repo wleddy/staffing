@@ -7,13 +7,13 @@ from shotglass2.users.models import User
 from shotglass2.users.admin import login_required, table_access_required
 from shotglass2.takeabeltof.mailer import send_message, email_admin
 from shotglass2.takeabeltof.utils import render_markdown_for, printException, cleanRecordID
-from shotglass2.takeabeltof.date_utils import datetime_as_string, local_datetime_now, getDatetimeFromString
+from shotglass2.takeabeltof.date_utils import datetime_as_string, local_datetime_now, getDatetimeFromString, date_to_string
 from staffing.models import Event, Location, ActivityGroup
 from staffing.views.activity import get_event_recs
 from staffing.views.signup import get_job_rows
 
 import calendar
-from datetime import date, timedelta
+from datetime import datetime, date, timedelta
 from ical.ical import ICal
 
 
@@ -222,8 +222,11 @@ def subscribe(calendar_name=''):
     if not calendar_name:
         calendar_name = site_config['SITE_NAME']
     ical = ICal(calendar_name=calendar_name)
-    
-    recs = Event(g.db).select(where="event.event_start_date > datetime('{}')".format(local_datetime_now() - timedelta(days=30)))
+    where="datetime(event.event_start_date,'localtime') > datetime('{}','localtime')".format(datetime_as_string(local_datetime_now() - timedelta(days=30)))
+    where += " and event.exclude_from_calendar = 0 "
+    where += " and lower(event.status) <> 'pending' "
+    recs = Event(g.db).select(where = where)
+    # import pdb;pdb.set_trace()
     
     if recs:
         for rec in recs:
@@ -234,10 +237,17 @@ def subscribe(calendar_name=''):
             elif locations and len(locations) > 1:
                 event_location = "Multiple Locations"
             url = request.url_root.rstrip('/') + url_for('calendar.event') + str(rec.id) + '/'
-            status = ''
+            calendar_status = rec.status.upper()
+            calendar_method = 'PUT'
+            sequence = 1
+            if rec.exclude_from_calendar == 1:
+                calendar_status = "CANCELLED" # Incase it was in the calendar before.
+                calendar_method = 'CANCEL'
+                sequence = 2000
+            summary_status = ''
             if rec.status.lower() != 'scheduled': 
-                status = '!' + rec.status.upper() + '! '
-            summary = "{} {}{}".format(site_config["MAIL_SUBJECT_PREFIX"],status,rec.event_title)
+                summary_status = '!' + rec.status.upper() + '! '
+            summary = "{} {}{}".format(site_config["MAIL_SUBJECT_PREFIX"],summary_status,rec.event_title)
             ical.add_event(
                 "{}.{}.{}".format(
                 rec.id,
@@ -250,6 +260,9 @@ def subscribe(calendar_name=''):
                url = url,
                description=rec.event_description,
                location = event_location,
+               status=calendar_status,
+               method=calendar_method,
+               sequence=sequence,
             )
         
         ical = ical.get()
@@ -287,3 +300,89 @@ def subscribe(calendar_name=''):
     return "No Events found..."
     
     
+@mod.route('calendar/subscribe/summary/<calendar_name>/',methods=['GET',])
+@mod.route('calendar/subscribe/summary/<calendar_name>',methods=['GET',])
+@mod.route('calendar/subscribe/summary',methods=['GET',])
+@mod.route('calendar/subscribe/summary/',methods=['GET',])
+def subscribe_to_summary(calendar_name=''):
+    """download an icalendar file where events are summeraized as all day event
+    entries in the calendar. 
+    
+    The goal is to not clutter up the users calendar too much.
+    """
+
+    def create_event(ical,cal_date,description):
+        summary = "{} Events for {}".format(site_config["MAIL_SUBJECT_PREFIX"],date_to_string(cal_date,'date'))
+        ical.add_event(
+            "{}.{}.{}".format(
+            cal_date,
+            site_config['HOST_NAME'],
+            calendar_name,
+            ),
+           cal_date,
+           cal_date,
+           summary,
+           description=description,
+        )
+        
+
+    # import pdb;pdb.set_trace()
+    site_config = get_site_config()
+    if not calendar_name:
+        calendar_name = site_config['SITE_NAME']
+    ical = ICal(calendar_name=calendar_name)
+    where="datetime(event.event_start_date,'localtime') > datetime('{}','localtime')".format(datetime_as_string(local_datetime_now() - timedelta(days=30)))
+    where += " and event.exclude_from_calendar = 0 "
+    where += " and lower(event.status) <> 'pending' "
+    recs = Event(g.db).select(where = where,order_by = "event.event_start_date")
+    
+    # import pdb;pdb.set_trace()
+
+    if recs:
+        prev_date = None
+        description = ''
+        for rec in recs:
+            # did the date change?
+            rec_date = datetime.date(getDatetimeFromString(rec.event_start_date))
+            if not prev_date or rec_date != prev_date:
+                if description !='':
+                    # there is something to output
+                    create_event(ical,prev_date,description)
+                    description = ''
+                    
+                prev_date = rec_date
+            #Add some content to the description
+            url = request.url_root.rstrip('/') + url_for('calendar.event') + str(rec.id) + '/'
+            calendar_status = ''
+            if rec.status.lower() != 'scheduled': 
+                calendar_status = '!' + rec.status.upper() + '! '
+                
+            description += """{calendar_status} {title} 
+{start} - {end} 
+{url} 
+""".format(
+                calendar_status=calendar_status,
+                title = rec.event_title,
+                start = date_to_string(rec.event_start_date,'local_time'),
+                end = date_to_string(rec.event_end_date,'local_time'),
+                url=url,
+            )
+            
+        if description != '':
+            #add the last event
+            create_event(ical,prev_date,description)
+                
+        ical = ical.get()
+            
+        headers={
+           "Content-Disposition":"attachment;filename={}.ics".format(calendar_name.replace(' ','_')),
+            }
+
+        return Response(
+                ical,
+                mimetype="text/calendar",
+                headers=headers
+                )
+     
+
+    return "No Events found..."
