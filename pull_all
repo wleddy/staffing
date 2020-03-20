@@ -16,7 +16,7 @@ cd ical/
 git pull origin master
 
 
-#cd ../
+cd ../
 echo 'All Done'
 
 
