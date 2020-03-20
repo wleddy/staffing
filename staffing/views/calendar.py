@@ -1,10 +1,11 @@
 from flask import request, session, g, redirect, url_for, abort, \
-     render_template, flash, Blueprint
+     render_template, flash, Blueprint, Response
      
 from shotglass2.mapping.views.maps import simple_map
 from shotglass2.shotglass import get_site_config
 from shotglass2.users.models import User
 from shotglass2.users.admin import login_required, table_access_required
+from shotglass2.takeabeltof.mailer import send_message, email_admin
 from shotglass2.takeabeltof.utils import render_markdown_for, printException, cleanRecordID
 from shotglass2.takeabeltof.date_utils import datetime_as_string, local_datetime_now, getDatetimeFromString
 from staffing.models import Event, Location, ActivityGroup
@@ -13,7 +14,7 @@ from staffing.views.signup import get_job_rows
 
 import calendar
 from datetime import date, timedelta
-# from ical.ical import ICal
+from ical.ical import ICal
 
 
 mod = Blueprint('calendar',__name__, template_folder='templates/calendar', url_prefix='')
@@ -206,34 +207,83 @@ def save_group_filter(action='remove',group_id=0):
     return 'Ok'
     
     
-# @mod.route('subscribe/<calendar_name>/',methods=['GET','PROPFIND','OPTIONS',])
-# @mod.route('subscribe/<calendar_name>',methods=['GET','PROPFIND','OPTIONS',])
-# @mod.route('subscribe',methods=['GET','PROPFIND','OPTIONS',])
-# @mod.route('subscribe/',methods=['GET','PROPFIND','OPTIONS',])
-# def subscribe(calendar_name=''):
-#     """Return an icalendar text. """
-#     # import pdb;pdb.set_trace()
-#     site_config = get_site_config()
-#     if not calendar_name:
-#         calendar_name = site_config['SITE_NAME']
-#     ical = ICal(calendar_name=calendar_name)
-#
-#     recs = Event(g.db).select(where="event.event_start_date > datetime('{}')".format(local_datetime_now() - timedelta(days=30)))
-#
-#     if recs:
-#         for rec in recs:
-#             ical.add_event(
-#                 "{}.{}.{}".format(
-#                 rec.id,
-#                 rec.activity_id,
-#                 site_config['HOST_NAME']
-#                 ),
-#                rec.event_start_date,
-#                rec.event_end_date,
-#                 rec.event_title,
-#                 url = request.url_root,
-#             )
-#
-#     return ical.get()
-#
+@mod.route('calendar/subscribe/<calendar_name>/',methods=['GET',])
+@mod.route('calendar/subscribe/<calendar_name>',methods=['GET',])
+@mod.route('calendar/subscribe',methods=['GET',])
+@mod.route('calendar/subscribe/',methods=['GET',])
+def subscribe(calendar_name=''):
+    """download an icalendar file"""
+    
+    setExits()
+    g.title = "Calendar Subscription"
+    
+    # import pdb;pdb.set_trace()
+    site_config = get_site_config()
+    if not calendar_name:
+        calendar_name = site_config['SITE_NAME']
+    ical = ICal(calendar_name=calendar_name)
+    
+    recs = Event(g.db).select(where="event.event_start_date > datetime('{}')".format(local_datetime_now() - timedelta(days=30)))
+    
+    if recs:
+        for rec in recs:
+            locations = Event(g.db).locations(rec.id)
+            event_location = 'tbd'
+            if locations and len(locations) == 1:
+                event_location = locations[0].location_name
+            elif locations and len(locations) > 1:
+                event_location = "Multiple Locations"
+            url = request.url_root.rstrip('/') + url_for('calendar.event') + str(rec.id) + '/'
+            status = ''
+            if rec.status.lower() != 'scheduled': 
+                status = '!' + rec.status.upper() + '! '
+            summary = "{} {}{}".format(site_config["MAIL_SUBJECT_PREFIX"],status,rec.event_title)
+            ical.add_event(
+                "{}.{}.{}".format(
+                rec.id,
+                rec.activity_id,
+                site_config['HOST_NAME'] + calendar_name
+                ),
+               rec.event_start_date,
+               rec.event_end_date,
+               summary,
+               url = url,
+               description=rec.event_description,
+               location = event_location,
+            )
+        
+        ical = ical.get()
+        
+        # attachment = None
+        # if ical:
+        #     attachment = ("{}.ics".format(calendar_name.replace(' ','_')), "text/calendar", ical)
+        #
+        # # import pdb;pdb.set_trace()
+        # # send that puppy!
+        # send_result = send_message(site_config.get('ADMIN_EMAILS',None),
+        #                 subject="Calendar '{}' from {}".format(calendar_name,site_config['HOST_NAME']),
+        #                 body_is_html=False,
+        #                 body="""Your Calendar for '{}'
+        #
+        #                 """.format(calendar_name),
+        #                 attachment=attachment,
+        #                 )
+        # if not send_result[0]:
+        #     #Error occured
+        #     email_admin(subject="Error sending calendar {}".format(get_site_config()['SITE_NAME']),message="An error occored while trying to send calendar email. Err: {}".format(send_result[1]))
+        #     return "Error while sending email"
+            
+        headers={
+           "Content-Disposition":"attachment;filename={}.ics".format(calendar_name.replace(' ','_')),
+            }
+
+        return Response(
+                ical,
+                mimetype="text/calendar",
+                headers=headers
+                )
+         
+    
+    return "No Events found..."
+    
     
