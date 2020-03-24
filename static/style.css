@@ -33,7 +33,7 @@ pre {
 /* Brown & tan */
 
 /* Menu Styles*/
-/*.w3-menu-color,.w3-drop-menu-hover-color:hover,
+.w3-menu-color,.w3-drop-menu-hover-color:hover,
 .w3-primary-color,.w3-primary-hover-color:hover,
 .w3-drop-menu-section-hover-color:hover,.w3-drop-menu-section-color:hover,
 .w3-drop-menu-section-color
@@ -49,7 +49,7 @@ pre {
 .w3-menu-border {
     border:solid 1pt rgb(247, 240, 230)!important;
 }
-*/
+
 
 /* for field labels and buttons */
 /* required fields */
