@@ -10,14 +10,14 @@
 
 
 /* change the fixed width of the right menu here*/
-
+/*
 .menu_space {
     margin-right:0px;
 }
 .menu_width {
     width:0px;
 }
-
+*/
 
 /*p {margin-top:0;margin-bottom:.4em;}*/
 
@@ -33,16 +33,15 @@ pre {
 /* Brown & tan */
 
 /* Menu Styles*/
-.w3-menu-color,
+/*.w3-menu-color,.w3-drop-menu-hover-color:hover,
 .w3-primary-color,.w3-primary-hover-color:hover,
-.w3-drop-menu-section-hover-color:hover,
-.w3-drop-menu-section-color,.w3-drop-menu-color
+.w3-drop-menu-section-hover-color:hover,.w3-drop-menu-section-color:hover,
+.w3-drop-menu-section-color
 {color:#fff!important;background-color:rgb(63, 36, 20)!important}
 .w3-primary-border-color,.w3-primary-hover-border-color:hover{border-color:rgb(63, 36, 20)!important}
 
-.w3-menu-hover-color:hover,.w3-drop-menu-section-color:hover,
-.w3-menu-hover-color:hover,.w3-drop-menu-hover-color:hover,
-.w3-secondary-color,.w3-secondary-hover-color:hover,
+.w3-menu-hover-color:hover,
+.w3-secondary-color,.w3-secondary-hover-color:hover,.w3-drop-menu-color,
 .w3-label-color,.w3-label-hover-color:hover,.roster-hover-color:hover
 {color:#000!important;background-color:rgb(247, 240, 230)!important}
 .w3-secondary-border-color,.w3-secondary-hover-border-color:hover{border-color:rgb(247, 240, 230)!important}
@@ -50,7 +49,7 @@ pre {
 .w3-menu-border {
     border:solid 1pt rgb(247, 240, 230)!important;
 }
-
+*/
 
 /* for field labels and buttons */
 /* required fields */
