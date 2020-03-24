@@ -109,16 +109,31 @@ def _before():
             # Refresh the user session
             setUserStatus(session['user'],cleanRecordID(session['user_id']))
         
+        # g.menu_items should be a list of dicts
+        #  with keys of 'title' & 'url' used to construct
+        #  the items in the main menu
+        # g.menu_items = shotglass.get_menu_items()
+        g.menu_items = [
+            {'title':'Home','drop_down_menu':[
+                {'title':'Events Home','url':url_for('www.home')},
+                {'title':'SABA Home','url':'http://sacbike.org'},
+              ]
+            },
+            {'title':'Calendar','url':url_for('calendar.display')},
+            {'title':'Signups','url':url_for('signup.display')},
+            ]
+        
         
         g.admin = Admin(g.db) # This is where user access rules are stored
     
         #Events
         # a header row must have the some permissions or higher than the items it heads
         #import pdb;pdb.set_trace()
+        g.admin.register(Job,url_for('signup.roster'),display_name='View Roster',top_level=True,minimum_rank_required=0,add_to_menu=True)
+            
         g.admin.register(Activity,url_for('activity.display'),display_name='Staffing Admin',header_row=True,minimum_rank_required=500,roles=['admin','activity manager'])
         g.admin.register(Activity,url_for('activity.display'),display_name='Activities',minimum_rank_required=500,roles=['admin','activity manager'])
         g.admin.register(Event,url_for('event.display'),display_name='Events',add_to_menu=True,minimum_rank_required=500,roles=['admin','activity manager'])
-        g.admin.register(Job,url_for('signup.roster'),display_name='',minimum_rank_required=80,add_to_menu=False)
         #location
         g.admin.register(Location,url_for('location.display'),display_name='Locations',minimum_rank_required=500,roles=['admin','activity manager'])
         g.admin.register(ActivityGroup,url_for('activity_group.display'),display_name='Activity Groups',minimum_rank_required=500,roles=['admin','activity manager'])
