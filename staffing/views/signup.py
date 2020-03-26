@@ -168,6 +168,10 @@ def signup(job_id=None):
     if not event:
         return 'failure: That is not a valid event id'
 
+    if event.is_past_event:
+        # this event is past
+        return 'failure: No changes allowed. The event has already happened.'
+
     if not g.user:
         ## get login first
         flash("You need to log in or create an account")
@@ -191,7 +195,6 @@ def signup(job_id=None):
         
     # if submitting form record signup
     if request.form:
-        #import pdb;pdb.set_trace()
         positions = cleanRecordID(request.form.get('positions',0))
         previous_positions = signup.positions
         submission_ok = True # set for success
@@ -202,9 +205,6 @@ def signup(job_id=None):
             
         # record change
         if positions > 0:
-            ##################
-            # TODO - Don't allow any change after the day of the event...
-            ###################
             
             # ensure that there are still some slots available...
             ###  it could happen that someone has signed up since the user

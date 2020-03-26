@@ -169,7 +169,7 @@ def get_event_recs(activity_id=None,**kwargs):
     coalesce(nullif(event.calendar_title,''),activity.title) as calendar_title,
     (select min(job.start_date) from job where job.event_id = event.id) as job_start_date,
     (select max(job.end_date) from job where job.event_id = event.id) as job_end_date,
-
+    (select case when '{today}' > event.event_start_date then 1 else 0 end) as is_past_event,
     event.event_start_date,
     event.event_end_date,
     event.event_start_date_label_id,
@@ -199,10 +199,6 @@ def get_event_recs(activity_id=None,**kwargs):
     coalesce(nullif(event.service_type,''),(select type from activity_type where activity_type.id = activity.activity_type_id ),"Activity Type") as service_type,
     coalesce(nullif(event.description,''),activity.description) as event_description,
     coalesce(
-        (select 1 from event where date(event.event_start_date,'localtime') < date('now','localtime') and event.id = job.event_id)
-     ,0) 
-    as is_past_event,
-    coalesce(
         (select 1 from activity join event as future_event on event.activity_id = activity.id where date(future_event.event_start_date,'localtime') > date('now','localtime') and activity.id = future_event.activity_id)
      ,0) as has_future_events,
      coalesce(
@@ -223,7 +219,10 @@ def get_event_recs(activity_id=None,**kwargs):
     where {where}
     group by event.event_start_date, event.location_id, job_start_date
     order by event.event_start_date DESC
-    """.format(where=where,user_id=user_id)
+    """.format(where=where,
+            user_id=user_id,
+            today=date_to_string(local_datetime_now(),'iso_date_tz'),
+            )
     event_recs = Event(g.db).query(sql)
     
     return event_recs

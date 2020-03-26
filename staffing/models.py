@@ -1,6 +1,6 @@
 from shotglass2.takeabeltof.database import SqliteTable
 from shotglass2.takeabeltof.utils import cleanRecordID
-from shotglass2.takeabeltof.date_utils import local_datetime_now
+from shotglass2.takeabeltof.date_utils import local_datetime_now, date_to_string
 from shotglass2.users.models import User
         
 class Activity(SqliteTable):
@@ -198,6 +198,7 @@ class Event(SqliteTable):
         user_id = kwargs.get('user_id',0)
 
         sql="""select event.*,
+        (select case when '{today}' > event.event_start_date then 1 else 0 end) as is_past_event,
         (select location.location_name from location) as event_default_location_name,
         (select location.street_address from location) as event_default_location_address,
         (select location.city from location) as event_default_location_city,
@@ -235,6 +236,7 @@ class Event(SqliteTable):
             where=kwargs.get('where',1),
             order_by=kwargs.get('order_by',self.order_by_col),
             user_id=user_id,
+            today=date_to_string(local_datetime_now(),'iso_date_tz'),
             )
 
         return self.query(sql)
