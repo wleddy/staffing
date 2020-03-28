@@ -40,6 +40,9 @@
                        <p class="w3-medium">
                            <strong>{{ job.activity_title }}</strong>
                            <!-- {% if job.user_event_positions %}Your Signup ({{ job.user_event_positions }}){% endif %} -->
+                           {% if job.event_status.lower() != 'scheduled' %}
+                           <br><strong class="w3-primary-color" style='padding:0 2pt;'>This event has been {{ job.event_status }}</strong>
+                           {% endif %}
                        </p>
                        {% if job.event_date_list %}
                        <p>
@@ -104,6 +107,11 @@
                                   <br><strong>{{ job.calendar_title }}</strong>
                                   {% endif %}
                                   <br><strong class="w3-small">@ {{ job.event_header_location_name | default("tbd", True ) }}</strong>
+                                  {% if job.is_past_event %}
+                                  <br><strong>This event has passed</strong>
+                                  {% elif job.event_status.lower() != 'scheduled' %}
+                                  <br><strong>This event has been {{ job.event_status }}</strong>
+                                  {% endif %}
                                   <span class="w3-small" id="job-date-more-{{ job.event_id }}-{{job.start_date[:10]}}" style="display:none;">&nbsp;<em>Show this event</em></span>
                                   <span class="w3-small" id="job-date-less-{{ job.event_id }}-{{job.start_date[:10]}}" >&nbsp;<em>Hide this event</em></span>
                             </p>

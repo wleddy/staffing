@@ -69,6 +69,10 @@
             <p style="text-align:center">
                 {% if job.job_filled_positions >= job.max_positions and session['user_id'] not in participant_list %}
                 <a class="w3-button w3-grey w3-round-medium w3-medium" >Full</a>
+                {% elif job.is_past_event %}
+                <a class="w3-button w3-grey w3-round-medium w3-medium" >Event is passed</a>
+                {% elif job.event_status.lower() != 'scheduled' and session['user_id'] not in participant_list%}
+                <a class="w3-button w3-grey w3-round-medium w3-medium" >Not Available</a>
                 {% else %}
                 <a class="w3-button w3-primary-color w3-round-medium w3-medium" 
                 {% if g.user %}

@@ -518,6 +518,8 @@ def get_job_rows(start_date=None,end_date=None,where='',user_skills=[],is_admin=
     null as activity_loc_name,
     coalesce(nullif(event.service_type,''),(select type from activity_type where activity_type.id = activity.activity_type_id ),"Activity Type") as service_type,
     event.id as event_id,
+    event.status as event_status,
+    (select case when '{today}' > event.event_start_date then 1 else 0 end) as is_past_event,
     event.event_start_date,
     event.event_end_date,
     event.event_start_date_label_id,
@@ -579,7 +581,6 @@ def get_job_rows(start_date=None,end_date=None,where='',user_skills=[],is_admin=
         where job.event_id in (select event.id from event where event.activity_id = activity.id ) and {where}) as activity_max_positions,
     job.id as job_id,
     job.title as job_title,
-    event.status as event_status,
     coalesce(job.description,'') as job_description,
     job.start_date,
     job.end_date,
@@ -600,11 +601,7 @@ def get_job_rows(start_date=None,end_date=None,where='',user_skills=[],is_admin=
         where job.id = user_job.job_id and job.event_id = event.id and {where}) 
         as job_filled_positions,
     -- 1 if a volunteer job, else 0
-    coalesce((select 1 from job_role where job_role.role_id in ({vol_role_ids}) and job_role.job_id = job.id),0) as is_volunteer_job,
-    coalesce(
-        (select 1 from event where date(event.event_start_date,'localtime') < date('now','localtime') and event.id = job.event_id)
-     ,0) 
-    as is_past_event
+    coalesce((select 1 from job_role where job_role.role_id in ({vol_role_ids}) and job_role.job_id = job.id),0) as is_volunteer_job
     
     
     from job
@@ -618,7 +615,13 @@ def get_job_rows(start_date=None,end_date=None,where='',user_skills=[],is_admin=
     {group_by}
     order by {order_by}
     """
-    sql = sql.format(where=where,order_by=order_by,group_by=group_by,vol_role_ids=vol_role_ids,)
+    sql = sql.format(
+                where=where,
+                order_by=order_by,
+                group_by=group_by,
+                vol_role_ids=vol_role_ids,
+                today=date_to_string(local_datetime_now(),'iso_date_tz'),
+            )
     #print(sql)
     #import pdb;pdb.set_trace()            
     jobs = Job(g.db).query(sql)
