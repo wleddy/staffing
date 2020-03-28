@@ -3,7 +3,7 @@ from flask import g
 from shotglass2.shotglass import get_site_config
 from shotglass2.takeabeltof.date_utils import getDatetimeFromString, local_datetime_now, datetime_as_string
 from shotglass2.takeabeltof.utils import render_markdown_for, printException
-from shotglass2.takeabeltof.mailer import send_message, email_admin
+from shotglass2.takeabeltof.mailer import Mailer, send_message, email_admin
 from shotglass2.users.models import User, Pref
 from staffing.models import StaffNotification, Job, Event, UserJob
 from datetime import datetime, timedelta
@@ -72,18 +72,21 @@ def send_signup_email(job_data_list,user,template_path,bp,**kwargs):
         bcc=site_config.get('ADMIN_EMAILS',None)
         
     # send that puppy!
-    send_result = send_message([(user.email,' '.join([user.first_name,user.last_name]))],
-                    subject=subject,
-                    body_is_html=True,
-                    body=email_html,
-                    attachment=attachment,
-                    bcc=bcc,
-                    )
-    if not send_result[0]:
-        #Error occured
-        email_admin(subject="Error sending signup confirmation at {}".format(get_site_config()['SITE_NAME']),message="An error occored while trying to send signup email. Err: {}".format(send_result[1]))
+    mailer = Mailer(**kwargs)
+    mailer.add_address((user.email,' '.join([user.first_name,user.last_name])))
+    mailer.add_bcc(bcc)
+    mailer.subject = subject
+    mailer.body = email_html
+    mailer.body_is_html = True
+    mailer.add_attachment(attachment)
     
-    return send_result
+    mailer.send()
+    if not mailer.success:
+        #Error occured
+        email_admin(subject="Error sending signup confirmation at {}".format(get_site_config()['SITE_NAME']),message="An error occored while trying to send signup email. Err: {}".format(mailer.result_text))
+    
+    # for now... just to support old code
+    return (mailer.success,mailer.result_text)
     
     
 def process_commitment_reminder():
