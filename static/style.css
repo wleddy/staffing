@@ -28,6 +28,17 @@ pre {
 
 */
 
+/* Footer image */
+.footer_image, .footer_image_small {
+    margin:0;
+    height:100pt;
+    background-image:url('{{url_for('static',filename='images/footer_bg2.png')}}');
+    background-repeat:no-repeat;
+    background-position: right bottom;
+}
+.footer_image_small {
+    background-image:url('{{url_for('static',filename='images/footer_bg2_small.png')}}');
+}
 
 /* colors */
 /* Brown & tan */
