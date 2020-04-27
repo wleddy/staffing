@@ -9,10 +9,13 @@ instance/
 __pycache__
 .pytest_cache
 .coverage
+robots.txt
 
 ## Passenger web app files
 tmp/
-passenger.*
+passenger*
+
+resource/
 
 ## The repo on which all depends
 shotglass2/
