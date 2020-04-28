@@ -439,6 +439,18 @@ class Task(SqliteTable):
 
         super().create_table(sql)
 
+    def select(self,**kwargs):
+        sql ="""select task.*,activity.title as activity_name 
+        from task 
+        join activity on activity.id = task.activity_id 
+        where {where}
+        order by {order_by}""".format(
+            where=kwargs.get('where',1),
+            order_by=kwargs.get('order_by',self.order_by_col),
+            )
+        
+        return self.query(sql)
+
 
 class UserJob(SqliteTable):
     """Staffing User_Job Table"""

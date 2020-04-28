@@ -18,15 +18,41 @@ def setExits():
     g.title = 'Events'
 
 
-@mod.route('/')
-@table_access_required(Event)
-def display():
-    setExits()
-    g.title="Event List"
-    recs = Event(g.db).select()
+# @mod.route('/')
+# @table_access_required(Event)
+# def display():
+#     setExits()
+#     g.title="Event List"
+#     recs = Event(g.db).select()
+#
+#     return render_template('event_list.html',recs=recs)
+#
     
-    return render_template('event_list.html',recs=recs)
     
+from shotglass2.takeabeltof.views import TableView
+PRIMARY_TABLE = Event
+# this handles table list and record delete
+@mod.route('/<path:path>',methods=['GET','POST',])
+@mod.route('/<path:path>/',methods=['GET','POST',])
+@mod.route('/',methods=['GET','POST',])
+@table_access_required(PRIMARY_TABLE)
+def display(path=None):
+    # import pdb;pdb.set_trace()
+
+    view = TableView(PRIMARY_TABLE,g.db)
+    # optionally specify the list fields
+    view.list_fields = [
+            {'name':'id','label':'ID','class':'w3-hide-small','search':True},
+            {'name':'activity_title','label':'Title'},
+            {'name':'status',},
+            {'name':'event_start_date','label':'Event Date','search':'date'},
+            {'name':'prep_status',},
+            {'name':'event_contract_date','label':'Contract Date','search':'date','type':'date'},
+        ]
+    view.list_table_template = 'event_list_table.html'
+    
+    return view.dispatch_request()
+  
     
 @mod.route('/edit/',methods=['POST',])
 @mod.route('/edit/<int:id>',methods=['GET','POST',])

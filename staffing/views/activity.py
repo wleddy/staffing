@@ -9,22 +9,45 @@ from staffing.views.event import edit as edit_event, edit_from_activity as edit_
 
 mod = Blueprint('activity',__name__, template_folder='templates/activity', url_prefix='/activity')
 
-
+PRIMARY_TABLE = Activity
 def setExits():
     g.listURL = url_for('.display')
     g.editURL = url_for('.edit')
-    g.deleteURL = url_for('.delete')
+    g.deleteURL = url_for('.display') + 'delete/'
     g.title = 'Activities'
-
-
-@mod.route('/')
-@table_access_required(Activity)
-def display():
-    setExits()
-    g.title="Activity List"
-    recs = Activity(g.db).select()
     
-    return render_template('activity_list.html',recs=recs)
+    
+from shotglass2.takeabeltof.views import TableView
+
+# this handles table list and record delete
+@mod.route('/<path:path>',methods=['GET','POST',])
+@mod.route('/<path:path>/',methods=['GET','POST',])
+@mod.route('/',methods=['GET','POST',])
+@table_access_required(PRIMARY_TABLE)
+def display(path=None):
+    # import pdb;pdb.set_trace()
+    
+    view = TableView(PRIMARY_TABLE,g.db)
+    # optionally specify the list fields
+    view.list_fields = [
+            {'name':'id','label':'ID','class':'w3-hide-small','search':True},
+            {'name':'title'},
+            {'name':'description'},
+            {'name':'contract_date','search':'date'},
+            {'name':'total_contract_price','label':'Total Price'},
+        ]
+    
+    return view.dispatch_request()
+
+
+# @mod.route('/')
+# @table_access_required(Activity)
+# def display():
+#     setExits()
+#     g.title="Activity List"
+#     recs = Activity(g.db).select()
+#
+#     return render_template('activity_list.html',recs=recs)
     
     
 @mod.route('/edit/',methods=['GET','POST',])
@@ -120,26 +143,26 @@ def get_event_list(id=0):
         
     return event_list
     
-@mod.route('/delete/',methods=['GET','POST',])
-@mod.route('/delete/<int:id>/',methods=['GET','POST',])
-@table_access_required(Activity)
-def delete(id=0):
-    setExits()
-    id = cleanRecordID(id)
-    activity = Activity(g.db)
-    if id <= 0:
-        return abort(404)
-        
-    if id > 0:
-        rec = activity.get(id)
-        
-    if rec:
-        activity.delete(rec.id)
-        g.db.commit()
-        flash("Activity {} Deleted".format(rec.title))
-    
-    return redirect(g.listURL)
-    
+# @mod.route('/delete/',methods=['GET','POST',])
+# @mod.route('/delete/<int:id>/',methods=['GET','POST',])
+# @table_access_required(Activity)
+# def delete(id=0):
+#     setExits()
+#     id = cleanRecordID(id)
+#     activity = Activity(g.db)
+#     if id <= 0:
+#         return abort(404)
+#
+#     if id > 0:
+#         rec = activity.get(id)
+#
+#     if rec:
+#         activity.delete(rec.id)
+#         g.db.commit()
+#         flash("Activity {} Deleted".format(rec.title))
+#
+#     return redirect(g.listURL)
+#
     
 def get_event_recs(activity_id=None,**kwargs):
     """Return a list of event records or None
@@ -244,7 +267,9 @@ def valid_input(rec):
     form_datetime = request.form.get("contract_date",'')
     if form_datetime:
         temp_datetime = getDatetimeFromString(form_datetime)
-        if temp_datetime == None:
+        if temp_datetime != None:
+            rec.contract_date = temp_datetime
+        else:
             #Failed conversion
             valid_data = False
             flash("That is not a valid Contract date")

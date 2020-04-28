@@ -11,18 +11,38 @@ mod = Blueprint('event_date_label',__name__, template_folder='templates/event_da
 def setExits():
     g.listURL = url_for('.display')
     g.editURL = url_for('.edit')
-    g.deleteURL = url_for('.delete')
+    g.deleteURL = url_for('.display') + 'delete/'
     g.title = 'Event Date Labels'
 
 
-@mod.route('/')
-@table_access_required(EventDateLabel)
-def display():
-    setExits()
-    g.title="Event Date Labels List"
-    recs = EventDateLabel(g.db).select()
-    
-    return render_template('event_date_label_list.html',recs=recs)
+from shotglass2.takeabeltof.views import TableView
+PRIMARY_TABLE = EventDateLabel
+# this handles table list and record delete
+@mod.route('/<path:path>',methods=['GET','POST',])
+@mod.route('/<path:path>/',methods=['GET','POST',])
+@mod.route('/',methods=['GET','POST',])
+@table_access_required(PRIMARY_TABLE)
+def display(path=None):
+    # import pdb;pdb.set_trace()
+
+    view = TableView(PRIMARY_TABLE,g.db)
+    # optionally specify the list fields
+    view.list_fields = [
+            {'name':'id','label':'ID','class':'w3-hide-small','search':True},
+            {'name':'label','label':'Event Label'},
+        ]
+
+    return view.dispatch_request()
+  
+
+# @mod.route('/')
+# @table_access_required(EventDateLabel)
+# def display():
+#     setExits()
+#     g.title="Event Date Labels List"
+#     recs = EventDateLabel(g.db).select()
+#
+#     return render_template('event_date_label_list.html',recs=recs)
     
     
 @mod.route('/edit/',methods=['GET','POST',])

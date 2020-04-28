@@ -14,19 +14,42 @@ mod = Blueprint('client',__name__, template_folder='templates/client', url_prefi
 def setExits():
     g.listURL = url_for('.display')
     g.editURL = url_for('.edit')
-    g.deleteURL = url_for('.delete')
+    g.deleteURL = url_for('.display') + 'delete/'
     g.homeURL = '/'
     g.title = 'Client'
 
     
-@mod.route('/', methods=['GET'])
-@table_access_required(Client)
-def display():
-    setExits()
-    g.title = "{} List".format(g.title)
     
-    recs = Client(g.db).select()
-    return render_template('client_list.html', recs=recs)
+from shotglass2.takeabeltof.views import TableView
+PRIMARY_TABLE = Client
+# this handles table list and record delete
+@mod.route('/<path:path>',methods=['GET','POST',])
+@mod.route('/<path:path>/',methods=['GET','POST',])
+@mod.route('/',methods=['GET','POST',])
+@table_access_required(PRIMARY_TABLE)
+def display(path=None):
+    # import pdb;pdb.set_trace()
+
+    view = TableView(PRIMARY_TABLE,g.db)
+    # optionally specify the list fields
+    view.list_fields = [
+            {'name':'id','label':'ID','class':'w3-hide-small','search':True},
+            {'name':'name'},
+            {'name':'email'},
+            {'name':'phone'},
+        ]
+
+    return view.dispatch_request()
+
+  
+# @mod.route('/', methods=['GET'])
+# @table_access_required(Client)
+# def display():
+#     setExits()
+#     g.title = "{} List".format(g.title)
+#
+#     recs = Client(g.db).select()
+#     return render_template('client_list.html', recs=recs)
     
 ## Edit the client record
 @mod.route('/edit/',methods=['GET','POST',])
@@ -64,36 +87,36 @@ def edit(id=0):
     return render_template('client_edit.html',rec=rec)
             
         
-@mod.route('/delete', methods=['GET'])
-@mod.route('/delete/', methods=['GET'])
-@mod.route('/delete/<int:rec_id>/', methods=['GET'])
-@table_access_required(Client)
-def delete(rec_id=None):
-    setExits()
-    delete_by_admin = request.args.get('delete',None)
-    if delete_by_admin:
-        client = Client(g.db)
-        rec=client.select_one(where='access_token = "{}"'.format(delete_by_admin.strip()))
-        if rec:
-            rec_id = rec.id
-    
-    if rec_id == None:
-        rec_id = request.form.get('id',request.args.get('id',-1))
-    
-    rec_id = cleanRecordID(rec_id)
-    if rec_id <=0:
-        flash("That is not a valid record ID")
-        return redirect(g.listURL)
-        
-    rec = Client(g.db).get(rec_id,include_inactive=True)
-    if not rec:
-        flash("Record not found")
-    else:
-        Client(g.db).delete(rec.id)
-        g.db.commit()
-        flash('Client Record Deleted')
-        
-    return redirect(g.listURL)
+# @mod.route('/delete', methods=['GET'])
+# @mod.route('/delete/', methods=['GET'])
+# @mod.route('/delete/<int:rec_id>/', methods=['GET'])
+# @table_access_required(Client)
+# def delete(rec_id=None):
+#     setExits()
+#     delete_by_admin = request.args.get('delete',None)
+#     if delete_by_admin:
+#         client = Client(g.db)
+#         rec=client.select_one(where='access_token = "{}"'.format(delete_by_admin.strip()))
+#         if rec:
+#             rec_id = rec.id
+#
+#     if rec_id == None:
+#         rec_id = request.form.get('id',request.args.get('id',-1))
+#
+#     rec_id = cleanRecordID(rec_id)
+#     if rec_id <=0:
+#         flash("That is not a valid record ID")
+#         return redirect(g.listURL)
+#
+#     rec = Client(g.db).get(rec_id,include_inactive=True)
+#     if not rec:
+#         flash("Record not found")
+#     else:
+#         Client(g.db).delete(rec.id)
+#         g.db.commit()
+#         flash('Client Record Deleted')
+#
+#     return redirect(g.listURL)
 
 
 @mod.route('/get_rec_as_json', methods=['GET'])

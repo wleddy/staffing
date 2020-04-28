@@ -1,0 +1,25 @@
+{# this may be replace via AJAX response following a search targeting <div id="sg-table-list"> #}
+
+{#build table_list_data#}
+{% include 'list_header_row.html'%}
+
+{% if data.recs %}
+    {% for rec in data.recs %}
+    <tr>
+        {% for col in data.list_fields%}
+            <td onclick="window.location='{{g.editURL}}{{rec.id}}/'" class="{{col.css}}">
+            {% if col.type.upper() in ['DATE','DATETIME'] and rec.__getattribute__(col['name']) != None %}
+            {{ rec.__getattribute__(col['name']) | default_if_none('')  | local_date_string }}</td>
+            {% elif col.type.upper() in ['INT','INTEGER','NUMBER','REAL'] %}
+            {{ rec.__getattribute__(col['name']) | default_if_none('') }}</td>
+            {% else %}
+            {{ rec.__getattribute__(col['name']) | default_if_none('')  | string  |  truncate(35,True) }}</td>
+            {% endif %}
+        {% endfor %}
+    </tr>
+    {% endfor %}
+{% else %}
+    <tr><td colspan='{{ data.list_fields | length }}'>No records match your search</td></tr>
+{% endif %}
+
+</table>

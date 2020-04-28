@@ -11,18 +11,38 @@ mod = Blueprint('activity_type',__name__, template_folder='templates/activity_ty
 def setExits():
     g.listURL = url_for('.display')
     g.editURL = url_for('.edit')
-    g.deleteURL = url_for('.delete')
+    g.deleteURL = url_for('.display') + 'delete/'
     g.title = 'Activity Types'
 
 
-@mod.route('/')
-@table_access_required(ActivityType)
-def display():
-    setExits()
-    g.title="Activity Type List"
-    recs = ActivityType(g.db).select()
-    
-    return render_template('activity_type_list.html',recs=recs)
+from shotglass2.takeabeltof.views import TableView
+PRIMARY_TABLE = ActivityType
+# this handles table list and record delete
+@mod.route('/<path:path>',methods=['GET','POST',])
+@mod.route('/<path:path>/',methods=['GET','POST',])
+@mod.route('/',methods=['GET','POST',])
+@table_access_required(PRIMARY_TABLE)
+def display(path=None):
+    # import pdb;pdb.set_trace()
+
+    view = TableView(PRIMARY_TABLE,g.db)
+    # optionally specify the list fields
+    view.list_fields = [
+            {'name':'id','label':'ID','class':'w3-hide-small','search':True},
+            {'name':'type','label':'Activity Type'},
+            {'name':'description'},
+        ]
+
+    return view.dispatch_request()
+  
+# @mod.route('/')
+# @table_access_required(ActivityType)
+# def display():
+#     setExits()
+#     g.title="Activity Type List"
+#     recs = ActivityType(g.db).select()
+#
+#     return render_template('activity_type_list.html',recs=recs)
     
     
 @mod.route('/edit/',methods=['GET','POST',])
@@ -62,25 +82,25 @@ def edit(id=0):
     return render_template('activity_type_edit.html',rec=rec,activity_groups=activity_groups)
     
     
-@mod.route('/delete/',methods=['GET','POST',])
-@mod.route('/delete/<int:id>/',methods=['GET','POST',])
-@table_access_required(ActivityType)
-def delete(id=0):
-    setExits()
-    id = cleanRecordID(id)
-    activity_type = ActivityType(g.db)
-    if id <= 0:
-        return abort(404)
-        
-    if id > 0:
-        rec = activity_type.get(id)
-        
-    if rec:
-        activity_type.delete(rec.id)
-        g.db.commit()
-        flash("{} Activity Type Deleted".format(rec.type))
-    
-    return redirect(g.listURL)
+# @mod.route('/delete/',methods=['GET','POST',])
+# @mod.route('/delete/<int:id>/',methods=['GET','POST',])
+# @table_access_required(ActivityType)
+# def delete(id=0):
+#     setExits()
+#     id = cleanRecordID(id)
+#     activity_type = ActivityType(g.db)
+#     if id <= 0:
+#         return abort(404)
+#
+#     if id > 0:
+#         rec = activity_type.get(id)
+#
+#     if rec:
+#         activity_type.delete(rec.id)
+#         g.db.commit()
+#         flash("{} Activity Type Deleted".format(rec.type))
+#
+#     return redirect(g.listURL)
     
     
 def valid_input(rec):

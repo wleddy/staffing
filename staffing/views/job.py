@@ -21,14 +21,35 @@ def setExits():
     g.title = 'Jobs'
 
 
-@mod.route('/')
-@table_access_required(Job)
-def display():
-    setExits()
-    g.title="Event Job List"
-    recs = Job(g.db).select()
-    
-    return render_template('job_list.html',recs=recs)
+# @mod.route('/')
+# @table_access_required(Job)
+# def display():
+#     setExits()
+#     g.title="Event Job List"
+#     recs = Job(g.db).select()
+#
+#     return render_template('job_list.html',recs=recs)
+
+from shotglass2.takeabeltof.views import TableView
+PRIMARY_TABLE = Job
+# this handles table list and record delete
+@mod.route('/<path:path>',methods=['GET','POST',])
+@mod.route('/<path:path>/',methods=['GET','POST',])
+@mod.route('/',methods=['GET','POST',])
+@table_access_required(PRIMARY_TABLE)
+def display(path=None):
+    # import pdb;pdb.set_trace()
+
+    view = TableView(PRIMARY_TABLE,g.db)
+    # optionally specify the list fields
+    view.list_fields = [
+            {'name':'id','label':'ID','class':'w3-hide-small','search':True},
+            {'name':'title',},
+            {'name':'start_date','label':'Date','search':'date','type':'date'},
+        ]
+
+    return view.dispatch_request()
+
     
 @mod.route('/roster',methods=['GET','POST'])
 @mod.route('/roster/',methods=['GET','POST'])

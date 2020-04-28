@@ -11,19 +11,38 @@ mod = Blueprint('task',__name__, template_folder='templates/task', url_prefix='/
 def setExits():
     g.listURL = url_for('.display')
     g.editURL = url_for('.edit')
-    g.deleteURL = url_for('.delete')
+    g.deleteURL = url_for('.display') + 'delete/'
     g.title = 'Tasks'
 
 
-@mod.route('/')
-@table_access_required(Task)
-def display():
-    setExits()
-    g.title="Task List"
-    recs = Task(g.db).query("select task.*,activity.title as activity_name from task join activity on activity.id = task.activity_id order by task.name,task.id")
+# @mod.route('/')
+# @table_access_required(Task)
+# def display():
+#     setExits()
+#     g.title="Task List"
+#     recs = Task(g.db).query("select task.*,activity.title as activity_name from task join activity on activity.id = task.activity_id order by task.name,task.id")
+#
+#     return render_template('task_list.html',recs=recs)
     
-    return render_template('task_list.html',recs=recs)
-    
+from shotglass2.takeabeltof.views import TableView
+PRIMARY_TABLE = Task
+# this handles table list and record delete
+@mod.route('/<path:path>',methods=['GET','POST',])
+@mod.route('/<path:path>/',methods=['GET','POST',])
+@mod.route('/',methods=['GET','POST',])
+@table_access_required(PRIMARY_TABLE)
+def display(path=None):
+    # import pdb;pdb.set_trace()
+
+    view = TableView(PRIMARY_TABLE,g.db)
+    # optionally specify the list fields
+    view.list_fields = [
+            {'name':'id','label':'ID','class':'w3-hide-small','search':True},
+            {'name':'name','label':'Task Name'},
+            {'name':'activity_name',},
+        ]
+
+    return view.dispatch_request()
     
 @mod.route('/edit/',methods=['GET','POST',])
 @mod.route('/edit/<int:id>/',methods=['GET','POST',])
@@ -61,25 +80,25 @@ def edit(id=0):
     return render_template('task_edit.html',rec=rec,activities=activities)
     
     
-@mod.route('/delete/',methods=['GET','POST',])
-@mod.route('/delete/<int:id>/',methods=['GET','POST',])
-@table_access_required(Task)
-def delete(id=0):
-    setExits()
-    id = cleanRecordID(id)
-    task = Task(g.db)
-    if id <= 0:
-        return abort(404)
-        
-    if id > 0:
-        rec = task.get(id)
-        
-    if rec:
-        task.delete(rec.id)
-        g.db.commit()
-        flash("{} Task Deleted".format(rec.name))
-    
-    return redirect(g.listURL)
+# @mod.route('/delete/',methods=['GET','POST',])
+# @mod.route('/delete/<int:id>/',methods=['GET','POST',])
+# @table_access_required(Task)
+# def delete(id=0):
+#     setExits()
+#     id = cleanRecordID(id)
+#     task = Task(g.db)
+#     if id <= 0:
+#         return abort(404)
+#
+#     if id > 0:
+#         rec = task.get(id)
+#
+#     if rec:
+#         task.delete(rec.id)
+#         g.db.commit()
+#         flash("{} Task Deleted".format(rec.name))
+#
+#     return redirect(g.listURL)
     
     
 def valid_input(rec):
