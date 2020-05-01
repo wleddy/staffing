@@ -18,17 +18,6 @@ def setExits():
     g.title = 'Events'
 
 
-# @mod.route('/')
-# @table_access_required(Event)
-# def display():
-#     setExits()
-#     g.title="Event List"
-#     recs = Event(g.db).select()
-#
-#     return render_template('event_list.html',recs=recs)
-#
-    
-    
 from shotglass2.takeabeltof.views import TableView
 PRIMARY_TABLE = Event
 # this handles table list and record delete
@@ -45,11 +34,23 @@ def display(path=None):
             {'name':'id','label':'ID','class':'w3-hide-small','search':True},
             {'name':'activity_title','label':'Title'},
             {'name':'status',},
-            {'name':'event_start_date','label':'Event Date','search':'date'},
+            {'name':'event_start_date','label':'Event Date','search':'date','type':"datetime"},
             {'name':'prep_status',},
             {'name':'event_contract_date','label':'Contract Date','search':'date','type':'date'},
         ]
-    view.list_table_template = 'event_list_table.html'
+    
+    view.export_fields = []
+    view.export_fields.append({'name':'activity_title',})
+    view.export_fields.append({'name':'event_title',})
+    view.export_fields.append({'name':'status',})
+    view.export_fields.append({'name':'event_start_date','type':'date'})
+    view.export_fields.append({'name':'prep_status',})
+    view.export_fields.append({'name':'event_size',})
+    view.export_fields.append({'name':'number_served',})
+    view.export_fields.append({'name':'tips_received',})
+    view.export_fields.append({'name':'event_contract_date','label':'Contract Date','type':'date'})
+    view.export_fields.append({'name':'event_per_event_contract_price','label':'Per Event Price'})
+    view.export_fields.append({'name':'event_total_contract_price','label':'Total Contract Price'})
     
     return view.dispatch_request()
   
@@ -359,34 +360,6 @@ def delete_from_activity(activity_id=-1,id=0):
     """
     g.listURL = url_for('activity.edit') + str(cleanRecordID(activity_id))
     return handle_delete(id)
-    
-@mod.route('/report',methods=['POST'])
-@mod.route('/report/',methods=['POST'])
-@table_access_required(Event)
-def report():
-    """Export the current selection of records as csv text"""
-
-    setExits()
-    #import pdb;pdb.set_trace()
-    selected_recs = request.form.get('selected_recs','')
-    filename = "event_report_{}.csv".format(date_to_string(local_datetime_now(),'iso_datetime')).replace(' ','_')
-    if selected_recs:
-        # get attendance recs with this id
-        recs = Event(g.db).select(where="event.id in ({})".format(selected_recs))
-        if recs:
-            result = render_template("event_report.csv", recs=recs)
-            headers={
-               "Content-Disposition":"attachment;filename={}".format(filename),
-                }
-
-            return Response(
-                    result,
-                    mimetype="text/csv",
-                    headers=headers
-                    )
-        
-    flash("No records to report")
-    return redirect(g.listURL)
     
 
 def valid_input(rec):
