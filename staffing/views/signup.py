@@ -304,12 +304,15 @@ def acknowledge_deletion():
 @mod.route('/roster/',methods=['GET','POST',])
 @table_access_required(Job)
 def roster(display_end_days=0):
-    """Display the roster of all current events
-    for now, define current as jobs that occure on today or within the next 2 weeks.
+    """Display the roster of events.
+    Allows for search by date or pre-set periods
     """
     
-    #import pdb;pdb.set_trace()
+    # import pdb;pdb.set_trace()
     
+    BEGINNING_OF_TIME = datetime(1000,1,1)
+    END_OF_TIME = datetime(4000,12,31)
+        
     setExits()
     g.title='Signup Roster'
     site_config = get_site_config()
@@ -323,13 +326,17 @@ def roster(display_end_days=0):
         
     as_spreadsheet=request.form.get("as_spreadsheet",False)
     
-    if display_end_days == -2:
-        #display all attendance
-        start_date = start_date - timedelta(days=2000)
-        
     if display_end_days < 0:
-        #display all future events
-        end_date = end_date + timedelta(days=2000) # that ought to do it...
+        #Use the date input fields for search
+        temp_date = getDatetimeFromString(request.form.get('roster_start_date',date_to_string(BEGINNING_OF_TIME,'iso_date')))
+        # if not temp_date:
+#             temp_date = BEGINNING_OF_TIME
+        start_date = temp_date
+        
+        temp_date = getDatetimeFromString(request.form.get('roster_end_date',date_to_string(END_OF_TIME,'iso_date')))
+        # if not temp_date:
+ #            temp_date = END_OF_TIME
+        end_date = temp_date
     elif display_end_days > 0:
         end_date = end_date + timedelta(days=display_end_days)
     
@@ -348,7 +355,15 @@ def roster(display_end_days=0):
     order_by = " sort_by_date_and_title, is_volunteer_job, start_date" 
     
     jobs = get_job_rows(start_date,end_date,"",user_skills,is_admin,order_by=order_by)
-    return render_template('roster.html',jobs=jobs,is_admin=is_admin,display_end_days=display_end_days,as_spreadsheet=as_spreadsheet,)
+    
+    return render_template('roster.html',
+        jobs=jobs,
+        is_admin=is_admin,
+        display_end_days=display_end_days,
+        as_spreadsheet=as_spreadsheet,
+        start_date=start_date,
+        end_date=end_date,
+        )
     
 
 @mod.route('/process_notifications',methods=['GET','POST',])

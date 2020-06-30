@@ -2,6 +2,13 @@
 
 {% extends 'layout.html' %}
 
+{% block head %}
+{{ super() }}
+{% include "anytime_head.html"%}
+<script src="{{ url_for('static', filename='list_search.js') }}"></script>
+
+{% endblock head%}
+
 {% block page_header %}
 {% include 'roster_page_header.html' %}
 {% endblock page_header %}

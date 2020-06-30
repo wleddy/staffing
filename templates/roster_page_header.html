@@ -1,23 +1,35 @@
-{% from "_form_helpers.html" import select_field, checkbox_field %}
+{% from "_form_helpers.html" import select_field, checkbox_field  %}
 
 <div class="w3-panel w3-card-2 w3-secondary-color">
     <div class="w3-row">
         <p class="w3-col l11 m11 s12" ><strong>Event Roster</strong></p>
     </div>
         <div class="w3-col l1 m1 w3-hide-small ">
-            <p style=""><img src="{{ url_for('static',filename='images/bicycle.png')}}" /></p>
+            <p><img src="{{ url_for('static',filename='images/bicycle.png')}}" /></p>
         </div>
         <form action="" method="post" >
-            <div class="w3-col l3 m3" >
+            <div class="w3-col l6 m6 " >
                 <p>
-                    {{ select_field("display_end_days","Show from today thru",extras="") }}
+                    {{ select_field("display_end_days","Show from today thru",extras="", id="date_range_select") }}
                         <option value="0">Today Only</option>
                         <option value="7" {% if display_end_days == 7 %}selected{% endif %} >Next Week</option>
                         <option value="30" {% if display_end_days == 30 %}selected{% endif %}>Next Month</option>
-                        <option value="-1" {% if display_end_days == -1 %}selected{% endif %}>All Future Events</option>
-                        <option value="-2" {% if display_end_days == -2 %}selected{% endif %}>Show All Events</option>
+                        <option value="-1" {% if display_end_days == -1 %}selected{% endif %}>Find By Date</option>
                     </select>
                 </p>
+                <p id="date_search">
+                    <span class="w3-hide-small">By Date:</span> 
+                    <input id="roster_start_date" name="roster_start_date" type="text"
+                    class="DatePickerButton w3-border deletable"
+                    placeholder="Start Date" 
+                    />&nbsp;thru&nbsp;
+                    <input id="roster_end_date" name="roster_end_date" type="text"
+                    class="DatePickerButton w3-border deletable"
+                    placeholder="End Date" 
+                    />
+                </p>
+                <script>addPicker("roster_start_date","%m/%d/%Y")</script>
+                <script>addPicker("roster_end_date","%m/%d/%Y")</script>
                 {% if as_spreadsheet %}
                     {% set checked = 'checked="checked"' %}
                 {% else %}
@@ -31,4 +43,23 @@
         </form>
     </div>
 </div>
-
+<script>
+    function date_range_change(){
+        // date range selector changed
+        let state = $('#date_range_select').val();
+        if (state >= 0){
+            $('#date_search').hide()
+        } else {
+            $('#date_search').show()
+        }
+    }
+    $(document).ready(function(){
+        // put the previous values into the date fields
+        $('#roster_start_date').val('{{ start_date | local_date_string |default('',true) }}')
+        $('#roster_end_date').val('{{ end_date | local_date_string | default('',true) }}')
+        // hide or show the date search fields
+        date_range_change();
+        // set the on change for the date range selector
+        $('#date_range_select').change(function(){date_range_change();});
+    })
+</script>
