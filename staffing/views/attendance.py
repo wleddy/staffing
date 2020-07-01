@@ -37,9 +37,24 @@ def display(path=None):
             {'name':'attendance'},
             {'name':'comment'},
         ]
+        # Activity,Event,Job Title,First Name,Last Name,Scheduled Start,Scheduled End,Start Date,End Date,Milage,Comments
+        # {% for rec in recs %}"{{rec.activity_title}}","{{ rec.calendar_title}}","{{ rec.job_title }}","{{ rec.first_name }}","{{ rec.last_name }}",{{ rec.job_start_date | default("No Job Start Time",True) | excel_date_and_time_string }},{{ rec.job_end_date | default("No Job End Time", True) | excel_date_and_time_string }},{% if rec.no_show == 1 %}No Show,No Show{% else %}{{ rec.start_date | default("Not Recorded", True)| excel_date_and_time_string }},{{ rec.end_date | default("Not Recorded", True) | excel_date_and_time_string }}{% endif %},{{ rec.milage | default('0',True) }},"{{ rec.comment | default('',True) }}"
+    view.export_fields = [
+        {'name':'activity_title','label':'Activity'},
+        {'name':'calendar_title','label':'Event'},
+        {'name':'job_title','label':'Job Title',},
+        {'name':'first_name',},
+        {'name':'last_name',},
+        {'name':'job_start_date','type':'datetime','label':"Scheduled Start",},
+        {'name':'job_end_date','type':'datetime','label':"Scheduled End",},
+        {'name':'no_show',},
+        {'name':'start_date','type':'datetime'},
+        {'name':'end_date','type':'datetime'},
+        {'name':'mileage',},
+        {'name':'comment',},    
+    ]
     
     view.list_table_template = 'attendance_list_table.html'
-    
     return view.dispatch_request()
 
 
