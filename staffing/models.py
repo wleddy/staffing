@@ -106,11 +106,12 @@ class Attendance(SqliteTable):
         # defaults are for list selection
         #where = kwargs.get('where',"date(job_start_date, 'localtime') <= date('now','localtime') and is_volunteer_job = 0")
         # import pdb;pdb.set_trace()
-        vol_job_clause = " is_volunteer_job = 0"
+        # vol_job_clause = " is_volunteer_job = 0"
+        
         if not where:
-            where = vol_job_clause
-        else:
-            where = where + " and " + vol_job_clause
+            where = '1'
+        #else:
+            #where = where + " and " + vol_job_clause
             
         if not order_by:
             order_by = "date(job_start_date,'localtime') DESC , activity_title, job_title, first_name, last_name"
