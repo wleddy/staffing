@@ -94,8 +94,9 @@
     
     <div id="no_show_box" class="w3-container w3-row" >
         <p class="w3-col w3-quarter w3-large w3-right" style="border:1.5pt red dashed;padding:2pt 0 4pt 8pt;">
-        {% set selected =  'checked="checked"' if rec.no_show else '' %}
-        {{ checkbox_field(1,'no_show',id='no_show', extras=selected)}}
+        {% set checked = 'checked="checked"' if rec.no_show else '' %}
+        {% set extra_stuff =  'style="width:auto;" '+ checked %}
+        {{ checkbox_field(1,'no_show',id='no_show', extras=extra_stuff, )}}
     </div>
     <div id="dateAndTime" class="w3-container input-tab">
          <p class="w3-xlarge">{{ label_only("Enter your attendance start and end times")}}</p>

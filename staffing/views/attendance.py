@@ -7,7 +7,7 @@ from shotglass2.takeabeltof.utils import render_markdown_for, printException, cl
 from shotglass2.takeabeltof.date_utils import date_to_string, getDatetimeFromString, local_datetime_now
 from shotglass2.shotglass import get_site_config
 from staffing.models import Event, Location, Job, UserJob, Attendance, Task
-from staffing.views.signup import get_job_rows, get_volunteer_role_ids
+
 
 mod = Blueprint('attendance',__name__, template_folder='templates/attendance', url_prefix='/attendance')
 
@@ -15,20 +15,33 @@ mod = Blueprint('attendance',__name__, template_folder='templates/attendance', u
 def setExits():
     g.listURL = url_for('.display')
     g.editURL = url_for('.edit')
-    g.deleteURL = url_for('.delete')
+    g.deleteURL = g.listURL + "delete/"
     g.title = 'Attendance'
 
-@table_access_required(Attendance)
-@mod.route('/',methods=['GET','POST'])
-def display():
-    setExits()
-    g.title = 'Attendance List'
+
+from shotglass2.takeabeltof.views import TableView
+PRIMARY_TABLE = Attendance
+# this handles table list and record delete
+@mod.route('/<path:path>',methods=['GET','POST',])
+@mod.route('/<path:path>/',methods=['GET','POST',])
+@mod.route('/',methods=['GET','POST',])
+@table_access_required(PRIMARY_TABLE)
+def display(path=None):
+    view = TableView(PRIMARY_TABLE,g.db)
+    view.list_fields = [
+            {'name':'activity_title','label':'Event',},
+            {'name':'job_title','label':'Job'},
+            {'name':'full_name','label':'Name'},
+            {'name':'job_start_date','label':'Job Date','search':'date'},
+            {'name':'scheduled'},
+            {'name':'attendance'},
+            {'name':'comment'},
+        ]
     
-    sql = attendance_sql()
-    #print(sql)
-    recs = Attendance(g.db).query(sql)
+    view.list_table_template = 'attendance_list_table.html'
     
-    return render_template('attendance_list.html',recs=recs)
+    return view.dispatch_request()
+
 
 @mod.route('/edit/<int:att_id>',methods=['GET','POST'])
 @mod.route('/edit/<int:att_id>/',methods=['GET','POST'])
@@ -55,9 +68,8 @@ def edit(att_id=0):
         rec.start_date = rec.end_date = date_to_string(local_datetime_now(),'iso_datetime')
         users = User(g.db).select()
     else:       
-        sql = attendance_sql(where = "attendance.id = {}".format(att_id))
-        rec = Attendance(g.db).query_one(sql)
-    
+        rec = Attendance(g.db).select_one(where = "attendance.id = {}".format(att_id))
+        
         if not rec:
             flash('Could not access Attendance Record')
             return abort(404)
@@ -108,7 +120,7 @@ def edit(att_id=0):
             else:
                 where = "attendance.id > 0"  # effectively, all records
 
-            rec = Attendance(g.db).query(attendance_sql(where=where))
+            rec = Attendance(g.db).select(where=where)
             if rec:
                 rec = rec[0] #single record
                 if att_id == 0:
@@ -146,27 +158,6 @@ def edit(att_id=0):
             users=users,
             tasks=tasks,
             )
-    
-    
-@mod.route('/delete/',methods=['GET','POST',])
-@mod.route('/delete/<int:id>/',methods=['GET',])
-@table_access_required(Attendance)
-def delete(id=0):
-    setExits()
-    id = cleanRecordID(id)
-    attendance = Attendance(g.db)
-    if id <= 0:
-        return abort(404)
-    
-    if id > 0:
-        rec = attendance.get(id)
-    
-    if rec:
-        attendance.delete(rec.id)
-        g.db.commit()
-        flash("Attendance Record Deleted")
-
-    return redirect(g.listURL)
 
 
 def valid_form(rec):
@@ -261,69 +252,6 @@ def tab_select():
         session['attendance_tab_select'] = tab_clicked
         
     return ''
-    
-@mod.route('/report',methods=['POST'])
-@mod.route('/report/',methods=['POST'])
-@table_access_required(Attendance)
-def report():
-    """Export the current selection of records as csv text"""
-    
-    setExits()
-    selected_recs = request.form.get('selected_recs','')
-    filename = "attendance_report_{}.csv".format(date_to_string(local_datetime_now(),'iso_datetime')).replace(' ','_')
-    if selected_recs:
-        # get attendance recs with this id
-        recs = Attendance(g.db).query(attendance_sql(where="attendance.id in ({})".format(selected_recs)))
-        if recs:
-            result = render_template("attendance_report.csv", recs=recs)
-            headers={
-               "Content-Disposition":"attachment;filename={}".format(filename),
-                }
-
-            return Response(
-                    result,
-                    mimetype="text/csv",
-                    headers=headers
-                    )
-            
-    flash("No records to report")
-    return redirect(g.listURL)
-    
-def attendance_sql(**kwargs):
-    """Return the sql statement to use to in input and edit forms"""
-    
-    # defaults are for list selection
-    #where = kwargs.get('where',"date(job_start_date, 'localtime') <= date('now','localtime') and is_volunteer_job = 0")
-    where = kwargs.get('where'," is_volunteer_job = 0")
-    order_by = kwargs.get('order_by',"date(job_start_date,'localtime') DESC , activity_title, job_title, first_name, last_name")
-    
-    sql = """select
-    attendance.*,
-    coalesce(job.start_date,attendance.start_date) as job_start_date,
-    coalesce(job.end_date,attendance.end_date) as job_end_date,
-    coalesce(activity.title,task_activity.title,'No Task Title') as activity_title, 
-    coalesce(user.first_name,task_user.first_name) as first_name,
-    coalesce(user.last_name,task_user.last_name) as last_name,
-    coalesce(nullif(event.calendar_title,''),activity.title,task_activity.title,'No Activity Title') as calendar_title,
-    coalesce(job.title,task.name,'No Job Title') as job_title, 
-    
-    -- 1 if a volunteer job, else 0
-    coalesce((select 1 from job_role where job_role.role_id in ({vol_role_ids}) and job_role.job_id = job.id),0) as is_volunteer_job
-    from attendance
-    left join user_job on user_job.id = attendance.user_job_id
-    left join job on user_job.job_id = job.id
-    left join user on user.id = user_job.user_id
-    left join user as task_user on task_user.id = attendance.task_user_id
-    left join task on task.id = attendance.task_id
-    left join event on event.id = job.event_id
-    left join activity as task_activity on task_activity.id = task.activity_id
-    left join activity on activity.id = event.activity_id
-    
-    where {where}
-    order by {order_by}
-    """.format(vol_role_ids=get_volunteer_role_ids(),where=where,order_by=order_by)
-    
-    return sql
     
     
 def get_start_time_from_form():

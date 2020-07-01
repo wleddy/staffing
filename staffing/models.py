@@ -99,7 +99,62 @@ class Attendance(SqliteTable):
 
         super().create_table(sql)
 
-
+    def select(self,where=None,order_by=None,**kwargs):
+        
+        from staffing.views.signup import get_volunteer_role_ids
+        
+        # defaults are for list selection
+        #where = kwargs.get('where',"date(job_start_date, 'localtime') <= date('now','localtime') and is_volunteer_job = 0")
+        # import pdb;pdb.set_trace()
+        vol_job_clause = " is_volunteer_job = 0"
+        if not where:
+            where = vol_job_clause
+        else:
+            where = where + " and " + vol_job_clause
+            
+        if not order_by:
+            order_by = "date(job_start_date,'localtime') DESC , activity_title, job_title, first_name, last_name"
+    
+        sql = """select
+        attendance.*,
+        coalesce(job.start_date,attendance.start_date) as job_start_date,
+        coalesce(job.end_date,attendance.end_date) as job_end_date,
+        coalesce(activity.title,task_activity.title,'No Task Title') as activity_title, 
+        coalesce(user.first_name,task_user.first_name) as first_name,
+        coalesce(user.last_name,task_user.last_name) as last_name,
+        coalesce(user.first_name,task_user.first_name) || 
+            ' ' 
+            || coalesce(user.last_name,task_user.last_name) as full_name,
+        coalesce(nullif(event.calendar_title,''),activity.title,task_activity.title,'No Activity Title') as calendar_title,
+        coalesce(job.title,task.name,'No Job Title') as job_title, 
+    
+        -- 1 if a volunteer job, else 0
+        coalesce((select 1 from job_role where job_role.role_id in ({vol_role_ids}) and job_role.job_id = job.id),0) as is_volunteer_job
+        from attendance
+        left join user_job on user_job.id = attendance.user_job_id
+        left join job on user_job.job_id = job.id
+        left join user on user.id = user_job.user_id
+        left join user as task_user on task_user.id = attendance.task_user_id
+        left join task on task.id = attendance.task_id
+        left join event on event.id = job.event_id
+        left join activity as task_activity on task_activity.id = task.activity_id
+        left join activity on activity.id = event.activity_id
+    
+        where {where}
+        order by {order_by}
+        """.format(vol_role_ids=get_volunteer_role_ids(),where=where,order_by=order_by)
+        
+        return self.query(sql)
+        
+        
+    def select_one(self,where=None,order_by=None,**kwargs):
+        recs = self.select(where,order_by,**kwargs)
+        if recs:
+            return recs[0]
+            
+        return recs
+        
+        
 class Client(SqliteTable):
     """Client for events"""
     def __init__(self,db_connection):
