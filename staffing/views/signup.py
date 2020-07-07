@@ -799,6 +799,28 @@ def get_volunteer_role_ids():
     return vol_role_ids
     
     
+def get_staff_user_ids():
+    """Return a text string cotaining the user ids of those users with a staff role.
+    The string is suitable for use in a SQL "in" query.
+    The Role selection is based on rank. Staff are to have a rank >= 50 and <=100
+    """
+    
+    sql = """select user.* 
+    from user
+    join user_role on user_role.user_id = user.id 
+    join role on role.id = user_role.role_id 
+    where role.rank >= 50 and role.rank <=100
+    
+    """
+    recs = Role(g.db).query(sql)
+    out = '0' # will create a ligit query, but no results
+    if recs:
+        y = set([str(rec.id) for rec in recs])
+        out = ",".join(set([str(rec.id) for rec in recs]))
+    
+    return out
+    
+    
 @mod.route('/get_commitment_email/<user_name_or_email>/',methods=['GET',])
 @mod.route('/get_commitment_email/<user_name_or_email>',methods=['GET',])
 @mod.route('/get_commitment_email/',methods=['GET',])

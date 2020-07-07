@@ -100,18 +100,17 @@ class Attendance(SqliteTable):
         super().create_table(sql)
 
     def select(self,where=None,order_by=None,**kwargs):
-        
-        from staffing.views.signup import get_volunteer_role_ids
-        
-        # defaults are for list selection
-        #where = kwargs.get('where',"date(job_start_date, 'localtime') <= date('now','localtime') and is_volunteer_job = 0")
+                
+        # delay import until needed
+        from staffing.views.signup import get_volunteer_role_ids, get_staff_user_ids
+                
         # import pdb;pdb.set_trace()
-        # vol_job_clause = " is_volunteer_job = 0"
-        
+        vol_job_clause = " is_volunteer_job = 0"
+        staff_only_clause = "user.id in ({})".format(get_staff_user_ids())
         if not where:
-            where = '1'
-        #else:
-            #where = where + " and " + vol_job_clause
+            where = staff_only_clause
+        else:
+            where = where + " and " + staff_only_clause
             
         if not order_by:
             order_by = "date(job_start_date,'localtime') DESC , activity_title, job_title, first_name, last_name"
@@ -131,6 +130,7 @@ class Attendance(SqliteTable):
     
         -- 1 if a volunteer job, else 0
         coalesce((select 1 from job_role where job_role.role_id in ({vol_role_ids}) and job_role.job_id = job.id),0) as is_volunteer_job
+
         from attendance
         left join user_job on user_job.id = attendance.user_job_id
         left join job on user_job.job_id = job.id
@@ -140,10 +140,15 @@ class Attendance(SqliteTable):
         left join event on event.id = job.event_id
         left join activity as task_activity on task_activity.id = task.activity_id
         left join activity on activity.id = event.activity_id
+        left join user_role on user_role.user_id = user.id
     
         where {where}
         order by {order_by}
-        """.format(vol_role_ids=get_volunteer_role_ids(),where=where,order_by=order_by)
+        """.format(
+            vol_role_ids=get_volunteer_role_ids(),
+            where=where,
+            order_by=order_by,
+        )
         
         return self.query(sql)
         
