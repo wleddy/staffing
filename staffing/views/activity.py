@@ -78,7 +78,7 @@ def edit(id=0):
         rec = activity.new()
         rec.title = "New Activity"
         activity.save(rec)
-        g.cancelURL = url_for('.delete') + str(rec.id)
+        g.cancelURL = g.deleteURL + str(rec.id)
         g.db.commit()
     
     if request.form and save_activity(rec):
