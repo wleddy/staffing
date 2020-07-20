@@ -75,7 +75,7 @@ class Attendance(SqliteTable):
     def __init__(self,db_connection):
         super().__init__(db_connection)
         self.table_name = 'attendance'
-        self.order_by_col = 'start_date DESC, id'
+        self.order_by_col = "date(job_start_date,'localtime') DESC , activity_title COLLATE NOCASE ASC, job_title COLLATE NOCASE ASC, first_name COLLATE NOCASE ASC, last_name COLLATE NOCASE ASC"
         self.defaults = {'no_show':0,}
         self.indexes = {"attendance_user_job_id":"user_job_id","attendance_start_date":"start_date"}
 
@@ -113,9 +113,9 @@ class Attendance(SqliteTable):
             where = where + " and " + staff_only_clause
             
         if not order_by:
-            order_by = "date(job_start_date,'localtime') DESC , activity_title, job_title, first_name, last_name"
+            order_by = self.order_by_col
     
-        sql = """select
+        sql = """select distinct
         attendance.*,
         coalesce(job.start_date,attendance.start_date) as job_start_date,
         coalesce(job.end_date,attendance.end_date) as job_end_date,
