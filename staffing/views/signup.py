@@ -836,44 +836,46 @@ def send_user_commitment_email(user_name_or_email=None):
     
     # get the user record
     user = User(g.db).get(user_name_or_email)
-    if not user:
-        result = "Sorry: Could not find the user record."
-    # get all the job.id's for user's future jobs
-    sql = """
-        select user_job.user_id, user_job.job_id from user_job
-        join job on user_job.job_id = job.id
+    if user:
+        # get all the job.id's for user's future jobs
+        sql = """
+            select user_job.user_id, user_job.job_id from user_job
+            join job on user_job.job_id = job.id
         
-        where user_job.user_id = {user_id} and date(job.start_date,'localtime') >= '{today}'
-    """.format(user_id=user.id,today=date_to_string(local_datetime_now(),'iso_date'))
-    user_jobs = UserJob(g.db).query(sql)
+            where user_job.user_id = {user_id} and date(job.start_date,'localtime') >= '{today}'
+        """.format(user_id=user.id,today=date_to_string(local_datetime_now(),'iso_date'))
+        user_jobs = UserJob(g.db).query(sql)
     
-    job_data = None
-    jobs_list = None
-    if user_jobs:
-        jobs_list = ','.join([str(x.job_id) for x in user_jobs])
-    if jobs_list:
-        job_data = get_job_rows(None,None,"job.id in ({})".format(jobs_list),[],is_admin=True)
-    if job_data:
+        job_data = None
+        jobs_list = None
+        if user_jobs:
+            jobs_list = ','.join([str(x.job_id) for x in user_jobs])
+        if jobs_list:
+            job_data = get_job_rows(None,None,"job.id in ({})".format(jobs_list),[],is_admin=True)
+        if job_data:
 
-        try:
-            send_signup_email(job_data,
-                user,
-                'announce/email/commitment_reminder.md',
-                mod,
-                escape=False,
-                subject="Your Commitments for {}".format(get_site_config()["SITE_NAME"]),
-                renminder_type="future",
-                )
+            try:
+                send_signup_email(job_data,
+                    user,
+                    'announce/email/commitment_reminder.md',
+                    mod,
+                    escape=False,
+                    subject="Your Commitments for {}".format(get_site_config()["SITE_NAME"]),
+                    renminder_type="future",
+                    )
             
-            result = 'Your commitment report has been emailed to you.'
+                result = 'Your commitment report has been emailed to you.'
             
-        except Exception as e:
-            mes = "An error occurred while sending user commitment email. Err: {}".format(str(e))
-            email_admin(mes,printException(mes))
+            except Exception as e:
+                mes = "An error occurred while sending user commitment email. Err: {}".format(str(e))
+                email_admin(mes,printException(mes))
             
-            result = "Sorry: Something wierd happened and we were not able to send an email. We'll look into it."
+                result = "Sorry: Something wierd happened and we were not able to send an email. We'll look into it."
+        else:
+            result =  'Sorry: No Future Commitments found.'
     else:
-        result =  'Sorry: No Future Commitments found.'
+        # no user record found
+        result = "Sorry: Could not find the user record."
         
         
     return render_template('get_commitment_result.html',result=result)
