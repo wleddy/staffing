@@ -1,0 +1,28 @@
+{% set selected_roles = session.get(data.ATTN_ROLES_SELECT_OBJ,[0]) %}
+<div class="w3-row">
+    <p>
+    <span class="w3-hide-small sg-list-search-label">Find by Role:</span>
+    <select multiple class="w3-select-multiple" style="width:auto;" id="{{ data.ATTN_ROLES_SELECT_OBJ }}" name="{{data.ATTN_ROLES_SELECT_OBJ}}" 
+     onchange="update_user_list(this)" >
+     <option value="0" {% if 0 in selected_roles %}selected {% endif %}>All</option>
+    {% for field in data.user_roles %}
+        <option value="{{ field.id }}" {% if field.id in selected_roles and 0 not in selected_roles %}selected {% endif %}>{{ field.name }}</option>
+    {% endfor %}
+    </select>
+    </p>
+</div>
+
+<script>
+    
+    function update_user_display(){
+        //alert("Ready to update display")
+        doDBsearch("{{g.listURL}}");
+    }
+    
+    function update_user_list(which){
+        // alert($(which).val())
+        $.post("{{url_for('attendance.set_list_roles')}}",{"{{data.ATTN_ROLES_SELECT_OBJ}}":$(which).val()});
+        // give the server time to update the session
+        setTimeout(update_user_display, 250);
+    }
+</script>

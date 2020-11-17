@@ -11,12 +11,15 @@ from staffing.models import Event, Location, Job, UserJob, Attendance, Task
 
 mod = Blueprint('attendance',__name__, template_folder='templates/attendance', url_prefix='/attendance')
 
+ATTN_ROLES_SELECT_OBJ = "attn_roles_select" #The ID of the role select html object
+ATTN_STATUS_SELECT_OBJ = "attn_status_select"
 
 def setExits():
     g.listURL = url_for('.display')
     g.editURL = url_for('.edit')
     g.deleteURL = g.listURL + "delete/"
     g.title = 'Attendance'
+    
 
 
 from shotglass2.takeabeltof.views import TableView
@@ -27,6 +30,8 @@ PRIMARY_TABLE = Attendance
 @mod.route('/',methods=['GET','POST',])
 @table_access_required(PRIMARY_TABLE)
 def display(path=None):
+    setExits()
+    
     view = TableView(PRIMARY_TABLE,g.db)
     view.list_fields = [
             {'name':'activity_title','label':'Event',},
@@ -37,8 +42,7 @@ def display(path=None):
             {'name':'attendance'},
             {'name':'comment'},
         ]
-        # Activity,Event,Job Title,First Name,Last Name,Scheduled Start,Scheduled End,Start Date,End Date,Milage,Comments
-        # {% for rec in recs %}"{{rec.activity_title}}","{{ rec.calendar_title}}","{{ rec.job_title }}","{{ rec.first_name }}","{{ rec.last_name }}",{{ rec.job_start_date | default("No Job Start Time",True) | excel_date_and_time_string }},{{ rec.job_end_date | default("No Job End Time", True) | excel_date_and_time_string }},{% if rec.no_show == 1 %}No Show,No Show{% else %}{{ rec.start_date | default("Not Recorded", True)| excel_date_and_time_string }},{{ rec.end_date | default("Not Recorded", True) | excel_date_and_time_string }}{% endif %},{{ rec.milage | default('0',True) }},"{{ rec.comment | default('',True) }}"
+
     view.export_fields = [
         {'name':'activity_title','label':'Activity'},
         {'name':'calendar_title','label':'Event'},
@@ -55,7 +59,49 @@ def display(path=None):
     ]
     
     view.list_table_template = 'attendance_list_table.html'
+    # get a set of Role records to use in the special search widget
+    view.user_roles = Role(g.db).select()
+    view.list_search_widget_extras_template = 'attendance_search_widget.html'
+    view.ATTN_ROLES_SELECT_OBJ = ATTN_ROLES_SELECT_OBJ
+    view.ATTN_STATUS_SELECT_OBJ = ATTN_STATUS_SELECT_OBJ
+    
     return view.dispatch_request()
+
+
+@mod.route('/set_list_roles', methods=['POST'])
+@mod.route('/set_list_roles/', methods=['POST'])
+@table_access_required(User)
+def set_list_roles():
+    """Record the selected roles for the user list page"""
+    # import pdb;pdb.set_trace()
+    element_name = ATTN_ROLES_SELECT_OBJ
+    if element_name not in request.form:
+        element_name = element_name + "[]" # brackets may be added by jquery or because it's an ajax post?
+    
+    selected_values = request.form.getlist(element_name)
+    
+    session[ATTN_ROLES_SELECT_OBJ] = []
+
+    # Use the long form loop in case any of the values submitted do not evalutate with int()
+    if selected_values and isinstance(selected_values,list):
+        for x in selected_values:
+            try:
+                session[ATTN_ROLES_SELECT_OBJ].append(int(x))
+            except:
+                printException("Error in attendance.py.set_list_roles. bad value for ATTN_ROLES_SELECT_OBJ. -> '{}'".format(x))
+        
+    return "OK"
+
+
+@mod.route('/set_list_status', methods=['POST'])
+@mod.route('/set_list_status/', methods=['POST'])
+@table_access_required(User)
+def set_list_status():
+    """Record the selected roles for the user list page"""
+    # import pdb;pdb.set_trace()
+    session[ATTN_STATUS_SELECT_OBJ] = request.form.get(ATTN_STATUS_SELECT_OBJ,"-1")
+    
+    return "OK"
 
 
 @mod.route('/edit/<int:att_id>',methods=['GET','POST'])

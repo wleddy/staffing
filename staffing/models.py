@@ -1,7 +1,8 @@
+from flask import session
 from shotglass2.takeabeltof.database import SqliteTable
 from shotglass2.takeabeltof.utils import cleanRecordID
 from shotglass2.takeabeltof.date_utils import local_datetime_now, date_to_string
-from shotglass2.users.models import User
+from shotglass2.users.models import User, UserRole
         
 class Activity(SqliteTable):
     """Events are grouped under Activiies
@@ -105,12 +106,25 @@ class Attendance(SqliteTable):
         from staffing.views.signup import get_volunteer_role_ids, get_staff_user_ids
                 
         # import pdb;pdb.set_trace()
+        # get the list of users who have at least one of specified roles
+        attn_roles_select = session.get('attn_roles_select')
+        user_roles = None
+        if attn_roles_select and len(attn_roles_select) > 0:
+            sql = """
+                Select user_id from user_role where role_id in ({role_ids}) 
+                """.format(role_ids=','.join(str(x) for x in attn_roles_select))
+            user_roles = UserRole(self.db).query(sql)
+        
         vol_job_clause = " is_volunteer_job = 0"
-        staff_only_clause = "user.id in ({})".format(get_staff_user_ids())
-        if not where:
-            where = staff_only_clause
-        else:
-            where = where + " and " + staff_only_clause
+        # staff_only_clause = "user.id in ({})".format(get_staff_user_ids())
+        staff_only_clause = None
+        if user_roles:
+            staff_only_clause = "user.id in ({})".format(','.join(str(x.user_id) for x in user_roles))
+        if staff_only_clause:
+            if not where:
+                where = staff_only_clause
+            else:
+                where = where + " and " + staff_only_clause
             
         if not order_by:
             order_by = self.order_by_col
