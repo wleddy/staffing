@@ -24,11 +24,11 @@ def start_app():
     get_db() # ensure that the database file exists
     shotglass.start_backup_thread(os.path.join(app.root_path,app.config['DATABASE_PATH']))
 
-# work around some web servers that mess up root path
-from werkzeug.contrib.fixers import CGIRootFix
-if app.config['CGI_ROOT_FIX_APPLY'] == True:
-    fixPath = app.config.get("CGI_ROOT_FIX_PATH","/")
-    app.wsgi_app = CGIRootFix(app.wsgi_app, app_root=fixPath)
+# # work around some web servers that mess up root path
+# from werkzeug.contrib.fixers import CGIRootFix
+# if app.config['CGI_ROOT_FIX_APPLY'] == True:
+#     fixPath = app.config.get("CGI_ROOT_FIX_PATH","/")
+#     app.wsgi_app =CGIRootFix(app.wsgi_app, app_root=fixPath)
 
 register_jinja_filters(app)
 
