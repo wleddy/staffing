@@ -114,12 +114,17 @@ class Attendance(SqliteTable):
                 Select user_id from user_role where role_id in ({role_ids}) 
                 """.format(role_ids=','.join(str(x) for x in attn_roles_select))
             user_roles = UserRole(self.db).query(sql)
-        
-        vol_job_clause = " is_volunteer_job = 0"
+            
+        # vol_job_clause = " is_volunteer_job = 0"
         # staff_only_clause = "user.id in ({})".format(get_staff_user_ids())
+        
+        if not user_roles and attn_roles_select:
+            # there are roles selected, but no users have any of those roles - bail now
+            return None
+            
         staff_only_clause = None
         if user_roles:
-            staff_only_clause = "user.id in ({})".format(','.join(str(x.user_id) for x in user_roles))
+            staff_only_clause = "user_table_id in ({})".format(','.join(str(x.user_id) for x in user_roles))
         if staff_only_clause:
             if not where:
                 where = staff_only_clause
@@ -128,9 +133,10 @@ class Attendance(SqliteTable):
             
         if not order_by:
             order_by = self.order_by_col
-    
-        sql = """select distinct
+
+        sql = """select
         attendance.*,
+        user.id as user_table_id,
         coalesce(job.start_date,attendance.start_date) as job_start_date,
         coalesce(job.end_date,attendance.end_date) as job_end_date,
         coalesce(activity.title,task_activity.title,'No Task Title') as activity_title, 
@@ -157,6 +163,7 @@ class Attendance(SqliteTable):
         left join user_role on user_role.user_id = user.id
     
         where {where}
+        group by attendance.id
         order by {order_by}
         """.format(
             vol_role_ids=get_volunteer_role_ids(),
