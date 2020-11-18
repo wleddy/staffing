@@ -156,9 +156,13 @@ def edit(att_id=0):
         else:
             fresh_rec = rec #already a single table record
             
+        # import pdb;pdb.set_trace()
         Attendance(g.db).update(fresh_rec,request.form)
-        fresh_rec.no_show = request.form.get('no_show','0')
-        #import pdb;pdb.set_trace()
+        # fresh_rec.no_show = request.form.get('no_show','0')
+        if 'no_show_checkbox' in request.form:
+            fresh_rec.no_show = 1
+        else:
+            fresh_rec.no_show = 0
             
         if valid_form(fresh_rec):
             #import pdb;pdb.set_trace()

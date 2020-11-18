@@ -132,7 +132,11 @@ def render_edit_form(id,activity_id):
     if request.form:
         #import pdb;pdb.set_trace()
         event.update(rec,request.form)
-        rec.exclude_from_calendar = request.form.get('exclude_from_calendar',0) #checkbox value
+        if 'exclude_from_calendar' in request.form:
+            rec.exclude_from_calendar = 1
+        else:
+            rec.exclude_from_calendar = 0
+            
         rec.location_id = cleanRecordID(request.form.get('location_id',-1))
         # ensure that web address is absolute
         if rec.client_website.strip():

@@ -102,7 +102,7 @@
         {% set _ = placeholders.update({"calendar_title": rec.activity_title | safe })%}
         <p>{{ input_field(rec.calendar_title,'calendar_title',id="calendar_title",label="Calendar Title (if different)")}}</p>
         {% set selected =  'checked="checked"' if rec.exclude_from_calendar else '' %}
-        <p>{{ checkbox_field(1,'exclude_from_calendar', extras=selected)}}</p>
+        <p>{{ checkbox_field('exclude','exclude_from_calendar', extras=selected)}}</p>
         {% set _ = placeholders.update({"service_type": rec.activity_service_type | safe })%}
         <p>{{ input_field(rec.service_type,'service_type',id="service_type",label="Service Type (if different)")}}</p>
         <p>{{ label_only(label="Event Times")}}</p>
