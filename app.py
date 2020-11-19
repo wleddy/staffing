@@ -146,7 +146,13 @@ def _before():
         g.admin.register(User,url_for('user.display'),display_name='Users',roles=['activity manager'],add_to_menu=False)
 
         tools.register_admin() # add the tools menu
-
+        # add this to the tools menu
+        g.admin.register(User,
+                url_for('signup.volunteer_contact_list'),
+                display_name='Download Volunteers',
+                minimum_rank_required=500,
+            )
+        
 @app.teardown_request
 def _teardown(exception):
     if 'db' in g:

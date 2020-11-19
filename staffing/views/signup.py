@@ -3,6 +3,8 @@ from flask import request, session, g, redirect, url_for, abort, \
 from shotglass2.shotglass import get_site_config
 from shotglass2.takeabeltof.mailer import send_message, email_admin
 from shotglass2.takeabeltof.utils import render_markdown_for, render_markdown_text, printException, cleanRecordID, looksLikeEmailAddress, formatted_phone_number
+from shotglass2.takeabeltof.jinja_filters import excel_date_and_time_string
+from shotglass2.takeabeltof.views import TableView
 from shotglass2.takeabeltof.date_utils import date_to_string, getDatetimeFromString, local_datetime_now
 from shotglass2.takeabeltof.jinja_filters import default_if_none
 from shotglass2.users.admin import login_required, table_access_required, silent_login
@@ -879,3 +881,76 @@ def send_user_commitment_email(user_name_or_email=None):
         
         
     return render_template('get_commitment_result.html',result=result)
+    
+    
+
+@mod.route('/volunteer_contacts',methods=['GET',])
+@mod.route('/volunteer_contacts/',methods=['GET',])
+@table_access_required(User)
+def volunteer_contact_list():
+    """A cvs export of a contact list of volunteers"""
+    
+    sql = """
+    with 
+        vols as (select id from role where name = 'volunteer' or name = 'user'), 
+        not_vols as (select id from role where id not in (select id from vols))
+
+        -- The first query finds any user who has ever signed up for a volunteer shift
+        select user.id, user.first_name, user.last_name, user.first_name || ' ' || user.last_name as full_name, 
+        user.email, user.phone, user.address, user.address2, user.city, user.state, user.zip, user.active
+        from user_job
+        left join job on job.id = user_job.job_id
+        left join user on user.id = user_job.user_id
+        left join job_role on job_role.job_id = user_job.job_id
+        where
+            user_job.job_id in (select job_role.job_id from job_role where job_role.role_id in (select id from vols))
+        group by user.id
+
+        union
+
+        -- This query finds any user who has only 'user' or 'volunteer' roles regardless of if they ever worked a shift
+        select user.id, user.first_name, user.last_name, user.first_name || ' ' || user.last_name as full_name, 
+        user.email, user.phone, user.address, user.address2, user.city, user.state, user.zip, user.active
+        from user_role
+        left join user on user.id = user_role.user_id
+        where
+            user_role.role_id not in (select id from not_vols)
+        group by user.id
+
+        intersect
+
+        -- only select active users
+        select user.id, user.first_name, user.last_name, user.first_name || ' ' || user.last_name as full_name, 
+        user.email, user.phone, user.address, user.address2, user.city, user.state, user.zip, user.active
+        from user where user.active == 1
+        order by user.last_name collate nocase, user.first_name collate nocase;
+    """
+
+    recs = User(g.db).query(sql)
+    if recs:
+        view = TableView(User,g.db)
+        view.export_fields = [
+            {'name':'first_name'},
+            {'name':'last_name'},
+            {'name':'full_name'},
+            {'name':'email'},
+            {'name':'phone'},
+            {'name':'address'},
+            {'name':'address2'},
+            {'name':'city'},
+            {'name':'state'},
+            {'name':'zip'},
+            {'name':'active'},
+        ]
+        view.list_fields = view.export_fields
+        view.recs = recs
+        view.export_file_name = 'volunteer_contact_list.csv'
+        view.export_title = "Volunteer Contact List as of {}\n".format(excel_date_and_time_string(local_datetime_now()))
+    
+        return view.export()
+    
+    
+            
+    flash("No Volunteers Found")
+    return redirect(url_for('www.home'))
+    
