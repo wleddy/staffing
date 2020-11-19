@@ -6,6 +6,7 @@ from shotglass2.users.models import User
 from shotglass2.takeabeltof.database import Database
 from shotglass2.takeabeltof.jinja_filters import register_jinja_filters
 from shotglass2.takeabeltof.utils import cleanRecordID
+from shotglass2.tools.views import tools
 from shotglass2.users.views.login import setUserStatus
 from shotglass2.users.admin import Admin
 from staffing.models import Activity, Event, Job, Location, ActivityType, UserJob, EventDateLabel, Client, \
@@ -23,12 +24,6 @@ def start_app():
     shotglass.start_logging(app)
     get_db() # ensure that the database file exists
     shotglass.start_backup_thread(os.path.join(app.root_path,app.config['DATABASE_PATH']))
-
-# # work around some web servers that mess up root path
-# from werkzeug.contrib.fixers import CGIRootFix
-# if app.config['CGI_ROOT_FIX_APPLY'] == True:
-#     fixPath = app.config.get("CGI_ROOT_FIX_PATH","/")
-#     app.wsgi_app =CGIRootFix(app.wsgi_app, app_root=fixPath)
 
 register_jinja_filters(app)
 
@@ -146,9 +141,11 @@ def _before():
         g.admin.register(UserJob,url_for('attendance.display'),display_name='User Jobs',minimum_rank_required=500,roles=['admin','activity manager'],add_to_menu=False)
 
         shotglass.user_setup() # g.admin now holds access rules Users, Prefs and Roles
+        
         #give activity managers access to the user records
         g.admin.register(User,url_for('user.display'),display_name='Users',roles=['activity manager'],add_to_menu=False)
 
+        tools.register_admin() # add the tools menu
 
 @app.teardown_request
 def _teardown(exception):
@@ -188,6 +185,8 @@ app.register_blueprint(activity_group.mod)
 
 ## Setup the routes for users
 shotglass.register_users(app)
+
+app.register_blueprint(tools.mod)
 
 # setup www.routes...
 shotglass.register_www(app)

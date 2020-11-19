@@ -24,7 +24,7 @@ PRIMARY_TABLE = ActivityType
 @table_access_required(PRIMARY_TABLE)
 def display(path=None):
     # import pdb;pdb.set_trace()
-
+    setExits()
     view = TableView(PRIMARY_TABLE,g.db)
     # optionally specify the list fields
     view.list_fields = [

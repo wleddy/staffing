@@ -27,6 +27,8 @@ PRIMARY_TABLE = Event
 @table_access_required(PRIMARY_TABLE)
 def display(path=None):
     # import pdb;pdb.set_trace()
+    setExits()
+    g.title = "{} Record List".format(g.title)
 
     view = TableView(PRIMARY_TABLE,g.db)
     # optionally specify the list fields
