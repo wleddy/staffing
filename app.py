@@ -23,7 +23,9 @@ app.config.from_pyfile('site_settings.py', silent=True)
 def start_app():
     shotglass.start_logging(app)
     get_db() # ensure that the database file exists
-    shotglass.start_backup_thread(os.path.join(app.root_path,app.config['DATABASE_PATH']))
+    # shotglass.start_backup_thread(os.path.join(app.root_path,app.config['DATABASE_PATH']))
+    # use os.path.normpath to resolve true path to data file when using '../' shorthand
+    shotglass.start_backup_thread(os.path.normpath(os.path.join(app.root_path,shotglass.get_site_config()['DATABASE_PATH'])))
 
 register_jinja_filters(app)
 
@@ -269,6 +271,6 @@ if __name__ == '__main__':
         
     #app.run(host='localhost', port=8000)
     #app.run()
-    app.run(host='admin.willie.local')
+    app.run(host='events.willie.local')
     
     
