@@ -117,7 +117,6 @@ class Attendance(SqliteTable):
                 find_all_users = False
                 sql = sql + " where role_id in ({role_ids})".format(role_ids=','.join(str(x) for x in attn_roles_select))
             user_roles = UserRole(self.db).query(sql)
-            import pdb;pdb.set_trace()
                     
         if not user_roles and attn_roles_select:
             # there are roles selected, but no users have any of those roles - bail now
