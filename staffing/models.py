@@ -109,21 +109,22 @@ class Attendance(SqliteTable):
         # get the list of users who have at least one of specified roles
         attn_roles_select = session.get('attn_roles_select')
         user_roles = None
+        find_all_users = True # simplify the final query if we can...
         if attn_roles_select and len(attn_roles_select) > 0:
-            sql = """
-                Select user_id from user_role where role_id in ({role_ids}) 
-                """.format(role_ids=','.join(str(x) for x in attn_roles_select))
+            sql = "select distinct user_id from user_role"
+            if 0 not in attn_roles_select:
+                # select only by roles
+                find_all_users = False
+                sql = sql + " where role_id in ({role_ids})".format(role_ids=','.join(str(x) for x in attn_roles_select))
             user_roles = UserRole(self.db).query(sql)
-            
-        # vol_job_clause = " is_volunteer_job = 0"
-        # staff_only_clause = "user.id in ({})".format(get_staff_user_ids())
-        
+            import pdb;pdb.set_trace()
+                    
         if not user_roles and attn_roles_select:
             # there are roles selected, but no users have any of those roles - bail now
             return None
             
         staff_only_clause = None
-        if user_roles:
+        if user_roles and not find_all_users:
             staff_only_clause = "user_table_id in ({})".format(','.join(str(x.user_id) for x in user_roles))
         if staff_only_clause:
             if not where:
