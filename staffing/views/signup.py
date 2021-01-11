@@ -1,7 +1,7 @@
 from flask import request, session, g, redirect, url_for, abort, \
      render_template, flash, Blueprint
 from shotglass2.shotglass import get_site_config
-from shotglass2.takeabeltof.mailer import send_message, email_admin
+from shotglass2.takeabeltof.mailer import email_admin
 from shotglass2.takeabeltof.utils import render_markdown_for, render_markdown_text, printException, cleanRecordID, looksLikeEmailAddress, formatted_phone_number
 from shotglass2.takeabeltof.jinja_filters import excel_date_and_time_string
 from shotglass2.takeabeltof.views import TableView
