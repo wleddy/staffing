@@ -40,6 +40,21 @@ pre {
     background-image:url('/static/images/footer_bg2_small.png');
 }
 
+#saba-footer-container {
+    position:relative;
+    top:-2pt;
+    background-color: rgb(119,157,144);
+    margin-top:0;
+    padding:4pt 10pt 20pt 10pt;
+    color:#fff;
+}
+
+/* logo color is diff on large/medium */
+@media (min-width:600px){
+    #saba-footer-container {
+    background-color: rgb(137,172,161);
+    }
+}
 /* colors */
 /* Brown & tan */
 
