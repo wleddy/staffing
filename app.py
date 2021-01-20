@@ -12,18 +12,17 @@ from staffing.models import Activity, Event, Job, Location, ActivityType, UserJo
     Attendance, Task, ActivityGroup
 
 # Create app
-# setting static_folder to None allows me to handle loading myself
-app = Flask(__name__, instance_relative_config=True,
+app = shotglass.create_app(
+        __name__,
+        instance_path='../data_store/instance',
+        config_filename='site_settings.py',
         static_folder=None,
         )
-app.config.from_pyfile('site_settings.py', silent=True)
 
 @app.before_first_request
 def start_app():
     shotglass.start_logging(app)
     get_db() # ensure that the database file exists
-    # shotglass.start_backup_thread(os.path.join(app.root_path,app.config['DATABASE_PATH']))
-    # use os.path.normpath to resolve true path to data file when using '../' shorthand
     shotglass.start_backup_thread(os.path.normpath(os.path.join(app.root_path,shotglass.get_site_config()['DATABASE_PATH'])))
 
 register_jinja_filters(app)
