@@ -1,4 +1,4 @@
-from flask import Flask, g, session, request, redirect, flash, abort, url_for, session, render_template
+from flask import g, session, request, redirect, flash, abort, url_for, session, render_template
 import os
 from shotglass2 import shotglass
 from shotglass2.users.models import User
@@ -12,13 +12,18 @@ from staffing.models import Activity, Event, Job, Location, ActivityType, UserJo
     Attendance, Task, ActivityGroup
 
 # Create app
-app = shotglass.create_app(
-        __name__,
-        instance_path='../data_store/instance',
-        config_filename='site_settings.py',
-        static_folder=None,
-        )
-
+import logging 
+try:
+    app = shotglass.create_app(
+            __name__,
+            instance_path='../data_store/instance',
+            config_filename='site_settings.py',
+            static_folder=None,
+            )
+except:
+    logging.exception('')
+    
+        
 @app.before_first_request
 def start_app():
     shotglass.start_logging(app)
