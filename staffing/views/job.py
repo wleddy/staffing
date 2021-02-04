@@ -6,7 +6,7 @@ from shotglass2.users.models import Role, User
 from shotglass2.takeabeltof.utils import render_markdown_for, printException, cleanRecordID
 from shotglass2.takeabeltof.date_utils import date_to_string, getDatetimeFromString, local_datetime_now
 from shotglass2.takeabeltof.mailer import email_admin
-from shotglass2.shotglass import get_site_config
+from shotglass2.shotglass import get_site_config, is_ajax_request
 from staffing.models import Event, Location, Job, UserJob, JobRole
 from staffing.views.announcements import send_signup_email
 from staffing.views.signup import get_job_rows
@@ -107,11 +107,8 @@ def edit(id=0,event_id=0,edit_from_list=False):
             rec.end_date = getDatetimeFromString(event_rec.service_end_date)
             
         if 'last_job' in session:
-            # apply previous record
-            ses_rec = session['last_job']
-            for key,value in rec._asdict().items():
-                if key != 'id' and key in ses_rec:
-                    rec._update([(key,ses_rec[key])])
+            # restore the data from the last job edited
+            rec.update(session['last_job'])
             
         rec.event_id = event_id
     
@@ -192,7 +189,7 @@ def delete(id=0):
         UJ = UserJob(g.db).select(where='job_id = {}'.format(id))
         if UJ:
             mes = "There are one or more users assigned to this job. You must remove the assignments first."
-            if request.is_xhr:
+            if is_ajax_request():
                 #this is an ajax request
                 return "failure: " + mes
             else:
@@ -201,11 +198,15 @@ def delete(id=0):
             
         job.delete(rec.id)
         g.db.commit()
-        if request.is_xhr:
+        if is_ajax_request():
             return "success"
-        #flash("Job {} Deleted from {}".format(rec.title,job.display_name))
+
     else:
-        flash("That record could not be found")
+        mes = "That record could not be found"
+        if is_ajax_request():
+            return f"failure: {mes}"
+                
+        flash(mes)
     
     return redirect(g.listURL)
     
