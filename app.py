@@ -131,7 +131,7 @@ def _before():
             
         g.admin.register(Activity,url_for('activity.display'),display_name='Staffing Admin',header_row=True,minimum_rank_required=500,roles=['admin','activity manager'])
         g.admin.register(Activity,url_for('activity.display'),display_name='Activities',minimum_rank_required=500,roles=['admin','activity manager'])
-        g.admin.register(Event,url_for('event.display'),display_name='Events',add_to_menu=True,minimum_rank_required=500,roles=['admin','activity manager'])
+        g.admin.register(Event,url_for('event.display'),display_name='Events',add_to_menu=False,minimum_rank_required=500,roles=['admin','activity manager'])
         #location
         g.admin.register(Location,url_for('location.display'),display_name='Locations',minimum_rank_required=500,roles=['admin','activity manager'])
         g.admin.register(ActivityGroup,url_for('activity_group.display'),display_name='Activity Groups',minimum_rank_required=500,roles=['admin','activity manager'])
