@@ -132,7 +132,14 @@ def render_edit_form(id,activity_id):
         rec = event.get(rec.id)
 
     if request.form:
-        #import pdb;pdb.set_trace()
+        # import pdb;pdb.set_trace()
+        
+        # set Service start and end to None in rec. 
+        # values will be set if Service start and end are in form
+        # or set == to event times in valid_input method
+        rec.service_start_date = None
+        rec.service_end_date = None
+        
         event.update(rec,request.form)
         if 'exclude_from_calendar' in request.form:
             rec.exclude_from_calendar = 1
