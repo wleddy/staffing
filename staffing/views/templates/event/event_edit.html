@@ -143,7 +143,7 @@
             <p>{{ label_only(label="Service Times")}}</p>
                 <div class="w3-row">
                     <p class="w3-col w3-third">
-                        {{ select_field("service_start_date_label_id","Calendar Label",class="w3-border") }}
+                        {{ select_field("service_start_date_label_id","Calendar Label",class="w3-border service_date_data") }}
                             {% if event_date_labels %}
                             {% for label in event_date_labels %}
                                 <option value="{{label.id}}" {% if label.id == rec.service_start_date_label_id %}selected="selected" {% endif %}>{{label.label}}</option>
@@ -153,12 +153,12 @@
                     </p>
                     <p class="w3-col w3-twothird">
                         {% set service_start_date = rec.service_start_date | local_date_and_time_string %}
-                        {{ input_field(service_start_date,'service_start_date',id="service_start_date", label="Service Starts", placeholder="Service Start Date and Time") }}
+                        {{ input_field(service_start_date,'service_start_date',id="service_start_date", label="Service Starts", class="service_date_data", placeholder="Service Start Date and Time") }}
                     </p>
                 </div>
                 <div class="w3-row">
                     <p class="w3-col w3-third">
-                        {{ select_field("service_end_date_label_id","Calendar Label",class="w3-border") }}
+                        {{ select_field("service_end_date_label_id","Calendar Label",class="w3-border service_date_data") }}
                             {% if event_date_labels %}
                             {% for label in event_date_labels %}
                                 <option value="{{label.id}}" {% if label.id == rec.service_end_date_label_id %}selected="selected" {% endif %}>{{label.label}}</option>
@@ -168,7 +168,7 @@
                     </p>
                     <p class="w3-col w3-twothird">
                         {% set service_end_date = rec.service_end_date | local_date_and_time_string %}
-                        {{ input_field(service_end_date,'service_end_date',id="service_end_date", label="Service Ends", placeholder="Service End Date and Time") }}
+                        {{ input_field(service_end_date,'service_end_date',id="service_end_date", class="service_date_data", label="Service Ends", placeholder="Service End Date and Time") }}
                     </p>
             </div>
         </div>
@@ -211,12 +211,11 @@
     
     function toggle_service_times(){
         if ($('#show_service_times').prop('checked') == false ){
-            $('#service_start_date').prop('disabled',true);
-            $('#service_end_date').prop('disabled',true);
+            $('.service_date_data').prop('disabled',true);
             $('#service-times').hide();
         } else {
             $('#show_service_times').prop('checked',true);
-            $('#service_start_date , #service_end_date').prop('disabled',false);
+            $('.service_date_data').prop('disabled',false);
             $('#service-times').show();
         }
     }
