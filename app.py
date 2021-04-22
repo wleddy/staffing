@@ -127,7 +127,7 @@ def _before():
         #Events
         # a header row must have the some permissions or higher than the items it heads
         #import pdb;pdb.set_trace()
-        g.admin.register(Job,url_for('signup.roster'),display_name='View Roster',top_level=True,minimum_rank_required=0,add_to_menu=True)
+        g.admin.register(Job,url_for('signup.roster'),display_name='View Roster',top_level=True,minimum_rank_required=80,add_to_menu=True)
             
         g.admin.register(Activity,url_for('activity.display'),display_name='Staffing Admin',header_row=True,minimum_rank_required=500,roles=['admin','activity manager'])
         g.admin.register(Activity,url_for('activity.display'),display_name='Activities',minimum_rank_required=500,roles=['admin','activity manager'])
