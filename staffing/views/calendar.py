@@ -42,10 +42,18 @@ def display(month=None,year=None):
     today = date(start_date.year,start_date.month,start_date.day)
     
     start_date = date(start_date.year,start_date.month,1)
+    
+    #try to get the month and year from session if not provided
     if month == None:
-        month = start_date.month
+        try:
+            month = session["calendar_month"]
+        except KeyError:
+            month = start_date.month
     if year == None:
-        year = start_date.year
+        try:
+            year = session["calendar_year"]
+        except KeyError:
+            year = start_date.year
         
     month = cleanRecordID(month)
     year = cleanRecordID(year)
@@ -58,6 +66,10 @@ def display(month=None,year=None):
     if month < 1 or month > 12:
         month = start_date.month
         refresh = True
+        
+    # add the year and month to the session
+    session["calendar_year"] = year
+    session["calendar_month"] = month
         
     if refresh:
         return redirect(url_for('.display')+"{}/{}".format(month,year))
