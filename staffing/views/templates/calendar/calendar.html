@@ -181,9 +181,26 @@
         
         <div class="w3-row">
             <p class="w3-col w3-full w3-large w3-primary-color month-name">
-                <a class="month_arrow" href="{{ url_for('calendar.display')}}{{ last_month.month }}/{{ last_month.year }}">&#x3c;</a>&nbsp;&nbsp;
-                {{ calendar.month_name[start_date.month]}} {{ start_date.year }}
-                &nbsp;&nbsp;<a class="month_arrow" href="{{ url_for('calendar.display')}}{{ next_month.month }}/{{ next_month.year }}">&#x3e;</a>
+                <select class="w3-select" style="width:auto;" onchange="location='{{ url_for('calendar.display')}}' + this.value">
+                    <option value="{{today.month}}/{{today.year}}">Today</option>
+                    {% set month = [start_date.month]%}
+                    {% set year = [start_date.year] %}
+                    {% for x in [-1,0,1,2,3,] %}
+                    {% set _ = month.append(start_date.month+x)%}{% set _ = month.pop(0) %}
+                    {% set _ = year.append(start_date.year)%}{% set _ = year.pop(0) %}
+                    {% if month[0] == 0 %}
+                        {% set _ = month.append(12)%}{% set _ = month.pop(0) %}
+                        {% set _ = year.append(start_date.year-1)%}{% set _ = year.pop(0) %}
+                    {%endif%}
+                    {% if month[0] > 12 %}
+                        {% set _ = month.append(month[0]-12)%}{% set _ = month.pop(0) %}
+                        {% set _ = year.append(start_date.year+1)%}{% set _ = year.pop(0) %}
+                    {%endif%}
+                        <option value="{{month[0]}}/{{year[0]}}" {% if x == 0 %}selected{% endif%} >
+                            {{ calendar.month_name[month[0]]}} {{ year[0] }}
+                        </option>
+                    {% endfor%}
+                </select>
             </p>
         <div class="w3-row">
             {%for day in calendar.weekheader(3).split(' ') %}
