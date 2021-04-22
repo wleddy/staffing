@@ -3,14 +3,14 @@ from flask import request, session, g, redirect, url_for, abort, \
      
 from shotglass2.mapping.views.maps import simple_map
 from shotglass2.shotglass import get_site_config
-from shotglass2.users.models import User
+from shotglass2.users.models import User, UserRole
 from shotglass2.users.admin import login_required, table_access_required
 from shotglass2.takeabeltof.mailer import send_message, email_admin
 from shotglass2.takeabeltof.utils import render_markdown_for, printException, cleanRecordID
 from shotglass2.takeabeltof.date_utils import datetime_as_string, local_datetime_now, getDatetimeFromString, date_to_string
-from staffing.models import Event, Location, ActivityGroup
+from staffing.models import Event, Location, ActivityGroup, Job, JobRole
 from staffing.views.activity import get_event_recs
-from staffing.views.signup import get_job_rows
+from staffing.views.signup import get_job_rows, get_volunteer_role_ids
 
 import calendar
 from datetime import datetime, date, timedelta
@@ -158,7 +158,7 @@ def event(event_id=None):
     """Return a page with the event details"""
     setExits()
     g.title = "Event Detail"
-    #import pdb;pdb.set_trace()
+    # import pdb;pdb.set_trace()
     
     event_id = cleanRecordID(event_id)
     if event_id < 1:
@@ -188,7 +188,45 @@ def event(event_id=None):
             },)
         map_html = simple_map(map_data,target_id='map')
         
-    return render_template('calendar_event.html',event=event,map_html=map_html,event_locations=event_locations)
+    # determine if user has a role that would allow them to signup for any job in this event
+    # import pdb;pdb.set_trace()
+    
+    has_required_role = False
+    temp_user_id = 0
+    vol_roles = [int(x) for x in get_volunteer_role_ids().split(",")]
+    
+    try:
+        temp_user_id = session["user_id"]
+    except KeyError:
+        pass
+        
+    if event:
+        jobs = Job(g.db).select(where="event_id = {event_id}".format(event_id=event.event_id))
+        if jobs:
+            job_list = ",".join([str(x.id) for x in jobs])
+            roles = JobRole(g.db).select(where="job_id in ({job_list})".format(job_list=job_list))
+            if roles:
+                # if volunteer roles are in the role_list everyone is qualified
+                for role in roles:
+                    if role.role_id in vol_roles:
+                        has_required_role = True
+                        break
+                        
+                if not has_required_role:
+                    # test to see if the user has other required roles
+                    role_list = ",".join([str(x.role_id) for x in roles])
+                    if UserRole(g.db).select(where="user_id = {user_id} and role_id in ({role_list})".format(
+                                user_id=temp_user_id,
+                                role_list=role_list,
+                                )):
+                        has_required_role = True
+    
+    return render_template('calendar_event.html',
+        event=event,
+        map_html=map_html,
+        event_locations=event_locations,
+        has_required_role = has_required_role,
+        )
     
 @mod.route('calendar/save_filter/<action>/<int:group_id>')
 @mod.route('calendar/save_filter/<action>/<int:group_id>/')

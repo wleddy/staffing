@@ -97,13 +97,18 @@
                 <div>
                 {# default link to generic signup list #}
                 {% set vol_url = url_for('signup.display') %}
-                {# link to the signup for this event #}
-                {% if event.is_past_event == 0 and event.activity_id and event.event_max_positions > 0 %}
-                   {% set vol_url = direct_url  %}
-                {% endif %}
-                {# link to future signups for this activity #}
-                {% if event.is_past_event == 1 and event.has_future_events == 1 %}
-                   {% set vol_url = url_for('signup.more_info') + event.activity_id | string  %}
+                {# if user has no role for this event, show default signup list #}
+                {% if not has_required_role %}
+                    {# do nothing#}
+                {% else %}
+                    {# link to the signup for this event #}
+                    {% if event.is_past_event == 0 and event.activity_id and event.event_max_positions > 0 %}
+                       {% set vol_url = direct_url  %}
+                    {% endif %}
+                    {# link to future signups for this activity #}
+                    {% if event.is_past_event == 1 and event.has_future_events == 1 %}
+                       {% set vol_url = url_for('signup.more_info') + event.activity_id | string  %}
+                    {% endif %}
                 {% endif %}
                 <p class="w3-medium">
                     Would you like to help? <a href="{{ vol_url }}">Click here to Volunteer...</a>
