@@ -42,17 +42,16 @@ def display(month=None,year=None):
     today = date(start_date.year,start_date.month,start_date.day)
     
     start_date = date(start_date.year,start_date.month,1)
-    
+
     #try to get the month and year from session if not provided
-    if month == None:
+    if month == None or year == None:
         try:
+            if session['calendar_last_access'] < today.toordinal():
+                raise KeyError
             month = session["calendar_month"]
-        except KeyError:
-            month = start_date.month
-    if year == None:
-        try:
             year = session["calendar_year"]
-        except KeyError:
+        except (KeyError, TypeError):
+            month = start_date.month
             year = start_date.year
         
     month = cleanRecordID(month)
@@ -67,7 +66,8 @@ def display(month=None,year=None):
         month = start_date.month
         refresh = True
         
-    # add the year and month to the session
+    # add the last settings to the session
+    session['calendar_last_access'] = today.toordinal()
     session["calendar_year"] = year
     session["calendar_month"] = month
         
