@@ -380,10 +380,11 @@ def delete_from_activity(activity_id=-1,id=0):
 def valid_input(rec):
     valid_data = True
     
-    # Require a default location
-    if cleanRecordID(rec.location_id) < 1:
-        valid_data = False
-        flash("You must select a default location.")
+    # # Require a default location
+#     # No longer Requied as of 5/2021
+#     if cleanRecordID(rec.location_id) < 1:
+#         valid_data = False
+#         flash("You must select a default location.")
         
     #Number Served and Tips received must be numbers
     if rec.number_served:

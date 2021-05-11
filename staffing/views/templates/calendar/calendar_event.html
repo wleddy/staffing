@@ -3,7 +3,7 @@
 
 {% block head %}
     {{ super() }}
-    {{ map_html | default('',True) | safe }}
+    {% if map_html %}{{ map_html | default('',True) | safe }}{% endif %}
     <style>
         #map {height: 60vh;}
     </style>
@@ -37,9 +37,11 @@
                 <strong>{{ event.calendar_title}}</strong>
                 {% if g.admin.has_access(g.user,'Events') %}<a href="{{ url_for('event.edit')}}{{ event.event_id }}/"><em class="w3-small">(Edit Event)</em></a>{% endif %}
             </h3>
+            {% if map_html %}
             <div class="sg-cal-event-desc">
                 {{ event.event_description | render_markdown }}
             </div>
+            {% endif %}
             {% if event.website | weblink %}
             <p>Event Web Site: {{event.website | weblink }}</p>
             {% endif %}
@@ -88,8 +90,6 @@
                             {% endif %}
                         {% endfor %}
                 </div>
-                {% else %}
-                <p><em>Location to be determined</em></p>
                 {% endif %}
             </div>
             {# build link to best signup page #}
@@ -119,6 +119,10 @@
         </div>
         {% if map_html %}
         <div id="map" class="w3-col w3-half w3-card-2"></div>
+        {% else %}
+        <div class="w3-col w3-half">
+        <div id="no_map" class="w3-large w3-bold w3-padding" style="border: solid 2pt black">{{ event.event_description | render_markdown }}</div>
+        </div>
         {% endif %}
     </div>
 </div>
