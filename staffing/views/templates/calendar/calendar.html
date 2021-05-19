@@ -219,6 +219,9 @@
                 {% set day_in_this_month = (day_number != 0)%}
                 {% set yours_are_hidden = [False] %}
                 <div class="w3-col w3-border w3-white day-col day-cell" style="padding:0 2pt;">
+                    {% set _ = yours_are_hidden.pop(0) %}
+                    {% set _ = yours_are_hidden.append(False) %}
+                    
                     {% if day_in_this_month %}
                     {# All events list #}
                     <div id="full_day_display_{{day_number}}" class="full_day_display w3-border">
