@@ -287,7 +287,7 @@ class Event(SqliteTable):
         user_id = kwargs.get('user_id',0)
 
         sql="""select event.*,
-        (select case when '{today}' > event.event_start_date then 1 else 0 end) as is_past_event,
+        (select case when '{today}' > event.event_end_date then 1 else 0 end) as is_past_event,
         (select location.location_name from location) as event_default_location_name,
         (select location.street_address from location) as event_default_location_address,
         (select location.city from location) as event_default_location_city,
