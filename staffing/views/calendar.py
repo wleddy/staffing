@@ -111,10 +111,14 @@ def display(month=None,year=None):
         data_row = 0
         for event in event_data:
             event_date = getDatetimeFromString(event.event_start_date)
-            if event_date:
-                if event_date.day not in event_list_dict:
-                    event_list_dict[event_date.day]=[]
-                event_list_dict[event_date.day].append(data_row)
+            # events may span multiple days
+            event_end = getDatetimeFromString(event.event_end_date)
+            if event_date and event_end and event_date <= event_end:
+                while event_date <= event_end:
+                    if event_date.day not in event_list_dict:
+                        event_list_dict[event_date.day]=[]
+                    event_list_dict[event_date.day].append(data_row)
+                    event_date = event_date + timedelta(days=1)
                 
             data_row+=1
     
@@ -316,25 +320,6 @@ def subscribe(calendar_name=''):
             )
         
         ical = ical.get()
-        
-        # attachment = None
-        # if ical:
-        #     attachment = ("{}.ics".format(calendar_name.replace(' ','_')), "text/calendar", ical)
-        #
-        # # import pdb;pdb.set_trace()
-        # # send that puppy!
-        # send_result = send_message(site_config.get('ADMIN_EMAILS',None),
-        #                 subject="Calendar '{}' from {}".format(calendar_name,site_config['HOST_NAME']),
-        #                 body_is_html=False,
-        #                 body="""Your Calendar for '{}'
-        #
-        #                 """.format(calendar_name),
-        #                 attachment=attachment,
-        #                 )
-        # if not send_result[0]:
-        #     #Error occured
-        #     email_admin(subject="Error sending calendar {}".format(get_site_config()['SITE_NAME']),message="An error occored while trying to send calendar email. Err: {}".format(send_result[1]))
-        #     return "Error while sending email"
             
         headers={
            "Content-Disposition":"attachment;filename={}.ics".format(calendar_name.replace(' ','_')),

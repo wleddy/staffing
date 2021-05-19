@@ -46,6 +46,15 @@
             <p>Event Web Site: {{event.website | weblink }}</p>
             {% endif %}
             
+            {% if event.all_day_event %}
+            <p>
+                <em>Date:</em> <strong>{{ event.event_start_date | default('tbd',True)| abbr_date_string }}</strong>
+                {% if event.event_end_date[:10] > event.event_start_date[:10] %}
+                <em>thru</em> <strong>{{ event.event_end_date | default('tbd',True)| abbr_date_string }}</strong>
+                {% endif %}
+            </p>
+            
+            {% else %}
             <p>
                 <em>Date:</em> <strong>{{ event.event_start_date | default('tbd',True)| abbr_date_string }}</strong>
             </p>
@@ -71,7 +80,8 @@
                     </p>
                 </div>
             </div>
-            {% endif %}
+            {% endif %} {# service times different #}
+            {% endif %} {# all day event #}
             <div class="w3-row">
                 {% if event_locations %}
                 <p class="w3-col l1 m2 s2 w3-right-align">
