@@ -141,7 +141,7 @@
         {% if event.status | lower != 'scheduled' %}
         <span class="w3-tiny">[{{ event.status | upper }}]<br>&nbsp;</span>
         {% endif %}
-        {{ event.is_yours }}: {{event.event_title}}
+        {{event.event_title}}
     </p>
 {% endmacro %}
 
