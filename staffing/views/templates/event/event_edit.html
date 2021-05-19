@@ -138,7 +138,10 @@
                 </p>
             </div>
         </div>
-        <p>{{ checkbox_field('show_service_times','Service times differ from Event times', id='show_service_times', extras='onclick="toggle_service_times();"')}}</p>
+        <p class="w3-secondary-color">
+            &nbsp;&nbsp;{{ checkbox_field('show_service_times', id='show_service_times', extras='onclick="toggle_service_times();"')}}
+            Service times differ from Event times
+        </p>
         <div id="service-times" style="display:none;" >
             <p>{{ label_only(label="Service Times")}}</p>
                 <div class="w3-row">
