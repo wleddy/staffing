@@ -259,6 +259,13 @@ class Event(SqliteTable):
                 
         super().create_table(sql)
         
+    @property
+    def _column_list(self):
+            column_list = [
+            {'name':'all_day_event','definition':'INTEGER',},
+            ]
+        
+            return column_list
         
     def new(self):
         """Setup a new record"""

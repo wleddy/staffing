@@ -105,7 +105,18 @@
         <p>{{ checkbox_field('exclude','exclude_from_calendar', extras=selected)}}</p>
         {% set _ = placeholders.update({"service_type": rec.activity_service_type | safe })%}
         <p>{{ input_field(rec.service_type,'service_type',id="service_type",label="Service Type (if different)")}}</p>
-        <p>{{ label_only(label="Event Times")}}</p>
+        <div class="w3-row">
+            <div class="w3-col l6 m6 s12">
+                <p class="w3-row">{{ label_only(label="Event Times")}}</p>
+            </div>
+            <div class="w3-col l6 m6 s12">
+                <p class="w3-row w3-primary-color">
+                    &nbsp;&nbsp;<input type="checkbox" name="all_day_event" value="1" id="all_day_event" 
+                    {% if rec.all_day_event %}checked{% endif %}
+                    onclick="all_day_check(this.checked);" />
+                     All Day Event</p>
+            </div>
+        </div>
         <div id="event-times">
             <div class="w3-row">
                 <p class="w3-col w3-third">
@@ -118,7 +129,11 @@
                     </select>
                 </p>
                 <p class="w3-col w3-twothird">
+                    {% if rec.all_day_event %}
+                    {% set event_start_date = rec.event_start_date | local_date_string %}
+                    {% else %}
                     {% set event_start_date = rec.event_start_date | local_date_and_time_string %}
+                    {% endif %}
                     {{ input_field(event_start_date,'event_start_date',id="event_start_date", label="Event Starts", placeholder="Event Start Date and Time") }}
                 </p>
             </div>
@@ -133,50 +148,56 @@
                     </select>
                 </p>
                 <p class="w3-col w3-twothird">
+                    {% if rec.all_day_event %}
+                    {% set event_end_date = rec.event_end_date | local_date_string %}
+                    {% else %}
                     {% set event_end_date = rec.event_end_date | local_date_and_time_string %}
+                    {% endif %}
                     {{ input_field(event_end_date,'event_end_date',id="event_end_date", label="Event Ends", placeholder="Event End Date and Time") }}
                 </p>
             </div>
         </div>
-        <p class="w3-secondary-color">
-            &nbsp;&nbsp;{{ checkbox_field('show_service_times', id='show_service_times', extras='onclick="toggle_service_times();"')}}
-            Service times differ from Event times
-        </p>
-        <div id="service-times" style="display:none;" >
-            <p>{{ label_only(label="Service Times")}}</p>
-                <div class="w3-row">
-                    <p class="w3-col w3-third">
-                        {{ select_field("service_start_date_label_id","Calendar Label",class="w3-border service_date_data") }}
-                            {% if event_date_labels %}
-                            {% for label in event_date_labels %}
-                                <option value="{{label.id}}" {% if label.id == rec.service_start_date_label_id %}selected="selected" {% endif %}>{{label.label}}</option>
-                            {% endfor %}
-                            {% endif %}
-                        </select>
-                    </p>
-                    <p class="w3-col w3-twothird">
-                        {% set service_start_date = rec.service_start_date | local_date_and_time_string %}
-                        {{ input_field(service_start_date,'service_start_date',id="service_start_date", label="Service Starts", class="service_date_data", placeholder="Service Start Date and Time") }}
-                    </p>
-                </div>
-                <div class="w3-row">
-                    <p class="w3-col w3-third">
-                        {{ select_field("service_end_date_label_id","Calendar Label",class="w3-border service_date_data") }}
-                            {% if event_date_labels %}
-                            {% for label in event_date_labels %}
-                                <option value="{{label.id}}" {% if label.id == rec.service_end_date_label_id %}selected="selected" {% endif %}>{{label.label}}</option>
-                            {% endfor %}
-                            {% endif %}
-                        </select>
-                    </p>
-                    <p class="w3-col w3-twothird">
-                        {% set service_end_date = rec.service_end_date | local_date_and_time_string %}
-                        {{ input_field(service_end_date,'service_end_date',id="service_end_date", class="service_date_data", label="Service Ends", placeholder="Service End Date and Time") }}
-                    </p>
+        <div id="service-times-contain">
+            <p class="w3-secondary-color">
+                &nbsp;&nbsp;{{ checkbox_field('show_service_times', id='show_service_times', extras='onclick="toggle_service_times();"')}}
+                Service times differ from Event times
+            </p>
+            <div id="service-times" style="display:none;" >
+                <p>{{ label_only(label="Service Times")}}</p>
+                    <div class="w3-row">
+                        <p class="w3-col w3-third">
+                            {{ select_field("service_start_date_label_id","Calendar Label",class="w3-border service_date_data") }}
+                                {% if event_date_labels %}
+                                {% for label in event_date_labels %}
+                                    <option value="{{label.id}}" {% if label.id == rec.service_start_date_label_id %}selected="selected" {% endif %}>{{label.label}}</option>
+                                {% endfor %}
+                                {% endif %}
+                            </select>
+                        </p>
+                        <p class="w3-col w3-twothird">
+                            {% set service_start_date = rec.service_start_date | local_date_and_time_string %}
+                            {{ input_field(service_start_date,'service_start_date',id="service_start_date", label="Service Starts", class="service_date_data", placeholder="Service Start Date and Time") }}
+                        </p>
+                    </div>
+                    <div class="w3-row">
+                        <p class="w3-col w3-third">
+                            {{ select_field("service_end_date_label_id","Calendar Label",class="w3-border service_date_data") }}
+                                {% if event_date_labels %}
+                                {% for label in event_date_labels %}
+                                    <option value="{{label.id}}" {% if label.id == rec.service_end_date_label_id %}selected="selected" {% endif %}>{{label.label}}</option>
+                                {% endfor %}
+                                {% endif %}
+                            </select>
+                        </p>
+                        <p class="w3-col w3-twothird">
+                            {% set service_end_date = rec.service_end_date | local_date_and_time_string %}
+                            {{ input_field(service_end_date,'service_end_date',id="service_end_date", class="service_date_data", label="Service Ends", placeholder="Service End Date and Time") }}
+                        </p>
+                    </div>
             </div>
         </div>
     </div>
-    <div id="job-list" class="w3-card-4" style="margin-top:10pt;">
+        <div id="job-list" class="w3-card-4" style="margin-top:10pt;">
         {{ job_embed_list | default("No Jobs Created Yet", True) | safe }}
     </div>        
 </div>
@@ -187,11 +208,23 @@
     $("#{{key}}").attr('placeholder',"{{value}}");
     {% endfor %}
     
-    var date_format = "%c/%e/%y %l:%i%p"; // "3/4/19 06:00AM"
+    var date_time_format = "%c/%e/%y %l:%i%p"; // "3/4/19 06:00AM"
+    var date_format = "%c/%e/%y"; // "3/4/19"
     var pickers = ["#event_start_date","#event_end_date","#service_start_date","#service_end_date"]
-    for( i = 0;i<pickers.length;i++){
-        $(pickers[i]).AnyTime_picker({ format: date_format } );                
+    
+    function set_date_pickers(format){
+        for( i = 0;i<pickers.length;i++){
+            $(pickers[i]).AnyTime_noPicker().AnyTime_picker({ format: format } );                
+        }
     }
+    
+    if ($('#all_day_event').prop('checked')){
+        set_date_pickers(date_format);
+        all_day_check(true)
+    } else {
+        set_date_pickers(date_time_format);
+    }
+    
     
     // so the date picker will show above modal job form
     $("#modal-form-contain").css({'z-index':'auto'})
@@ -220,6 +253,20 @@
             $('#show_service_times').prop('checked',true);
             $('.service_date_data').prop('disabled',false);
             $('#service-times').show();
+        }
+    }
+    
+    function all_day_check(checked){
+        if (checked){
+            // reset and hide the service times section
+            $('#show_service_times').prop('checked',false); // ensure service times are off
+            toggle_service_times();
+            $('#service-times-contain').hide();
+            // re-configure the event date picker to dates only
+            set_date_pickers(date_format);
+        } else {
+            $('#service-times-contain').show();
+            set_date_pickers(date_time_format);
         }
     }
     

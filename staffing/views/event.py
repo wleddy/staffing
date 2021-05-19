@@ -141,6 +141,8 @@ def render_edit_form(id,activity_id):
         rec.service_end_date = None
         rec.service_start_date_label_id = None
         rec.service_end_date_label_id = None
+        # set all_day to default state
+        rec.all_day_event = None
         
         event.update(rec,request.form)
         if 'exclude_from_calendar' in request.form:
