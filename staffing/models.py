@@ -298,7 +298,7 @@ class Event(SqliteTable):
         -- This is mostly for calendar to know if the user is assigned to this event
         coalesce(
             (select 1 from user_job where {user_id} = user_job.user_id and
-             user_job.job_id in (select id from job where job.event_id = event.id LIMIT 1 ) 
+             user_job.job_id in (select id from job where job.event_id = event.id  ) LIMIT 1
             ),
         0) as is_yours,
         coalesce(nullif(event.calendar_title,''),activity.title) as event_title,
