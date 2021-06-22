@@ -7,6 +7,7 @@ from shotglass2.takeabeltof.jinja_filters import excel_date_and_time_string
 from shotglass2.takeabeltof.views import TableView
 from shotglass2.takeabeltof.date_utils import date_to_string, getDatetimeFromString, local_datetime_now
 from shotglass2.takeabeltof.jinja_filters import default_if_none
+from shotglass2.takeabeltof.mailer import Mailer
 from shotglass2.users.admin import login_required, table_access_required, silent_login
 from shotglass2.users.models import Role, User
 from shotglass2.users.views.login import authenticate_user, setUserStatus, logout as log_user_out, login as log_user_in
@@ -234,24 +235,15 @@ def signup(job_id=None):
                 
                 send_signup_email(job_data,user,'announce/email/signup_announce.md',mod,escape=False)
                          
-            if previous_positions and positions < previous_positions:
-                # the number of positions has been reduced
-                pass
-                # Dont allow reduction after the date of the event
-                #
-                # if reducing committment and < 2 days to job,
-                #.   If is staff... inform event manager and email staff that they need to find a replacement?
-                #.   if not staff, inform event manager and record change
-                # if reducing and not within 2 days
-                #   if not staff, just record the change
-                #   if Staff, Inform event manager
-            
-        if submission_ok:
+            # send an email to the Event manager as appropriate
+            send_manager_signup_notice(
+                positions=positions,
+                previous_positions=previous_positions,
+                job_data=job_data,
+                signup=signup,user=user,
+                )
+
             return 'success'
-        else:
-            # return the form with flashed message?
-            pass
-    
     
     return render_template('signup_form.html',job=job_data,signup=signup,filled_positions=filled_positions)
     
@@ -954,3 +946,29 @@ def volunteer_contact_list():
     flash("No Volunteers Found")
     return redirect(url_for('www.home'))
     
+def send_manager_signup_notice(days=2,**kwargs):
+    """Send an email to the event manager if user signed up close to the date of the event"""
+
+    positions = kwargs.get('positions',0)
+    previous_positions = kwargs.get("previous_positions",0)
+    job_data = kwargs.get('job_data',None)
+    signup = kwargs.get("signup",None)
+    user = kwargs.get("user",None)
+    
+    if not user or not job_data:
+        return # there is no point in going on
+
+    if local_datetime_now() >= getDatetimeFromString(job_data.start_date) - timedelta(days=days):
+        # it's 2 days or less till the job starts
+        mailer = Mailer(**kwargs)
+        mailer.add_address((job_data.event_manager_email,' '.join([job_data.event_manager_first_name,job_data.event_manager_last_name])))
+        mailer.subject = "Late Signup Change for {job_title} at {calendar_title}".format(calendar_title=job_data.calendar_title,job_title=job_data.job_title)
+        mailer.body_is_html = True
+        mailer.html_template = 'email/signup_change.html'
+    
+        mailer.send()
+        if not mailer.success:
+            #Error occured
+            email_admin(subject="Error sending job change notice at {}".format(get_site_config()['SITE_NAME']),message="An error occored while trying to send job change email. Err: {}".format(mailer.result_text))
+    
+    return
