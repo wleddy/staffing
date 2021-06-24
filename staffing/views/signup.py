@@ -9,7 +9,7 @@ from shotglass2.takeabeltof.date_utils import date_to_string, getDatetimeFromStr
 from shotglass2.takeabeltof.jinja_filters import default_if_none
 from shotglass2.takeabeltof.mailer import Mailer
 from shotglass2.users.admin import login_required, table_access_required, silent_login
-from shotglass2.users.models import Role, User
+from shotglass2.users.models import Role, User, Pref
 from shotglass2.users.views.login import authenticate_user, setUserStatus, logout as log_user_out, login as log_user_in
 from shotglass2.www.views.home import contact as home_contact
 from staffing.models import Event, Location, Job, UserJob, JobRole, Activity
@@ -240,7 +240,7 @@ def signup(job_id=None):
                 positions=positions,
                 previous_positions=previous_positions,
                 job_data=job_data,
-                signup=signup,user=user,
+                user=user,
                 )
 
             return 'success'
@@ -946,23 +946,30 @@ def volunteer_contact_list():
     flash("No Volunteers Found")
     return redirect(url_for('www.home'))
     
-def send_manager_signup_notice(days=2,**kwargs):
+def send_manager_signup_notice(**kwargs):
     """Send an email to the event manager if user signed up close to the date of the event"""
 
     positions = kwargs.get('positions',0)
     previous_positions = kwargs.get("previous_positions",0)
     job_data = kwargs.get('job_data',None)
-    signup = kwargs.get("signup",None)
     user = kwargs.get("user",None)
+        
+    days_pref = Pref(g.db).get("Alert on Signup",
+            default=2,
+            description="""When a user signs up or cancels within this many days before an event an email is sent to the Event Manager.
+Enter the number of days or -1 to always be notified""",
+            user_name = get_site_config().get('HOST_NAME',None),
+            )
+    days = int(days_pref.value)
     
     if not user or not job_data:
         return # there is no point in going on
 
-    if local_datetime_now() >= getDatetimeFromString(job_data.start_date) - timedelta(days=days):
-        # it's 2 days or less till the job starts
+    if days < 0 or local_datetime_now() >= getDatetimeFromString(job_data.start_date) - timedelta(days=days):
+        # Alert the event manager
         mailer = Mailer(**kwargs)
         mailer.add_address((job_data.event_manager_email,' '.join([job_data.event_manager_first_name,job_data.event_manager_last_name])))
-        mailer.subject = "Late Signup Change for {job_title} at {calendar_title}".format(calendar_title=job_data.calendar_title,job_title=job_data.job_title)
+        mailer.subject = "Signup Change for {job_title} at {calendar_title}".format(calendar_title=job_data.calendar_title,job_title=job_data.job_title)
         mailer.body_is_html = True
         mailer.html_template = 'email/signup_change.html'
     
