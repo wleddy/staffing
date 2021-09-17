@@ -962,7 +962,7 @@ Enter the number of days or -1 to always be notified""",
             )
     days = int(days_pref.value)
     
-    if not user or not job_data:
+    if not user or not job_data or not job_data.event_manager_user_id:
         return # there is no point in going on
 
     if days < 0 or local_datetime_now() >= getDatetimeFromString(job_data.start_date) - timedelta(days=days):
