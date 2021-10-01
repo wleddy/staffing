@@ -528,6 +528,10 @@ def valid_input(rec):
         valid_data = False
         flash("The End Time can't be before the Start Time")
         
+    if not rec.max_positions or int(rec.max_positions) < 1:
+        valid_data = False
+        flash("The number of People Requested must be greater than 0")
+        
     if not skills_to_list():
         valid_data = False
         flash("You must select at least one Skill for the job.")
