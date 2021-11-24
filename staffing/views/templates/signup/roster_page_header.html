@@ -35,7 +35,7 @@
                 {% else %}
                     {% set checked = '' %}
                 {% endif %}
-                <p>{{ checkbox_field("True","as_spreadsheet",label="Spreadsheet Format",extras=checked) }}</p>
+                <p>{{ checkbox_field(as_spreadsheet,"as_spreadsheet",label="Spreadsheet Format", extras=checked) }}</p>
             </div>
             <p class="w3-col l2 m2" style="margin-left:10pt">
                 <input class=" w3-button w3-primary-color w3-round-large" type="submit" value="Search">
