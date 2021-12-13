@@ -901,6 +901,7 @@ def volunteer_contact_list():
             -- and date(job.start_date) >= date('{report_start_date}')
         group by user.id
 
+        -- ### this includes anyone who ever volunteered, we dont want that now ###
         -- union
         -- 
         -- -- This query finds any user who has only 'user' or 'volunteer' roles regardless of if they ever worked a shift
