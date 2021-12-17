@@ -318,7 +318,17 @@ def roster(display_end_days=0):
     except:
         display_end_days = 0
         
-    as_spreadsheet=request.form.get("as_spreadsheet",False)
+    as_spreadsheet = False
+    if request.method == "GET":
+        # on the inital GET see if the as_spreadsheet option is set in session
+        as_spreadsheet = session.get("roster_as_spreadsheet",False)
+    else:
+        # is POST
+        if "as_spreadsheet" in request.form:
+            as_spreadsheet = True
+    
+    session["roster_as_spreadsheet"] = as_spreadsheet
+    
     
     if display_end_days < 0:
         #Use the date input fields for search
