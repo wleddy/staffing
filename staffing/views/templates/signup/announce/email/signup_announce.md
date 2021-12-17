@@ -14,6 +14,8 @@ and ends at {{ job_data.end_date | local_time_string }}.
 
 {{ description | safe }}
 
+{% include "announce/email/addendum.md" %}
+
 {{ directions_snippet(job_data) | safe }}
 
 If you have questions about your shift or you're unable to make it for some reason please 

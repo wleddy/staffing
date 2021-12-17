@@ -28,6 +28,8 @@ contact links below as soon as possible so we can arrange for someone to take yo
 
 > Location: {{job_data.job_loc_name}}  
 
+{% include "announce/email/addendum.md" %}
+
 > Questions about this shift? [Contact Event Manager](http://{{config.HOST_NAME}}{{ url_for('signup.contact_event_manager')}}{{ job_data.job_id | default('',True) }}/).
 
 {{ directions_snippet(job_data) }}
