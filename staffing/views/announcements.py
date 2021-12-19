@@ -22,7 +22,7 @@ def send_signup_email(job_data_list,user,template_path,bp,**kwargs):
     
     if values are supplied in kwargs they are passed to the template as additional context
     """
-    #import pdb;pdb.set_trace()
+    # import pdb;pdb.set_trace()
     if not isinstance(job_data_list,list):
         job_data_list = [job_data_list]
             

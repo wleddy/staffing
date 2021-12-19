@@ -6,7 +6,9 @@ from shotglass2.takeabeltof.utils import render_markdown_for, printException, cl
 from shotglass2.takeabeltof.date_utils import date_to_string, getDatetimeFromString, local_datetime_now
 from staffing.models import Event, Location, ActivityType, Client, EventDateLabel, Job, JobRole, UserJob
 from shotglass2.users.models import User
+from staffing.views.announcements import send_signup_email
 from staffing.views.job import get_job_list_for_event, coerce_datetime
+from staffing.views.signup import get_job_rows
 
 mod = Blueprint('event',__name__, template_folder='templates/event', url_prefix='/event')
 
@@ -377,6 +379,65 @@ def delete_from_activity(activity_id=-1,id=0):
     """
     g.listURL = url_for('activity.edit') + str(cleanRecordID(activity_id))
     return handle_delete(id)
+    
+    
+@mod.route('/send_event_email/',methods=['GET','POST',])
+@mod.route('/send_event_email/<int:event_id>/',methods=['GET','POST',])
+@table_access_required(Event)
+def send_event_email(event_id):
+    """Send an email to all the people who have signed up for an event"""
+    
+    event_id = cleanRecordID(event_id)
+    event = Event(g.db).select_one(where="event.id = {}".format(event_id))
+    if not event:
+        return "fallure: That is not a valid event record"
+        
+    # import pdb;pdb.set_trace()
+    # Get the users who have signed up fo this event
+    sql = """select * from user where user.id in 
+                (select user_id from user_job where job_id in 
+                    (select job.id from job where job.event_id = {}
+                    )
+                )
+                group by user.id
+                order by user.last_name, user.first_name""".format(event_id)
+    users = User(g.db).query(sql)
+                    
+    if request.form:
+        valid_form = True
+        if not request.form.get("message",'').strip():
+            flash("You must include a message.")
+            valid_form = False
+        if not request.form.get("subject",'').strip():
+            flash("You must include a subject.")
+            valid_form = False
+            
+        # send emails
+        if valid_form and 'user' in request.form:
+            for user_id in request.form.getlist('user'):
+                user = User(g.db).get(cleanRecordID(user_id))
+                if user:
+                    # get jobs for this user
+                    sql = """job.id in (
+                    select job_id from user_job where user_id = {} and job_id in (
+                        select job.id from job where job.event_id = {}
+                        )
+                    )
+                    """.format(user.id,event_id)
+                    job_list = get_job_rows(where=sql,is_admin=True)
+                    if job_list:
+                        # send_signup_email(job_data_list,user,template_path,bp,**kwargs)
+                        send_signup_email(job_list,user,'email/event_notification.md',mod,
+                        form=request.form,
+                        subject=request.form["subject"],
+                        event=event,
+                        )
+                        
+            return 'success'
+        else:
+            flash("You must select at least one recipient")
+    
+    return render_template('event_email_form.html',event=event,users=users,form=request.form)
     
 
 def valid_input(rec):

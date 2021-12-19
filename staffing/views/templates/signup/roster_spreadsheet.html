@@ -40,7 +40,12 @@
                         <br>
                         <strong>{{ job.service_start_label }}</strong>: {{ job.service_start_date | local_time_string }}  &ndash; 
                         <strong>{{ job.service_end_label }}</strong>: {{ job.service_end_date | local_time_string }}
+                    </p>                    <p>
+                        <a href="#" onclick="editFromList('{{ url_for('event.send_event_email')}}{{job.event_id}}');return false;">
+                            Email staff
+                        </a>
                     </p>
+
                 </div>
                 </td>
                 <td>

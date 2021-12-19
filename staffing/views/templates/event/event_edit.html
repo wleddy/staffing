@@ -17,8 +17,8 @@
       <a class="w3-bar-item w3-button w3-border" style="width:100%" href="#calendar-settings">Calendar Settings</a>
       <a class="w3-bar-item w3-button w3-border" style="width:100%" href="#job-list">Job List</a>
       <a class="w3-bar-item w3-button w3-border" style="width:100%" href="#contract-info">Contract Info</a>
-      <a class="w3-bar-item w3-button w3-border" style="width:100%" href="#sg_section_tabs" 
-          onclick="alert('will one day open a send email option to contact staff and volunteers');return false;">
+      <a class="w3-bar-item w3-button w3-border" style="width:100%" 
+          onclick="editFromList('{{ url_for('event.send_event_email')}}{{rec.id}}');return false;">
           Email...
       </a>
     </div>

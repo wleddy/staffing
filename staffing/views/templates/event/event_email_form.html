@@ -1,0 +1,43 @@
+{# event notification form for response to AJAX request #}
+
+{% from "_form_helpers.html" import input_field, select_field, radio_field, checkbox_field, label_only %}
+
+{% include "flasher.html"%}
+
+{% if not users %}
+<h3>There is no one signed up for this event yet.</h3>
+<p>
+    <a  class="w3-btn w3-ripple w3-cancel-button-color w3-mobile w3-round-large" onclick="cancelModalForm()">Cancel</a>
+</p>
+{% else %}
+<form id="eventNotificationForm"  action="" method="POST">
+    <p class="form_button_row w3-contain w3-panel" >
+    	<input type="button" class="w3-btn w3-ripple w3-save-button-color w3-mobile w3-round-large"
+            onclick="submitModalForm('eventNotificationForm', 
+            '{{ url_for('event.send_event_email')}}{{event.id}}/', 
+            '', 
+            '#');" 
+            name="Send" value="Send" />
+        &nbsp;&nbsp;
+    	        <a  class="w3-btn w3-ripple w3-cancel-button-color w3-mobile w3-round-large" onclick="cancelModalForm()">Cancel</a>
+    </p> 
+    <div class="w3-container">
+        <h3>Send a message regarding: <em>{{ event.event_title }}</em></h3>
+        <div class="w3-col w3-full">    
+            <h3>Recipients:</h3>
+            <p>Mark the users you would like to receive this message</p>
+            {% for user in users %}
+                <p>{{ checkbox_field(user.id,'user',label=user.first_name + " " + user.last_name,class="w3-row")}}</p>
+            {% endfor %}
+        </div>  
+        <div class="w3-col w3-full">
+            <h3>{{ input_field(form.subject,"subject",req=True)}}</h3>
+            <h3>{{ label_only("Message",req=True)}}</h3>
+            <p>
+                <textarea name="message" rows=6 style="width:100%"> {{form.message}}</textarea>
+            </p>
+        </div> 
+    </div> 
+</form>
+</div>
+{% endif %}
