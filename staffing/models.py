@@ -330,7 +330,14 @@ class Event(SqliteTable):
 
         return self.query(sql)
 
-
+    def select_one(self,**kwargs):
+        recs = self.select(**kwargs)
+        if recs:
+            return recs[0]
+            
+        return recs
+        
+        
     def get(self, id):
         out = self.select(where=self.table_name + ".id={}".format(cleanRecordID(id)))
         if type(out) == list and len(out) > 0:
