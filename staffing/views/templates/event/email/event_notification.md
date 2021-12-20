@@ -10,11 +10,12 @@
 
 {{ form.message | safe }}
 
+
+{% if job_data_list and not no_calendar %}
+
 {% include "announce/email/addendum.md" %}
 
 ---
-
-{% if job_data_list %}
 If you are unable to make it to any of your events, please contact the Event Manager using the 
 contact links below as soon as possible so we can arrange for someone to take your place.
 
@@ -40,9 +41,6 @@ The attached file(s) will add (or update) your shifts on your calendar.
 
 (Usually you can tap or double click to open it.)
 {% endif %}
-
-{% else %}
-Hummm... something when wrong... there are no jobs listed.
 
 {% endif %}
 
