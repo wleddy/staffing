@@ -14,10 +14,10 @@
             border:1px solid #000 !important;
             color:#333 !important;
         }
-.AnyTime-cur-btn {
-            background-color:white !important;
-            border:3px solid black !important;
-            color:black !important;
+.AnyTime-cur-btn, th.AnyTime-dow, .AnyTime-x-btn {
+            background-color:rgb(63, 36, 20) !important;
+            border:1px solid rgb(63, 36, 20) !important;
+            color:white !important;
         }
 
 .AnyTime-pkr .AnyTime-lbl {
@@ -27,4 +27,10 @@
  .AnyTime-hdr {
      background-color:rgb(63, 36, 20) !important;
      color:white !important;
+ }
+
+.AnyTime-x-btn {
+     background-color:rgb(63, 36, 20) !important;
+     color:white !important;
+     border-color:white !important;
  }
