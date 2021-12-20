@@ -2,8 +2,11 @@
 
 {% block head %}
     {{ super() }}
+    
+    {% include "anytime_head.html"%}
+
     <style>
-        @font-face {
+       @font-face {
           font-family: condensed-font;
           src: url("{{ url_for('static', filename='fonts/sans_condensed.ttf')}}") format("truetype");
         }
@@ -185,7 +188,7 @@
         
         <div class="w3-row">
             <p class="w3-col w3-full w3-large w3-primary-color month-name">
-                <select class="w3-select" style="width:auto;" onchange="location='{{ url_for('calendar.display')}}' + this.value">
+                <select id="date-selector" class="w3-select" style="width:auto;" onchange="goto_month(this)">
                     <option value="{{today.month}}/{{today.year}}">Today</option>
                     {% set month = [start_date.month]%}
                     {% set year = [start_date.year] %}
@@ -205,6 +208,18 @@
                         </option>
                     {% endfor%}
                 </select>
+                <input id="picker-input" 
+                    style="width:0pt;border:none;padding:0;" 
+                    class="w3-primary-color"
+                    />
+                <a href="javascript:addPicker('picker-input','%c/%Y')"  class="DatePickerButton w3-secondary-color">
+                <img src="{{ url_for('static', filename='anytime/calendar.png' ) }}" alt="[calendar icon]"/>
+                </a>
+                &nbsp;<input type="button" 
+                    id="go-button" value="Go" class="w3-secondary-color"
+                    style="border:0;padding:0 2.5pt;line-height:1.7;border-radius:4pt;"
+                    onclick="goto_month('#picker-input')"
+                    />
             </p>
         <div class="w3-row">
             {%for day in calendar.weekheader(3).split(' ') %}
@@ -298,5 +313,12 @@
             elm.addClass('group_uncheck_box')
         {% endfor %}
     {% endif %}
+    
+    // set the default anytime date to the value of the select object
+    $('#picker-input').val($('#date-selector').val())
+    // jump to the selected month
+    function goto_month(date_field_id){
+        location='{{ url_for('calendar.display')}}' + $(date_field_id).val()
+    }
 </script>
 {% endblock body %}

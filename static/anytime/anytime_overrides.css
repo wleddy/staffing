@@ -1,0 +1,30 @@
+/* 
+    you can change the default styling of anytime pickers 
+    See anytime.XXX.css file for defaults
+*/
+
+
+.AnyTime-win {
+          background-color:rgb(247, 240, 230) !important;
+          border:2px solid rgb(63, 36, 20) !important;
+      }
+
+.AnyTime-btn {
+            background-color:#eee !important;
+            border:1px solid #000 !important;
+            color:#333 !important;
+        }
+.AnyTime-cur-btn {
+            background-color:white !important;
+            border:3px solid black !important;
+            color:black !important;
+        }
+
+.AnyTime-pkr .AnyTime-lbl {
+          color:black !important;
+      }
+
+ .AnyTime-hdr {
+     background-color:rgb(63, 36, 20) !important;
+     color:white !important;
+ }
