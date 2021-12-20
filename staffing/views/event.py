@@ -395,15 +395,6 @@ def send_event_email(event_id):
     include_calendar = request.form.get("include_calendar",True) # include the calenar attachments by default
     
     # import pdb;pdb.set_trace()
-    # Get the users who have signed up fo this event
-    sql = """select * from user where user.id in 
-                (select user_id from user_job where job_id in 
-                    (select job.id from job where job.event_id = {}
-                    )
-                )
-                group by user.id
-                order by user.last_name, user.first_name""".format(event_id)
-    users = User(g.db).query(sql)
                     
     if request.form:
         valid_form = True
@@ -413,11 +404,18 @@ def send_event_email(event_id):
         if not request.form.get("subject",'').strip():
             flash("You must include a subject.")
             valid_form = False
+        if  not ('user' in request.form or 'user[]' in request.form):
+            flash("You must select at least one recipient")
+            valid_form = False
             
         # send emails
-        if valid_form and 'user' in request.form:
+        if valid_form:
             include_calendar = "include_calendar" in request.form
-            for user_id in request.form.getlist('user'):
+            users = request.form.getlist('user[]') # multiple recipients selected
+            if not users:
+                users = request.form.getlist('user') # just a single user
+                
+            for user_id in users:
                 user = User(g.db).get(cleanRecordID(user_id))
                 if user:
                     # get jobs for this user
@@ -438,9 +436,18 @@ def send_event_email(event_id):
                         )
                         
             return 'success'
-        else:
-            flash("You must select at least one recipient")
+            
     
+    # Get the users who have signed up fo this event
+    sql = """select * from user where user.id in 
+                (select user_id from user_job where job_id in 
+                    (select job.id from job where job.event_id = {}
+                    )
+                )
+                group by user.id
+                order by user.last_name, user.first_name""".format(event_id)
+    users = User(g.db).query(sql)
+
     return render_template('event_email_form.html',
                 event=event,
                 users=users,
