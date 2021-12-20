@@ -392,6 +392,8 @@ def send_event_email(event_id):
     if not event:
         return "fallure: That is not a valid event record"
         
+    include_calendar = request.form.get("include_calendar",True) # include the calenar attachments by default
+    
     # import pdb;pdb.set_trace()
     # Get the users who have signed up fo this event
     sql = """select * from user where user.id in 
@@ -414,6 +416,7 @@ def send_event_email(event_id):
             
         # send emails
         if valid_form and 'user' in request.form:
+            include_calendar = "include_calendar" in request.form
             for user_id in request.form.getlist('user'):
                 user = User(g.db).get(cleanRecordID(user_id))
                 if user:
@@ -431,13 +434,19 @@ def send_event_email(event_id):
                         form=request.form,
                         subject=request.form["subject"],
                         event=event,
+                        no_calendar = not include_calendar,
                         )
                         
             return 'success'
         else:
             flash("You must select at least one recipient")
     
-    return render_template('event_email_form.html',event=event,users=users,form=request.form)
+    return render_template('event_email_form.html',
+                event=event,
+                users=users,
+                form=request.form,
+                include_calendar=include_calendar,
+                )
     
 
 def valid_input(rec):
