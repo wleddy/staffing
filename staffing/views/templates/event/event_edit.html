@@ -13,10 +13,10 @@
 
 <div id="sg_section_tabs" class="w3-col l2 m2 s12" style="padding-right:6pt;">
     <div class="w3-side-bar w3-primary-color">
-      <a class="w3-bar-item w3-button w3-border" style="width:100%" href="#form-head">Event Details</a>
-      <a class="w3-bar-item w3-button w3-border" style="width:100%" href="#calendar-settings">Calendar Settings</a>
+      <a class="w3-bar-item w3-button w3-border" style="width:100%" href="#form-head"><span class="w3-hide-medium">Event </span>Details</a>
+      <a class="w3-bar-item w3-button w3-border" style="width:100%" href="#calendar-settings">Calendar</a>
       <a class="w3-bar-item w3-button w3-border" style="width:100%" href="#job-list">Job List</a>
-      <a class="w3-bar-item w3-button w3-border" style="width:100%" href="#contract-info">Contract Info</a>
+      <a class="w3-bar-item w3-button w3-border" style="width:100%" href="#contract-info">Contract<span class="w3-hide-medium"> Info</span></a>
       <a class="w3-bar-item w3-button w3-border" style="width:100%" 
           onclick="editFromList('{{ url_for('event.send_event_email')}}{{rec.id}}');return false;">
           Email...
