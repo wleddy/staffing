@@ -385,7 +385,7 @@ def delete_from_activity(activity_id=-1,id=0):
 @mod.route('/send_event_email/<int:event_id>/',methods=['GET','POST',])
 @table_access_required(Event)
 def send_event_email(event_id):
-    """Send an email to all the people who have signed up for an event"""
+    """Send a custom email to all or some the people who have signed up for an event"""
     
     event_id = cleanRecordID(event_id)
     event = Event(g.db).select_one(where="event.id = {}".format(event_id))
@@ -439,13 +439,20 @@ def send_event_email(event_id):
             
     
     # Get the users who have signed up fo this event
-    sql = """select * from user where user.id in 
-                (select user_id from user_job where job_id in 
-                    (select job.id from job where job.event_id = {}
-                    )
-                )
-                group by user.id
-                order by user.last_name, user.first_name""".format(event_id)
+    # import pdb;pdb.set_trace()
+    
+    sql = """select 
+                user.*,
+                job.title as job_title, 
+                sum(user_job.positions) as positions, 
+                job.start_date as job_start_date
+            from user_job
+            join user on user.id = user_job.user_id 
+            join job on job.id = user_job.job_id
+            where user_job.job_id in (select job.id from job where job.event_id = {event_id})
+            group by user.id
+            order by user.last_name, user.first_name, job_start_date
+            """.format(event_id=event_id)
     users = User(g.db).query(sql)
 
     return render_template('event_email_form.html',

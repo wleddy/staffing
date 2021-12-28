@@ -26,8 +26,19 @@
         <div class="w3-col w3-full">    
             <h3>Recipients:</h3>
             <p>Mark the users you would like to receive this message</p>
+            <div class="w3-row w3-hide-small w3-hide-medium">
+                <p class="w3-col w3-quarter "><strong>User</strong></p>
+                <p class="w3-col w3-quarter "><strong>Job</strong></p>
+                <p class="w3-col l2 m2 "><strong>Time</strong></p>
+                <p class="w3-col l2 m2 "><strong>Spots</strong></p>
+            </div>
             {% for user in users %}
-                <p>{{ checkbox_field(user.id,'user',label=user.first_name + " " + user.last_name,class="w3-row")}}</p>
+            <div class="w3-row">
+                <p class="w3-col w3-quarter">{{ checkbox_field(user.id,'user',label=user.first_name + " " + user.last_name,class="w3-row")}}</p>
+                <p class="w3-col w3-quarter w3-hide-small w3-hide-medium">{{ user.job_title | truncate(15,True) }}</p>
+                <p class="w3-col l2 m2      w3-hide-small w3-hide-medium">{{ user.job_start_date | local_time_string }}</p>
+                <p class="w3-col l2 m2      w3-hide-small w3-hide-medium">{{ user.positions }}</p>
+            </div>
             {% endfor %}
         </div>  
         <div class="w3-col w3-full">
