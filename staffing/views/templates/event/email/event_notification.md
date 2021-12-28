@@ -1,4 +1,4 @@
-## This is a message from {{ site_config.ORG_NAME | default(site_config.SITE_NAME, True) }}
+## A message from {{ session.user_name }} at {{ site_config.ORG_NAME | default(site_config.SITE_NAME, True) }}
 
 ### RE: {{ event.event_title }}
 
