@@ -27,7 +27,7 @@
                 <td>{{ job.start_date[:10] | abbr_date_string }}</td>
                 <td>
                     <p>
-                        {{ job.activity_title }} 
+                        {{ job.calendar_title }} 
                         {% if is_admin %}
                         <a href="{{ url_for('event.edit_from_activity')}}{{ job.event_id}}/{{ job.activity_id }}/"><em>(Edit)</em></a>
                         {% endif %}
