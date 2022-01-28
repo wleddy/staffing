@@ -1,9 +1,9 @@
 {% from '_staffing_helper_macros.html' import directions_snippet %}
 
 {% if renminder_type == 'future' %}
-## Your Future commitments for {{ site_config.ORG_NAME | default(site_config.SITE_NAME, True) }}
+## Your Future {{ 'commitment' | plural(job_data_list) }} for {{ site_config.ORG_NAME | default(site_config.SITE_NAME, True) }}
 
-You have the following commitments coming up.
+You have the following {{ 'commitment' | plural(job_data_list) }} coming up.
 
 {% else %}
 ## Your Reminder from {{ site_config.ORG_NAME | default(site_config.SITE_NAME, True) }}

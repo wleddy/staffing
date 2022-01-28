@@ -835,6 +835,7 @@ def send_user_commitment_email(user_name_or_email=None):
     """
     
     #import pdb;pdb.set_trace()
+    from shotglass2.takeabeltof.jinja_filters import plural
     
     result = "No Result Yet"
     
@@ -864,7 +865,7 @@ def send_user_commitment_email(user_name_or_email=None):
                     'announce/email/commitment_reminder.md',
                     mod,
                     escape=False,
-                    subject="Your Commitments for {}".format(get_site_config()["SITE_NAME"]),
+                    subject="Your {} for {}".format(plural("Commitment",len(job_data)),get_site_config()["SITE_NAME"]),
                     renminder_type="future",
                     )
             
