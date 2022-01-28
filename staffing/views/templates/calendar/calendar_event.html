@@ -102,6 +102,16 @@
                 </div>
                 {% endif %}
             </div>
+            {# a link to add this event to your calendar #}
+            {% if not event.is_past_event %}
+            <p class="w3-medium">
+                <a href="{{ url_for('.event_calendar_item') }}{{event.event_id}}/">
+                    Add to your Calendar
+                    <img src="{{ url_for('static',filename='anytime/calendar.png')}}"/>
+                </a>
+            </p>
+            {% endif %}
+            
             {# build link to best signup page #}
             {% if not event.is_yours or event.is_past_event %}
                 <div>

@@ -177,9 +177,7 @@ def event(event_id=None):
     # import pdb;pdb.set_trace()
     
     event_id = cleanRecordID(event_id)
-    if event_id < 1:
-        return redirect(url_for('.display'))
-                        
+
     event = get_event_recs(event_id=event_id)
     
     if not event:
@@ -191,6 +189,7 @@ def event(event_id=None):
 
     # assemble a list of locations where this event will be held
     event_locations = Event(g.db).locations(event_id)
+    
     # get the map for this
     map_data = []
     if event_locations:
@@ -216,33 +215,50 @@ def event(event_id=None):
     except KeyError:
         pass
         
-    if event:
-        jobs = Job(g.db).select(where="event_id = {event_id}".format(event_id=event.event_id))
-        if jobs:
-            job_list = ",".join([str(x.id) for x in jobs])
-            roles = JobRole(g.db).select(where="job_id in ({job_list})".format(job_list=job_list))
-            if roles:
-                # if volunteer roles are in the role_list everyone is qualified
-                for role in roles:
-                    if role.role_id in vol_roles:
-                        has_required_role = True
-                        break
-                        
-                if not has_required_role:
-                    # test to see if the user has other required roles
-                    role_list = ",".join([str(x.role_id) for x in roles])
-                    if UserRole(g.db).select(where="user_id = {user_id} and role_id in ({role_list})".format(
-                                user_id=temp_user_id,
-                                role_list=role_list,
-                                )):
-                        has_required_role = True
-    
+    jobs = Job(g.db).select(where="event_id = {event_id}".format(event_id=event.event_id))
+    if jobs:
+        job_list = ",".join([str(x.id) for x in jobs])
+        roles = JobRole(g.db).select(where="job_id in ({job_list})".format(job_list=job_list))
+        if roles:
+            # if volunteer roles are in the role_list everyone is qualified
+            for role in roles:
+                if role.role_id in vol_roles:
+                    has_required_role = True
+                    break
+                    
+            if not has_required_role:
+                # test to see if the user has other required roles
+                role_list = ",".join([str(x.role_id) for x in roles])
+                if UserRole(g.db).select(where="user_id = {user_id} and role_id in ({role_list})".format(
+                            user_id=temp_user_id,
+                            role_list=role_list,
+                            )):
+                    has_required_role = True
+
     return render_template('calendar_event.html',
         event=event,
         map_html=map_html,
         event_locations=event_locations,
         has_required_role = has_required_role,
         )
+    
+    
+@mod.route('calendar/event_calendar_item/<int:event_id>',methods=['GET',])
+@mod.route('calendar/event_calendar_item/<int:event_id>/',methods=['GET',])
+@mod.route('calendar/event_calendar_item/',methods=['GET',])
+def event_calendar_item(event_id=None):
+    #download an ical text for the specified event
+    
+    filename=None
+    ical=None
+    calendar_name="calendar"
+    rec = Event(g.db).select_one(where="event.id = {}".format(cleanRecordID(event_id)))
+    if rec:
+        ical = get_ical_text(calendar_name,rec)
+        filename = calendar_name = rec.event_title
+        
+    return ical_response(ical,filename)
+    
     
 @mod.route('calendar/save_filter/<action>/<int:group_id>')
 @mod.route('calendar/save_filter/<action>/<int:group_id>/')
@@ -275,64 +291,16 @@ def subscribe(calendar_name=''):
     site_config = get_site_config()
     if not calendar_name:
         calendar_name = site_config['SITE_NAME']
-    ical = ICal(calendar_name=calendar_name)
+
     where="datetime(event.event_start_date,'localtime') > datetime('{}','localtime')".format(datetime_as_string(local_datetime_now() - timedelta(days=30)))
     where += " and event.exclude_from_calendar = 0 "
     where += " and lower(event.status) <> 'pending' "
     recs = Event(g.db).select(where = where)
     # import pdb;pdb.set_trace()
     
-    if recs:
-        for rec in recs:
-            locations = Event(g.db).locations(rec.id)
-            event_location = 'tbd'
-            if locations and len(locations) == 1:
-                event_location = locations[0].location_name
-            elif locations and len(locations) > 1:
-                event_location = "Multiple Locations"
-            url = request.url_root.rstrip('/') + url_for('calendar.event') + str(rec.id) + '/'
-            calendar_status = rec.status.upper()
-            calendar_method = 'PUT'
-            sequence = 1
-            if rec.exclude_from_calendar == 1:
-                calendar_status = "CANCELLED" # Incase it was in the calendar before.
-                calendar_method = 'CANCEL'
-                sequence = 2000
-            summary_status = ''
-            if rec.status.lower() != 'scheduled': 
-                summary_status = '!' + rec.status.upper() + '! '
-            summary = "{} {}{}".format(site_config["MAIL_SUBJECT_PREFIX"],summary_status,rec.event_title)
-            ical.add_event(
-                "{}.{}.{}".format(
-                rec.id,
-                rec.activity_id,
-                site_config['HOST_NAME'] + calendar_name
-                ),
-               rec.event_start_date,
-               rec.event_end_date,
-               summary,
-               url = url,
-               description=rec.event_description,
-               location = event_location,
-               status=calendar_status,
-               method=calendar_method,
-               sequence=sequence,
-            )
-        
-        ical = ical.get()
-            
-        headers={
-           "Content-Disposition":"attachment;filename={}.ics".format(calendar_name.replace(' ','_')),
-            }
-
-        return Response(
-                ical,
-                mimetype="text/calendar",
-                headers=headers
-                )
-         
-    
-    return "No Events found..."
+    ical = get_ical_text(calendar_name,recs) # return some ical text or None
+    filename = calendar_name.replace(' ','_')
+    return ical_response(ical,filename)
     
     
 @mod.route('calendar/subscribe/summary/<calendar_name>/',methods=['GET',])
@@ -409,8 +377,73 @@ def subscribe_to_summary(calendar_name=''):
                 
         ical = ical.get()
             
+        return ical_response(ical,calendar_name)
+
+    
+def get_ical_text(calendar_name,event_recs):
+    # return an ical text object or None for event_recs
+    if not isinstance(calendar_name,str):
+        calendar_name = "calendar"
+    ical = ICal(calendar_name=calendar_name)
+
+    site_config = get_site_config()
+        
+    if event_recs:
+        if not isinstance(event_recs,list):
+            event_recs = [event_recs]
+        
+        for rec in event_recs:
+            locations = Event(g.db).locations(rec.id)
+            event_location = 'tbd'
+            geo = None
+            if locations and len(locations) == 1:
+                event_location = "{}, {} {}".format(locations[0].street_address,locations[0].city,locations[0].state)
+                geo = (locations[0].lat,locations[0].lng)
+            elif locations and len(locations) > 1:
+                event_location = "Multiple Locations"
+            url = request.url_root.rstrip('/') + url_for('calendar.event') + str(rec.id) + '/'
+            calendar_status = rec.status.upper()
+            calendar_method = 'PUT'
+            sequence = 1
+            if rec.exclude_from_calendar == 1:
+                calendar_status = "CANCELLED" # Incase it was in the calendar before.
+                calendar_method = 'CANCEL'
+                sequence = 2000
+            summary_status = ''
+            if rec.status.lower() != 'scheduled': 
+                summary_status = '!' + rec.status.upper() + '! '
+            summary = "{} {}{}".format(site_config["MAIL_SUBJECT_PREFIX"],summary_status,rec.event_title)
+            ical.add_event(
+                "{}.{}.{}".format(
+                rec.id,
+                rec.activity_id,
+                site_config['HOST_NAME'] + calendar_name
+                ),
+               rec.event_start_date,
+               rec.event_end_date,
+               summary,
+               url = url,
+               description=rec.event_description,
+               location = event_location,
+               status=calendar_status,
+               method=calendar_method,
+               sequence=sequence,
+               geo=geo,
+            )
+        
+        ical = ical.get()
+        
+    return ical
+    
+def ical_response(ical,filename):
+    # return a Responce object with the sepecifred ical text or some error text
+    calendar_name = "calendar_item"
+    if filename and isinstance(filename,str):
+        calendar_name = filename.replace(' ','_').replace("&","_")
+        
+    if ical:            
         headers={
-           "Content-Disposition":"attachment;filename={}.ics".format(calendar_name.replace(' ','_')),
+           "Content-Disposition":"attachment;filename={}.ics".format(calendar_name),
             }
 
         return Response(
@@ -418,6 +451,7 @@ def subscribe_to_summary(calendar_name=''):
                 mimetype="text/calendar",
                 headers=headers
                 )
-     
-
+         
+    
     return "No Events found..."
+    
