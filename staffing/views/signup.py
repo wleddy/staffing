@@ -834,7 +834,7 @@ def send_user_commitment_email(user_name_or_email=None):
     Param: user_name_or_email : the user_name or email address
     """
     
-    #import pdb;pdb.set_trace()
+    # import pdb;pdb.set_trace()
     from shotglass2.takeabeltof.jinja_filters import plural
     
     result = "No Result Yet"

@@ -326,6 +326,7 @@ def subscribe_to_summary(calendar_name=''):
            cal_date,
            summary,
            description=description,
+           reminder=True, # Default 30 minute reminder
         )
         
 
@@ -387,7 +388,7 @@ def get_ical_text(calendar_name,event_recs):
     ical = ICal(calendar_name=calendar_name)
 
     site_config = get_site_config()
-        
+    
     if event_recs:
         if not isinstance(event_recs,list):
             event_recs = [event_recs]
@@ -429,8 +430,8 @@ def get_ical_text(calendar_name,event_recs):
                method=calendar_method,
                sequence=sequence,
                geo=geo,
+               reminder=True, # Default 30 minute reminder
             )
-        
         ical = ical.get()
         
     return ical

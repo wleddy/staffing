@@ -1,5 +1,6 @@
 # Send communications to users
 from flask import g
+from ical.ical import ICal
 from shotglass2.shotglass import get_site_config
 from shotglass2.takeabeltof.date_utils import getDatetimeFromString, local_datetime_now, datetime_as_string
 from shotglass2.takeabeltof.utils import render_markdown_for, printException
@@ -29,6 +30,8 @@ def send_signup_email(job_data_list,user,template_path,bp,**kwargs):
             
     site_config = get_site_config()
             
+    # import pdb;pdb.set_trace()
+            
     ical = None
     ical_events = []
     for job_data in job_data_list:
@@ -42,6 +45,7 @@ def send_signup_email(job_data_list,user,template_path,bp,**kwargs):
                     description=description.replace('\n\n','\n'),
                     location=location,
                     geo=geo,
+                    reminder=True, # Default 30 minute reminder
                     )
                 )
 
@@ -211,54 +215,28 @@ def log_notifications(job_list,user_id,trigger_function_name):
                                 
 def get_ical_text(events):
     """Return the text of an icalendar object or None
-    @param events = a list of dictionaries that each describ an event
+    @param events = a list of dictionaries that each describe an event
         
     """
-    from icalendar import Calendar, Event as IcalEvent
-    #import pdb;pdb.set_trace()
 
-    out = None
+    # import pdb;pdb.set_trace()
+    calendar = ICal()
+
     if not isinstance(events,list):
         events = [events]
- 
-    calendar = Calendar()
-    calendar.add('version','2.0')
-    calendar.add('calscale','GREGORIAN')
-    calendar.add('prodid','net.williesworkshop.calendar')
-    calendar.add('x-priamry-calendar','TRUE')
 
-    event_count = 0
     for event in events:
         if event:
-            ev = IcalEvent()
-        
             minumum_properties = True
             # Minimum required properties
             for key in ['uid','dtstart','dtend','summary',]:
                 if key not in event:
                     minumum_properties = False
                     break
-                value = event.pop(key)
-                if isinstance(value,str) and key in ['dtstart','dtend',]:
-                    value = getDatetimeFromString(value)
-                
-                ev.add(key,value)
-            
-            if not minumum_properties:
-                break
-            
-            for key, value in event.items():
-                if value:
-                    ev.add(key,value)
-            
-            ev.add('DTSTAMP',local_datetime_now('UTC'))
-            calendar.add_component(ev)
-            event_count += 1
-        
-    if event_count > 0:
-        out = calendar.to_ical()
-
-    return out
+            if minumum_properties:
+                calendar.add_event(event.pop('uid'),event.pop('dtstart'),event.pop('dtend'),event.pop('summary'),**event)
+             
+    return calendar.get()
 
 
 def make_event_dict(uid,start,end,summary,**kwargs):
