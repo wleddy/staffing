@@ -184,6 +184,7 @@ def event(event_id=None):
         return redirect(url_for('.display'))
         
     event = event[0]
+    g.title=event.service_type
     map_html = None
     event_locations = None
 
