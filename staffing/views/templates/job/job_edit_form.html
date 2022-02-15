@@ -1,7 +1,7 @@
 {% from "_form_helpers.html" import input_field, select_field, radio_field, checkbox_field, label_only %}
 
 
-<fieldset style="background-color:transparent;position:relative:left:200pt;">
+<fieldset style="background-color:transparent;">
     <p>{{ input_field(rec.id,"id",type="hidden",default=0)}}</p>
     <div class="w3-row">
         		<input type=hidden name="event_id" value="{{rec.event_id|default('0',True )}}">
@@ -24,7 +24,7 @@
         {% set job_start_date = rec.start_date | local_date_and_time_string %}
         <p class="w3-col l3 m3 s12" style="padding-right:3pt;">{{ input_field(job_start_date,'start_date',label="Shift Start",id="job_start_date", req=True)}}</p>
         {% set job_end_date = rec.end_date | local_date_and_time_string %}
-        <p class="w3-col l3 m3 s12" style="padding-right:3pt;">{{ input_field(job_end_date,'end_date',label="Shift End",id="job_end_date, req=True")}}</p>
+        <p class="w3-col l3 m3 s12" style="padding-right:3pt;">{{ input_field(job_end_date,'end_date',label="Shift End",id="job_end_date", req=True)}}</p>
         <p class="w3-col l4 m4 s12" style="padding-left:3pt;">{{ input_field(rec.max_positions,'max_positions',label="# of People Requested", default=1, req=True, type="num")}}</p>  
     </div>
     {% if roles %}
@@ -45,13 +45,12 @@
 <script>
     
     var date_format = "%c/%e/%y %l:%i%p"; // "3/4/19 06:00AM"
-    var job_pickers = ["#job_start_date","#job_end_date"]
+    var job_pickers = ["job_start_date","job_end_date"]
+    
     for( i = 0;i<job_pickers.length;i++){
-        /* 
-            you must remove the pickers before dismissing the dialog
-            else they will not be reattached the next time the dialog opens
-        */
-        $(job_pickers[i]).AnyTime_noPicker().AnyTime_picker({ format: date_format } );                
+        $("#" + job_pickers[i]).AnyTime_noPicker().AnyTime_picker({ format: date_format } );
+        // be sure the picker comes to the top of the stack
+        $("#AnyTime--" + job_pickers[i]).css('z-index',1000)
     }
     
 </script>
