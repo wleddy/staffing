@@ -76,7 +76,7 @@
             {% endif %} {# all day event #}
 
             {# a link to add this event to your calendar #}
-            {% if not event.is_past_event %}
+            {% if not event.is_past_event and event.status | lower == 'scheduled' %}
             <p class="w3-medium">
                 <a style="text-decoration:none;" href="{{ url_for('.event_calendar_item') }}{{event.event_id}}/"><img src="{{ url_for('static',filename='anytime/calendar.png')}}"/></a>
                 <a href="{{ url_for('.event_calendar_item') }}{{event.event_id}}/"> Add to your Calendar</a>
