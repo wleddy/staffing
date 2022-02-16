@@ -399,10 +399,18 @@ def get_ical_text(calendar_name,event_recs):
             event_location = 'tbd'
             geo = None
             if locations and len(locations) == 1:
-                event_location = "{}, {} {}".format(locations[0].street_address,locations[0].city,locations[0].state)
-                geo = (locations[0].lat,locations[0].lng)
+                event_location = "{}, {} {}".format(
+                        locations[0].street_address,
+                        locations[0].city,
+                        locations[0].state,
+                        )
+                if isinstance(locations[0].lat,(float,int)) \
+                    and isinstance(locations[0].lng,(float,int)):
+                        geo = (float(locations[0].lat),float(locations[0].lng))
+                        
             elif locations and len(locations) > 1:
                 event_location = "Multiple Locations"
+                
             url = request.url_root.rstrip('/') + url_for('calendar.event') + str(rec.id) + '/'
             calendar_status = rec.status.upper()
             calendar_method = 'PUT'
