@@ -8,7 +8,7 @@ from staffing.models import Event, Location, Job, UserJob
 
 mod = Blueprint('location',__name__, template_folder='templates/location', url_prefix='/location')
 
-
+    
 def setExits():
     g.listURL = url_for('.display')
     g.editURL = url_for('.edit')
@@ -76,7 +76,6 @@ def edit(id=0):
             return redirect(g.listURL)
     else:
         rec = location.new()
-        rec.location_name = "New Location"
         search_field_id = 'search-input'
     
     if request.form:
@@ -86,20 +85,6 @@ def edit(id=0):
             g.db.commit()
             return redirect(g.listURL)
         
-        
-    
-    #get the map for this
-    # make a list of dict for the location
-#     marker["dragable"] = point.get('dragable',False)
-#     marker['map_icon'] = point.get('map_icon')
-#     marker['lat'] = point.get('lat')
-#     marker['lng'] = point.get('lng')
-#     marker['UID'] = point.get('UID')
-#     marker['title'] = point.get('title')
-#     marker['location_name'] = point.get('location_name')
-#     # for getting lat and lng values interactively from map
-#     marker['latitudeFieldId'] = point.get('latitudeFieldId')
-#     marker['longitudeFieldId'] = point.get('longitudeFieldId')
     if rec.lat and rec.lng:
         map_data = {'lat':rec.lat,'lng':rec.lng,
         'title':rec.location_name,
@@ -140,9 +125,18 @@ def edit(id=0):
 def valid_input(rec):
     valid_data = True
     
-    location_name = request.form.get('location_name').strip()
-    if not location_name:
+    if not rec.location_name.strip():
         valid_data = False
-        flash("You must give the location a location_name")
+        flash("You must give the location a name")
+    if not rec.street_address.strip():
+        valid_data = False
+        flash("The Street Address is required")
+    try:
+        lat = float(rec.lat.strip())
+        lng = float(rec.lng.strip())
+    except ValueError:
+        valid_data = False
+        flash("Latitude and Longitude are both required")
+        
 
     return valid_data

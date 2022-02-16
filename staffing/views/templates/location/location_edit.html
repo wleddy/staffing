@@ -16,12 +16,12 @@
     {% else %}
     <p>{{ input_field(rec.location_name,'location_name',req=True)}}</p>
     {% endif %}
-    <p>{{ input_field(rec.street_address,'street_address',id="street_address")}}</p>
+    <p>{{ input_field(rec.street_address,'street_address',id="street_address",req=True)}}</p>
     <p class="w3-row w3-half" style="padding-right:3pt;">{{ input_field(rec.city,'city',id="city")}}</p>
     <p class="w3-row w3-quarter" style="padding-right:3pt;padding-left:3pt;">{{ input_field(rec.state,'state',id="state")}}</p>
     <p class="w3-row w3-quarter" style="padding-left:3pt;">{{ input_field(rec.zip,'zip',id="zip")}}</p>
-    <p class="w3-row w3-half" style="padding-right:3pt;">{{ input_field(rec.lat,'lat',label="Latitude", id="latitude" )}}</p>
-    <p class="w3-row w3-half" style="padding-left:3pt;">{{ input_field(rec.lng,'lng',label="Longitude", id="longitude" )}}</p>
+    <p class="w3-row w3-half" style="padding-right:3pt;">{{ input_field(rec.lat,'lat',label="Latitude", id="latitude",req=True )}}</p>
+    <p class="w3-row w3-half" style="padding-left:3pt;">{{ input_field(rec.lng,'lng',label="Longitude", id="longitude",req=True )}}</p>
     <p class="w3-row">{{ label_only("Drag the marker below to set the Latitude and Longitude for this location")}}</p>
     <div id='map' class="w3-border w3-secondary-color" style="height:40em;width:100%;"></div>
 </fieldset>
