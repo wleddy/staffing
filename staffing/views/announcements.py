@@ -1,5 +1,5 @@
 # Send communications to users
-from flask import g
+from flask import g, request, url_for
 from ical.ical import ICal
 from shotglass2.shotglass import get_site_config
 from shotglass2.takeabeltof.date_utils import getDatetimeFromString, local_datetime_now, datetime_as_string
@@ -13,7 +13,7 @@ from datetime import datetime, timedelta
 def send_signup_email(job_data_list,user,template_path,bp,**kwargs):
     """Send an email confirming a single user's signup
     currently this only generates one email
-    param: job_data is the result of the query in staffing.signup.get_job_rows (a list of recs)
+    param: job_data_list is the result of the query in staffing.signup.get_job_rows (a list of recs)
     param: user is a single instance of a User record
     param: template_path, obviously the path to a template... but absolute or relative to what?
     param: bp, the Blueprint for the template. May be None
@@ -41,7 +41,10 @@ def send_signup_email(job_data_list,user,template_path,bp,**kwargs):
         description = get_description(job_data,geo,location)
     
         if not kwargs.get('no_calendar',False):            
-            ical_events.append(make_event_dict(uid,job_data.start_date,job_data.end_date,job_data.job_title,
+            ical_events.append(make_event_dict(
+                    uid,
+                    job_data.start_date,
+                    job_data.end_date,"{} {}".format(site_config["MAIL_SUBJECT_PREFIX"],job_data.calendar_title),
                     description=description.replace('\n\n','\n'),
                     location=location,
                     geo=geo,
@@ -255,11 +258,14 @@ def make_event_dict(uid,start,end,summary,**kwargs):
 
 def get_description(job_data,geo,location):
     """Return the description text for the job"""
-    description = ''
+    
+    # Start with the event name
+    description = "Your assignment: {}\n\n".format(job_data.job_title)
+    description += "Event Page: {}\n\n".format(request.url_root.rstrip('/') + url_for('calendar.event') + str(job_data.event_id) + '/')
     
     if job_data.job_loc_name:
         location = job_data.job_loc_name
-        description += 'Location:\n\n{}'.format(job_data.job_loc_name)
+        description += 'Location:{}\n\n'.format(job_data.job_loc_name)
 
     if  job_data.job_loc_street_address and job_data.job_loc_city and job_data.job_loc_state:
         if description:
@@ -268,7 +274,8 @@ def get_description(job_data,geo,location):
     
     if description:
         description += '\n\n'
-    description += job_data.event_description + '\n\n' + job_data.job_description
+    description += job_data.event_description + '\n\n' + job_data.job_description + "\n\n"
+    
     
     return description
     
