@@ -214,7 +214,7 @@
            </div>
             <h4>Contract Info</h4>
              {% set _ = placeholders.update({"contract_date": rec.activity_contract_date | local_date_string })%}
-             <p class="">{{ input_field(rec.contract_date,"contract_date",type="date",id="contract_date", placeholder="MM/DD/YYYY")}}</p>
+             <p class="">{{ input_field(rec.contract_date,"contract_date",type="text",id="contract_date", placeholder="MM/DD/YYYY")}}</p>
              <div class="w3-row">
                  {% set _ = placeholders.update({"per_event_contract_price": rec.activity_per_event_contract_price | money })%}
                  <p class="w3-col w3-half">{{ input_field(rec.per_event_contract_price,"per_event_contract_price", type="text",id="per_event_contract_price",placeholder="0.00")}}</p>
@@ -243,6 +243,9 @@
             $(pickers[i]).AnyTime_noPicker().AnyTime_picker({ format: format } );                
         }
     }
+    
+    // set the contract date picker
+    $("#contract_date").AnyTime_noPicker().AnyTime_picker({ format: date_format } );
     
     if ($('#all_day_event').prop('checked')){
         set_date_pickers(date_format);
