@@ -140,7 +140,7 @@
 
 {% macro calendar_entry(event)%}
     {% set status_var = True %}
-    <p grp="{{ event.activity_group_id }}" onclick="location='{{ url_for('calendar.event')}}{{event.id}}'" class="day-content {{ event.activity_group_style }} {%if event.is_yours %}yours{% endif %} {% if event.all_day_event %}all-day-event{% endif %}">
+    <p grp="{{ event.activity_group_id }}" onclick="location='{{ url_for('calendar.event')}}{{event.id}}'" class="day-content {{ event.activity_group_style }} {%if event.is_yours and event.status | lower == 'scheduled' %}yours{% endif %} {% if event.all_day_event %}all-day-event{% endif %}">
         {% if event.status | lower != 'scheduled' %}
         <span class="w3-tiny">[{{ event.status | upper }}]<br>&nbsp;</span>
         {% endif %}
