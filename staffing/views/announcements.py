@@ -144,15 +144,19 @@ def process_commitment_reminder():
         select
         user_job.user_id,
         user_job.job_id,
-        job.start_date as job_start_date
+        job.start_date as job_start_date,
+        event.status
 
         from user_job
         join user on user.id = user_job.user_id
         join job on job.id = user_job.job_id
+        join event on event.id = job.event_id
 
         where 
             date(job_start_date,'localtime') >= date('{}','localtime') and
             date(job_start_date,'localtime') <= date('{}','localtime') 
+            -- only include jobs for scheduled events
+            and lower(event.status) = 'scheduled'
     
         order by
             user_job.user_id,
