@@ -91,7 +91,7 @@
             color:white;
             background-color:red;
         }
-        .month_arrow{
+        .month_arrow, .month_arrow a{
             text-decoration:none;
         }
         #coverup{
@@ -168,6 +168,7 @@
     </div>
 </nav>
 {% endmacro %}
+
 
 {% block body %}
 <div id="coverup" onclick="hide_full_day()">&nbsp;</div>
@@ -269,6 +270,11 @@
                 {% endfor %}
         </div>
         {% endfor %}
+        <div class="w3-row">
+            <p class="w3-col w3-full w3-large w3-primary-color month-name month_arrow">
+                <a id="next_month_link" href="{{g.listURL}}{{next_month.month}}/{{next_month.year}}" >Go To {{ calendar.month_name[next_month.month] }} {{ next_month.year }}</a>
+            </p>
+        </div>
     </div>
 {% else %}
 <h3>Well, that's odd... there's no calendar to display...</h3>
