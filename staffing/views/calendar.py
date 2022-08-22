@@ -21,7 +21,7 @@ mod = Blueprint('calendar',__name__, template_folder='templates/calendar', url_p
 
 
 def setExits():
-    g.listURL = url_for('.display')
+    g.listURL = url_for('calendar.display')
     # g.editURL = url_for('.edit')
     # g.deleteURL = url_for('.delete')
     g.title = 'Calendar'
