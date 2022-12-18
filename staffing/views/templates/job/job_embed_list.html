@@ -18,7 +18,7 @@
                 <p class="w3-col w3-threequarter" >
                     {{ job.job_title | truncate(35)}}<br>
                     <span class="w3-small">{{ job.job_filled_positions }} of {{ job.max_positions }} : {{ job.start_date | local_time_string }} - {{ job.end_date | local_time_string }}</span>
-                    <br>@ {{ job.job_loc_name }}
+                    <br>@ {{ job.job_loc_name | default('tbd',True) }}
                 </p>
                <div class="w3-col w3-quarter" style="text-align:center;">
                    <p>

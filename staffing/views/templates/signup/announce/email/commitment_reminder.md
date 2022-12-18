@@ -26,7 +26,7 @@ contact links below as soon as possible so we can arrange for someone to take yo
 > Your shift starts at {{ job_data.start_date | local_time_string }}
 > and ends at {{ job_data.end_date | local_time_string }}.
 
-> Location: {{job_data.job_loc_name}}  
+> Location: {{job_data.job_loc_name | default('tbd',True) }}  
 
 {% include "announce/email/addendum.md" %}
 
