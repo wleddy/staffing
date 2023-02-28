@@ -6,19 +6,27 @@
         <span class="w3-xxlarge">Thanks!</span>
        <br><em>(You'll receive an email with all the details for your calendar.)</em>
    </p>
-   {% else  %}
-        {% if signup_status == "full" %}
+   {% elif signup_status == "full" %}
         <p>
             <span class="w3-xxlarge">Sorry!</span>
            <br><em>Looks like someone already took that spot.</em><br>
             <em>(Try refreshing your browser to get a fresh list)</em>
       </p>
+     {% elif signup_status == "employee_limited" %}
+        <p>
+            <span class="w3-xlarge w3-bold">It is too close to the event to Cancel your assignment</span>
+           <br><br>
+           Please contact your manager if you can't make it to your assignment.<br>
+           You are still responsible for your shift.<br>
+      </p>
+      <p>
+          <a href="{{ url_for('.contact_event_manager') }}{{ job_id }}" class="w3-button w3-primary-color w3-round-medium">Contact the event manager</a>
+      </p>
             
-       {% else %}
+    {% else %}
        <p>
            Sorry you had to cancel. Hope to see you at another event soon.
        </p>
-       {% endif %}
    {% endif %}
     <p>
     	<a class="w3-button w3-primary-color w3-round-medium " onclick="cancelModalForm()">Close</a>

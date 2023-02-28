@@ -2,17 +2,15 @@ from flask import request, session, g, redirect, url_for, abort, \
      render_template, flash, Blueprint
 from shotglass2.shotglass import get_site_config
 from shotglass2.takeabeltof.mailer import email_admin
-from shotglass2.takeabeltof.utils import render_markdown_for, render_markdown_text, printException, cleanRecordID, looksLikeEmailAddress, formatted_phone_number
-from shotglass2.takeabeltof.jinja_filters import excel_date_and_time_string
+from shotglass2.takeabeltof.utils import render_markdown_for, printException, cleanRecordID
 from shotglass2.takeabeltof.views import TableView
 from shotglass2.takeabeltof.date_utils import date_to_string, getDatetimeFromString, local_datetime_now
 from shotglass2.takeabeltof.jinja_filters import default_if_none
 from shotglass2.takeabeltof.mailer import Mailer
-from shotglass2.users.admin import login_required, table_access_required, silent_login
+from shotglass2.users.admin import table_access_required, silent_login
 from shotglass2.users.models import Role, User, Pref
-from shotglass2.users.views.login import authenticate_user, setUserStatus, logout as log_user_out, login as log_user_in
 from shotglass2.www.views.home import contact as home_contact
-from staffing.models import Event, Location, Job, UserJob, JobRole, Activity
+from staffing.models import Event, Location, Job, UserJob, JobRole
 from staffing.views.announcements import send_signup_email, process_commitment_reminder
 from datetime import timedelta, datetime
 
@@ -29,12 +27,6 @@ def home():
     return display()
     return redirect(url_for('.display'))
     
-# @mod.route('/about/')
-# @mod.route('/about')
-# def about():
-#     """So we can use www routes here"""
-#     g.title = "About"
-#     return render_template('about_signup.html')
 
 @mod.route('/contact/', methods=['GET','POST',])
 @mod.route('/contact', methods=['GET','POST',])
@@ -201,10 +193,33 @@ def signup(job_id=None):
         positions = cleanRecordID(request.form.get('positions',0))
         previous_positions = signup.positions
         submission_ok = True # set for success
+        # user wants to cancel their shift
         if signup.id and positions <= 0 and signup.id > 0:
-            positions = -1 # indicates a cancellation of all positions
-            UserJob(g.db).delete(signup.id)
-            g.db.commit()
+            if may_cancel(signup):
+                positions = -1 # indicates a cancellation of all positions
+                UserJob(g.db).delete(signup.id)
+                g.db.commit()
+            else:
+                # import pdb;pdb.set_trace()
+                
+                #Cancellation is denied
+                # if there is no event manager, the email will be sent to system admin
+                if job_data.event_manager_user_id:
+                    address_list=[(job_data.event_manager_email,' '.join([job_data.event_manager_first_name,job_data.event_manager_last_name]))],
+                else:
+                    address_list = None
+
+                alert_event_manager(
+                    address_list = address_list,
+                    subject = "Late Cancellation attempt",
+                    body_is_html = True,
+                    html_template = "email/cancellation_attempt.html",
+                    user = user,
+                    job_data=job_data,
+                    )
+                    
+                signup_status = "employee_limited"
+                return render_template('signup_acknowledgment.html',signup_status=signup_status,job_id=signup.job_id)
             
         # record change
         if positions > 0:
@@ -966,9 +981,10 @@ def volunteer_contact_list():
     
 def send_manager_signup_notice(**kwargs):
     """Send an email to the event manager if user signed up close to the date of the event"""
-
-    positions = kwargs.get('positions',0)
-    previous_positions = kwargs.get("previous_positions",0)
+    
+    # import pdb;pdb.set_trace()
+    # positions = kwargs.get('positions',0)
+    # previous_positions = kwargs.get("previous_positions",0)
     job_data = kwargs.get('job_data',None)
     user = kwargs.get("user",None)
         
@@ -984,16 +1000,71 @@ Enter the number of days or -1 to always be notified""",
         return # there is no point in going on
 
     if days < 0 or local_datetime_now() >= getDatetimeFromString(job_data.start_date) - timedelta(days=days):
-        # Alert the event manager
-        mailer = Mailer(**kwargs)
-        mailer.add_address((job_data.event_manager_email,' '.join([job_data.event_manager_first_name,job_data.event_manager_last_name])))
-        mailer.subject = "Signup Change for {job_title} at {calendar_title}".format(calendar_title=job_data.calendar_title,job_title=job_data.job_title)
-        mailer.body_is_html = True
-        mailer.html_template = 'email/signup_change.html'
-    
-        mailer.send()
-        if not mailer.success:
-            #Error occured
-            email_admin(subject="Error sending job change notice at {}".format(get_site_config()['SITE_NAME']),message="An error occored while trying to send job change email. Err: {}".format(mailer.result_text))
-    
+        # if there is no event manager, the email will be sent to system admin
+        if job_data.event_manager_user_id:
+            address_list=[(job_data.event_manager_email,' '.join([job_data.event_manager_first_name,job_data.event_manager_last_name]))],
+        else:
+            address_list = None
+
+        alert_event_manager(
+            address_list=address_list,
+            subject = "Signup Change for {job_title} at {calendar_title}".format(calendar_title=job_data.calendar_title,job_title=job_data.job_title),
+            body_is_html = True,
+            html_template = 'email/signup_change.html',
+            positions = kwargs.get('positions',0),
+            job_data = kwargs.get('job_data',None),
+            )
+        
     return
+
+def may_cancel(signup):
+    """Return True or False if the user is allowed to cancel this signup"""
+    # import pdb;pdb.set_trace()
+    result = True #Set for success
+    
+    # the signup record is not loaded..
+    if not signup.user_id or not signup.job_id:
+        return True
+        
+    job = Job(g.db).get(signup.job_id)
+    if not job:
+        # This should never really hapben, but...
+        return True
+        
+    # if the event is far enough in the future, it's ok to cancel
+    cancel_limit_days = Pref(g.db).get("Employee Cancelation Limit Days",
+            default=7,
+            description="""Emplyees are restricted from cancelling a shift within this many days of the event.""",
+            user_name = get_site_config().get('HOST_NAME',None),
+            ).value
+        
+    if local_datetime_now() <= getDatetimeFromString(job.start_date) - timedelta(days=int(cancel_limit_days)):
+        #Job is at least some days in the future
+        return True # Ok to cancel
+        
+    # Get the users roles and ranking
+    is_employee = User(g.db).user_has_role(session.get('user_id'),'employee')
+    max_rank = User(g.db).max_role_rank(session.get('user_id'))
+    # as of feb, 2023 Activity managers have a rank of 100
+    if is_employee and max_rank < 100:
+        return False
+            
+    return result
+    
+    
+
+def alert_event_manager(address_list,**kwargs):
+    # import pdb;pdb.set_trace()
+    
+    # Alert the event manager
+    mailer = Mailer(address_list=address_list,**kwargs)
+    # mailer.add_address((job_data.event_manager_email,' '.join([job_data.event_manager_first_name,job_data.event_manager_last_name])))
+    # mailer.subject = "Signup Change for {job_title} at {calendar_title}".format(calendar_title=job_data.calendar_title,job_title=job_data.job_title)
+    # mailer.body_is_html = True
+    # mailer.html_template = 'email/signup_change.html'
+
+    mailer.send()
+    if not mailer.success:
+        #Error occured
+        email_admin(subject="Error sending job change notice at {}".format(get_site_config()['SITE_NAME']),message="An error occored while trying to send job change email. Err: {}".format(mailer.result_text))
+    

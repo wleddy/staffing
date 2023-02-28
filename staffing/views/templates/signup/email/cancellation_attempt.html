@@ -1,0 +1,17 @@
+{# email to alert the event manager that an event lead has attempted to cancel a signup position #}
+
+<style>
+    table#user_info td {padding-left:12pt;}
+</style>
+
+<h3>{{user.first_name}} {{user.last_name}} attempted to cancel a position</h3>
+<p>{{user.first_name}} {{user.last_name}} would like to cancel their commitment 
+for {{ job_data.job_title }} at {{ job_data.calendar_title }} on {{ job_data.start_date | long_date_string }}.<p>
+    
+<p>User Info:</p>
+<table id="user_info">
+    <tr><th>Name:</th><td>{{user.first_name}} {{user.last_name}}</td></tr>
+    <tr><th>Email:</th><td>{{user.email|default('None',True)}}</td></tr>
+    <tr><th>Phone:</th><td>{{user.phone|default('None',True) | phone }}</td></tr>
+</table>
+
