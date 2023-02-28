@@ -580,5 +580,9 @@ def valid_input(rec):
                     flash("That is not a valid End date")
                 else:
                     rec.service_end_date = temp_datetime #store as date time
+
+    if cleanRecordID(rec.manager_user_id) < 1:
+        valid_data = False
+        flash("You must specify a manager for this event")
             
     return valid_data

@@ -55,7 +55,7 @@
                     {% endif %}
                 </select>
             </p>
-            <p>{{ select_field("manager_user_id","Event Manager", class="w3-border") }}
+            <p>{{ select_field("manager_user_id","Event Manager", class="w3-border", req=True) }}
                     <option value="0">Select an Event Manager</option>
                     {% if event_managers %}
                     {% for manager in event_managers %}
