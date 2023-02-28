@@ -1,6 +1,6 @@
 from flask import request, session, g, redirect, url_for, abort, \
      render_template, flash, Blueprint
-from shotglass2.shotglass import get_site_config
+from shotglass2.shotglass import get_site_config, is_ajax_request
 from shotglass2.takeabeltof.mailer import email_admin
 from shotglass2.takeabeltof.utils import render_markdown_for, printException, cleanRecordID
 from shotglass2.takeabeltof.views import TableView
@@ -151,13 +151,17 @@ def signup(job_id=None):
     user = None
     filled_positions = 0
     job_id = cleanRecordID(request.form.get('id',job_id))
-        
+
     job_data = get_job_rows(None,None,"job.id = {}".format(job_id),[],is_admin=True)
     if job_data:
         job_data = job_data[0]
         filled_positions = job_data.job_filled_positions
     else:
-        return'failure: That is not a valid job id'
+        if is_ajax_request():
+            return'failure: That is not a valid job id'
+        else:
+            return redirect(url_for('.display'))
+        
         
     event = Event(g.db).get(job_data.event_id)
     if not event:
