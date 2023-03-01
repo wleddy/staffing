@@ -1017,6 +1017,7 @@ Enter the number of days or -1 to always be notified""",
             html_template = 'email/signup_change.html',
             positions = kwargs.get('positions',0),
             job_data = kwargs.get('job_data',None),
+            user=user,
             )
         
     return
