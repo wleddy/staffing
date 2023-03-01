@@ -40,7 +40,7 @@ def contact():
 def contact_event_manager(job_id=''):
     """User wants to contact the event manager"""
     
-    #import pdb;pdb.set_trace()
+    # import pdb;pdb.set_trace()
     
     job_id = cleanRecordID(job_id)
     job_data = get_job_rows(None,None,'job.id = {}'.format(job_id),is_admin=True)
@@ -208,13 +208,8 @@ def signup(job_id=None):
                 
                 #Cancellation is denied
                 # if there is no event manager, the email will be sent to system admin
-                if job_data.event_manager_user_id:
-                    address_list=[(job_data.event_manager_email,' '.join([job_data.event_manager_first_name,job_data.event_manager_last_name]))],
-                else:
-                    address_list = None
 
                 alert_event_manager(
-                    address_list = address_list,
                     subject = "Late Cancellation attempt",
                     body_is_html = True,
                     html_template = "email/cancellation_attempt.html",
@@ -811,6 +806,17 @@ def get_activity_location_list(activity_id,where_clause=''):
     return None
     
         
+def get_event_manager_email(job_data):
+    """return a list containing a tuple of the event manager address and name or None"""
+    if job_data and job_data.event_manager_user_id:
+        return [(
+            job_data.event_manager_email,
+            ' '.join([job_data.event_manager_first_name,job_data.event_manager_last_name]),
+            )]
+    else:
+        return None
+
+
 def get_volunteer_role_ids():
     #get the ids for vounteer roles
     l= ['"' + x + '"' for x in get_site_config().get('DEFAULT_USER_ROLES',['volunteer','user'])]
@@ -1005,13 +1011,8 @@ Enter the number of days or -1 to always be notified""",
 
     if days < 0 or local_datetime_now() >= getDatetimeFromString(job_data.start_date) - timedelta(days=days):
         # if there is no event manager, the email will be sent to system admin
-        if job_data.event_manager_user_id:
-            address_list=[(job_data.event_manager_email,' '.join([job_data.event_manager_first_name,job_data.event_manager_last_name]))],
-        else:
-            address_list = None
 
         alert_event_manager(
-            address_list=address_list,
             subject = "Signup Change for {job_title} at {calendar_title}".format(calendar_title=job_data.calendar_title,job_title=job_data.job_title),
             body_is_html = True,
             html_template = 'email/signup_change.html',
@@ -1058,16 +1059,16 @@ def may_cancel(signup):
     
     
 
-def alert_event_manager(address_list,**kwargs):
+def alert_event_manager(**kwargs):
     # import pdb;pdb.set_trace()
-    
+
+    job_data = kwargs.get('job_data',None)
+
+    address_list = get_event_manager_email(job_data)
+
     # Alert the event manager
     mailer = Mailer(address_list=address_list,**kwargs)
-    # mailer.add_address((job_data.event_manager_email,' '.join([job_data.event_manager_first_name,job_data.event_manager_last_name])))
-    # mailer.subject = "Signup Change for {job_title} at {calendar_title}".format(calendar_title=job_data.calendar_title,job_title=job_data.job_title)
-    # mailer.body_is_html = True
-    # mailer.html_template = 'email/signup_change.html'
-
+ 
     mailer.send()
     if not mailer.success:
         #Error occured
