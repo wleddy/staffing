@@ -106,8 +106,7 @@
                     {% else %}
                         {{ filled_positions }} positions filled. (requested max: {{ job.max_positions }})<br>
                     {% endif %}
-                    <strong>Assignment: </strong>
-                    <input class="w3-xlarge" id="signup-count" type="num" id="positions" name='positions' value="1" style="padding:6pt;width:40pt;display:block-inline;text-align:center"/>
+                    <input type="hidden" id="positions" name='positions' value="1" />
                 </p>
             </div>
             <p class="w3-right">
