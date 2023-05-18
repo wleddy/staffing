@@ -93,10 +93,12 @@
             {% if g._more_info_activity_id %}
             
                 {# only show the date once within job list of same date #}
-                {% if job.start_date[:10] != job_start_date[0] %}
+                {% if job.start_date[:10] != job_start_date[0] or job.event_id != event_id[0] %}
                     {% set _ = job_start_date.pop() %}
                     {% set _ = job_start_date.append(job.start_date[:10]) %}
                     {% set _ = job_date_header_list.append(job.job_id)  %}
+                    {% set _ = event_id.pop() %}
+                    {% set _ = event_id.append(job.event_id) %}
                     <div id="event-header-{{ job.event_id }}" class="w3-row w3-secondary-color job-contain job-date-contain" style="margin-top:3pt;">
                         <div class="w3-col l1 m1 w3-hide-small">&nbsp;</div>
                         <div class="w3-col l11 m11 w3-primary-color">
