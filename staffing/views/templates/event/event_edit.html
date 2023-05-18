@@ -298,8 +298,9 @@
             set_date_pickers(date_time_format);
         }
     }
-    
-    {% if rec.service_start_date != rec.event_start_date or rec.service_end_date != rec.event_end_date %}
+    {% if not rec.service_start_date and not rec.service_end_date %}
+    {# do nothing #}
+    {% elif rec.service_start_date != rec.event_start_date or rec.service_end_date != rec.event_end_date %}
     $('#show_service_times').prop('checked',true);
     toggle_service_times();
     {% endif %}

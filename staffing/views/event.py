@@ -3,12 +3,13 @@ from flask import request, session, g, redirect, url_for, abort, \
 from shotglass2.shotglass import get_site_config
 from shotglass2.users.admin import login_required, table_access_required
 from shotglass2.takeabeltof.utils import render_markdown_for, printException, cleanRecordID, Numeric
-from shotglass2.takeabeltof.date_utils import date_to_string, getDatetimeFromString, local_datetime_now
+from shotglass2.takeabeltof.date_utils import date_to_string, getDatetimeFromString, local_datetime_now, datetime_as_string
 from staffing.models import Event, Location, ActivityType, Client, EventDateLabel, Job, JobRole, UserJob
 from shotglass2.users.models import User
 from staffing.views.announcements import send_signup_email
 from staffing.views.job import get_job_list_for_event, coerce_datetime
 from staffing.views.signup import get_job_rows
+from datetime import timedelta
 
 mod = Blueprint('event',__name__, template_folder='templates/event', url_prefix='/event')
 
@@ -127,6 +128,11 @@ def render_edit_form(id,activity_id):
         user = User(g.db).get(g.user)
         rec.manager_user_id = user.id
         rec.activity_id = activity_id
+
+        # set default begin and end date to Now
+        rec.event_start_date = datetime_as_string(local_datetime_now())
+        rec.event_end_date = datetime_as_string(local_datetime_now()+timedelta(minutes=60))
+        
         event.save(rec)
         g.db.commit()
         g.cancelURL = g.cancelURL + str(rec.id)
