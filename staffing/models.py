@@ -101,6 +101,8 @@ class Attendance(SqliteTable):
         super().create_table(sql)
 
     def select(self,where=None,order_by=None,**kwargs):
+        offset = kwargs.get('offset',0)
+        limit = kwargs.get('limit',9999999)
                 
         # delay import until needed
         from staffing.views.signup import get_volunteer_role_ids, get_staff_user_ids
@@ -134,7 +136,7 @@ class Attendance(SqliteTable):
         if not order_by:
             order_by = self.order_by_col
 
-        sql = """select
+        sql =  """select
         attendance.*,
         user.id as user_table_id,
         coalesce(job.start_date,attendance.start_date) as job_start_date,
@@ -150,7 +152,7 @@ class Attendance(SqliteTable):
     
         -- 1 if a volunteer job, else 0
         coalesce((select 1 from job_role where job_role.role_id in ({vol_role_ids}) and job_role.job_id = job.id),0) as is_volunteer_job
-
+ 
         from attendance
         left join user_job on user_job.id = attendance.user_job_id
         left join job on user_job.job_id = job.id
@@ -163,12 +165,17 @@ class Attendance(SqliteTable):
         left join user_role on user_role.user_id = user.id
     
         where {where}
-        group by attendance.id
+        group by attendance.id 
+
         order by {order_by}
+        limit {limit}
+        offset {offset}
         """.format(
             vol_role_ids=get_volunteer_role_ids(),
             where=where,
             order_by=order_by,
+            offset=offset,
+            limit=limit,
         )
         
         return self.query(sql)
@@ -180,7 +187,7 @@ class Attendance(SqliteTable):
             return recs[0]
             
         return recs
-        
+    
         
 class Client(SqliteTable):
     """Client for events"""

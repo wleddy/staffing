@@ -16,6 +16,8 @@ ATTN_STATUS_SELECT_OBJ = "attn_status_select"
 
 def setExits():
     g.listURL = url_for('.display')
+    if 'page' in request.args:
+        g.listURL += f'?page={request.args["page"]}'
     g.editURL = url_for('.edit')
     g.deleteURL = g.listURL + "delete/"
     g.title = 'Attendance'
