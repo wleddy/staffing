@@ -10,32 +10,42 @@ from shotglass2.users.views.login import setUserStatus
 from shotglass2.users.admin import Admin
 from staffing.models import Activity, Event, Job, Location, ActivityType, UserJob, EventDateLabel, Client, \
     Attendance, Task, ActivityGroup
+from staffing.views import signup, calendar, event, activity,location, job, activity_type, \
+    attendance, task, event_date_label, client, activity_group
 
 # Create app
 import logging 
-try:
-    app = shotglass.create_app(
-            __name__,
-            instance_path='../data_store/instance',
-            config_filename='site_settings.py',
-            static_folder=None,
-            )
-except:
-    logging.exception('')
-    
-        
-@app.before_first_request
+
+app = shotglass.create_app(
+        __name__,
+        instance_path='../data_store/instance',
+        config_filename='site_settings.py',
+        static_folder=None,
+        )
+
+
 def start_app():
     shotglass.start_logging(app)
-    get_db() # ensure that the database file exists
-    shotglass.start_backup_thread(os.path.normpath(os.path.join(app.root_path,shotglass.get_site_config()['DATABASE_PATH'])))
+    initalize_base_tables()
+    ## Setup the routes for users
+    shotglass.register_users(app)
 
-register_jinja_filters(app)
+    # setup www.routes...
+    shotglass.register_www(app)
 
+    app.register_blueprint(tools.mod)
+    
+    register_blueprints() # Register all the other bluepints for the app
 
-def init_db(db=None):
-    # to support old code
-    initalize_base_tables(db)
+    # use os.path.normpath to resolve true path to data file when using '../' shorthand
+    shotglass.start_backup_thread(
+        os.path.normpath(
+            os.path.join(
+                app.root_path,shotglass.get_site_config()['DATABASE_PATH']
+                )
+            )
+        )
+
 
 def initalize_base_tables(db=None):
     """Place code here as needed to initialze all the tables for this site"""
@@ -47,6 +57,11 @@ def initalize_base_tables(db=None):
     ### setup any other tables you need here....
     from staffing.models import init_event_db
     init_event_db(db)
+    
+def init_db(db=None):
+    # to support old code
+    initalize_base_tables(db)
+            
     
 def get_db(filespec=None):
     """Return a connection to the database.
@@ -79,6 +94,9 @@ def inject_site_config():
     """
     c = shotglass.get_site_config()
     return {'site_config':c}
+    
+    
+register_jinja_filters(app)
     
     
 @app.before_request
@@ -174,32 +192,8 @@ def server_error(error):
 # Direct to a specific server for static content
 app.add_url_rule('/static/<path:filename>','static',shotglass.static)
 
-from staffing.views import signup, calendar, event, activity,location, job, activity_type, \
-    attendance, task, event_date_label, client, activity_group
     
 app.add_url_rule('/','display',calendar.display) # Make the calendar our home page...
-    
-app.register_blueprint(signup.mod)
-app.register_blueprint(activity.mod)
-app.register_blueprint(event.mod)
-app.register_blueprint(job.mod)
-app.register_blueprint(calendar.mod)
-app.register_blueprint(location.mod)
-app.register_blueprint(activity_type.mod)
-app.register_blueprint(attendance.mod)
-app.register_blueprint(task.mod)
-app.register_blueprint(event_date_label.mod)
-app.register_blueprint(client.mod)
-app.register_blueprint(activity_group.mod)
-
-## Setup the routes for users
-shotglass.register_users(app)
-
-app.register_blueprint(tools.mod)
-
-# setup www.routes...
-shotglass.register_www(app)
-shotglass.register_maps(app)
 
 
 @app.route('/')
@@ -262,13 +256,42 @@ def get_rss_feed():
     
     return feed
     
-    
 
+def register_blueprints():
+    """Register all your blueprints here and initialize 
+    any data tables they need.
+    """
+    # # add app specific modules...
+    # from starter_module.models import init_db as starter_init
+    # starter_init(g.db) #initialize the tables for the module
+    # from starter_module.views import starter
+    # app.register_blueprint(starter.mod)
+    # # update function 'create_menus' to display menu items for the app
+
+    app.register_blueprint(signup.mod)
+    app.register_blueprint(activity.mod)
+    app.register_blueprint(event.mod)
+    app.register_blueprint(job.mod)
+    app.register_blueprint(calendar.mod)
+    app.register_blueprint(location.mod)
+    app.register_blueprint(activity_type.mod)
+    app.register_blueprint(attendance.mod)
+    app.register_blueprint(task.mod)
+    app.register_blueprint(event_date_label.mod)
+    app.register_blueprint(client.mod)
+    app.register_blueprint(activity_group.mod)
+    shotglass.register_maps(app)
+
+
+with app.app_context():
+    start_app()
+    
+    
 if __name__ == '__main__':
     
     with app.app_context():
         # create the default database if needed
-        initalize_all_tables()
+        initalize_base_tables()
         
     #app.run(host='localhost', port=8000)
     #app.run()
