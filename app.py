@@ -35,9 +35,9 @@ register_jinja_filters(app)
 
 def init_db(db=None):
     # to support old code
-    initalize_all_tables(db)
+    initalize_base_tables(db)
 
-def initalize_all_tables(db=None):
+def initalize_base_tables(db=None):
     """Place code here as needed to initialze all the tables for this site"""
     if not db:
         db = get_db()
@@ -63,7 +63,7 @@ def get_db(filespec=None):
     # test the path, if not found, try to create it
     if shotglass.make_db_path(filespec):
         g.db = Database(filespec).connect()
-        initalize_all_tables(g.db)
+        initalize_base_tables(g.db)
             
         return g.db
     else:
