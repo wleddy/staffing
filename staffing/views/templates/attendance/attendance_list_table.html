@@ -28,14 +28,6 @@
 
 </table>
 
-{% if data.recs %}
-    {% if data.page_count == 1%}
-        <p class="list_record_count">{{ data.rec_count }} {{ "record" | plural(data.rec_count)}}.</p>
-    {% elif data.page == data.page_count %}
-        <p class="list_record_count">{{((data.page-1)*data.page_size)+1}} thru {{data.rec_count}} of {{ data.rec_count }} {{ "record" | plural(data.rec_count)}}.</p>
-    {% else %}
-        <p class="list_record_count">{{((data.page-1)*data.page_size)+1}} thru {{((data.page-1)*data.page_size)+data.page_size}} of {{ data.rec_count }} {{ "record" | plural(data.rec_count)}}.</p>
-    {% endif %}
-{% endif %}
+{% include 'list_record_count.html' %}
 
 {% include 'list_pagination_template.html' %}
