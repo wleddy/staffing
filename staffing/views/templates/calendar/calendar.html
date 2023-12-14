@@ -232,7 +232,7 @@
                 {% set day_number = cal_list[week][day][0]%}
                 {% set day_in_this_month = (day_number != 0)%}
                 {% set yours_are_hidden = [False] %}
-                <div class="w3-col w3-border w3-white day-col day-cell" style="padding:0 2pt;">
+                <div class="w3-col w3-border day-col day-cell" style="padding:0 2pt;">
                     {% set _ = yours_are_hidden.pop(0) %}
                     {% set _ = yours_are_hidden.append(False) %}
                     
