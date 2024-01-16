@@ -7,6 +7,7 @@ from shotglass2.takeabeltof.date_utils import date_to_string, getDatetimeFromStr
 from staffing.models import Activity, Event, ActivityType
 from staffing.views.event import edit as edit_event, edit_from_activity as edit_event_from_activity
 
+
 mod = Blueprint('activity',__name__, template_folder='templates/activity', url_prefix='/activity')
 
 PRIMARY_TABLE = Activity
@@ -40,16 +41,6 @@ def display(path=None):
     
     return view.dispatch_request()
 
-
-# @mod.route('/')
-# @table_access_required(Activity)
-# def display():
-#     setExits()
-#     g.title="Activity List"
-#     recs = Activity(g.db).select()
-#
-#     return render_template('activity_list.html',recs=recs)
-    
     
 @mod.route('/edit/',methods=['GET','POST',])
 @mod.route('/edit/<int:id>/',methods=['GET','POST',])
