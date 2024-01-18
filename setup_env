@@ -1,12 +1,13 @@
 #!/bin/bash
 
 echo ""
+set -e 
 
 if [ ! -d "env" ]
 then
     echo 'making env'
 
-    virtualenv --python=python3 env
+    python3 -m venv env
 
     . env/bin/activate
 
