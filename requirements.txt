@@ -1,7 +1,6 @@
 Werkzeug
 Flask
 mistune
-namedlist
 pytest
 pytz
 Pillow

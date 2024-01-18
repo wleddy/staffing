@@ -605,7 +605,7 @@ class UserJob(SqliteTable):
         return row_id
 
     def get_assigned_users(self,job_id):
-        """Return a namedlist of user records assigned to this job or None"""
+        """Return a list of user records assigned to this job or None"""
         #import pdb;pdb.set_trace()
         user_jobs = self.select(where='job_id = {}'.format(job_id))
         if user_jobs:

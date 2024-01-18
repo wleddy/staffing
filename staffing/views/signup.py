@@ -412,7 +412,7 @@ def process_notifications():
         
         
 def populate_participant_list(job):
-    """Add participant values to the job namedlist"""
+    """Add participant values to the job record list"""
     sql = """
     select user.id as user_id, upper(substr(user.first_name,1,1) || substr(user.last_name,1,1)) as initials,
     (user.first_name || ' '  || user.last_name ) as user_name, user.phone as phone, user.email as email,
