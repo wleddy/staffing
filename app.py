@@ -108,6 +108,14 @@ def _before():
     #ensure that nothing is served from the instance directory
     if 'instance' in request.url:
         return abort(404)
+    
+    # If this file exists, just serve it.
+    # This is intended to make the site unavailable while undergoing (major) updates
+
+    if os.path.exists('site_down.html'):
+        with open('site_down.html','r') as f:
+            return f.read()
+
         
     #import pdb;pdb.set_trace()
     if 'static' not in request.url:
