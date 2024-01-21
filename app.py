@@ -1,7 +1,7 @@
 from flask import g, session, request, redirect, flash, abort, url_for, session, render_template
 import os
 from shotglass2 import shotglass
-from shotglass2.users.models import User
+from shotglass2.users.models import User, Pref
 from shotglass2.takeabeltof.database import Database
 from shotglass2.takeabeltof.jinja_filters import register_jinja_filters
 from shotglass2.takeabeltof.utils import cleanRecordID
@@ -108,15 +108,7 @@ def _before():
     #ensure that nothing is served from the instance directory
     if 'instance' in request.url:
         return abort(404)
-    
-    # If this file exists, just serve it.
-    # This is intended to make the site unavailable while undergoing (major) updates
-
-    if os.path.exists('site_down.html'):
-        with open('site_down.html','r') as f:
-            return f.read()
-
-        
+            
     #import pdb;pdb.set_trace()
     if 'static' not in request.url:
         # this is not needed for static requests
@@ -129,10 +121,35 @@ def _before():
         
         # Is the user signed in?
         g.user = None
+        is_admin = False
         if 'user_id' in session and 'user' in session:
             # Refresh the user session
             setUserStatus(session['user'],cleanRecordID(session['user_id']))
-        
+            is_admin = User(g.db).is_admin(session['user_id'])
+
+        # if site is down and user is not admin, stop them here.
+        # will allow an admin user to log in
+        down = Pref(g.db).get("Site Down Till",
+                            user_name=shotglass.get_site_config().get("HOST_NAME"),
+                            default='',
+                            description = 'Enter something that looks like a date or time. It will be displayed to visitors and make the site inaccessable. Delete the value to allow access again.',
+                            )
+        if down and down.value.strip():
+            if not is_admin:
+                # log the user out...
+                from shotglass2.users.views import login
+                if g.user:
+                    login.logout()
+
+                # this will allow an admin to log in.
+                if request.url.endswith(url_for('login.login')):
+                    return login.login()
+                
+                g.title = "Sorry"
+                return render_template('site_down.html',down_till = down.value.strip())
+            else:
+                flash("The Site is in Maintenance Mode. Changes may be lost...",category='warning')
+         
         # g.menu_items should be a list of dicts
         #  with keys of 'title' & 'url' used to construct
         #  the items in the main menu
