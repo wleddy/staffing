@@ -1,0 +1,11 @@
+#!/bin/bash
+
+echo 'Installing Staffing repositories'
+
+git clone https://github.com/wleddy/shotglass2.git
+git clone https://github.com/wleddy/ical.git
+git clone https://github.com/wleddy/feedme.git
+cd feedme
+git clone https://github.com/wleddy/rfeed.git
+
+

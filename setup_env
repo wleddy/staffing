@@ -53,6 +53,20 @@ fi
 
 echo ""
 
+if [ -f 'clone_all' ]
+then
+    . clone_all
+fi
+
+echo ""
+
+if [ -d 'tmp' ]
+then
+    mkdir "tmp"
+fi
+
+touch tmp/restart.txt
+
 echo ""
 
 echo "Don't forget to update instance/site_settings.py before launching the app for the first time"
