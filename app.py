@@ -26,16 +26,9 @@ app = shotglass.create_app(
 
 
 def start_app():
-    shotglass.start_logging(app)
+    shotglass.start_logging(app) # This logs to general purpose log.log 
     initalize_base_tables()
     register_blueprints()
-    # ## Setup the routes for users
-    # shotglass.register_users(app)
-
-    # # setup www.routes...
-    # shotglass.register_www(app)
-
-    # app.register_blueprint(tools.mod)
     
     # use os.path.normpath to resolve true path to data file when using '../' shorthand
     shotglass.start_backup_thread(
