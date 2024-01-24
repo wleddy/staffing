@@ -6,6 +6,7 @@ from shotglass2.takeabeltof.database import Database
 from shotglass2.takeabeltof.jinja_filters import register_jinja_filters
 from shotglass2.takeabeltof.utils import cleanRecordID
 from shotglass2.tools.views import tools
+from shotglass2.users.views import user
 from shotglass2.users.views.login import setUserStatus
 from shotglass2.users.admin import Admin
 from staffing.models import Activity, Event, Job, Location, ActivityType, UserJob, EventDateLabel, Client, \
@@ -27,16 +28,15 @@ app = shotglass.create_app(
 def start_app():
     shotglass.start_logging(app)
     initalize_base_tables()
-    ## Setup the routes for users
-    shotglass.register_users(app)
+    register_blueprints()
+    # ## Setup the routes for users
+    # shotglass.register_users(app)
 
-    # setup www.routes...
-    shotglass.register_www(app)
+    # # setup www.routes...
+    # shotglass.register_www(app)
 
-    app.register_blueprint(tools.mod)
+    # app.register_blueprint(tools.mod)
     
-    register_blueprints() # Register all the other bluepints for the app
-
     # use os.path.normpath to resolve true path to data file when using '../' shorthand
     shotglass.start_backup_thread(
         os.path.normpath(
@@ -47,57 +47,41 @@ def start_app():
         )
 
 
-def initalize_base_tables(db=None):
-    """Place code here as needed to initialze all the tables for this site"""
-    if not db:
-        db = get_db()
-        
-    shotglass.initalize_user_tables(db)
-    
-    ### setup any other tables you need here....
-    from staffing.models import init_event_db
-    init_event_db(db)
-    
-def init_db(db=None):
-    # to support old code
-    initalize_base_tables(db)
-            
-    
+@app.context_processor
+def inject_site_config():
+    # Add 'site_config' dict to template context
+    return {'site_config':shotglass.get_site_config()}
+
+register_jinja_filters(app)
+
+
 def get_db(filespec=None):
     """Return a connection to the database.
-    
+
     If the db path does not exist, create it and initialize the db"""
-    
+
     if not filespec:
         filespec = shotglass.get_site_config()['DATABASE_PATH']
-        
+
     # This is probobly a good place to change the
     # filespec if you want to use a different database
     # for the current request.
-    
+
     # test the path, if not found, try to create it
     if shotglass.make_db_path(filespec):
         g.db = Database(filespec).connect()
         initalize_base_tables(g.db)
-            
+    
         return g.db
     else:
         # was unable to create a path to the database
         raise IOError("Unable to create path to () in app.get_db".format(filespec))
+    
 
-
-@app.context_processor
-def inject_site_config():
-    """ Add 'site_config' dict to template context 
-    
-    site_config will contain the settings specific to the current site
-    """
-    c = shotglass.get_site_config()
-    return {'site_config':c}
-    
-    
-register_jinja_filters(app)
-    
+def init_db(db=None):
+    # to support old code
+    initalize_base_tables(db)
+            
     
 @app.before_request
 def _before():
@@ -109,95 +93,117 @@ def _before():
     if 'instance' in request.url:
         return abort(404)
             
-    #import pdb;pdb.set_trace()
-    if 'static' not in request.url:
-        # this is not needed for static requests
-        
-        session.permanent = True
+    session.permanent = True
     
-        get_db()
-        
-        shotglass.set_template_dirs(app)
-        
-        # Is the user signed in?
-        g.user = None
-        is_admin = False
-        if 'user_id' in session and 'user' in session:
-            # Refresh the user session
-            setUserStatus(session['user'],cleanRecordID(session['user_id']))
-            is_admin = User(g.db).is_admin(session['user_id'])
+    # shotglass.get_site_config(app)
+    shotglass.set_template_dirs(app)
+    get_db()
 
-        # if site is down and user is not admin, stop them here.
-        # will allow an admin user to log in
-        down = Pref(g.db).get("Site Down Till",
-                            user_name=shotglass.get_site_config().get("HOST_NAME"),
-                            default='',
-                            description = 'Enter something that looks like a date or time. It will be displayed to visitors and make the site inaccessable. Delete the value to allow access again.',
-                            )
-        if down and down.value.strip():
-            if not is_admin:
-                # log the user out...
-                from shotglass2.users.views import login
-                if g.user:
-                    login.logout()
-
-                # this will allow an admin to log in.
-                if request.url.endswith(url_for('login.login')):
-                    return login.login()
-                
-                g.title = "Sorry"
-                return render_template('site_down.html',down_till = down.value.strip())
-            else:
-                flash("The Site is in Maintenance Mode. Changes may be lost...",category='warning')
-         
-        # g.menu_items should be a list of dicts
-        #  with keys of 'title' & 'url' used to construct
-        #  the items in the main menu
-        # g.menu_items = shotglass.get_menu_items()
-        g.menu_items = [
-            {'title':'Home','drop_down_menu':[
-                {'title':'Events Home','url':url_for('www.home')},
-                {'title':'SABA Home','url':'http://sacbike.org'},
-              ]
-            },
-            {'title':'Calendar','url':url_for('calendar.display')},
-            {'title':'Signups','url':url_for('signup.display')},
-            ]
-        
-        
-        g.admin = Admin(g.db) # This is where user access rules are stored
+    if 'static' in request.url:
+        return
     
-        #Events
-        # a header row must have the some permissions or higher than the items it heads
-        #import pdb;pdb.set_trace()
-        g.admin.register(Job,url_for('signup.roster'),display_name='View Roster',top_level=True,minimum_rank_required=80,add_to_menu=True)
+    # load the saved visit_data into session
+    shotglass._before_request(g.db)
+
+        
+    # Is the user signed in?
+    g.user = None
+    is_admin = False
+    if 'user_id' in session and 'user' in session:
+        # Refresh the user session
+        setUserStatus(session['user'],cleanRecordID(session['user_id']))
+        is_admin = User(g.db).is_admin(session['user_id'])
+
+    # if site is down and user is not admin, stop them here.
+    # will allow an admin user to log in
+    down = Pref(g.db).get("Site Down Till",
+                        user_name=shotglass.get_site_config().get("HOST_NAME"),
+                        default='',
+                        description = 'Enter something that looks like a date or time. It will be displayed to visitors and make the site inaccessable. Delete the value to allow access again.',
+                        )
+    if down and down.value.strip():
+        if not is_admin:
+            # log the user out...
+            from shotglass2.users.views import login
+            if g.user:
+                login.logout()
+
+            # this will allow an admin to log in.
+            if request.url.endswith(url_for('login.login')):
+                return login.login()
             
-        g.admin.register(Activity,url_for('activity.display'),display_name='Staffing Admin',header_row=True,minimum_rank_required=500,roles=['admin','activity manager'])
-        g.admin.register(Activity,url_for('activity.display'),display_name='Activities',minimum_rank_required=500,roles=['admin','activity manager'])
-        g.admin.register(Event,url_for('event.display'),display_name='Events',add_to_menu=False,minimum_rank_required=500,roles=['admin','activity manager'])
-        #location
-        g.admin.register(Location,url_for('location.display'),display_name='Locations',minimum_rank_required=500,roles=['admin','activity manager'])
-        g.admin.register(ActivityGroup,url_for('activity_group.display'),display_name='Activity Groups',minimum_rank_required=500,roles=['admin','activity manager'])
-        g.admin.register(ActivityType,url_for('activity_type.display'),display_name='Activity Types',minimum_rank_required=500,roles=['admin','activity manager'])
-        g.admin.register(EventDateLabel,url_for('event_date_label.display'),display_name='Date Labels',minimum_rank_required=500,roles=['admin','activity manager'])
-        g.admin.register(Client,url_for('client.display'),display_name='Clients',minimum_rank_required=500,roles=['admin','activity manager'])
-        g.admin.register(Attendance,url_for('attendance.display'),display_name='Attendance',minimum_rank_required=500,roles=['admin','activity manager'])
-        g.admin.register(Task,url_for('task.display'),display_name='Ad Hoc Tasks',minimum_rank_required=500,roles=['admin',])
-        
-        g.admin.register(UserJob,url_for('attendance.display'),display_name='User Jobs',minimum_rank_required=500,roles=['admin','activity manager'],add_to_menu=False)
+            g.title = "Sorry"
+            return render_template('site_down.html',down_till = down.value.strip())
+        else:
+            flash("The Site is in Maintenance Mode. Changes may be lost...",category='warning')
 
-        shotglass.user_setup() # g.admin now holds access rules Users, Prefs and Roles
-        
-        #give activity managers access to the user records
-        g.admin.register(User,url_for('user.display'),display_name='Users',roles=['activity manager'],add_to_menu=False)
+    create_menus()
 
-        tools.register_admin() # add the tools menu
-        # add this to the tools menu
-        g.admin.register(User,
-                url_for('signup.volunteer_contact_list'),
-                display_name='Download Volunteers',
-                minimum_rank_required=500,
-            )
+
+def create_menus():
+    """Create g.menu_items and g.admin objects.
+
+    g.menu_items is a list of dicts that define the unprotected menu items. 
+    They will be displayed to all visitors at the top (or left) of the menus.
+
+    g.admin defines menu items that require a user logged in with at certain level
+    of privilege.
+
+    The order in which they are defined is the order in which they are displayed.
+
+    g.menu_items should be a list of dicts
+    with keys of 'title' & 'url' used to construct
+    the non-table based items in the main menu
+    """
+
+    g.menu_items = [
+        {'title':'Home','drop_down_menu':[
+            {'title':'Events Home','url':url_for('www.home')},
+            {'title':'SABA Home','url':'http://sacbike.org'},
+            ]
+        },
+        {'title':'Calendar','url':url_for('calendar.display')},
+        {'title':'Signups','url':url_for('signup.display')},
+        ]
+    
+    
+    g.admin = Admin(g.db) # This is where user access rules are stored
+
+    #Events
+    # a header row must have the some permissions or higher than the items it heads
+    #import pdb;pdb.set_trace()
+    g.admin.register(Job,url_for('signup.roster'),display_name='View Roster',top_level=True,minimum_rank_required=80,add_to_menu=True)
+        
+    g.admin.register(Activity,url_for('activity.display'),display_name='Staffing Admin',header_row=True,minimum_rank_required=500,roles=['admin','activity manager'])
+    g.admin.register(Activity,url_for('activity.display'),display_name='Activities',minimum_rank_required=500,roles=['admin','activity manager'])
+    g.admin.register(Event,url_for('event.display'),display_name='Events',add_to_menu=False,minimum_rank_required=500,roles=['admin','activity manager'])
+    #location
+    g.admin.register(Location,url_for('location.display'),display_name='Locations',minimum_rank_required=500,roles=['admin','activity manager'])
+    g.admin.register(ActivityGroup,url_for('activity_group.display'),display_name='Activity Groups',minimum_rank_required=500,roles=['admin','activity manager'])
+    g.admin.register(ActivityType,url_for('activity_type.display'),display_name='Activity Types',minimum_rank_required=500,roles=['admin','activity manager'])
+    g.admin.register(EventDateLabel,url_for('event_date_label.display'),display_name='Date Labels',minimum_rank_required=500,roles=['admin','activity manager'])
+    g.admin.register(Client,url_for('client.display'),display_name='Clients',minimum_rank_required=500,roles=['admin','activity manager'])
+    g.admin.register(Attendance,url_for('attendance.display'),display_name='Attendance',minimum_rank_required=500,roles=['admin','activity manager'])
+    g.admin.register(Task,url_for('task.display'),display_name='Ad Hoc Tasks',minimum_rank_required=500,roles=['admin',])
+    
+    g.admin.register(UserJob,url_for('attendance.display'),display_name='User Jobs',minimum_rank_required=500,roles=['admin','activity manager'],add_to_menu=False)
+
+    # shotglass.user_setup() # g.admin now holds access rules Users, Prefs and Roles
+    # This one will set up the view log item
+    
+    # set up the User menu
+    shotglass.set_user_menus()
+
+    #give activity managers access to the user records
+    g.admin.register(User,url_for('user.display'),display_name='Users',roles=['activity manager'],add_to_menu=False)
+
+    tools.register_admin() # add the tools menu
+    # add this to the tools menu
+    g.admin.register(User,
+            url_for('signup.volunteer_contact_list'),
+            display_name='Download Volunteers',
+            minimum_rank_required=500,
+        )
         
 @app.teardown_request
 def _teardown(exception):
@@ -213,6 +219,49 @@ def page_not_found(error):
 def server_error(error):
     return shotglass.server_error(error)
 
+def initalize_base_tables(db=None):
+    """Place code here as needed to initialze all the tables for this site"""
+    if not db:
+        db = get_db()
+        
+    shotglass.initalize_user_tables(db)
+    
+    ### setup any other tables you need here....
+    from staffing.models import init_event_db
+    init_event_db(db)
+    
+
+def register_blueprints():
+    """Register all your blueprints here and initialize 
+    any data tables they need.
+    """
+
+    user.register_users(app)
+    shotglass.register_www(app)
+    app.register_blueprint(tools.mod)
+
+    # # add app specific modules...
+    # from starter_module.models import init_db as starter_init
+    # starter_init(g.db) #initialize the tables for the module
+    # from starter_module.views import starter
+    # app.register_blueprint(starter.mod)
+    # # update function 'create_menus' to display menu items for the app
+
+    app.register_blueprint(signup.mod)
+    app.register_blueprint(activity.mod)
+    app.register_blueprint(event.mod)
+    app.register_blueprint(job.mod)
+    app.register_blueprint(calendar.mod)
+    app.register_blueprint(location.mod)
+    app.register_blueprint(activity_type.mod)
+    app.register_blueprint(attendance.mod)
+    app.register_blueprint(task.mod)
+    app.register_blueprint(event_date_label.mod)
+    app.register_blueprint(client.mod)
+    app.register_blueprint(activity_group.mod)
+    shotglass.register_maps(app)
+
+
 #Register the static route
 # Direct to a specific server for static content
 app.add_url_rule('/static/<path:filename>','static',shotglass.static)
@@ -220,12 +269,6 @@ app.add_url_rule('/static/<path:filename>','static',shotglass.static)
     
 app.add_url_rule('/','display',calendar.display) # Make the calendar our home page...
 
-
-@app.route('/')
-def default_home():
-    # if no subdomain
-    return "Know Whan Hom"
-    
 
 @app.route('/rss', methods=['GET',])
 @app.route('/rss/', methods=['GET',])
@@ -280,32 +323,6 @@ def get_rss_feed():
     feed =  feeder.get_feed(items)
     
     return feed
-    
-
-def register_blueprints():
-    """Register all your blueprints here and initialize 
-    any data tables they need.
-    """
-    # # add app specific modules...
-    # from starter_module.models import init_db as starter_init
-    # starter_init(g.db) #initialize the tables for the module
-    # from starter_module.views import starter
-    # app.register_blueprint(starter.mod)
-    # # update function 'create_menus' to display menu items for the app
-
-    app.register_blueprint(signup.mod)
-    app.register_blueprint(activity.mod)
-    app.register_blueprint(event.mod)
-    app.register_blueprint(job.mod)
-    app.register_blueprint(calendar.mod)
-    app.register_blueprint(location.mod)
-    app.register_blueprint(activity_type.mod)
-    app.register_blueprint(attendance.mod)
-    app.register_blueprint(task.mod)
-    app.register_blueprint(event_date_label.mod)
-    app.register_blueprint(client.mod)
-    app.register_blueprint(activity_group.mod)
-    shotglass.register_maps(app)
 
 
 with app.app_context():
@@ -313,11 +330,6 @@ with app.app_context():
     
     
 if __name__ == '__main__':
-    
-    with app.app_context():
-        # create the default database if needed
-        initalize_base_tables()
-        
     #app.run(host='localhost', port=8000)
     #app.run()
     app.run(host='events.willie.local')
