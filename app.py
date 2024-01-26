@@ -217,7 +217,7 @@ def initalize_base_tables(db=None):
     if not db:
         db = get_db()
         
-    shotglass.initalize_user_tables(db)
+    user.initalize_tables(db)
     
     ### setup any other tables you need here....
     from staffing.models import init_event_db
@@ -229,7 +229,7 @@ def register_blueprints():
     any data tables they need.
     """
 
-    user.register_users(app)
+    user.register_blueprints(app)
     shotglass.register_www(app)
     app.register_blueprint(tools.mod)
 
