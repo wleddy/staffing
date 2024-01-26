@@ -149,6 +149,9 @@ def create_menus():
     the non-table based items in the main menu
     """
 
+    g.menu_items = []
+    g.admin = Admin(g.db) # This is where user access rules are stored
+
     g.menu_items = [
         {'title':'Home','drop_down_menu':[
             {'title':'Events Home','url':url_for('www.home')},
@@ -160,7 +163,6 @@ def create_menus():
         ]
     
     
-    g.admin = Admin(g.db) # This is where user access rules are stored
 
     #Events
     # a header row must have the some permissions or higher than the items it heads
@@ -185,7 +187,7 @@ def create_menus():
     # This one will set up the view log item
     
     # set up the User menu
-    shotglass.set_user_menus()
+    user.create_menus()
 
     #give activity managers access to the user records
     g.admin.register(User,url_for('user.display'),display_name='Users',roles=['activity manager'],add_to_menu=False)
