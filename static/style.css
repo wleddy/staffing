@@ -55,107 +55,6 @@ pre {
     background-color: rgb(137,172,161);
     }
 }
-/* colors */
-/* Brown & tan */
-
-/* brown and tan (SABA) */
-
-:root {
-    --primary-color: rgb(63, 36, 20);
-    --primary-contrast: #fff;
-    --primary-border: rgb(63, 36, 20);
-    --secondary-color: rgb(247, 240, 230); 
-    --secondary-contrast: #000;
-    --secondary-border: rgb(247, 240, 230);
-    --menu-border: rgb(247, 240, 230);
-   } 
-
-
-@media (prefers-color-scheme: dark) 
-{
-    :root{
-        --primary-color: rgb(101, 58, 32);
-        --primary-contrast: #f8f5f5;
-        --primary-border: rgb(144, 83, 48);
-        --secondary-color: rgb(244, 195, 128); 
-        --secondary-contrast:#000;
-        --secondary-border: rgb(247, 240, 230);
-        --menu-border: rgb(247, 240, 230);   
-    }
-
-    .w3-table-all tr:nth-child(even), .datatable tr:nth-child(even) {
-        background-color: rgb(240, 206, 157)!important;
-        color:var(--secondary-contrast)!important;
-    }
-    
-    .w3-hoverable tbody tr:hover, .w3-ul.w3-hoverable li:hover, .datatable tr {
-        background-color:rgb(242, 189, 109)!important;
-        color: var(--secondary-contrast)!important;
-    }
-    
-    
-    
-  /* the actual styles... */
-  .w3-menu-color,.w3-drop-menu-hover-color:hover,
-  .w3-primary-color,.w3-primary-hover-color:hover,
-  .w3-drop-menu-section-hover-color:hover,.w3-drop-menu-section-color:hover,
-  .w3-drop-menu-section-color
-  {color:var(--primary-contrast)!important;background-color:var(--primary-color)!important}
-  .w3-primary-border-color,.w3-primary-hover-border-color:hover{border-color:var(--primary-border)!important}
-  
-  .w3-menu-hover-color:hover,
-  .w3-secondary-color,.w3-secondary-hover-color:hover,.w3-drop-menu-color,
-  .w3-label-color,.w3-label-hover-color:hover,.roster-hover-color:hover
-  {color:var(--secondary-contrast)!important;background-color:var(--secondary-color)!important;}
-  .w3-secondary-border-color,.w3-secondary-hover-border-color:hover{border-color:var(--secondary-border)!important}
-  
-  .w3-menu-border {
-      border:solid 1pt var(--menu-border)!important;
-  }
-  
-  /* styles for the pagination in the record lists */
-  
-  /* .sg.pagination {} */
-  .sg-page-current {
-      font-weight: bold;
-  }
-  a.sg-page-end, a.sg-page-prev,
-  a.sg-page-next, a.sg-page-select,
-  a.sg-page-begin
-      {
-      text-decoration: none;
-  }
-  .sg-page-end, .sg-page-begin,
-  .sg-page-next, .sg-page-prev  {
-      background-color: var(--primary-color);
-      color: var(--primary-contrast);
-      padding:2pt;
-  }
-  .sg-page-begin.sg-page-inactive, .sg-page-end.sg-page-inactive,
-  .sg-page-begin.sg-page-current, .sg-page-end.sg-page-current,
-  .sg-page-next.sg-page-inactive, .sg-page-prev.sg-page-inactive,
-  .sg-page-next.sg-page-current, .sg-page-prev.sg-page-current {
-      color: var(--secondary-contrast);
-      background-color: var(--secondary-color);
-      padding:2pt;
-  }
-}
-
-  /* for field labels and buttons */
-  /* required fields */
-  /* red */
-  /* 
-  .w3-label-color,.w3-label-hover-color:hover{color:#000!important;background-color:#ddffdd!important}
-  .w3-label-req,.w3-hover-label-req:hover{color:#000!important;background-color:#ffdddd!important}
-  .w3-text-req,.w3-hover-text-req:hover{color:#f44336!important}
-   */
-  /* buttons */
-  /* 
-  .w3-save-button-color,.w3-save-button-hover-color:hover{color:#fff!important;background-color:#009688!important}
-  .w3-delete-button-color,.w3-delete-button-hover-color:hover{color:#fff!important;background-color:#ff5722!important}
-  .w3-cancel-button-color,.w3-delete-button-hover-color:hover{color:#fff!important;background-color:#3f51b5!important}
-   */
-
 
 /* Some styles for staffing */
 
@@ -210,3 +109,119 @@ hr.past-event{
 .silver-background {
     background-color: rgba(214, 214, 214, 1.0);
 }
+
+
+#headerlogo-dark {
+    display:none;
+}
+#headerlogo {
+    display:block;
+}
+
+/* colors */
+/* Brown & tan */
+
+/* brown and tan (SABA) */
+
+:root {
+    --primary-color: rgb(63, 36, 20);
+    --primary-contrast: #fff;
+    --primary-border: rgb(63, 36, 20);
+    --secondary-color: rgb(247, 240, 230); 
+    --secondary-contrast: #000;
+    --secondary-border: rgb(247, 240, 230);
+    --menu-border: rgb(247, 240, 230);
+   } 
+
+
+@media (prefers-color-scheme: dark) 
+{
+    :root{
+        --primary-color: rgb(101, 58, 32);
+        --primary-contrast: #f8f5f5;
+        --primary-border: rgb(144, 83, 48);
+        --secondary-color: rgb(244, 195, 128); 
+        --secondary-contrast:#000;
+        --secondary-border: rgb(247, 240, 230);
+        --menu-border: rgb(247, 240, 230);   
+    }
+
+    .w3-table-all tr:nth-child(even), .datatable tr:nth-child(even) {
+        background-color: rgb(240, 206, 157)!important;
+        color:var(--secondary-contrast)!important;
+    }
+    
+    .w3-hoverable tbody tr:hover, .w3-ul.w3-hoverable li:hover, .datatable tr {
+        background-color:rgb(242, 189, 109)!important;
+        color: var(--secondary-contrast)!important;
+    }
+
+    #headerlogo-dark {
+        display:block;
+    }
+    #headerlogo {
+        display:none;
+    }
+    
+    /* some background colors for event types */
+    .yellow-background,
+    .green-background ,
+    .red-background,
+    .blue-background,
+    .turquoise-background,
+    .coffee-background,
+    .silver-background {
+        background-color: black;
+        color:white;
+    }
+
+}
+    
+  /* the actual styles... */
+  .w3-menu-color,.w3-drop-menu-hover-color:hover,
+  .w3-primary-color,.w3-primary-hover-color:hover,
+  .w3-drop-menu-section-hover-color:hover,.w3-drop-menu-section-color:hover,
+  .w3-drop-menu-section-color
+  {color:var(--primary-contrast)!important;background-color:var(--primary-color)!important}
+  .w3-primary-border-color,.w3-primary-hover-border-color:hover{border-color:var(--primary-border)!important}
+  
+  .w3-menu-hover-color:hover,
+  .w3-secondary-color,.w3-secondary-hover-color:hover,.w3-drop-menu-color,
+  .w3-label-color,.w3-label-hover-color:hover,.roster-hover-color:hover
+  {color:var(--secondary-contrast)!important;background-color:var(--secondary-color)!important;}
+  .w3-secondary-border-color,.w3-secondary-hover-border-color:hover{border-color:var(--secondary-border)!important}
+  
+  .w3-menu-border {
+      border:solid 1pt var(--menu-border)!important;
+  }
+  
+  /* styles for the pagination in the record lists */
+  
+  /* .sg.pagination {} */
+  .sg-page-current {
+      font-weight: bold;
+  }
+  a.sg-page-end, a.sg-page-prev,
+  a.sg-page-next, a.sg-page-select,
+  a.sg-page-begin
+      {
+      text-decoration: none;
+  }
+  .sg-page-end, .sg-page-begin,
+  .sg-page-next, .sg-page-prev  {
+      background-color: var(--primary-color);
+      color: var(--primary-contrast);
+      padding:2pt;
+  }
+  .sg-page-begin.sg-page-inactive, .sg-page-end.sg-page-inactive,
+  .sg-page-begin.sg-page-current, .sg-page-end.sg-page-current,
+  .sg-page-next.sg-page-inactive, .sg-page-prev.sg-page-inactive,
+  .sg-page-next.sg-page-current, .sg-page-prev.sg-page-current {
+      color: var(--secondary-contrast);
+      background-color: var(--secondary-color);
+      padding:2pt;
+  }
+
+
+
+
