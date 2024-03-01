@@ -164,7 +164,7 @@ hr.past-event{
     }
     
     /* some background colors for event types */
-    .yellow-background,
+    /* .yellow-background,
     .green-background ,
     .red-background,
     .blue-background,
@@ -173,6 +173,31 @@ hr.past-event{
     .silver-background {
         background-color: black;
         color:white;
+    } */
+
+    .yellow-background {
+        background-color: rgb(255, 255, 0);
+        color:black;
+    }
+    .green-background {
+        background-color: rgb(0, 143, 0);
+    }
+    .red-background {
+        background-color: rgb(194, 0, 0);
+    }
+    .blue-background {
+        background-color: rgb(0, 0, 178);
+    }
+    .turquoise-background {
+        background-color: rgb(0, 255, 253);
+        color:black;
+    }
+    .coffee-background {
+        background-color: rgb(128, 63, 0);
+    }
+    .silver-background {
+        background-color: rgb(214, 214, 214);
+        color:black;
     }
 
 }
