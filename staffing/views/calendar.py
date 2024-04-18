@@ -35,14 +35,10 @@ def setExits():
 @mod.route('calendar/')
 def display(month=None,year=None):
     setExits()
-    site_config = get_site_config()
     g.title="Calendar"
-    
-    start_date = local_datetime_now()
-    today = date(start_date.year,start_date.month,start_date.day)
-    
-    start_date = date(start_date.year,start_date.month,1)
 
+    today = local_datetime_now()
+    
     #try to get the month and year from session if not provided
     if month == None or year == None:
         try:
@@ -51,19 +47,21 @@ def display(month=None,year=None):
             month = session["calendar_month"]
             year = session["calendar_year"]
         except (KeyError, TypeError):
-            month = start_date.month
-            year = start_date.year
+            month = today.month
+            year = today.year
         
     month = cleanRecordID(month)
     year = cleanRecordID(year)
+    display_date = date(year,month,1)
+
     refresh = False
     
     if year < 1951 or year > 3000:
-        year = start_date.year
+        year = today.year
         refresh = True
         
     if month < 1 or month > 12:
-        month = start_date.month
+        month = today.month
         refresh = True
         
     # add the last settings to the session
@@ -73,26 +71,26 @@ def display(month=None,year=None):
         
     if refresh:
         return redirect(url_for('.display')+"{}/{}".format(month,year))
-            
-    try:
-        start_date = date(year,month,1)
-    except:
-        pass # use todays date
            
-    #import pdb;pdb.set_trace()
+    # import pdb;pdb.set_trace()
     user_id = 0
     if g.user:
         try:
            user_id = User(g.db).get(g.user).id 
         except:
            pass
-    
-    eom = calendar.monthrange(start_date.year,start_date.month)[1]
-    end_date = start_date.replace(day=eom)    
-    
-    #import pdb;pdb.set_trace()
+        
+    # import pdb;pdb.set_trace()
     status_list = ['scheduled','cancelled','postponed'] # this may come from form in future
     status_list = "'" + "','".join(status_list) + "'" 
+
+    # create a calendar object
+    cal = calendar.Calendar(6)
+
+    # Add days to start and end to fill all boxes in calendar
+    weeks = cal.monthdatescalendar(year,month)
+    start_date = weeks[0][0]
+    end_date = weeks[len(weeks)-1][-1]
         
     where = """lower(event.status) in ({status_list}) and date(event.event_start_date,'localtime') >= date('{start_date}') and date(event.event_end_date,'localtime') <= date('{end_date}')
     and event.exclude_from_calendar = 0
@@ -104,61 +102,56 @@ def display(month=None,year=None):
     order_by = "event.event_start_date"
     
     event_data = Event(g.db).select(where = where, order_by=order_by, user_id=user_id)
-    
+    if event_data is None:
+        event_data = []
+
     activity_groups = ActivityGroup(g.db).select()
-    event_list_dict = {}
-    if event_data:
-        data_row = 0
-        for event in event_data:
-            event_date = getDatetimeFromString(event.event_start_date)
-            # events may span multiple days
-            event_end = getDatetimeFromString(event.event_end_date)
-            if event_date and event_end and event_date <= event_end:
-                while event_date <= event_end:
-                    if event_date.day not in event_list_dict:
-                        event_list_dict[event_date.day]=[]
-                    event_list_dict[event_date.day].append(data_row)
-                    event_date = event_date + timedelta(days=1)
-                
-            data_row+=1
-    
-    # create a calendar object
-    cal = calendar.Calendar(6)
-    #get a list of lists of tuples
-    cal_list=cal.monthdays2calendar(start_date.year,start_date.month)\
-    ## some "constants for my sanity... the positions in the cal_list tuples"
-    _cal_day = 0
-    
-    # add a list to each tuple to hold event_data index for each day
-    for week in range(len(cal_list)):
-        for day in range(7):
-            if cal_list[week][day][_cal_day] != 0 and cal_list[week][day][_cal_day] in event_list_dict:
-                cal_list[week][day] = cal_list[week][day] + (event_list_dict[cal_list[week][day][_cal_day]],)
-            else:
-                cal_list[week][day] = cal_list[week][day] + ([],)
-        
+
+    # import pdb;pdb.set_trace()
+
+    # this_week is a list of tuples as (date,[list of event recs for that date]) for a week
+    # cal_list is a list of this_week for each week of calendar
+    cal_list = []
+    for week in weeks:
+        this_week = []
+        for day in week:
+            day_data = [day,[]]
+            for event in event_data:
+                event_start = getDatetimeFromString(event.event_start_date).date()
+                event_end = getDatetimeFromString(event.event_end_date).date()
+                if event_end > day:
+                    break
+                if event_start >= day and event_end <= day:
+                    # events may span multiple days
+                    day_data[1].append(event)
+
+            this_week.append((day_data[0],day_data[1],))
+        cal_list.append(this_week)
+
+    # import pdb;pdb.set_trace()
+
+    # used for simple navigation 
     if month == 1:
         #go back to Dec of last year
-        last_month = date(start_date.year-1,12,1)
+        last_month = date(year-1,12,1)
         #go to Feb of this year
-        next_month = date(start_date.year,2,1)
+        next_month = date(year,2,1)
     elif month == 12:
         #go to Nov. of this year
-        last_month = date(start_date.year,11,1)
+        last_month = date(year,11,1)
         #go to Jan of next year
-        next_month = date(start_date.year+1,1,1)
+        next_month = date(year+1,1,1)
     else:
         # year does not change
-        next_month = date(start_date.year,start_date.month+1,1)
-        last_month = date(start_date.year,start_date.month-1,1)
+        next_month = date(year,month+1,1)
+        last_month = date(year,month-1,1)
         
 
     
     return render_template('calendar.html',
-                            event_data=event_data,
                             calendar=calendar,
                             cal_list=cal_list,
-                            start_date=start_date,
+                            display_date=display_date,
                             last_month=last_month,
                             next_month=next_month,
                             today = today,

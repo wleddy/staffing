@@ -82,10 +82,13 @@
             overflow-y:auto;
             overflow-x:hidden;
         }
-        .day-number{
+        .day-number, .day-other-number{
             text-align:right;
             font-weight:bold;
             padding-right:6pt;
+        }
+        .day-other-number {
+            color:#a3a1a1;
         }
         .today {
             color:white;
@@ -174,7 +177,6 @@
 <div id="coverup" onclick="hide_full_day()">&nbsp;</div>
 {% if cal_list %}
     {% set _ = calendar.setfirstweekday(calendar.SUNDAY) %}
-    {% set event_list_position = 2 %} {# for my sanity #}
     <div id="calendar-contain">
         <div class="w3-row  w3-border  w3-card-2" style="margin-bottom:6pt;">
             {% if g.user %}
@@ -191,18 +193,18 @@
             <p class="w3-col w3-full w3-large w3-primary-color month-name">
                 <select id="date-selector" class="w3-select" style="width:auto;" onchange="goto_month(this)">
                     <option value="{{today.month}}/{{today.year}}">Today</option>
-                    {% set month = [start_date.month]%}
-                    {% set year = [start_date.year] %}
+                    {% set month = [display_date.month]%}
+                    {% set year = [display_date.year] %}
                     {% for x in [-1,0,1,2,3,] %}
-                    {% set _ = month.append(start_date.month+x)%}{% set _ = month.pop(0) %}
-                    {% set _ = year.append(start_date.year)%}{% set _ = year.pop(0) %}
+                    {% set _ = month.append(display_date.month+x)%}{% set _ = month.pop(0) %}
+                    {% set _ = year.append(display_date.year)%}{% set _ = year.pop(0) %}
                     {% if month[0] == 0 %}
                         {% set _ = month.append(12)%}{% set _ = month.pop(0) %}
-                        {% set _ = year.append(start_date.year-1)%}{% set _ = year.pop(0) %}
+                        {% set _ = year.append(display_date.year-1)%}{% set _ = year.pop(0) %}
                     {%endif%}
                     {% if month[0] > 12 %}
                         {% set _ = month.append(month[0]-12)%}{% set _ = month.pop(0) %}
-                        {% set _ = year.append(start_date.year+1)%}{% set _ = year.pop(0) %}
+                        {% set _ = year.append(display_date.year+1)%}{% set _ = year.pop(0) %}
                     {%endif%}
                         <option value="{{month[0]}}/{{year[0]}}" {% if x == 0 %}selected{% endif%} >
                             {{ calendar.month_name[month[0]]}} {{ year[0] }}
@@ -225,45 +227,46 @@
             <p class="w3-col w3-border w3-secondary-color day-name day-col">{{ day }}</p>
             {% endfor %}
         </div>
-        {%for week in range(cal_list | length ) %}
+        {% for week in cal_list %}
         <div class="w3-row">
-                {% for day in range(cal_list[week] | length ) %}
-                {% set events_today = cal_list[week][day][event_list_position] | length %}
-                {% set day_number = cal_list[week][day][0]%}
-                {% set day_in_this_month = (day_number != 0)%}
+                {% for day in week %}
+                {% set events_today = day[1] | length %}
+                {% set day_number = day[0].day %}
                 {% set yours_are_hidden = [False] %}
                 <div class="w3-col w3-border day-col day-cell" style="padding:0 2pt;">
                     {% set _ = yours_are_hidden.pop(0) %}
                     {% set _ = yours_are_hidden.append(False) %}
                     
-                    {% if day_in_this_month %}
                     {# All events list #}
                     <div id="full_day_display_{{day_number}}" class="full_day_display w3-border">
                         <p class="day-number w3-primary-color">{{ day_number }}</p>
-                        {% for event_num in range( events_today )%}
-                            {% set event = event_data[cal_list[week][day][event_list_position][event_num]] %}
+                        {% for event in day[1] %}
                             {{ calendar_entry(event) }}
-                            {% if event_num > 2 and event.is_yours %}
+                            {% if day[1] | length > 2 and event.is_yours %}
                                 {% set _ = yours_are_hidden.pop(0) %}
                                 {% set _ = yours_are_hidden.append(True) %}
                             {% endif %}
                         {% endfor %}
                     </div>
-                    {% endif %}
-                    <p class="day-number {% if today and start_date and today.day == day_number and today.month == start_date.month and start_date.year == today.year %}today{% endif %}">
-                        {% if day_in_this_month %}{{ day_number }}{% else %}&nbsp;{% endif %}
+                    <p class="day-number 
+                        {% if today and display_date and today.day == day_number and today.month == display_date.month and display_date.year == today.year %}today{% endif %}
+                        {% if day[0].month != display_date.month %}day-other-number {% endif %}
+                        ">
+                        {{ day_number }}
                     </p>
                     {# events that fit list #}
                     <div>
-                        {% for event_num in range( events_today )%}
-                            {% if event_num <= 1 or events_today < 4 %}
-                            {% set event = event_data[cal_list[week][day][event_list_position][event_num]] %}
+                        {% set event_count = [0] %}
+                        {% for event in day[1] %}
+                            {% set _ = event_count.append(event_count[0] + 1) %}
+                            {% set _ = event_count.pop(0) %}
+                            {% if event_count[0] <= 2 or events_today < 4 %}
                             {{ calendar_entry(event) }}
                             {% endif %}
                         {% endfor %}
                         {# lump all the extra events into a "more" line #}
                         {% if events_today > 3 %}
-                        <p class="theres-more{% if yours_are_hidden[0] %}-yours{% else %} w3-primary-color {% endif %}" onclick="show_full_day({{day_number}})">&amp; {{ cal_list[week][day][2] | length - 2}} more...</p>
+                        <p class="theres-more{% if yours_are_hidden[0] %}-yours{% else %} w3-primary-color {% endif %}" onclick="show_full_day({{day_number}})">&amp; {{ day[1] | length - 2}} more...</p>
                         {% endif %}
                     </div>
                 </div>
