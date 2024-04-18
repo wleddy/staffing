@@ -4,13 +4,11 @@ from flask import request, session, g, redirect, url_for, abort, \
 from shotglass2.mapping.views.maps import simple_map
 from shotglass2.shotglass import get_site_config
 from shotglass2.users.models import User, UserRole
-from shotglass2.users.admin import login_required, table_access_required
-from shotglass2.takeabeltof.mailer import send_message, email_admin
-from shotglass2.takeabeltof.utils import render_markdown_for, printException, cleanRecordID
+from shotglass2.takeabeltof.utils import cleanRecordID
 from shotglass2.takeabeltof.date_utils import datetime_as_string, local_datetime_now, getDatetimeFromString, date_to_string
-from staffing.models import Event, Location, ActivityGroup, Job, JobRole
+from staffing.models import Event, ActivityGroup, Job, JobRole
 from staffing.views.activity import get_event_recs
-from staffing.views.signup import get_job_rows, get_volunteer_role_ids
+from staffing.views.signup import get_volunteer_role_ids
 
 import calendar
 from datetime import datetime, date, timedelta
@@ -38,7 +36,7 @@ def display(month=None,year=None):
     g.title="Calendar"
 
     today = local_datetime_now()
-    
+
     #try to get the month and year from session if not provided
     if month == None or year == None:
         try:
@@ -89,21 +87,6 @@ def display(month=None,year=None):
 
     # Add days to start and end to fill all boxes in calendar
     weeks = cal.monthdatescalendar(year,month)
-    start_date = weeks[0][0]
-    end_date = weeks[len(weeks)-1][-1]
-        
-    where = """lower(event.status) in ({status_list}) and date(event.event_start_date,'localtime') >= date('{start_date}') and date(event.event_end_date,'localtime') <= date('{end_date}')
-    and event.exclude_from_calendar = 0
-    """.format(
-        status_list=status_list,
-        start_date=start_date,
-        end_date=end_date,
-        )
-    order_by = "event.event_start_date"
-    
-    event_data = Event(g.db).select(where = where, order_by=order_by, user_id=user_id)
-    if event_data is None:
-        event_data = []
 
     activity_groups = ActivityGroup(g.db).select()
 
@@ -115,17 +98,20 @@ def display(month=None,year=None):
     for week in weeks:
         this_week = []
         for day in week:
-            day_data = [day,[]]
-            for event in event_data:
-                event_start = getDatetimeFromString(event.event_start_date).date()
-                event_end = getDatetimeFromString(event.event_end_date).date()
-                if event_end > day:
-                    break
-                if event_start >= day and event_end <= day:
-                    # events may span multiple days
-                    day_data[1].append(event)
+            where = """lower(event.status) in ({status_list}) and date(event.event_start_date,'localtime') >= date('{start_date}') and date(event.event_end_date,'localtime') <= date('{end_date}')
+            and event.exclude_from_calendar = 0
+            """.format(
+                status_list=status_list,
+                start_date=day,
+                end_date=day,
+                )
+            order_by = "event.event_start_date"
+            
+            event_data = Event(g.db).select(where = where, order_by=order_by, user_id=user_id)
+            if event_data is None:
+                event_data = []
 
-            this_week.append((day_data[0],day_data[1],))
+            this_week.append((day,event_data,))
         cal_list.append(this_week)
 
     # import pdb;pdb.set_trace()
