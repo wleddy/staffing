@@ -249,10 +249,12 @@
                         {% endfor %}
                     </div>
                     <p class="day-number 
-                        {% if today and display_date and today.day == day_number and today.month == display_date.month and display_date.year == today.year %}today{% endif %}
+                    {% if day[0] == today.date() %}today
+                    {% else %}
                         {% if day[0].month != display_date.month %}day-other-number {% endif %}
-                        ">
-                        {{ day_number }}
+                    {% endif %}
+                    ">
+                    {{ day_number }}
                     </p>
                     {# events that fit list #}
                     <div>
