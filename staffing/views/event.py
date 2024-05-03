@@ -396,7 +396,7 @@ def send_event_email(event_id):
     event_id = cleanRecordID(event_id)
     event = Event(g.db).select_one(where="event.id = {}".format(event_id))
     if not event:
-        return "fallure: That is not a valid event record"
+        return "failure: That is not a valid event record"
         
     include_calendar = request.form.get("include_calendar",True) # include the calenar attachments by default
     
@@ -439,6 +439,8 @@ def send_event_email(event_id):
                         subject=request.form["subject"],
                         event=event,
                         no_calendar = not include_calendar,
+                        from_address = job_list[0].event_manager_email,
+                        from_sender=f"{job_list[0].event_manager_first_name} {job_list[0].event_manager_last_name}",
                         )
                         
             return 'success'
