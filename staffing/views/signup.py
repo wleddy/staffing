@@ -535,7 +535,7 @@ def get_job_rows(start_date=None,end_date=None,where='',user_skills=[],is_admin=
 
     order_by = kwargs.get('order_by',None)
     if not order_by:
-        order_by = " activity_first_date, activity_title, substr(job.start_date,1,10), is_volunteer_job, job.start_date "
+        order_by = " activity_first_date, activity_title, job.start_date, event_id, is_volunteer_job "
     
     group_by = kwargs.get('group_by','')
     if group_by:
