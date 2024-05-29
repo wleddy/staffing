@@ -328,11 +328,14 @@ class Event(SqliteTable):
         left join activity_type on activity_type.id = activity.activity_type_id
         left join activity_group on activity_group.id = activity_type.activity_group_id
         where {where} order by {order_by}
+        limit {limit} offset {offset}
         """.format(
             where=kwargs.get('where',1),
             order_by=kwargs.get('order_by',self.order_by_col),
             user_id=user_id,
             today=date_to_string(local_datetime_now(),'iso_date_tz'),
+            limit=kwargs.get("limit",99999999),
+            offset=kwargs.get("offset",0),
             )
 
         return self.query(sql)
