@@ -238,7 +238,7 @@
                     {% set _ = yours_are_hidden.append(False) %}
                     
                     {# All events list #}
-                    <div id="full_day_display_{{day_number}}" class="full_day_display w3-border">
+                    <div id="full_day_display_{{day[0]}}" class="full_day_display w3-border">
                         <p class="day-number w3-primary-color">{{ day_number }}</p>
                         {% for event in day[1] %}
                             {{ calendar_entry(event) }}
@@ -268,7 +268,7 @@
                         {% endfor %}
                         {# lump all the extra events into a "more" line #}
                         {% if events_today > 3 %}
-                        <p class="theres-more{% if yours_are_hidden[0] %}-yours{% else %} w3-primary-color {% endif %}" onclick="show_full_day({{day_number}})">&amp; {{ day[1] | length - 2}} more...</p>
+                        <p class="theres-more{% if yours_are_hidden[0] %}-yours{% else %} w3-primary-color {% endif %}" onclick="show_full_day('{{day[0]}}')">&amp; {{ day[1] | length - 2}} more...</p>
                         {% endif %}
                     </div>
                 </div>
