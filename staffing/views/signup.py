@@ -543,7 +543,7 @@ def get_job_rows(start_date=None,end_date=None,where='',user_skills=[],is_admin=
         
     vol_role_ids = get_volunteer_role_ids()
     
-    sql = """
+    root_sql = """
     select activity.id as activity_id, 
     activity.title as activity_title, 
     activity.description as activity_description,
@@ -648,130 +648,150 @@ def get_job_rows(start_date=None,end_date=None,where='',user_skills=[],is_admin=
     {group_by}
     order by {order_by}
     """
-    sql = sql.format(
-                where=where,
-                order_by=order_by,
-                group_by=group_by,
-                vol_role_ids=vol_role_ids,
-                today=date_to_string(local_datetime_now(),'iso_date_tz'),
-            )
-    #print(sql)
-    #import pdb;pdb.set_trace()            
-    jobs = Job(g.db).query(sql)
 
-    last_activity_id = 0
-    dates_list = []
-    if jobs:
-        for job in jobs:
+    #### Modified 9/4/24 - BL
+    #### Trying to resove the issue where 2 events for the same activity
+    #### occur on the same day and where their times overlap causes job records
+    #### to become mixed in the list
+    # first select all the events that occur within start_date and end_date
+    # then query each event for it's jobs and append those jobs that meet criteria to the output
 
-            # this only needs to run once for each activity id (assuming the records are in activity ID order)
-            if job.activity_id != last_activity_id:
-                last_activity_id = job.activity_id
+    out = [] 
+
+    events = Event(g.db).query(f"""select id, min(event.event_start_date) as starting_date from event 
+                               where date(event_start_date,'localtime') >= date('{start_date}','localtime') 
+                               and  date(event_end_date,'localtime') <= date('{end_date}','localtime')
+                               group by id order by starting_date, id""")
+    
+    if events:
+        for event in events:
+            job_where = where + f" and event_id = {event.id}"
+
+            sql = root_sql.format(
+                        where=job_where,
+                        order_by=order_by,
+                        group_by=group_by,
+                        vol_role_ids=vol_role_ids,
+                        today=date_to_string(local_datetime_now(),'iso_date_tz'),
+                    )
+            #print(sql)
+            #import pdb;pdb.set_trace()            
+            jobs = Job(g.db).query(sql)
+
+            last_activity_id = 0
+            dates_list = []
+            if jobs:
+                for job in jobs:
+
+                    # this only needs to run once for each activity id (assuming the records are in activity ID order)
+                    if job.activity_id != last_activity_id:
+                        last_activity_id = job.activity_id
+                        
+                        # need to set this each time the activity changes in the list
+                        activity_location_name = 'tbd'
+                        activity_locations = get_activity_location_list(job.activity_id,where)
+                        if activity_locations:
+                            if len(activity_locations) == 1:
+                                activity_location_name = activity_locations[0].location_name
+                            elif len(activity_locations) > 1:
+                                activity_location_name = "Multiple Locations"
                 
-                # need to set this each time the activity changes in the list
-                activity_location_name = 'tbd'
-                activity_locations = get_activity_location_list(job.activity_id,where)
-                if activity_locations:
-                    if len(activity_locations) == 1:
-                        activity_location_name = activity_locations[0].location_name
-                    elif len(activity_locations) > 1:
-                        activity_location_name = "Multiple Locations"
-         
-                job.activity_loc_name = activity_location_name
-                
-                # generate a list of all dates of events for this activity in this selection of jobs
-                # get a selection of jobs for this actvity's events
-                sql = """
-                select job.*, event.status from job 
-                join event on event.id = job.event_id 
-                where job.event_id in (select event.id from event where event.activity_id = {}) {} {} {} 
-                order by job.start_date
-                """.format(job.activity_id,where_date_range,where_skills,event_status_where)
-                job_dates = Job(g.db).query(sql)
-                #put into list
-                dates_list = []
-                if job_dates:
-                    for job_date in job_dates:
-                        if job_date.start_date[:10] not in dates_list:
-                            dates_list.append(job_date.start_date[:10])
+                        job.activity_loc_name = activity_location_name
+                        
+                        # generate a list of all dates of events for this activity in this selection of jobs
+                        # get a selection of jobs for this actvity's events
+                        sql = """
+                        select job.*, event.status from job 
+                        join event on event.id = job.event_id 
+                        where job.event_id in (select event.id from event where event.activity_id = {}) {} {} {} 
+                        order by job.start_date
+                        """.format(job.activity_id,where_date_range,where_skills,event_status_where)
+                        job_dates = Job(g.db).query(sql)
+                        #put into list
+                        dates_list = []
+                        if job_dates:
+                            for job_date in job_dates:
+                                if job_date.start_date[:10] not in dates_list:
+                                    dates_list.append(job_date.start_date[:10])
+                            
+                    #import pdb;pdb.set_trace()
+                    job.event_date_list = dates_list
                     
-            #import pdb;pdb.set_trace()
-            job.event_date_list = dates_list
-            
-            # Location resolution...
-            # job.event_loc_* and job.job_loc_* fields will all be populated for display
-            # defaults
-            job.event_header_location_name = default_if_none(job.event_loc_name,'tdb')
-            event_default_loc = (job.event_header_location_name, job.event_loc_lat, job.event_loc_lng)
-            event_default_loc_street_address = default_if_none(job.event_loc_street_address,'')
-            event_default_loc_city = default_if_none(job.event_loc_city,'')
-            event_default_loc_state = default_if_none(job.event_loc_state,'')
-            event_default_loc_zip = default_if_none(job.event_loc_zip,'')
-            event_default_loc_id = default_if_none(job.event_loc_id,None)
-            
-            # get unique location list for event related to this job
-            event_locations = Event(g.db).locations(job.event_id)
-                
-            # import pdb;pdb.set_trace()
-            if event_locations:
-                if len(event_locations) > 1:
-                    job.event_header_location_name = 'Multiple Locations'
-                else:
-                    if event_locations[0].id == job.job_loc_id:
-                        # there is only one location and it is not the event location
-                        # use the job location for the event location
-                        event_default_loc = (job.job_loc_name, job.job_loc_lat, job.job_loc_lng)
-                        event_default_loc_street_address = job.job_loc_street_address
-                        event_default_loc_city = job.job_loc_state
-                        event_default_loc_zip = job.job_loc_zip
-                        event_default_loc_id = job.job_loc_id
-                
-                # finally, set the event and job locations if not already
-                if not job.job_loc_name:
-                    job.job_loc_name, job.job_loc_lat, job.job_loc_lng = event_default_loc
-                    job.job_loc_street_address = event_default_loc_street_address
-                    job.job_loc_city = event_default_loc_city
-                    job.job_loc_state = event_default_loc_state
-                    job.job_loc_zip = event_default_loc_zip
-                    job.job_loc_id = event_default_loc_id
-            
-                if not job.event_loc_name:
-                    job.event_loc_name, job.event_loc_lat, job.event_loc_lng = event_default_loc
-                    job.event_loc_street_address = event_default_loc_street_address
-                    job.event_loc_city = event_default_loc_city
-                    job.event_loc_state = event_default_loc_state
-                    job.event_loc_zip = event_default_loc_zip
-                    job.event_loc_id = event_default_loc_id
-
-            if g.user:
-                #if not logged in, can't see any of this anyway...
-                populate_participant_list(job)
+                    # Location resolution...
+                    # job.event_loc_* and job.job_loc_* fields will all be populated for display
+                    # defaults
+                    job.event_header_location_name = default_if_none(job.event_loc_name,'tdb')
+                    event_default_loc = (job.event_header_location_name, job.event_loc_lat, job.event_loc_lng)
+                    event_default_loc_street_address = default_if_none(job.event_loc_street_address,'')
+                    event_default_loc_city = default_if_none(job.event_loc_city,'')
+                    event_default_loc_state = default_if_none(job.event_loc_state,'')
+                    event_default_loc_zip = default_if_none(job.event_loc_zip,'')
+                    event_default_loc_id = default_if_none(job.event_loc_id,None)
                     
-            ##################
-            ## There really ought to be a way to do these 2 queries within the main query
-            ## but I can't figure it out
-            ##################
-            # set the number of positions the current user has for this job
-            sql = """
-            select coalesce(sum(user_job.positions),0) as temp from user_job
-            where user_job.user_id = {} and user_job.job_id = {}
-            
-            """.format(user_id,job.job_id)
-            UJPos = UserJob(g.db).query(sql)
-            if UJPos:
-                job.user_job_positions = UJPos[0].temp
-                
-            # set the number of positions the current user has for the event this job is a part of
-            sql = """
-            select coalesce(sum(user_job.positions),0) as temp from user_job
-            join job on job.id = user_job.job_id
-            where user_job.user_id = {} and job.event_id = {}
-            """.format(user_id,job.event_id)
-            UJPos = UserJob(g.db).query(sql)
-            if UJPos:
-                job.user_event_positions = UJPos[0].temp
-            
-    return jobs
+                    # get unique location list for event related to this job
+                    event_locations = Event(g.db).locations(job.event_id)
+                        
+                    # import pdb;pdb.set_trace()
+                    if event_locations:
+                        if len(event_locations) > 1:
+                            job.event_header_location_name = 'Multiple Locations'
+                        else:
+                            if event_locations[0].id == job.job_loc_id:
+                                # there is only one location and it is not the event location
+                                # use the job location for the event location
+                                event_default_loc = (job.job_loc_name, job.job_loc_lat, job.job_loc_lng)
+                                event_default_loc_street_address = job.job_loc_street_address
+                                event_default_loc_city = job.job_loc_state
+                                event_default_loc_zip = job.job_loc_zip
+                                event_default_loc_id = job.job_loc_id
+                        
+                        # finally, set the event and job locations if not already
+                        if not job.job_loc_name:
+                            job.job_loc_name, job.job_loc_lat, job.job_loc_lng = event_default_loc
+                            job.job_loc_street_address = event_default_loc_street_address
+                            job.job_loc_city = event_default_loc_city
+                            job.job_loc_state = event_default_loc_state
+                            job.job_loc_zip = event_default_loc_zip
+                            job.job_loc_id = event_default_loc_id
+                    
+                        if not job.event_loc_name:
+                            job.event_loc_name, job.event_loc_lat, job.event_loc_lng = event_default_loc
+                            job.event_loc_street_address = event_default_loc_street_address
+                            job.event_loc_city = event_default_loc_city
+                            job.event_loc_state = event_default_loc_state
+                            job.event_loc_zip = event_default_loc_zip
+                            job.event_loc_id = event_default_loc_id
+
+                    if g.user:
+                        #if not logged in, can't see any of this anyway...
+                        populate_participant_list(job)
+                            
+                    ##################
+                    ## There really ought to be a way to do these 2 queries within the main query
+                    ## but I can't figure it out
+                    ##################
+                    # set the number of positions the current user has for this job
+                    sql = """
+                    select coalesce(sum(user_job.positions),0) as temp from user_job
+                    where user_job.user_id = {} and user_job.job_id = {}
+                    
+                    """.format(user_id,job.job_id)
+                    UJPos = UserJob(g.db).query(sql)
+                    if UJPos:
+                        job.user_job_positions = UJPos[0].temp
+                        
+                    # set the number of positions the current user has for the event this job is a part of
+                    sql = """
+                    select coalesce(sum(user_job.positions),0) as temp from user_job
+                    join job on job.id = user_job.job_id
+                    where user_job.user_id = {} and job.event_id = {}
+                    """.format(user_id,job.event_id)
+                    UJPos = UserJob(g.db).query(sql)
+                    if UJPos:
+                        job.user_event_positions = UJPos[0].temp
+
+                out.extend(jobs)
+    return out
     
     
 def get_activity_location_list(activity_id,where_clause=''):
