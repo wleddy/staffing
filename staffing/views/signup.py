@@ -658,10 +658,13 @@ def get_job_rows(start_date=None,end_date=None,where='',user_skills=[],is_admin=
 
     out = [] 
 
-    events = Event(g.db).query(f"""select id, min(event.event_start_date) as starting_date from event 
+    events = Event(g.db).query(f"""select id, min(event.event_start_date) as starting_date,
+                                (select activity.title from activity where activity.id = event.activity_id) as activity_title
+                                from event 
                                where date(event_start_date,'localtime') >= date('{start_date}','localtime') 
                                and  date(event_end_date,'localtime') <= date('{end_date}','localtime')
-                               group by id order by starting_date, id""")
+                               group by id 
+                               order by activity_title, starting_date, id""")
     
     if events:
         for event in events:
