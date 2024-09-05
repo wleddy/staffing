@@ -657,15 +657,16 @@ def get_job_rows(start_date=None,end_date=None,where='',user_skills=[],is_admin=
     # then query each event for it's jobs and append those jobs that meet criteria to the output
 
     out = [] 
-
-    events = Event(g.db).query(f"""select id, min(event.event_start_date) as starting_date,
+  
+    events = Event(g.db).query(f"""select event.id,
+                                   (select min(job.start_date) from job join event on event.id = job.event_id where event.activity_id = activity.id and {where}) as activity_first_date, 
                                 (select activity.title from activity where activity.id = event.activity_id) as activity_title
                                 from event 
+                                join activity on activity.id = event.activity_id
                                where date(event_start_date,'localtime') >= date('{start_date}','localtime') 
                                and  date(event_end_date,'localtime') <= date('{end_date}','localtime')
-                               group by id 
-                               order by activity_title, starting_date, id""")
-    
+                               group by event.id 
+                               order by activity_first_date, activity_title, event.id""")
     if events:
         for event in events:
             job_where = where + f" and event_id = {event.id}"
