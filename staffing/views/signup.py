@@ -43,7 +43,7 @@ def contact_event_manager(job_id=''):
     # import pdb;pdb.set_trace()
     
     job_id = cleanRecordID(job_id)
-    job_data = get_job_rows(None,None,'job.id = {}'.format(job_id),is_admin=True)
+    job_data = get_job_rows(None,None,'job.id = {}'.format(job_id),is_admin=True,event_status_where='')
     if job_data:
         job_data = job_data[0]
         custom_message = render_markdown_for('announce/email/contact_event_manager_message.md',job_data=job_data,bp=mod)
