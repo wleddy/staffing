@@ -618,6 +618,7 @@ class UserJob(SqliteTable):
         user_jobs = self.select(where='job_id = {}'.format(job_id))
         if user_jobs:
             user_ids = [str(user_job.user_id) for user_job in user_jobs]
+            # User.select only returns active users by default
             users = User(self.db).select(where='user.id in ({})'.format(','.join(user_ids)))
             return users
         else:
