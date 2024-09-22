@@ -109,7 +109,7 @@ def process_commitment_reminder():
         
         def send_reminder(user_id,job_list):
             user_rec = User(g.db).get(user_id) 
-            if len(job_list) > 0 and user_rec:
+            if len(job_list) > 0 and user_rec and user_rec.active == 1:
                     # send a reminder for the current user and job list
                     subject = "Commitment Reminder"
                     template_path = 'announce/email/commitment_reminder.md'
