@@ -441,7 +441,12 @@ class Job(SqliteTable):
     def filled(self,job_id):
         """Return the number positions filled for this job"""
         out = 0
-        cnt = self.db.execute('select sum(positions) as cnt from user_job where job_id=?',(job_id,)).fetchone()[0]
+        # Only include active users in count
+        cnt = self.db.execute("""select sum(positions) as cnt from user_job 
+                              join user on user.id = user_job.user_id
+                              where job_id=?
+                              and user.active = 1
+                              """,(job_id,)).fetchone()[0]
         if cnt:
             out = cnt
         return out
