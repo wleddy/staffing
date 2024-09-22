@@ -412,7 +412,9 @@ def process_notifications():
         
         
 def populate_participant_list(job):
-    """Add participant values to the job record list"""
+    """Add participant values to the job record list
+        9/22/24 -- include only active Users
+    """
     sql = """
     select user.id as user_id, upper(substr(user.first_name,1,1) || substr(user.last_name,1,1)) as initials,
     (user.first_name || ' '  || user.last_name ) as user_name, user.phone as phone, user.email as email,
@@ -420,13 +422,13 @@ def populate_participant_list(job):
     from user_job
     join user on user.id = user_job.user_id
     where user_job.job_id = {}
+    and user.active = 1
     order by user.first_name, user.last_name
     """.format(job.job_id)
     parts = Job(g.db).query(sql)
     job.participants = {}
     participant_list = []
     initials = []
-    participant_skills = []
     user_data_list = []
     if parts:
         for part in parts:
@@ -468,6 +470,9 @@ def get_job_rows(start_date=None,end_date=None,where='',user_skills=[],is_admin=
     
     Query happens in 2 steps, first find the jobs that require the skills in user_skills,
     Then use that selection to reduce the list of jobs to just those jobs.
+
+    -- 9/22/24 -- only count active users as participants
+    
     """
     
     site_config = get_site_config()
@@ -602,13 +607,15 @@ def get_job_rows(start_date=None,end_date=None,where='',user_skills=[],is_admin=
     (select min(job.start_date) from job join event on event.id = job.event_id where event.activity_id = activity.id and {where}) as activity_first_date, 
     -- the number of positions filled in this event
     (select coalesce(sum(user_job.positions),0) from user_job
-        where user_job.job_id in (select id from job where job.event_id = event.id and {where} )) as event_filled_positions,
+        join user on user.id = user_job.user_id
+        where user.active = 1 and user_job.job_id in (select id from job where job.event_id = event.id and {where} )) as event_filled_positions,
     -- the total positions for this event
     (select coalesce(sum(job.max_positions),1) from job 
         where job.event_id = event.id and {where}) as event_max_positions,
     -- the number of positions filled in this activity
     (select coalesce(sum(user_job.positions),0) from user_job
-        where user_job.job_id in (select id from job where job.event_id in (select event.id from event where event.activity_id = activity.id) and {where} )) as activity_filled_positions,
+        join user on user.id = user_job.user_id
+        where user.active = 1 and user_job.job_id in (select id from job where job.event_id in (select event.id from event where event.activity_id = activity.id) and {where} )) as activity_filled_positions,
     -- the total positions for this activity
     (select coalesce(sum(job.max_positions),1) from job 
         where job.event_id in (select event.id from event where event.activity_id = activity.id ) and {where}) as activity_max_positions,
@@ -630,8 +637,10 @@ def get_job_rows(start_date=None,end_date=None,where='',user_skills=[],is_admin=
     null as participants, -- just a place holder
     0 as user_event_positions,
     0 as user_job_positions,
-    (select coalesce(sum(user_job.positions),0) from user_job 
-        where job.id = user_job.job_id and job.event_id = event.id and {where}) 
+    (select coalesce(sum(user_job.positions),0) 
+        from user_job 
+        join user on user.id = user_job.user_id
+        where user.active = 1 and job.id = user_job.job_id and job.event_id = event.id and {where}) 
         as job_filled_positions,
     -- 1 if a volunteer job, else 0
     coalesce((select 1 from job_role where job_role.role_id in ({vol_role_ids}) and job_role.job_id = job.id),0) as is_volunteer_job
@@ -776,8 +785,10 @@ def get_job_rows(start_date=None,end_date=None,where='',user_skills=[],is_admin=
                     ##################
                     # set the number of positions the current user has for this job
                     sql = """
-                    select coalesce(sum(user_job.positions),0) as temp from user_job
-                    where user_job.user_id = {} and user_job.job_id = {}
+                    select coalesce(sum(user_job.positions),0) as temp 
+                    from user_job
+                    join user on user.id = user_job.user_id
+                    where user_job.user_id = {} and user_job.job_id = {} and user.active = 1
                     
                     """.format(user_id,job.job_id)
                     UJPos = UserJob(g.db).query(sql)
@@ -786,9 +797,11 @@ def get_job_rows(start_date=None,end_date=None,where='',user_skills=[],is_admin=
                         
                     # set the number of positions the current user has for the event this job is a part of
                     sql = """
-                    select coalesce(sum(user_job.positions),0) as temp from user_job
+                    select coalesce(sum(user_job.positions),0) as temp 
+                    from user_job
                     join job on job.id = user_job.job_id
-                    where user_job.user_id = {} and job.event_id = {}
+                    join user on user.id = user_job.user_id
+                    where user_job.user_id = {} and job.event_id = {} and user.active = 1
                     """.format(user_id,job.event_id)
                     UJPos = UserJob(g.db).query(sql)
                     if UJPos:
