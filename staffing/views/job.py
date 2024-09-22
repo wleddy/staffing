@@ -92,7 +92,6 @@ def edit(id=0,event_id=0,edit_from_list=False):
             flash("{} Record Not Found".format(job.display_name))
             return redirect(g.listURL)
         event_id = rec.event_id
-        #slots_filled = job.slots_filled(rec.id)
         
     else:
         rec = job.new()
@@ -162,14 +161,6 @@ def edit(id=0,event_id=0,edit_from_list=False):
             skills_list=skills_list,
             )
     
-    return render_template(template,rec=rec,
-            roles=roles,
-            current_event=current_event,
-            locations=locations,
-            slots_filled=slots_filled,
-            users=users,
-            skills_list=skills_list,
-            )
             
                 
 @mod.route('/delete/',methods=['GET','POST',])
