@@ -666,16 +666,22 @@ def get_job_rows(start_date=None,end_date=None,where='',user_skills=[],is_admin=
     # then query each event for it's jobs and append those jobs that meet criteria to the output
 
     out = [] 
-  
+    
+    # # print(where)
+    from time import time
+    timer_start = time()
+    # print(time()-timer_start)
+
     events = Event(g.db).query(f"""select event.id,
-                                   (select min(job.start_date) from job join event on event.id = job.event_id where event.activity_id = activity.id and {where}) as activity_first_date, 
+                                min(event.event_start_date) as event_first_date,
                                 (select activity.title from activity where activity.id = event.activity_id) as activity_title
                                 from event 
                                 join activity on activity.id = event.activity_id
-                               where date(event_start_date,'localtime') >= date('{start_date}','localtime') 
-                               and  date(event_end_date,'localtime') <= date('{end_date}','localtime')
+                                join job on job.event_id = event.id
+                                where {where}
                                group by event.id 
-                               order by activity_first_date, activity_title, event.id""")
+                               order by event_first_date, activity_title""")
+    # print("event query",time()-timer_start)
     if events:
         for event in events:
             job_where = where + f" and event_id = {event.id}"
@@ -687,9 +693,10 @@ def get_job_rows(start_date=None,end_date=None,where='',user_skills=[],is_admin=
                         vol_role_ids=vol_role_ids,
                         today=date_to_string(local_datetime_now(),'iso_date_tz'),
                     )
-            #print(sql)
+            # print(sql)
             #import pdb;pdb.set_trace()            
             jobs = Job(g.db).query(sql)
+            # print("jobs query:",time()-timer_start)
 
             last_activity_id = 0
             dates_list = []
@@ -808,6 +815,8 @@ def get_job_rows(start_date=None,end_date=None,where='',user_skills=[],is_admin=
                         job.user_event_positions = UJPos[0].temp
 
                 out.extend(jobs)
+                # print("loop out:",time()-timer_start)
+
     return out
     
     
