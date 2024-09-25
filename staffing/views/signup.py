@@ -119,11 +119,14 @@ def display():
     end_date = None # forever...
     
     where = ''
+    group_by = "activity.id"
+    # group_by = ""
     activity_id = g.get('_more_info_activity_id',0)
     if activity_id:
         where = 'activity.id = {}'.format(activity_id)
-    
-    jobs = get_job_rows(start_date,end_date,where,user_skills,is_admin)
+        group_by = "event.id"
+
+    jobs = get_job_rows(start_date,end_date,where,user_skills,is_admin,group_by=group_by)
             
     return render_template('signup_list.html',jobs=jobs,is_admin=is_admin)
         
@@ -607,15 +610,17 @@ def get_job_rows(start_date=None,end_date=None,where='',user_skills=[],is_admin=
     (select min(job.start_date) from job join event on event.id = job.event_id where event.activity_id = activity.id and {where}) as activity_first_date, 
     -- the number of positions filled in this event
     (select coalesce(sum(user_job.positions),0) from user_job
-        join user on user.id = user_job.user_id
-        where user.active = 1 and user_job.job_id in (select id from job where job.event_id = event.id and {where} )) as event_filled_positions,
+        -- join user on user.id = user_job.user_id
+        -- where user.active = 1 and user_job.job_id in (select id from job where job.event_id = event.id and {where} )) as event_filled_positions,
+        where user_job.job_id in (select id from job where job.event_id = event.id and {where} )) as event_filled_positions,
     -- the total positions for this event
     (select coalesce(sum(job.max_positions),1) from job 
         where job.event_id = event.id and {where}) as event_max_positions,
     -- the number of positions filled in this activity
     (select coalesce(sum(user_job.positions),0) from user_job
-        join user on user.id = user_job.user_id
-        where user.active = 1 and user_job.job_id in (select id from job where job.event_id in (select event.id from event where event.activity_id = activity.id) and {where} )) as activity_filled_positions,
+        -- join user on user.id = user_job.user_id
+        -- where user.active = 1 and user_job.job_id in (select id from job where job.event_id in (select event.id from event where event.activity_id = activity.id) and {where} )) as activity_filled_positions,
+        where user_job.job_id in (select id from job where job.event_id in (select event.id from event where event.activity_id = activity.id) and {where} )) as activity_filled_positions,
     -- the total positions for this activity
     (select coalesce(sum(job.max_positions),1) from job 
         where job.event_id in (select event.id from event where event.activity_id = activity.id ) and {where}) as activity_max_positions,
@@ -654,10 +659,10 @@ def get_job_rows(start_date=None,end_date=None,where='',user_skills=[],is_admin=
     join activity on activity.id = event.activity_id
     left join client on client.id = event.client_id
     where {where}
-    {group_by}
+    -- {group_by}
     order by {order_by}
     """
-
+    
     #### Modified 9/4/24 - BL
     #### Trying to resove the issue where 2 events for the same activity
     #### occur on the same day and where their times overlap causes job records
@@ -668,21 +673,21 @@ def get_job_rows(start_date=None,end_date=None,where='',user_skills=[],is_admin=
     out = [] 
     
     # # print(where)
-    from time import time
-    timer_start = time()
-    # print(time()-timer_start)
-
-    events = Event(g.db).query(f"""select event.id,
+    event_list_sql = f"""select event.id,
                                 min(event.event_start_date) as event_first_date,
                                 (select activity.title from activity where activity.id = event.activity_id) as activity_title
                                 from event 
                                 join activity on activity.id = event.activity_id
                                 join job on job.event_id = event.id
                                 where {where}
-                               group by event.id 
-                               order by event_first_date, activity_title""")
-    # print("event query",time()-timer_start)
+                               {group_by} 
+                               order by event_first_date, activity_title"""
+    # print(event_list_sql)
+    events = Event(g.db).query(event_list_sql)
+
     if events:
+        # import pdb; pdb.set_trace()
+
         for event in events:
             job_where = where + f" and event_id = {event.id}"
 
@@ -693,10 +698,7 @@ def get_job_rows(start_date=None,end_date=None,where='',user_skills=[],is_admin=
                         vol_role_ids=vol_role_ids,
                         today=date_to_string(local_datetime_now(),'iso_date_tz'),
                     )
-            # print(sql)
-            #import pdb;pdb.set_trace()            
             jobs = Job(g.db).query(sql)
-            # print("jobs query:",time()-timer_start)
 
             last_activity_id = 0
             dates_list = []
@@ -707,6 +709,14 @@ def get_job_rows(start_date=None,end_date=None,where='',user_skills=[],is_admin=
                     if job.activity_id != last_activity_id:
                         last_activity_id = job.activity_id
                         
+                        # # Set the total number of slots available for this actvity
+                        # slots_sql = f"""select coalesce(sum(job.max_positions),0) as slots from job 
+                        #     join event on event.id = job.event_id
+                        #     join activity on activity.id = event.activity_id
+                        #     where job.event_id in (select id from event where event.activity_id = activity.id and {where})"""
+                        # job_slots = Job(g.db).query_one(slots_sql)
+                        # job.activity_max_positions = job_slots.slots
+
                         # need to set this each time the activity changes in the list
                         activity_location_name = 'tbd'
                         activity_locations = get_activity_location_list(job.activity_id,where)
@@ -815,7 +825,6 @@ def get_job_rows(start_date=None,end_date=None,where='',user_skills=[],is_admin=
                         job.user_event_positions = UJPos[0].temp
 
                 out.extend(jobs)
-                # print("loop out:",time()-timer_start)
 
     return out
     
