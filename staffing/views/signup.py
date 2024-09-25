@@ -480,7 +480,7 @@ def get_job_rows(start_date=None,end_date=None,where='',user_skills=[],is_admin=
     
     site_config = get_site_config()
     
-    #import pdb;pdb.set_trace()
+    # import pdb;pdb.set_trace()
     user_id = session.get('user_id',0)
     
     # from this point, use date strings
@@ -685,9 +685,9 @@ def get_job_rows(start_date=None,end_date=None,where='',user_skills=[],is_admin=
     # print(event_list_sql)
     events = Event(g.db).query(event_list_sql)
 
-    if events:
-        # import pdb; pdb.set_trace()
+    # import pdb; pdb.set_trace()
 
+    if events and events[0].id: # Test that events is not an empty record
         for event in events:
             job_where = where + f" and event_id = {event.id}"
 
