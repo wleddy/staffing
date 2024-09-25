@@ -687,7 +687,10 @@ def get_job_rows(start_date=None,end_date=None,where='',user_skills=[],is_admin=
 
     # import pdb; pdb.set_trace()
 
-    if events and events[0].id: # Test that events is not an empty record
+    # The max() aggrigate function returns row with null values
+    #   event if no records match the where clause
+    # Test that events is not an empty record
+    if events and events[0].id: 
         for event in events:
             job_where = where + f" and event_id = {event.id}"
 
