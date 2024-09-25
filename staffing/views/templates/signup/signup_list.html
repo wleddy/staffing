@@ -66,15 +66,16 @@
                     {% set width_pct = filled_positions | default(0,True) / max_positions * 74 %}
                     {% if width_pct > 100 %}{% set width_pct = 100 %}{% endif %}
                     {% if width_pct > 25.0 %}
-                    <p>Filled: 
+                    <!-- hide this for now -->
+                    <!-- <p>Filled: 
                         <a class="w3-button w3-primary-color w3-round-medium filled-bar" style="width:{{ width_pct }}%;"
                         >{{ filled_positions | default("0", True) }} of {{ max_positions | default("0", True) }}</a>
-                    </p>
+                    </p> -->
                     {% else %}
-                    <p>Filled: 
+                    <!-- <p>Filled: 
                         <a class="w3-button w3-primary-color w3-round-medium filled-bar" style="width:{{ width_pct }}%;">&nbsp;</a>
                         &nbsp;{{ filled_positions | default("0", True) }} of {{ max_positions | default("0", True) }}
-                    </p>
+                    </p> -->
                     {% endif %}
                     {% if not g._more_info_activity_id %}
                         <p style="margin-top:10pt;" >
