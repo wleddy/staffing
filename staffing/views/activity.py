@@ -223,12 +223,16 @@ def get_event_recs(activity_id=None,**kwargs):
           LIMIT 1
          ),
      0) as is_yours,
-     coalesce(event.client_website,client.website,'') website
+     coalesce(event.client_website,client.website,'') website,
+     activity_group.name as activity_group_name,
+     activity_group.display_style as activity_group_style
 
     
     
     from event
     join activity on activity.id = event.activity_id
+    join activity_type on activity_type.id = activity.activity_type_id
+    join activity_group on activity_group.id = activity_type.activity_group_id
     left join job on event.id = job.event_id
     left join location on event_location_id = location.id
     left join client on event.client_id = client.id

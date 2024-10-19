@@ -25,10 +25,11 @@
                 <p style="padding:6pt;border:2pt solid black;margin:6pt 12pt 6pt 0;text-align:center;" ><strong>You are signed up for this event.</strong>
                     &nbsp;&nbsp;&nbsp;<a class="w3-button w3-primary-color w3-mobile w3-round-large" href="{{ direct_url }}">View Your Commitment</a></p>
             {% endif %}
-            <h3>
+            <h3 style="margin-bottom:auto:">
                 <strong>{{ event.calendar_title}}</strong>
                 {% if g.admin.has_access(g.user,'Events') %}<a href="{{ url_for('event.edit')}}{{ event.event_id }}/"><em class="w3-small">(Edit Event)</em></a>{% endif %}
             </h3>
+            <p class="{{event.activity_group_style}}" style="width:fit-content;padding:0 4px;margin-bottom: 6pt;"><strong>{{event.activity_group_name}}</strong></p>
             {% if map_html %}
             <div class="sg-cal-event-desc">
                 {{ event.event_description | render_markdown }}
